@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>МСВ — Шахматка заселения (демо)</title>
+<link rel="stylesheet" href="shahmatka.css">
+<style>
+  body {
+    margin: 0;
+    padding: 24px;
+    background: #F0F3F7;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  }
+  .wrap { max-width: 1400px; margin: 0 auto; }
+  .note {
+    margin: 0 0 16px;
+    padding: 12px 14px;
+    background: #fff;
+    border: 1px solid #E3E8EF;
+    border-left: 3px solid #FB344A;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #4A5769;
+  }
+  #shahmatka { height: 640px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="note">
+    Демонстрационная страница с вымышленными данными. Наведите курсор на фамилию —
+    появится краткая справка. Щёлкните по полосе — справа выедет карточка проживающего.
+  </p>
+  <div id="shahmatka"></div>
+</div>
+
+<script src="shahmatka.js"></script>
+<script>
+/* Тестовые данные. Даты считаются от текущего месяца, чтобы демо
+   не устаревало со временем. */
+(function () {
+  function iso(offsetDays) {
+    var n = new Date();
+    var t = Date.UTC(n.getFullYear(), n.getMonth(), 1) + offsetDays * 86400000;
+    var d = new Date(t);
+    return d.getUTCFullYear() + '-' +
+      String(d.getUTCMonth() + 1).padStart(2, '0') + '-' +
+      String(d.getUTCDate()).padStart(2, '0');
+  }
+
+  var data = {
+    buildings: [
+      { id: 'b1', name: 'Блаватская' },
+      { id: 'b2', name: 'Тарковский' }
+    ],
+    rooms: [
+      { id: 'r1', buildingId: 'b1', number: '5', name: 'Комната 5', gender: 'ж' },
+      { id: 'r2', buildingId: 'b1', number: '7', name: 'Комната 7', gender: 'ж' },
+      { id: 'r3', buildingId: 'b2', number: '9', name: 'Комната 9', gender: 'м' }
+    ],
+    beds: [
+      { id: 'p1', roomId: 'r1', label: '5.1.н', tier: 'нижнее' },
+      { id: 'p2', roomId: 'r1', label: '5.2.в', tier: 'верхнее' },
+      { id: 'p3', roomId: 'r2', label: '7.1.н', tier: 'нижнее' },
+      { id: 'p4', roomId: 'r2', label: '7.2.в', tier: 'верхнее' },
+      { id: 'p5', roomId: 'r3', label: '9.1.н', tier: 'нижнее' },
+      { id: 'p6', roomId: 'r3', label: '9.2.в', tier: 'верхнее' }
+    ],
+    residents: [
+      { id: 'u1', name: 'Высоцкая Полина Денисовна', phone: '+7 961 591-39-36',
+        birthday: '2009-02-25', docsSigned: true, city: 'Краснодар, Россия',
+        university: 'Колледж РАНХиГС', program: 'Экономика и бухгалтерский учет',
+        contactPerson: 'Высоцкий Денис Вячеславович, +7 964 901-51-85',
+        vk: 'https://vk.com/polinnav' },
+      { id: 'u2', name: 'Крякова Анна Сергеевна', phone: '+7 903 111-22-33',
+        birthday: '2007-11-04', docsSigned: false, city: 'Тула, Россия',
+        university: 'МИБиУ', program: 'Менеджмент',
+        contactPerson: 'Крякова Ольга Ивановна, +7 903 111-22-30', vk: 'vk.com/anna_kr' },
+      { id: 'u3', name: 'Чекючоглу Суде', phone: '+7 999 555-22-22',
+        birthday: '2006-06-14', docsSigned: true, city: 'Стамбул, Турция',
+        university: 'МГМУ им. Сеченова', program: 'Лечебное дело',
+        contactPerson: '', vk: '' },
+      { id: 'u4', name: 'Черкасов Матвей Игоревич', phone: '+7 926 127-39-11',
+        birthday: '2005-01-30', docsSigned: true, city: 'Москва, Россия',
+        university: 'РУДН', program: 'Юриспруденция',
+        contactPerson: 'Черкасова Ирина Петровна, +7 926 127-39-12', vk: '' },
+      { id: 'u5', name: 'Курт-оглы Яна', phone: '+7 917 000-11-22',
+        birthday: '2008-09-09', docsSigned: false, city: 'Казань, Россия',
+        university: 'ВШЭ', program: 'Реклама и связи с общественностью',
+        contactPerson: '', vk: '' }
+    ],
+    bookings: [
+      { id: 'bk1', bedId: 'p1', residentId: 'u1', from: iso(-20), to: iso(300),
+        source: 'От стойки', tariff: 'Оплата от месяца', accrued: 37760, paid: 37760,
+        bookedAt: iso(-40), note: '' },
+      { id: 'bk2', bedId: 'p2', residentId: 'u2', from: iso(2), to: iso(120),
+        source: 'Сайт', tariff: 'Оплата от месяца', accrued: 33040, paid: 20000,
+        bookedAt: iso(-5), note: 'долг по депозиту 1660 руб.' },
+      { id: 'bk3', bedId: 'p3', residentId: 'u3', from: iso(-60), to: iso(4),
+        source: 'От стойки', tariff: 'Оплата от месяца', accrued: 33040, paid: 33040,
+        bookedAt: iso(-70), note: '' },
+      { id: 'bk4', bedId: 'p3', residentId: 'u5', from: iso(6), to: iso(200),
+        source: 'Сайт', tariff: 'Оплата от месяца', accrued: 31380, paid: 0,
+        bookedAt: iso(0), note: '' },
+      { id: 'bk5', bedId: 'p5', residentId: 'u4', from: iso(-90), to: iso(-2),
+        source: 'От стойки', tariff: 'Оплата от месяца', accrued: 31380, paid: 31380,
+        bookedAt: iso(-100), note: '' }
+    ],
+    payments: [
+      { id: 'pay1', residentId: 'u1', period: 'Август 2026', amount: 37760, date: iso(-14) },
+      { id: 'pay2', residentId: 'u1', period: 'Июль 2026', amount: 37760, date: iso(-45) },
+      { id: 'pay3', residentId: 'u1', period: 'Депозит', amount: 20000, date: iso(-80), kind: 'Депозит' },
+      { id: 'pay4', residentId: 'u2', period: 'Депозит', amount: 20000, date: iso(-3), kind: 'Депозит' },
+      { id: 'pay5', residentId: 'u3', period: 'Август 2026', amount: 33040, date: iso(-12) },
+      { id: 'pay6', residentId: 'u4', period: 'Июль 2026', amount: 31380, date: iso(-50) }
+    ]
+  };
+
+  window.sh = MSVShahmatka.mount('#shahmatka', data, {
+    title: 'Шахматка заселения',
+    days: 35,
+    onEdit: function (b) { alert('Здесь откроется форма редактирования брони ' + (b && b.id)); },
+    onOpenProfile: function (r) { alert('Здесь откроется профиль: ' + (r && r.name)); }
+  });
+})();
+</script>
+</body>
+</html>

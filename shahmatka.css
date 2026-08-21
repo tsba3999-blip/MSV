@@ -1,0 +1,622 @@
+/* ============================================================
+   МСВ — Шахматка заселения
+   Все классы начинаются с msv-sh-, чтобы не конфликтовать
+   с существующим styles.css проекта.
+   ============================================================ */
+
+.msv-sh {
+  --sh-accent: #FB344A;
+  --sh-accent-dark: #D91D33;
+  --sh-ink: #16202F;
+  --sh-muted: #6B7A90;
+  --sh-line: #E3E8EF;
+  --sh-line-soft: #EFF3F8;
+  --sh-bg: #FFFFFF;
+  --sh-bg-alt: #F6F8FB;
+  --sh-weekend: #EEF2F8;
+  --sh-today: rgba(251, 52, 74, .55);
+
+  --sh-booked-bg: #E8F0FF;
+  --sh-booked-br: #A8C6FE;
+  --sh-booked-tx: #1B4C9E;
+
+  --sh-active-bg: #E4F6EC;
+  --sh-active-br: #97D6B6;
+  --sh-active-tx: #1B6B45;
+
+  --sh-debt-bg: #FFE7EB;
+  --sh-debt-br: #FFB3BF;
+  --sh-debt-tx: #B0142A;
+
+  --sh-leaving-bg: #FFF3DC;
+  --sh-leaving-br: #F2CE85;
+  --sh-leaving-tx: #8A5B00;
+
+  --sh-done-bg: #EEF1F5;
+  --sh-done-br: #CBD3DE;
+  --sh-done-tx: #5A6779;
+
+  --sh-left-w: 240px;
+  --sh-day-w: 40px;
+  --sh-row-h: 30px;
+  --sh-head-h: 52px;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 320px;
+  color: var(--sh-ink);
+  background: var(--sh-bg);
+  border: 1px solid var(--sh-line);
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+.msv-sh *,
+.msv-sh *::before,
+.msv-sh *::after { box-sizing: border-box; }
+
+/* ---------- Панель инструментов ---------- */
+
+.msv-sh__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--sh-line);
+  background: var(--sh-bg);
+}
+
+.msv-sh__title {
+  margin: 0 8px 0 0;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+}
+
+.msv-sh__spacer { flex: 1 1 auto; }
+
+.msv-sh__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 12px;
+  font: inherit;
+  font-weight: 600;
+  color: var(--sh-ink);
+  background: var(--sh-bg);
+  border: 1px solid var(--sh-line);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease;
+}
+
+.msv-sh__btn:hover { background: var(--sh-bg-alt); border-color: #CFD8E3; }
+.msv-sh__btn:focus-visible { outline: 2px solid var(--sh-accent); outline-offset: 2px; }
+.msv-sh__btn[aria-pressed="true"] {
+  color: #fff;
+  background: var(--sh-accent);
+  border-color: var(--sh-accent);
+}
+
+.msv-sh__btn--icon { width: 32px; padding: 0; font-size: 15px; }
+
+.msv-sh__date,
+.msv-sh__search {
+  min-height: 32px;
+  padding: 0 10px;
+  font: inherit;
+  color: var(--sh-ink);
+  background: var(--sh-bg);
+  border: 1px solid var(--sh-line);
+  border-radius: 8px;
+}
+
+.msv-sh__search { width: 220px; }
+.msv-sh__date:focus-visible,
+.msv-sh__search:focus-visible { outline: 2px solid var(--sh-accent); outline-offset: 1px; }
+
+.msv-sh__zoom { display: inline-flex; }
+.msv-sh__zoom .msv-sh__btn { border-radius: 0; margin-left: -1px; }
+.msv-sh__zoom .msv-sh__btn:first-child { border-radius: 8px 0 0 8px; margin-left: 0; }
+.msv-sh__zoom .msv-sh__btn:last-child { border-radius: 0 8px 8px 0; }
+
+/* ---------- Легенда ---------- */
+
+.msv-sh__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--sh-line);
+  background: var(--sh-bg-alt);
+  color: var(--sh-muted);
+  font-size: 12px;
+}
+
+.msv-sh__legend-item { display: inline-flex; align-items: center; gap: 6px; }
+
+.msv-sh__swatch {
+  width: 14px;
+  height: 10px;
+  border-radius: 3px;
+  border: 1px solid transparent;
+}
+
+/* ---------- Прокручиваемая область ---------- */
+
+.msv-sh__scroll {
+  position: relative;
+  flex: 1 1 auto;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.msv-sh__canvas { position: relative; width: max-content; min-width: 100%; }
+
+/* ---------- Шапка с датами ---------- */
+
+.msv-sh__head {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  background: var(--sh-bg);
+  box-shadow: 0 1px 0 var(--sh-line);
+}
+
+.msv-sh__head-left {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  flex: 0 0 var(--sh-left-w);
+  width: var(--sh-left-w);
+  display: flex;
+  align-items: flex-end;
+  padding: 0 12px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--sh-muted);
+  background: var(--sh-bg);
+  border-right: 1px solid var(--sh-line);
+}
+
+.msv-sh__head-track { position: relative; flex: 0 0 auto; }
+
+.msv-sh__months { display: flex; height: 24px; }
+
+.msv-sh__month {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--sh-muted);
+  border-right: 1px solid var(--sh-line);
+  border-bottom: 1px solid var(--sh-line-soft);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.msv-sh__days { display: flex; height: 28px; }
+
+.msv-sh__day {
+  flex: 0 0 var(--sh-day-w);
+  width: var(--sh-day-w);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--sh-line-soft);
+  font-size: 11px;
+  line-height: 1.15;
+}
+
+.msv-sh__day b { font-size: 12px; font-weight: 700; }
+.msv-sh__day span { color: var(--sh-muted); font-size: 10px; }
+.msv-sh__day--weekend { background: var(--sh-weekend); }
+.msv-sh__day--today b { color: var(--sh-accent); }
+.msv-sh__day--today span { color: var(--sh-accent); }
+
+/* ---------- Тело сетки ---------- */
+
+.msv-sh__body { position: relative; }
+
+.msv-sh__underlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--sh-left-w);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.msv-sh__band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--sh-weekend);
+}
+
+.msv-sh__nowline {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--sh-today);
+  z-index: 1;
+}
+
+/* ---------- Строки ---------- */
+
+.msv-sh__group {
+  position: sticky;
+  left: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 32px;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--sh-ink);
+  background: var(--sh-bg-alt);
+  border-top: 1px solid var(--sh-line);
+  border-bottom: 1px solid var(--sh-line);
+}
+
+.msv-sh__group-count {
+  padding: 1px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--sh-muted);
+  background: var(--sh-bg);
+  border: 1px solid var(--sh-line);
+  border-radius: 20px;
+}
+
+.msv-sh__row {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid var(--sh-line-soft);
+}
+
+.msv-sh__row:hover .msv-sh__cell { background: #FAFBFD; }
+
+.msv-sh__cell {
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  flex: 0 0 var(--sh-left-w);
+  width: var(--sh-left-w);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  background: var(--sh-bg);
+  border-right: 1px solid var(--sh-line);
+  transition: background .12s ease;
+}
+
+.msv-sh__bed { font-weight: 700; font-size: 12px; white-space: nowrap; }
+
+.msv-sh__room {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--sh-muted);
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.msv-sh__tag {
+  flex: 0 0 auto;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 4px;
+  background: var(--sh-bg-alt);
+  color: var(--sh-muted);
+  border: 1px solid var(--sh-line);
+}
+
+.msv-sh__tag--f { color: #A3316B; background: #FCEBF3; border-color: #F3C9DD; }
+.msv-sh__tag--m { color: #1B4C9E; background: #E8F0FF; border-color: #C3D8FE; }
+
+.msv-sh__track { position: relative; flex: 0 0 auto; z-index: 1; }
+
+/* ---------- Полосы проживания ---------- */
+
+.msv-sh__bar {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 8px;
+  border: 1px solid;
+  border-radius: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+  transition: filter .12s ease, box-shadow .12s ease;
+}
+
+.msv-sh__bar:hover { filter: brightness(.96); box-shadow: 0 2px 6px rgba(22,32,47,.16); }
+.msv-sh__bar:focus-visible { outline: 2px solid var(--sh-accent); outline-offset: 1px; }
+.msv-sh__bar--selected { box-shadow: 0 0 0 2px var(--sh-accent); }
+
+.msv-sh__bar-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 2px;
+}
+
+.msv-sh__bar-sub { font-weight: 400; opacity: .78; overflow: hidden; text-overflow: ellipsis; }
+
+.msv-sh__bar--booked  { background: var(--sh-booked-bg);  border-color: var(--sh-booked-br);  color: var(--sh-booked-tx); }
+.msv-sh__bar--active  { background: var(--sh-active-bg);  border-color: var(--sh-active-br);  color: var(--sh-active-tx); }
+.msv-sh__bar--debt    { background: var(--sh-debt-bg);    border-color: var(--sh-debt-br);    color: var(--sh-debt-tx); }
+.msv-sh__bar--leaving { background: var(--sh-leaving-bg); border-color: var(--sh-leaving-br); color: var(--sh-leaving-tx); }
+.msv-sh__bar--done    { background: var(--sh-done-bg);    border-color: var(--sh-done-br);    color: var(--sh-done-tx); }
+
+/* обрезка полосы, уходящей за границу видимого периода */
+.msv-sh__bar--cut-left  { border-left-width: 0;  border-top-left-radius: 0;  border-bottom-left-radius: 0; }
+.msv-sh__bar--cut-right { border-right-width: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; }
+
+.msv-sh__bar-dot {
+  flex: 0 0 auto;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ---------- Пустое состояние ---------- */
+
+.msv-sh__empty {
+  position: sticky;
+  left: 0;
+  width: 100%;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--sh-muted);
+}
+
+.msv-sh__empty b { display: block; margin-bottom: 4px; color: var(--sh-ink); font-size: 14px; }
+
+/* ---------- Подсказка при наведении (скрин 4) ---------- */
+
+.msv-sh-tip {
+  position: fixed;
+  z-index: 9999;
+  max-width: 320px;
+  padding: 10px 12px;
+  background: #10161F;
+  color: #F2F5F9;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(10,16,24,.32);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.45;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-2px);
+  transition: opacity .12s ease, transform .12s ease;
+}
+
+.msv-sh-tip--on { opacity: 1; transform: translateY(0); }
+.msv-sh-tip:not(.msv-sh-tip--on) { pointer-events: none; }
+.msv-sh-tip ul { margin: 0; padding: 0 0 0 14px; list-style: disc; }
+.msv-sh-tip li { margin: 0 0 2px; }
+.msv-sh-tip li:last-child { margin-bottom: 0; }
+.msv-sh-tip b { color: #fff; font-weight: 600; }
+.msv-sh-tip .msv-sh-tip__debt { color: #FF8E9D; font-weight: 700; }
+
+/* ---------- Выезжающая панель (скрин 2 + структура скрина 3) ---------- */
+
+.msv-sh__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  background: rgba(16,22,31,.28);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease;
+}
+
+.msv-sh__scrim--on { opacity: 1; pointer-events: auto; }
+
+.msv-sh__panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  width: 380px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--sh-bg);
+  border-left: 1px solid var(--sh-line);
+  box-shadow: -12px 0 32px rgba(16,22,31,.14);
+  transform: translateX(100%);
+  transition: transform .24s cubic-bezier(.22,.61,.36,1);
+}
+
+.msv-sh__panel--on { transform: translateX(0); }
+
+.msv-sh__panel-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 14px 12px;
+  border-bottom: 1px solid var(--sh-line);
+}
+
+.msv-sh__panel-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.msv-sh__panel-close {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--sh-muted);
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.msv-sh__panel-close:hover { background: var(--sh-bg-alt); color: var(--sh-ink); }
+.msv-sh__panel-close:focus-visible { outline: 2px solid var(--sh-accent); outline-offset: 2px; }
+
+.msv-sh__panel-body { flex: 1 1 auto; overflow: auto; padding: 0 0 12px; }
+
+.msv-sh__sect { padding: 14px; border-bottom: 1px solid var(--sh-line-soft); }
+.msv-sh__sect:last-child { border-bottom: 0; }
+
+.msv-sh__ident { display: flex; align-items: center; gap: 12px; }
+
+.msv-sh__avatar {
+  flex: 0 0 auto;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--sh-bg-alt);
+  border: 1px solid var(--sh-line);
+}
+
+.msv-sh__avatar--ph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--sh-muted);
+}
+
+.msv-sh__ident-name { font-size: 15px; font-weight: 700; }
+.msv-sh__ident-sub { margin-top: 2px; color: var(--sh-muted); font-size: 12px; }
+
+.msv-sh__badge {
+  display: inline-block;
+  padding: 2px 9px;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+
+.msv-sh__badge--booked  { background: var(--sh-booked-bg);  border-color: var(--sh-booked-br);  color: var(--sh-booked-tx); }
+.msv-sh__badge--active  { background: var(--sh-active-bg);  border-color: var(--sh-active-br);  color: var(--sh-active-tx); }
+.msv-sh__badge--debt    { background: var(--sh-debt-bg);    border-color: var(--sh-debt-br);    color: var(--sh-debt-tx); }
+.msv-sh__badge--leaving { background: var(--sh-leaving-bg); border-color: var(--sh-leaving-br); color: var(--sh-leaving-tx); }
+.msv-sh__badge--done    { background: var(--sh-done-bg);    border-color: var(--sh-done-br);    color: var(--sh-done-tx); }
+
+.msv-sh__field { margin-bottom: 12px; }
+.msv-sh__field:last-child { margin-bottom: 0; }
+.msv-sh__label { color: var(--sh-muted); font-size: 12px; margin-bottom: 2px; }
+.msv-sh__value { font-size: 13px; word-break: break-word; }
+.msv-sh__value--num { font-variant-numeric: tabular-nums; }
+.msv-sh__value a { color: var(--sh-accent); text-decoration: none; }
+.msv-sh__value a:hover { text-decoration: underline; }
+.msv-sh__value--empty { color: #9AA6B6; font-style: italic; }
+
+.msv-sh__pairs { display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; align-items: baseline; }
+.msv-sh__pairs dt { color: var(--sh-muted); font-size: 12px; margin: 0; }
+.msv-sh__pairs dd { margin: 0; font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
+.msv-sh__pairs dd.msv-sh__total { font-weight: 700; }
+.msv-sh__pairs dd.msv-sh__debt { color: var(--sh-accent); font-weight: 700; }
+.msv-sh__pairs dd.msv-sh__ok { color: #1B6B45; font-weight: 700; }
+
+.msv-sh__sect-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.msv-sh__sect-title { color: var(--sh-muted); font-size: 12px; }
+
+.msv-sh__pay { width: 100%; border-collapse: collapse; font-size: 12px; }
+.msv-sh__pay th {
+  text-align: left;
+  font-weight: 400;
+  color: var(--sh-muted);
+  padding: 0 0 6px;
+  border-bottom: 1px solid var(--sh-line-soft);
+}
+.msv-sh__pay th:nth-child(2), .msv-sh__pay td:nth-child(2) { text-align: right; }
+.msv-sh__pay th:nth-child(3), .msv-sh__pay td:nth-child(3) { text-align: right; }
+.msv-sh__pay td { padding: 7px 0; border-bottom: 1px solid var(--sh-line-soft); font-variant-numeric: tabular-nums; }
+.msv-sh__pay tr:last-child td { border-bottom: 0; }
+.msv-sh__pay td:nth-child(3) { color: var(--sh-muted); white-space: nowrap; }
+
+.msv-sh__panel-foot {
+  display: flex;
+  gap: 8px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--sh-line);
+  background: var(--sh-bg);
+}
+
+.msv-sh__panel-foot .msv-sh__btn--primary {
+  flex: 1 1 auto;
+  color: #fff;
+  background: var(--sh-accent);
+  border-color: var(--sh-accent);
+}
+
+.msv-sh__panel-foot .msv-sh__btn--primary:hover {
+  background: var(--sh-accent-dark);
+  border-color: var(--sh-accent-dark);
+}
+
+/* ---------- Адаптив ---------- */
+
+@media (max-width: 760px) {
+  .msv-sh { --sh-left-w: 150px; --sh-day-w: 34px; }
+  .msv-sh__panel { width: 100%; }
+  .msv-sh__search { width: 100%; }
+  .msv-sh__title { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .msv-sh *,
+  .msv-sh-tip { transition: none !important; }
+}
