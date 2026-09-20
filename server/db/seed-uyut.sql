@@ -13,20 +13,14 @@ INSERT INTO beds (id, room_id, label, tier, price) VALUES
   ('uyut-b1-2', 'uyut-r1', '1.2.в', 'верхнее', 24200),
   ('uyut-b1-3', 'uyut-r1', '1.3.н', 'нижнее', 27500),
   ('uyut-b1-4', 'uyut-r1', '1.4.н', 'нижнее', 27500),
-  ('uyut-b1-5', 'uyut-r1', '1.5.в', 'верхнее', 24200),
-  ('uyut-b1-6', 'uyut-r1', '1.6.н', 'нижнее', 27500),
-  ('uyut-b2-1', 'uyut-r2', '2.1', NULL, 24200),
-  ('uyut-b2-2', 'uyut-r2', '2.2', NULL, 24200),
+  ('uyut-b2-1', 'uyut-r2', '2.1.в', 'верхнее', 24200),
+  ('uyut-b2-2', 'uyut-r2', '2.2.в', 'верхнее', 24200),
   ('uyut-b2-3', 'uyut-r2', '2.3.н', 'нижнее', 27500),
   ('uyut-b2-4', 'uyut-r2', '2.4.н', 'нижнее', 27500),
-  ('uyut-b2-5', 'uyut-r2', '2.5', NULL, 24200),
-  ('uyut-b2-6', 'uyut-r2', '2.6', NULL, 24200),
-  ('uyut-b3-1', 'uyut-r3', '3.1', NULL, 24200),
-  ('uyut-b3-2', 'uyut-r3', '3.2', NULL, 24200),
+  ('uyut-b3-1', 'uyut-r3', '3.1.в', 'верхнее', 24200),
+  ('uyut-b3-2', 'uyut-r3', '3.2.в', 'верхнее', 24200),
   ('uyut-b3-3', 'uyut-r3', '3.3.н', 'нижнее', 27500),
   ('uyut-b3-4', 'uyut-r3', '3.4.н', 'нижнее', 27500),
-  ('uyut-b3-5', 'uyut-r3', '3.5', NULL, 24200),
-  ('uyut-b3-6', 'uyut-r3', '3.6', NULL, 24200),
   ('uyut-b4-1', 'uyut-r4', '4.1.в', 'верхнее', 35200),
   ('uyut-b4-2', 'uyut-r4', '4.2.н', 'нижнее', 38500),
   ('uyut-b6-1', 'uyut-r6', '6.1.в', 'верхнее', 24200),
@@ -89,7 +83,7 @@ INSERT INTO beds (id, room_id, label, tier, price) VALUES
   ('uyut-b17-4', 'uyut-r17', '17.4.н', 'нижнее', 27500)
 ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, tier = EXCLUDED.tier, price = EXCLUDED.price;
 -- Старые сгенерированные метки мест убираем, если на них нет броней
-DELETE FROM beds WHERE room_id LIKE 'uyut-r%' AND id NOT IN ('uyut-b1-1', 'uyut-b1-2', 'uyut-b1-3', 'uyut-b1-4', 'uyut-b1-5', 'uyut-b1-6', 'uyut-b2-1', 'uyut-b2-2', 'uyut-b2-3', 'uyut-b2-4', 'uyut-b2-5', 'uyut-b2-6', 'uyut-b3-1', 'uyut-b3-2', 'uyut-b3-3', 'uyut-b3-4', 'uyut-b3-5', 'uyut-b3-6', 'uyut-b4-1', 'uyut-b4-2', 'uyut-b6-1', 'uyut-b6-2', 'uyut-b6-3', 'uyut-b6-4', 'uyut-b7-1', 'uyut-b7-2', 'uyut-b7-3', 'uyut-b7-4', 'uyut-b8-1', 'uyut-b8-2', 'uyut-b8-3', 'uyut-b8-4', 'uyut-b9-1', 'uyut-b9-2', 'uyut-b9-3', 'uyut-b9-4', 'uyut-b10-1', 'uyut-b10-2', 'uyut-b11-1', 'uyut-b11-2', 'uyut-b11-3', 'uyut-b11-4', 'uyut-b11-5', 'uyut-b11-6', 'uyut-b12-1', 'uyut-b12-2', 'uyut-b12-3', 'uyut-b12-4', 'uyut-b12-5', 'uyut-b12-6', 'uyut-b12-7', 'uyut-b12-8', 'uyut-b12-9', 'uyut-b12-10', 'uyut-b12-11', 'uyut-b12-12', 'uyut-b13-1', 'uyut-b13-2', 'uyut-b13-3', 'uyut-b13-4', 'uyut-b14-1', 'uyut-b14-2', 'uyut-b15-1', 'uyut-b15-2', 'uyut-b15-3', 'uyut-b15-4', 'uyut-b16-1', 'uyut-b16-2', 'uyut-b16-3', 'uyut-b16-4', 'uyut-b16-5', 'uyut-b16-6', 'uyut-b16-7', 'uyut-b16-8', 'uyut-b17-1', 'uyut-b17-2', 'uyut-b17-3', 'uyut-b17-4') AND NOT EXISTS (SELECT 1 FROM bookings x WHERE x.bed_id = beds.id);
+DELETE FROM beds WHERE room_id LIKE 'uyut-r%' AND id NOT IN ('uyut-b1-1', 'uyut-b1-2', 'uyut-b1-3', 'uyut-b1-4', 'uyut-b2-1', 'uyut-b2-2', 'uyut-b2-3', 'uyut-b2-4', 'uyut-b3-1', 'uyut-b3-2', 'uyut-b3-3', 'uyut-b3-4', 'uyut-b4-1', 'uyut-b4-2', 'uyut-b6-1', 'uyut-b6-2', 'uyut-b6-3', 'uyut-b6-4', 'uyut-b7-1', 'uyut-b7-2', 'uyut-b7-3', 'uyut-b7-4', 'uyut-b8-1', 'uyut-b8-2', 'uyut-b8-3', 'uyut-b8-4', 'uyut-b9-1', 'uyut-b9-2', 'uyut-b9-3', 'uyut-b9-4', 'uyut-b10-1', 'uyut-b10-2', 'uyut-b11-1', 'uyut-b11-2', 'uyut-b11-3', 'uyut-b11-4', 'uyut-b11-5', 'uyut-b11-6', 'uyut-b12-1', 'uyut-b12-2', 'uyut-b12-3', 'uyut-b12-4', 'uyut-b12-5', 'uyut-b12-6', 'uyut-b12-7', 'uyut-b12-8', 'uyut-b12-9', 'uyut-b12-10', 'uyut-b12-11', 'uyut-b12-12', 'uyut-b13-1', 'uyut-b13-2', 'uyut-b13-3', 'uyut-b13-4', 'uyut-b14-1', 'uyut-b14-2', 'uyut-b15-1', 'uyut-b15-2', 'uyut-b15-3', 'uyut-b15-4', 'uyut-b16-1', 'uyut-b16-2', 'uyut-b16-3', 'uyut-b16-4', 'uyut-b16-5', 'uyut-b16-6', 'uyut-b16-7', 'uyut-b16-8', 'uyut-b17-1', 'uyut-b17-2', 'uyut-b17-3', 'uyut-b17-4') AND NOT EXISTS (SELECT 1 FROM bookings x WHERE x.bed_id = beds.id);
 
 WITH u AS (
   INSERT INTO users (role, name, phone, first_login) VALUES ('resident', 'Рудов Матвей', '+79508582208', now())
@@ -205,19 +199,6 @@ WITH u AS (
   INSERT INTO bookings (user_id, bed_id, date_from, date_to, source, tariff)
   SELECT id, 'uyut-b8-2', '2026-09-01', '2026-10-01', 'desk', 'Годовой контракт' FROM u
   WHERE NOT EXISTS (SELECT 1 FROM bookings x WHERE x.bed_id = 'uyut-b8-2' AND x.date_from < '2026-10-01'::date AND x.date_to > '2026-09-01'::date)
-  RETURNING id
-)
-INSERT INTO charges (booking_id, kind, period, amount, due_date) SELECT id, 'rent', '2026-09-01'::date, 24200, '2026-09-15'::date FROM b;
-WITH u AS (
-  INSERT INTO users (role, name, phone, first_login) VALUES ('resident', 'Дидыч Анна', '+79508982713', now())
-  ON CONFLICT (phone) DO UPDATE SET name = EXCLUDED.name RETURNING id
-), p AS (
-  INSERT INTO resident_profiles (user_id, last_name, first_name, middle_name, university, city, docs_signed_at)
-  SELECT id, 'Дидыч', 'Анна', NULL, 'ИСИ', NULL, '2026-09-01' FROM u ON CONFLICT (user_id) DO UPDATE SET university = EXCLUDED.university, city = EXCLUDED.city
-), b AS (
-  INSERT INTO bookings (user_id, bed_id, date_from, date_to, source, tariff)
-  SELECT id, 'uyut-b1-5', '2026-09-01', '2026-10-01', 'desk', 'Годовой контракт' FROM u
-  WHERE NOT EXISTS (SELECT 1 FROM bookings x WHERE x.bed_id = 'uyut-b1-5' AND x.date_from < '2026-10-01'::date AND x.date_to > '2026-09-01'::date)
   RETURNING id
 )
 INSERT INTO charges (booking_id, kind, period, amount, due_date) SELECT id, 'rent', '2026-09-01'::date, 24200, '2026-09-15'::date FROM b;
@@ -768,32 +749,6 @@ WITH u AS (
 )
 INSERT INTO charges (booking_id, kind, period, amount, due_date) SELECT id, 'rent', '2026-09-01'::date, 27500, '2026-09-15'::date FROM b;
 WITH u AS (
-  INSERT INTO users (role, name, phone, first_login) VALUES ('resident', 'Дуйшенова София', '+79035680818', now())
-  ON CONFLICT (phone) DO UPDATE SET name = EXCLUDED.name RETURNING id
-), p AS (
-  INSERT INTO resident_profiles (user_id, last_name, first_name, middle_name, university, city, docs_signed_at)
-  SELECT id, 'Дуйшенова', 'София', NULL, 'Синергия', 'Российская Федерация', '2026-09-01' FROM u ON CONFLICT (user_id) DO UPDATE SET university = EXCLUDED.university, city = EXCLUDED.city
-), b AS (
-  INSERT INTO bookings (user_id, bed_id, date_from, date_to, source, tariff)
-  SELECT id, 'uyut-b2-5', '2026-09-01', '2026-10-01', 'desk', 'Годовой контракт' FROM u
-  WHERE NOT EXISTS (SELECT 1 FROM bookings x WHERE x.bed_id = 'uyut-b2-5' AND x.date_from < '2026-10-01'::date AND x.date_to > '2026-09-01'::date)
-  RETURNING id
-)
-INSERT INTO charges (booking_id, kind, period, amount, due_date) SELECT id, 'rent', '2026-09-01'::date, 24200, '2026-09-15'::date FROM b;
-WITH u AS (
-  INSERT INTO users (role, name, phone, first_login) VALUES ('resident', 'Юдина Вероника', '+79293287628', now())
-  ON CONFLICT (phone) DO UPDATE SET name = EXCLUDED.name RETURNING id
-), p AS (
-  INSERT INTO resident_profiles (user_id, last_name, first_name, middle_name, university, city, docs_signed_at)
-  SELECT id, 'Юдина', 'Вероника', NULL, 'ИСИ', NULL, '2026-09-01' FROM u ON CONFLICT (user_id) DO UPDATE SET university = EXCLUDED.university, city = EXCLUDED.city
-), b AS (
-  INSERT INTO bookings (user_id, bed_id, date_from, date_to, source, tariff)
-  SELECT id, 'uyut-b1-6', '2026-09-01', '2026-10-01', 'desk', 'Годовой контракт' FROM u
-  WHERE NOT EXISTS (SELECT 1 FROM bookings x WHERE x.bed_id = 'uyut-b1-6' AND x.date_from < '2026-10-01'::date AND x.date_to > '2026-09-01'::date)
-  RETURNING id
-)
-INSERT INTO charges (booking_id, kind, period, amount, due_date) SELECT id, 'rent', '2026-09-01'::date, 27500, '2026-09-15'::date FROM b;
-WITH u AS (
   INSERT INTO users (role, name, phone, first_login) VALUES ('resident', 'Попов Максим', '+79517453773', now())
   ON CONFLICT (phone) DO UPDATE SET name = EXCLUDED.name RETURNING id
 ), p AS (
@@ -972,45 +927,6 @@ WITH u AS (
   INSERT INTO bookings (user_id, bed_id, date_from, date_to, source, tariff)
   SELECT id, 'uyut-b2-2', '2026-09-01', '2026-10-01', 'desk', 'Годовой контракт' FROM u
   WHERE NOT EXISTS (SELECT 1 FROM bookings x WHERE x.bed_id = 'uyut-b2-2' AND x.date_from < '2026-10-01'::date AND x.date_to > '2026-09-01'::date)
-  RETURNING id
-)
-INSERT INTO charges (booking_id, kind, period, amount, due_date) SELECT id, 'rent', '2026-09-01'::date, 24200, '2026-09-15'::date FROM b;
-WITH u AS (
-  INSERT INTO users (role, name, phone, first_login) VALUES ('resident', 'Володина Светлана', '+79683907099', now())
-  ON CONFLICT (phone) DO UPDATE SET name = EXCLUDED.name RETURNING id
-), p AS (
-  INSERT INTO resident_profiles (user_id, last_name, first_name, middle_name, university, city, docs_signed_at)
-  SELECT id, 'Володина', 'Светлана', NULL, 'МПК', NULL, '2026-09-01' FROM u ON CONFLICT (user_id) DO UPDATE SET university = EXCLUDED.university, city = EXCLUDED.city
-), b AS (
-  INSERT INTO bookings (user_id, bed_id, date_from, date_to, source, tariff)
-  SELECT id, 'uyut-b2-6', '2026-09-01', '2026-10-01', 'desk', 'Годовой контракт' FROM u
-  WHERE NOT EXISTS (SELECT 1 FROM bookings x WHERE x.bed_id = 'uyut-b2-6' AND x.date_from < '2026-10-01'::date AND x.date_to > '2026-09-01'::date)
-  RETURNING id
-)
-INSERT INTO charges (booking_id, kind, period, amount, due_date) SELECT id, 'rent', '2026-09-01'::date, 24200, '2026-09-15'::date FROM b;
-WITH u AS (
-  INSERT INTO users (role, name, phone, first_login) VALUES ('resident', 'Рахматуллина Надира', '+79172937943', now())
-  ON CONFLICT (phone) DO UPDATE SET name = EXCLUDED.name RETURNING id
-), p AS (
-  INSERT INTO resident_profiles (user_id, last_name, first_name, middle_name, university, city, docs_signed_at)
-  SELECT id, 'Рахматуллина', 'Надира', NULL, 'ИСИ', NULL, '2026-09-01' FROM u ON CONFLICT (user_id) DO UPDATE SET university = EXCLUDED.university, city = EXCLUDED.city
-), b AS (
-  INSERT INTO bookings (user_id, bed_id, date_from, date_to, source, tariff)
-  SELECT id, 'uyut-b3-5', '2026-09-01', '2026-10-01', 'desk', 'Годовой контракт' FROM u
-  WHERE NOT EXISTS (SELECT 1 FROM bookings x WHERE x.bed_id = 'uyut-b3-5' AND x.date_from < '2026-10-01'::date AND x.date_to > '2026-09-01'::date)
-  RETURNING id
-)
-INSERT INTO charges (booking_id, kind, period, amount, due_date) SELECT id, 'rent', '2026-09-01'::date, 24200, '2026-09-15'::date FROM b;
-WITH u AS (
-  INSERT INTO users (role, name, phone, first_login) VALUES ('resident', 'Лебедева Светлана', '+79969231000', now())
-  ON CONFLICT (phone) DO UPDATE SET name = EXCLUDED.name RETURNING id
-), p AS (
-  INSERT INTO resident_profiles (user_id, last_name, first_name, middle_name, university, city, docs_signed_at)
-  SELECT id, 'Лебедева', 'Светлана', NULL, 'МГИМО', 'Российская Федерация', '2026-09-01' FROM u ON CONFLICT (user_id) DO UPDATE SET university = EXCLUDED.university, city = EXCLUDED.city
-), b AS (
-  INSERT INTO bookings (user_id, bed_id, date_from, date_to, source, tariff)
-  SELECT id, 'uyut-b3-6', '2026-09-01', '2026-10-01', 'desk', 'Годовой контракт' FROM u
-  WHERE NOT EXISTS (SELECT 1 FROM bookings x WHERE x.bed_id = 'uyut-b3-6' AND x.date_from < '2026-10-01'::date AND x.date_to > '2026-09-01'::date)
   RETURNING id
 )
 INSERT INTO charges (booking_id, kind, period, amount, due_date) SELECT id, 'rent', '2026-09-01'::date, 24200, '2026-09-15'::date FROM b;
