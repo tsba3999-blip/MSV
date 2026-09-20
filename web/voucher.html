@@ -11,8 +11,11 @@
 <link rel="stylesheet" href="resident.css">
 <style>
   .paper { background: var(--msv-white); border-radius: var(--msv-r12); box-shadow: var(--msv-e1); padding: var(--msv-s24); margin-bottom: var(--msv-s16); }
-  .paper__brand { display: flex; align-items: center; justify-content: space-between; gap: var(--msv-s12); padding-bottom: var(--msv-s16); border-bottom: 2px solid var(--msv-red); margin-bottom: var(--msv-s16); }
-  .paper__mark { display: inline-block; padding: 4px 12px; background: var(--msv-red); color: var(--msv-white); font-weight: 700; letter-spacing: .04em; border-radius: 6px; transform: skewX(-14deg); }
+  /* Шапка ваучера — логотип МСВ из брендбука (белая подпись) на графитовой полосе.
+     Полоса заходит за края листа, чтобы логотип стоял на цветном поле от края до края. */
+  .paper__brand { display: flex; align-items: center; justify-content: space-between; gap: var(--msv-s12); margin: calc(var(--msv-s24) * -1) calc(var(--msv-s24) * -1) var(--msv-s20); padding: var(--msv-s16) var(--msv-s24); background: var(--msv-graphite); border-radius: var(--msv-r12) var(--msv-r12) 0 0; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .paper__logo { display: block; height: 36px; width: auto; }
+  .paper__brand .msv-note { color: var(--msv-n300); }
   .paper__title { margin: 0 0 var(--msv-s4); }
   .paper__no { color: var(--msv-n500); }
   .paper dl { margin: var(--msv-s16) 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: var(--msv-s12) var(--msv-s16); }
@@ -25,6 +28,7 @@
     .head, .foot, .tabbar, .msv-mark-btn, .edit-bar, .no-print { display: none !important; }
     .page { max-width: none; padding: 0; }
     .paper { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+    .paper__brand { border-radius: 0; }
   }
 </style>
 </head>
@@ -46,8 +50,8 @@
 
   <article class="paper" id="voucher">
     <div class="paper__brand">
-      <span class="paper__mark">МСВ</span>
-      <span class="msv-note">Москва в студентов верит!</span>
+      <img class="paper__logo" src="msv-1200-white.png" alt="МСВ — Москва в студентов верит!">
+      <span class="msv-note">ваучер на заселение</span>
     </div>
     <h2 class="msv-sub paper__title">Ваучер на заселение</h2>
     <p class="msv-note paper__no" id="vNo">№ 2026-0412 · выдан 08.07.2026</p>
