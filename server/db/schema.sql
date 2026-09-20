@@ -178,13 +178,19 @@ CREATE INDEX IF NOT EXISTS bookings_user_idx ON bookings(user_id);
 -- ровно то правило, по которому шахматка разрешает переселение.
 CREATE EXTENSION IF NOT EXISTS btree_gist;
 
+-- EXCLUDE создаёт индекс, поэтому при повторе ошибка не duplicate_object,
+-- а duplicate_table — проверяем наличие явно, чтобы deploy.sh проходил снова.
 DO $$ BEGIN
-  ALTER TABLE bookings ADD CONSTRAINT bookings_no_overlap
-    EXCLUDE USING gist (
-      bed_id WITH =,
-      daterange(date_from, date_to, '[)') WITH &&
-    );
-EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'bookings_no_overlap'
+  ) THEN
+    ALTER TABLE bookings ADD CONSTRAINT bookings_no_overlap
+      EXCLUDE USING gist (
+        bed_id WITH =,
+        daterange(date_from, date_to, '[)') WITH &&
+      );
+  END IF;
+END $$;
 
 -- ------------------------------------------------------------
 --  Деньги
