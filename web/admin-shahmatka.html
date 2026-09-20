@@ -64,6 +64,11 @@
     border-color: var(--msv-red);
   }
 
+  /* окно «Изменить бронь» */
+  .bk-modal { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: var(--msv-s16); background: rgba(52,73,94,.45); }
+  .bk-modal__card { width: 100%; max-width: 380px; padding: var(--msv-s20); background: var(--msv-white); border-radius: var(--msv-r20); box-shadow: var(--msv-e2); }
+  .bk-modal .msv-field { display: block; margin-bottom: var(--msv-s12); }
+
   @media (max-width: 860px) {
     .work__body--full { padding: var(--msv-s12); }
     .work__top { flex-wrap: wrap; }
@@ -226,11 +231,56 @@ MSV.ready(function (ctx) {
         })
         .catch(function () { alert('Сервер не отвечает. Переселение не сохранено.'); });
     },
+    /* Изменить бронь: даты заезда/выезда и место — сохраняется на сервере (PATCH /api/bookings/:id) */
     onEdit: function (b) {
-      alert('Здесь откроется форма брони ' + (b && b.id) + '. Сервер пока не подключён.');
+      if (!b) return;
+      if (!ctx.live) { alert('Без сервера бронь не изменить.'); return; }
+      var iso = function (ts) { return new Date(ts).toISOString().slice(0, 10); };
+      var box = document.createElement('div');
+      box.className = 'bk-modal';
+      box.innerHTML =
+        '<div class="bk-modal__card" role="dialog" aria-label="Изменить бронь">' +
+          '<h2 class="msv-sub" style="margin:0 0 var(--msv-s12)">Изменить бронь</h2>' +
+          '<label class="msv-field"><span class="msv-field__label">Место</span><select class="msv-input" id="bkBed"></select></label>' +
+          '<label class="msv-field"><span class="msv-field__label">Заезд</span><input class="msv-input" id="bkFrom" type="date"></label>' +
+          '<label class="msv-field"><span class="msv-field__label">Выезд</span><input class="msv-input" id="bkTo" type="date"></label>' +
+          '<p class="msv-note" id="bkErr" hidden style="color:var(--msv-red)"></p>' +
+          '<div style="display:flex;gap:var(--msv-s12);margin-top:var(--msv-s16)">' +
+            '<button class="msv-btn msv-btn--m msv-btn--primary" type="button" id="bkSave">Сохранить</button>' +
+            '<button class="msv-btn msv-btn--m msv-btn--tertiary" type="button" id="bkCancel">Отмена</button>' +
+          '</div>' +
+        '</div>';
+      document.body.appendChild(box);
+      var sel = box.querySelector('#bkBed');
+      res.beds.forEach(function (bed) {
+        var room = res.rooms.filter(function (r) { return r.id === bed.roomId; })[0];
+        var o = document.createElement('option'); o.value = bed.id;
+        o.textContent = (room ? room.name + ' · ' : '') + bed.label + (bed.tier ? ' (' + bed.tier + ')' : '');
+        if (bed.id === b.bedId) o.selected = true;
+        sel.appendChild(o);
+      });
+      box.querySelector('#bkFrom').value = iso(b.from);
+      box.querySelector('#bkTo').value = iso(b.to);
+      function close() { box.remove(); }
+      box.querySelector('#bkCancel').addEventListener('click', close);
+      box.addEventListener('click', function (e) { if (e.target === box) close(); });
+      box.querySelector('#bkSave').addEventListener('click', function () {
+        var bedId = sel.value, from = box.querySelector('#bkFrom').value, to = box.querySelector('#bkTo').value;
+        var err = box.querySelector('#bkErr');
+        if (!from || !to || to <= from) { err.textContent = 'Выезд должен быть позже заезда.'; err.hidden = false; return; }
+        ctx.api('PATCH', '/api/bookings/' + encodeURIComponent(b.id), { bedId: bedId, from: from, to: to })
+          .then(function (r) {
+            if (r.status !== 200) { err.textContent = (r.body && r.body.error) || 'Не удалось сохранить.'; err.hidden = false; return; }
+            b.bedId = bedId; b.from = new Date(from + 'T00:00:00').getTime(); b.to = new Date(to + 'T00:00:00').getTime();
+            window.sh.refresh(); close();
+          })
+          .catch(function () { err.textContent = 'Сервер не отвечает.'; err.hidden = false; });
+      });
     },
+    /* Профиль: список резидентов с уже введённым поиском по имени */
     onOpenProfile: function (r) {
-      alert('Здесь откроется профиль: ' + (r && r.name) + '. Сервер пока не подключён.');
+      if (!r) return;
+      location.href = 'admin-residents.html?q=' + encodeURIComponent(r.name);
     }
   });
 });

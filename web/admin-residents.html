@@ -323,6 +323,9 @@ MSV.ready(function (ctx) {
   /* ---------- Управление ---------- */
 
   var timer = null;
+  // ?q=Фамилия — из шахматки («Профиль»): сразу показать нужного резидента
+  var preQ = new URLSearchParams(location.search).get('q');
+  if (preQ) { var qEl = document.getElementById('q'); qEl.value = preQ; setTimeout(function () { qEl.dispatchEvent(new Event('input', { bubbles: true })); }, 0); }
   document.getElementById('q').addEventListener('input', function (e) {
     clearTimeout(timer);
     var v = e.target.value;

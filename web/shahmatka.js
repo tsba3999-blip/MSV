@@ -1556,17 +1556,21 @@
       var digits = phoneDigits(r.phone);
       var out = '<span class="msv-sh__phone">' +
         '<a href="tel:+' + esc(digits) + '">' + esc(r.phone) + '</a></span>';
-      // Лепестки мессенджеров после телефона: щелчок открывает чат с этим номером
+      // Лепестки Telegram и Max — всегда оба. Если резидент указал мессенджер в
+      // анкете — лепесток активный (графит) и открывает чат; если нет — бледный, без ссылки.
+      var have = {};
+      (r.messengers || []).forEach(function (key) { have[String(key).toLowerCase()] = true; });
       var petals = '';
-      (r.messengers || []).forEach(function (key) {
-        var k = String(key).toLowerCase();
-        var m = MESSENGERS[k];
-        if (!m || !digits) return;
-        petals += '<a class="msv-sh__petal msv-sh__petal--' + esc(k) + '" href="' + esc(m.url(digits)) +
-               '" target="_blank" rel="noopener noreferrer" title="' + esc(m.title) + '">' +
-               (k === 'tg' ? 'Telegram' : 'Max') + '</a>';
+      ['tg', 'max'].forEach(function (k) {
+        var m = MESSENGERS[k], label = k === 'tg' ? 'Telegram' : 'Max';
+        if (have[k] && m && digits) {
+          petals += '<a class="msv-sh__petal msv-sh__petal--' + k + ' msv-sh__petal--on" href="' + esc(m.url(digits)) +
+                    '" target="_blank" rel="noopener noreferrer" title="' + esc(m.title) + '">' + label + '</a>';
+        } else {
+          petals += '<span class="msv-sh__petal msv-sh__petal--' + k + ' msv-sh__petal--off" title="Не указан в анкете">' + label + '</span>';
+        }
       });
-      return out + (petals ? '<span class="msv-sh__petals">' + petals + '</span>' : '');
+      return out + '<span class="msv-sh__petals">' + petals + '</span>';
     }
 
     function bdayHTML(r) {

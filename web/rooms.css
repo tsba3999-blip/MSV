@@ -14,6 +14,7 @@
 }
 
 .room__kind { display: block; }
+.room__res { display: block; margin-bottom: var(--msv-s4); color: var(--msv-graphite); font-weight: 600; }
 
 .room__head {
   display: flex;

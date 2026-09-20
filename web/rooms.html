@@ -90,18 +90,21 @@ MSV.ready(function (ctx) {
     res.rooms.forEach(function (r, i) {
       var beds = res.beds.filter(function (b) { return b.roomId === r.id; });
       var tiers = {};
+      // У части мест в исходных данных нет пометки яруса. Если в комнате есть
+      // ярусные места с той же ценой — это тот же ярус (24 200 — верхнее, 27 500 — нижнее).
+      var priceTier = {};
+      beds.forEach(function (b) { if (b.tier) priceTier[b.price] = priceTier[b.price] || b.tier; });
       beds.forEach(function (b) {
-        var k = b.tier || 'Место';
-        // Без яруса — обычная кровать, не двухъярусная: «Отдельное место»
-        tiers[k] = tiers[k] || { kind: k === 'нижнее' ? 'Нижнее место' : (k === 'верхнее' ? 'Верхнее место' : 'Отдельное место'), left: 0, price: b.price, ids: [] };
+        var k = b.tier || priceTier[b.price] || 'Место';
+        tiers[k] = tiers[k] || { kind: k === 'нижнее' ? 'Нижнее место' : (k === 'верхнее' ? 'Верхнее место' : 'Место'), left: 0, price: b.price, ids: [] };
         if (!busy[b.id]) { tiers[k].left++; tiers[k].ids.push(b.id); }
       });
       var list = Object.keys(tiers).map(function (k) { return tiers[k]; }).sort(function (a, b) { return a.price - b.price; });
       var freeIds = []; list.forEach(function (t) { freeIds = freeIds.concat(t.ids); });
       ROOMS.push({
-        id: r.id, size: r.size || beds.length, sex: r.gender || '', name: r.name, residence: res.name,
+        id: r.id, size: r.size || beds.length, sex: r.gender || '', name: r.name, residence: res.name, residenceTitle: res.title || res.name,
         shots: SHOTS[(ri * 7 + i) % SHOTS.length], more: 0,
-        text: r.note ? r.note.charAt(0).toUpperCase() + r.note.slice(1) : (res.title + '.'),
+        text: r.note ? r.note.charAt(0).toUpperCase() + r.note.slice(1) : '',   // без описания — ничего, резиденция уже подписана выше
         beds: list, bedIds: freeIds, price: list.length ? list[0].price : 0
       });
     });
@@ -192,18 +195,19 @@ MSV.ready(function (ctx) {
           btn = '<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-pick="' + esc(r.id) + '" data-tier="' + ti + '">Выбрать</button>';
         }
         return '<div class="room__price' + (out ? ' room__price--out' : '') + '">' +
-          '<span>' + esc(b.kind) + ' · ' + (out ? 'продано' : b.left + ' ' + plural(b.left, 'место', 'места', 'мест')) + '</span>' +
+          '<span>' + esc(b.kind) + (out ? '' : ' · ' + b.left + ' ' + plural(b.left, 'место', 'места', 'мест')) + '</span>' +
           '<b>' + money(b.price) + '</b>' + btn + '</div>';
       }).join('');
 
       return '<article class="room">' +
         '<span class="msv-note room__kind">' + r.size + '-местная комната</span>' +
+        '<span class="msv-note room__res">' + esc(r.residenceTitle) + '</span>' +
         '<div class="room__head">' +
-          '<h2 class="msv-sub room__name">' + esc(r.name) + ' <span class="msv-note" style="font-weight:500">' + esc(r.residence) + '</span></h2>' +
+          '<h2 class="msv-sub room__name">' + esc(r.name) + '</h2>' +
           '<span class="sex-tag sex-tag--' + (r.sex === 'ж' ? 'f' : 'm') + '">' + (r.sex === 'ж' ? 'Женская' : 'Мужская') + '</span>' +
         '</div>' +
         '<div class="room__shots">' + shots(r) + '</div>' +
-        '<p class="msv-body room__text">' + esc(r.text) + '</p>' +
+        (r.text ? '<p class="msv-body room__text">' + esc(r.text) + '</p>' : '') +
         '<div class="room__prices">' + prices + '</div>' +
         '<p class="msv-note" style="margin:0">Цены при условии заключения «годового контракта» (проживание минимум до конца августа).</p>' +
       '</article>';

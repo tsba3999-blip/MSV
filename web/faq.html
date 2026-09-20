@@ -14,7 +14,11 @@
   .qa:last-child { border-bottom: 0; }
   .qa__q { display: flex; align-items: center; justify-content: space-between; gap: var(--msv-s12); min-height: 56px; padding: var(--msv-s12) var(--msv-s16); font-weight: 600; cursor: pointer; list-style: none; }
   .qa__q::-webkit-details-marker { display: none; }
-  .qa__q svg { flex: 0 0 auto; color: var(--msv-n300); transition: transform var(--msv-fast) var(--msv-ease); }
+  .qa__q svg { flex: 0 0 auto; color: var(--msv-n300); transition: transform .32s var(--msv-ease); }
+  /* Ответ раскрывается плавно: высота анимируется скриптом ниже, .32s — как модальное окно в брендбуке */
+  .qa__a { overflow: hidden; transition: height .32s var(--msv-ease), opacity .32s var(--msv-ease); }
+  .qa__a.is-closing, .qa__a.is-opening { opacity: 0; }
+  .qa__a.is-opening.is-shown { opacity: 1; }
   .qa[open] .qa__q svg { transform: rotate(180deg); }
   .qa__a { margin: 0; padding: 0 var(--msv-s16) var(--msv-s16); color: var(--msv-n500); }
 </style>
@@ -174,6 +178,33 @@
     <span class="tab__cap">Профиль</span>
   </a>
 </nav>
+<script>
+/* Плавное раскрытие ответов. <details> сам открывается рывком, поэтому
+   перехватываем нажатие и анимируем высоту ответа: 0 → его высота → auto. */
+(function () {
+  var D = 320;
+  document.querySelectorAll('.qa').forEach(function (qa) {
+    var q = qa.querySelector('.qa__q'), a = qa.querySelector('.qa__a');
+    if (!q || !a) return;
+    q.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (qa.dataset.busy) return;
+      qa.dataset.busy = '1';
+      if (!qa.open) {
+        qa.open = true;
+        var h = a.scrollHeight;
+        a.classList.add('is-opening'); a.style.height = '0px';
+        requestAnimationFrame(function () { requestAnimationFrame(function () { a.style.height = h + 'px'; a.classList.add('is-shown'); }); });
+        setTimeout(function () { a.style.height = ''; a.classList.remove('is-opening', 'is-shown'); delete qa.dataset.busy; }, D + 20);
+      } else {
+        a.style.height = a.scrollHeight + 'px';
+        requestAnimationFrame(function () { requestAnimationFrame(function () { a.classList.add('is-closing'); a.style.height = '0px'; }); });
+        setTimeout(function () { qa.open = false; a.style.height = ''; a.classList.remove('is-closing'); delete qa.dataset.busy; }, D + 20);
+      }
+    });
+  });
+})();
+</script>
 <script src="mark.js"></script>
 <script src="edit.js"></script>
 <script src="protect.js"></script>

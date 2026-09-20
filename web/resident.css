@@ -21,7 +21,9 @@
   gap: var(--msv-s12);
   height: var(--msv-header);
   margin: 0 calc(var(--msv-s24) * -1);
-  padding: 0 var(--msv-s16);
+  /* Иконки «назад» и «выход» — 24 px внутри области 44 px: отступ подобран так,
+     чтобы сами значки стояли ровно по краям колонки */
+  padding: 0 calc(var(--msv-s24) - 10px);
 }
 
 .head__back {
@@ -397,7 +399,7 @@
 @media (min-width: 768px) {
   /* Ширина колонки на ПК одна для всех страниц — как у проверки заказа (form.css) */
   .page { max-width: 640px; padding-left: var(--msv-s32); padding-right: var(--msv-s32); }
-  .head { margin-left: calc(var(--msv-s32) * -1); margin-right: calc(var(--msv-s32) * -1); }
+  .head { margin-left: calc(var(--msv-s32) * -1); margin-right: calc(var(--msv-s32) * -1); padding-left: calc(var(--msv-s32) - 10px); padding-right: calc(var(--msv-s32) - 10px); }
   /* Таббар — ровно по ширине содержимого колонки */
   .tabbar { max-width: 576px; }
 

@@ -92,7 +92,8 @@ a.side__who:focus-visible { outline: 2px solid var(--msv-white); outline-offset:
   display: flex;
   align-items: center;
   gap: var(--msv-s16);
-  height: 76px;
+  height: var(--msv-header);   /* 56 px везде, включая шахматку */
+  flex: 0 0 auto;              /* не сжимать, даже если содержимое не помещается по высоте */
   padding: 0 var(--msv-s24);
   background: var(--msv-white);
   border-bottom: 1px solid var(--msv-n100);

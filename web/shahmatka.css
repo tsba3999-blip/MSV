@@ -530,6 +530,10 @@
 .msv-sh__petal:hover { transform: translateY(-1px); }
 .msv-sh__petal--tg  { background: #A2D2FF; }
 .msv-sh__petal--max { background: #CBB6FF; border-radius: 8px 24px 8px 24px; }
+/* активный — фирменный графит; не указан — бледный, без ссылки */
+.msv-sh__petal--on  { background: var(--msv-graphite); color: var(--msv-white); }
+.msv-sh__petal--off { background: var(--msv-n100); color: var(--msv-n300); cursor: default; }
+.msv-sh__petal--off:hover { transform: none; }
 
 /* ---------- Телефон с мессенджерами ---------- */
 
