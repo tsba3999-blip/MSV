@@ -1,0 +1,51 @@
+# ============================================================
+#  МСВ — автовыкладка на сервер
+#
+#  Срабатывает после каждой отправки в ветку main, если менялись
+#  web/ или server/. Заходит на сервер по SSH, обновляет копию
+#  репозитория в /var/www/MSV и запускает server/deploy.sh.
+#
+#  Нужны три секрета в GitHub (Settings → Secrets → Actions):
+#    SSH_HOST — адрес сервера (IP)
+#    SSH_USER — пользователь (обычно root)
+#    SSH_KEY  — закрытый SSH-ключ целиком, вместе со строками
+#               -----BEGIN ... KEY----- и -----END ... KEY-----
+#  Подробнее — КАК_ВЫКЛАДЫВАТЬ.md в корне репозитория.
+# ============================================================
+
+name: Выкладка на сервер
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'web/**'
+      - 'server/**'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Обновить и перезапустить на сервере
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script_stop: true
+          script: |
+            set -e
+            if [ ! -d /var/www/MSV/.git ]; then
+              mkdir -p /var/www
+              git clone https://github.com/tsba3999-blip/MSV.git /var/www/MSV
+            fi
+            cd /var/www/MSV
+            git fetch origin main
+            git reset --hard origin/main
+            bash server/deploy.sh
