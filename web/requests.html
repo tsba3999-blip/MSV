@@ -118,9 +118,20 @@
       .then(function (r) { if (r.status === 201) ok(); else alert('Не удалось отправить'); }).catch(function () { alert('Сервер не отвечает'); });
   });
 
-  // ?type=fix — открыть сразу нужный запрос
+  // ?type=fix — сразу нужный запрос: список остальных сворачиваем, форма наверху.
+  // Иначе на телефоне форма оказывалась ниже списка и казалось, что ничего не открылось.
   var pre = new URLSearchParams(location.search).get('type');
-  if (pre && NAMES[pre]) { var btn = document.querySelector('[data-kind="' + pre + '"]'); if (btn) btn.click(); }
+  if (pre && NAMES[pre]) {
+    var btn = document.querySelector('[data-kind="' + pre + '"]'); if (btn) btn.click();
+    var kinds = document.getElementById('kinds');
+    var kindsTitle = kinds && kinds.previousElementSibling && kinds.previousElementSibling.classList.contains('group__title') ? kinds.previousElementSibling : null;
+    if (kinds) {
+      kinds.hidden = true; if (kindsTitle) kindsTitle.hidden = true;
+      var other = document.createElement('p'); other.className = 'msv-note'; other.style.margin = '0 0 var(--msv-s16)';
+      other.innerHTML = '<a class="msv-link" href="requests.html">Другой запрос</a>';
+      var form = document.getElementById('form'); if (form && form.parentNode) form.parentNode.insertBefore(other, form.nextSibling);
+    }
+  }
   load();
 })();
 </script>

@@ -373,7 +373,7 @@
 .tab[aria-current="page"] .tab__cap { display: block; }
 
 /* Внесённый депозит — отдельный неброский тон */
-.pay-row--deposit { background: var(--msv-ice); }
+.pay-row--deposit { background: color-mix(in srgb, var(--msv-ice) 25%, var(--msv-white)); }   /* в четыре раза светлее подложки сообщений */
 .pay-row--deposit .msv-num { color: var(--msv-graphite); }
 
 /* Скидка — отдельный столбик со стрелкой; текст раскрывается под строкой */
