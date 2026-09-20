@@ -22,12 +22,12 @@
         <path d="M15 6l-6 6 6 6"/>
       </svg>
     </a>
-    <a class="msv-note form__title-link" href="residences.html">Резиденция Уют</a>
+    <a class="msv-sub form__title-link" href="residences.html">Резиденция Уют</a>
   </div>
 
   <div class="filters">
     <div class="filters__row">
-      <span class="msv-note filters__label">Комната</span>
+      <span class="msv-note filters__label">Выбор комнаты и места</span>
       <div class="chips" role="group" aria-label="Пол">
         <button class="chip" type="button" data-sex="м" aria-pressed="false">Муж.</button>
         <button class="chip" type="button" data-sex="ж" aria-pressed="false">Жен.</button>
@@ -76,12 +76,17 @@ MSV.ready(function (ctx) {
 
   /* Резиденция из адреса — со страницы выбора адреса */
   var wantRes = new URLSearchParams(location.search).get('res');
+  var DEMO = new URLSearchParams(location.search).get('demo') === '1';
   var ROOMS = [];
   ctx.residences.forEach(function (res, ri) {
     if (wantRes && res.id !== wantRes) return;
     var d = ctx.bookings(res);
     var busy = {};
     d.bookings.forEach(function (b) { var f = day(b.from), t = day(b.to); if (f !== null && t !== null && f <= today && t >= today) busy[b.bedId] = true; });
+    // ?demo=1 — режим просмотра для заказчика: каждое второе место считается
+    // занятым, чтобы в одной карточке были и «Выбрать», и «Продано».
+    // Реальные брони не меняются, это только показ.
+    if (DEMO) { busy = {}; res.beds.forEach(function (b, i) { if (i % 2 === 0) busy[b.id] = true; }); }
     res.rooms.forEach(function (r, i) {
       var beds = res.beds.filter(function (b) { return b.roomId === r.id; });
       var tiers = {};
@@ -125,9 +130,14 @@ MSV.ready(function (ctx) {
   ];
 
   var list = document.getElementById('list');
+  if (DEMO) { var warn = document.createElement('p'); warn.className = 'msv-note'; warn.style.cssText = 'margin:0 0 var(--msv-s12);padding:var(--msv-s8) var(--msv-s12);background:var(--msv-lavender);border-radius:var(--msv-r11)'; warn.textContent = 'Режим показа: занятость мест условная, каждое второе место считается занятым.'; list.parentNode.insertBefore(warn, list); }
   var filter = { sex: '', size: '', free: '1' };
-  var notice = document.querySelector('.form__head .msv-sub');
-  if (notice) notice.textContent = ctx.residences.length > 1 ? 'Все резиденции' : (ctx.residences[0] || {}).title || 'Резиденция';
+  // Заголовок шапки — по выбранной резиденции; без ?res= — «Все резиденции».
+  // (Раньше искался по устаревшему классу и не менялся: страница всех резиденций
+  // называлась «Резиденция Уют» и показывала под ней чужие комнаты.)
+  var notice = document.querySelector('.form__head .form__title-link');
+  var shown = wantRes ? ctx.residences.filter(function (r) { return r.id === wantRes; }) : ctx.residences;
+  if (notice) notice.textContent = shown.length === 1 ? (shown[0].title || shown[0].name) : 'Все резиденции';
 
   function money(n) {
     // Разряды разделяются тонким пробелом, валюта — «руб.»

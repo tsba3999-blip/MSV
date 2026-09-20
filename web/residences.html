@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="icon" href="favicon4.png" type="image/png">
 <meta name="theme-color" content="#F5F1EA">
-<title>Где будешь жить — МСВ</title>
+<title>Выбери свою резиденцию — МСВ</title>
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="resident.css">
 <style>
@@ -25,7 +25,7 @@
   .res-pick__logo { position: relative; display: block; width: 100%; max-width: 236px; aspect-ratio: 415 / 116; margin-bottom: auto; border-radius: var(--msv-r11); box-shadow: var(--msv-e1); object-fit: cover; }
   .res-pick--wide .res-pick__logo { max-width: 300px; }
   .res-pick__kind { position: relative; margin-top: var(--msv-s12); font-size: 10px; line-height: 16px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--msv-n500); }
-  .res-pick__name { position: relative; margin: 0; }
+  .res-pick__name { position: relative; margin: 0; overflow-wrap: anywhere; }
   .res-pick__meta { position: relative; color: var(--msv-graphite); }
   .res-pick__note { position: relative; }
   .res-pick__map { position: relative; margin-top: 4px; align-self: flex-start; font-size: var(--msv-note-size); cursor: pointer; }
@@ -56,7 +56,7 @@
         <path d="M15 6l-6 6 6 6"/>
       </svg>
     </a>
-    <h1 class="msv-sub head__title"><a class="head__title-link" href="profile-2.html">Где будешь жить</a></h1>
+    <h1 class="msv-sub head__title"><a class="head__title-link" href="profile-2.html">Выбери свою резиденцию</a></h1>
   </div>
 
   <p class="msv-body" style="margin:0 0 var(--msv-s16);color:var(--msv-n500)">Три резиденции в разных районах Москвы. Выбери, где хочешь жить — дальше покажем свободные места. <a class="msv-link" href="residences-variants.html">Другие варианты страницы</a></p>
@@ -76,8 +76,8 @@
     <span class="res-pick__blob"></span>
     <img class="res-pick__logo" src="logo-uyut.jpg" alt="Уют на Варшавке — резиденция высокой культуры для студентов у м. Нагатинская">
     <span class="res-pick__kind">Эконом-резиденция</span>
-    <span class="msv-sub res-pick__name">Уют</span>
-    <span class="msv-note res-pick__meta">м. Нагатинская · Варшавское шоссе, 18к2</span>
+    <span class="msv-h res-pick__name">Уют</span>
+    <span class="msv-body res-pick__meta">м. Нагатинская · Варшавское шоссе, 18к2</span>
     <span class="msv-note res-pick__note">16 комнат · 78 мест</span>
     <span class="msv-link res-pick__map" role="link" tabindex="0" data-map="https://yandex.ru/maps/-/CTtSYE5l">посмотреть на карте</span>
   </a>
@@ -86,8 +86,8 @@
     <span class="res-pick__blob"></span>
     <img class="res-pick__logo" src="logo-molod.jpg" alt="Молодежка — квартира для девушек-студенток у метро Молодежная">
     <span class="res-pick__kind">Квартира для девушек-студенток</span>
-    <span class="msv-sub res-pick__name">Молодежка</span>
-    <span class="msv-note res-pick__meta">м. Молодежная · ул. Партизанская, 40</span>
+    <span class="msv-h res-pick__name">Молодежка</span>
+    <span class="msv-body res-pick__meta">м. Молодежная · ул. Партизанская, 40</span>
     <span class="msv-note res-pick__note">3 комнаты · 6 мест · по двое</span>
     <span class="msv-link res-pick__map" role="link" tabindex="0" data-map="https://yandex.ru/maps/-/CTtSaI6E">посмотреть на карте</span>
   </a>

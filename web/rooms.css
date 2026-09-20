@@ -89,7 +89,7 @@
 }
 
 .filters { margin-bottom: var(--msv-s24); }
-.filters__label { display: block; margin-bottom: var(--msv-s8); }
+.filters__label { display: block; margin-bottom: var(--msv-s8); font-size: var(--msv-body-size); line-height: var(--msv-body-line); font-weight: 600; color: var(--msv-graphite); }
 .filters__row { margin-bottom: var(--msv-s16); }
 .filters__row:last-child { margin-bottom: 0; }
 
@@ -275,8 +275,7 @@
 /* ---------- Монитор: выбор комнаты ----------
    Колонка шире, карточки комнат в два ряда. Только rooms.html
    (.form--wide); месяц и проверка остаются узкой колонкой. */
-@media (min-width: 900px) {
-  .form--wide { max-width: 960px; }
+@media (min-width: 1100px) {
   .form--wide #list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--msv-s16); align-items: start; }
   .form--wide .room { margin-bottom: 0; }
 }
