@@ -75,7 +75,8 @@ systemctl daemon-reload
 systemctl enable --now msv-backup.timer >/dev/null 2>&1 && echo "    таймер копий включён (03:30 ежедневно)"
 
 echo "==> Проверка"
-if curl -fs http://127.0.0.1:3000/api/health >/dev/null; then
+PORT="$(grep -oP '^PORT=\K[0-9]+' "$APP/server/.env" || echo 3000)"
+if curl -fs "http://127.0.0.1:$PORT/api/health" >/dev/null; then
   echo "    сервер отвечает, база доступна"
 else
   echo "    ПРЕДУПРЕЖДЕНИЕ: /api/health не ответил. Проверьте DATABASE_URL в .env"
