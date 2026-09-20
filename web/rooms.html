@@ -265,8 +265,29 @@ MSV.ready(function (ctx) {
   });
 
   render();
+
+  /* Пол из анкеты: свой фильтр включён, чужой недоступен — комнаты в резиденциях
+     мужские и женские, и резидент видит только свои. */
+  if (location.protocol !== 'file:') {
+    fetch('/api/me/home', { credentials: 'same-origin' })
+      .then(function (r) { return r.status === 200 ? r.json() : null; })
+      .then(function (d) {
+        var g = d && d.profile && d.profile.gender;
+        if (g !== 'м' && g !== 'ж') return;
+        document.querySelectorAll('.chip[data-sex]').forEach(function (c) {
+          var mine = c.getAttribute('data-sex') === g;
+          c.setAttribute('aria-pressed', mine ? 'true' : 'false');
+          c.disabled = !mine;
+          if (!mine) c.title = 'Комнаты другого пола недоступны';
+        });
+        filter.sex = g;
+        render();
+      })
+      .catch(function () {});
+  }
 });
 </script>
+
 
 <script src="mark.js"></script>
 <script src="zoom.js"></script>

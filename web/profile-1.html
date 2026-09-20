@@ -21,7 +21,7 @@
         <path d="M15 6l-6 6 6 6"/>
       </svg>
     </a>
-    <a class="msv-sub form__title-link" href="signup.html">Анкета</a>
+    <a class="msv-sub form__title-link" href="signup.html">Анкета резидента</a>
   </div>
 
   <div class="progress">
@@ -67,6 +67,14 @@
       <span class="msv-field__label">Отчество</span>
       <input class="msv-input" name="middle" id="fMiddle" autocomplete="additional-name" placeholder="Сергеевич">
     </label>
+
+    <!-- Пол — обязательное поле: комнаты в резиденциях мужские и женские,
+         на выборе комнаты чужой пол будет недоступен -->
+    <p class="msv-note" style="margin-bottom:var(--msv-s8)">Пол</p>
+    <div class="chips" role="group" aria-label="Пол" style="margin-bottom:var(--msv-s12)">
+      <button class="chip" type="button" data-group="gender" data-gender="м" aria-pressed="false">Мужской</button>
+      <button class="chip" type="button" data-group="gender" data-gender="ж" aria-pressed="false">Женский</button>
+    </div>
 
     <label class="msv-field">
       <span class="msv-field__label">Телефон</span>
@@ -312,6 +320,7 @@
         if (m === 'tg') { document.getElementById('tgField').hidden = false; }
       });
       if (saved1.tgNick) document.getElementById('tgNick').value = saved1.tgNick;
+      if (saved1.gender) { var gc = document.querySelector('.chip[data-group="gender"][data-gender="' + saved1.gender + '"]'); if (gc) gc.setAttribute('aria-pressed', 'true'); }
       if (saved1.course) document.querySelectorAll('.chip[data-group="course"]').forEach(function (c) {
         c.setAttribute('aria-pressed', c.textContent.trim() === saved1.course ? 'true' : 'false');
       });
@@ -341,9 +350,15 @@
       birthday: touched ? birth.value : '',
       university: document.getElementById('school').value.trim(),
       course: pressed('.chip[data-group="course"]')[0] || '',
+      gender: (document.querySelector('.chip[data-group="gender"][aria-pressed="true"]') || {}).dataset ? document.querySelector('.chip[data-group="gender"][aria-pressed="true"]').dataset.gender : '',
       faculty: document.getElementById('fFaculty').value.trim()
     };
 
+    if (!step1.gender) {
+      alert('Укажи пол — от него зависит, какие комнаты можно выбрать.');
+      document.querySelector('.chip[data-group="gender"]').focus();
+      return;
+    }
     if (!step1.lastName || !step1.firstName) {
       alert('Заполни фамилию и имя — без них анкету не принять.');
       document.getElementById(step1.lastName ? 'fFirst' : 'fLast').focus();

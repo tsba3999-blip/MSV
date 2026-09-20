@@ -51,7 +51,7 @@ module.exports = function register(route) {
       me: { id: String(user.id), name: user.name, phone: user.phone, email: user.email },
       profile: user.user_id ? {
         birthday: iso(user.birthday), city: user.city, university: user.university,
-        course: user.course, faculty: user.faculty, about: user.about,
+        course: user.course, faculty: user.faculty, about: user.about, gender: user.gender || null,
         messengers: user.messengers || [], docsSignedAt: iso(user.docs_signed_at)
       } : null,
       booking: b ? {
@@ -93,20 +93,21 @@ module.exports = function register(route) {
     const bday = /^\d{4}-\d{2}-\d{2}$/.test(String(b.birthday || '')) ? b.birthday : null;
     const health = Number.isInteger(b.healthScore) && b.healthScore >= 1 && b.healthScore <= 5 ? b.healthScore : null;
     const mess = Array.isArray(b.messengers) ? b.messengers.filter((m) => m === 'tg' || m === 'max') : [];
+    const gender = b.gender === 'м' || b.gender === 'ж' ? b.gender : null;
 
     await tx(async (q) => {
       await q(`INSERT INTO resident_profiles (user_id, last_name, first_name, middle_name, birthday, city,
-                 university, course, faculty, about, health_score, contact_person, vk, messengers, updated_at)
-               VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14, now())
+                 university, course, faculty, about, health_score, contact_person, vk, messengers, gender, updated_at)
+               VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15, now())
                ON CONFLICT (user_id) DO UPDATE SET
                  last_name = EXCLUDED.last_name, first_name = EXCLUDED.first_name, middle_name = EXCLUDED.middle_name,
                  birthday = EXCLUDED.birthday, city = EXCLUDED.city, university = EXCLUDED.university,
                  course = EXCLUDED.course, faculty = EXCLUDED.faculty, about = EXCLUDED.about,
                  health_score = EXCLUDED.health_score, contact_person = EXCLUDED.contact_person,
-                 vk = EXCLUDED.vk, messengers = EXCLUDED.messengers, updated_at = now()`,
+                 vk = EXCLUDED.vk, messengers = EXCLUDED.messengers, gender = EXCLUDED.gender, updated_at = now()`,
         [s.uid, str(b.lastName, 100), str(b.firstName, 100), str(b.middleName, 100), bday, str(b.city, 100),
          str(b.university, 200), str(b.course, 20), str(b.faculty, 200), str(b.about, 600), health,
-         str(b.contactPerson, 200), str(b.vk, 200), mess]);
+         str(b.contactPerson, 200), str(b.vk, 200), mess, gender]);
 
       // Имя в учётной записи — из анкеты
       const full = [b.lastName, b.firstName, b.middleName].filter(Boolean).join(' ').trim();

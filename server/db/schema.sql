@@ -112,6 +112,9 @@ DO $$ BEGIN
   CREATE TYPE room_gender AS ENUM ('м', 'ж');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
+-- Пол резидента — из анкеты; по нему на выборе комнаты закрываются чужие комнаты
+ALTER TABLE resident_profiles ADD COLUMN IF NOT EXISTS gender room_gender;
+
 CREATE TABLE IF NOT EXISTS rooms (
   id           text PRIMARY KEY,          -- 'forma-r1'
   residence_id text NOT NULL REFERENCES residences(id) ON DELETE CASCADE,
