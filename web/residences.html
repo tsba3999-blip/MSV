@@ -11,14 +11,18 @@
 <link rel="stylesheet" href="resident.css">
 <style>
   .page { padding-bottom: var(--msv-s32); }
-  .res-pick { display: flex; align-items: center; gap: var(--msv-s16); margin-bottom: var(--msv-s12); padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r20); box-shadow: var(--msv-e1); color: inherit; text-decoration: none; transition: transform var(--msv-fast) var(--msv-ease); }
+  /* Вариант 1 из residences-designs.html: открытка с цветной полосой.
+     Логотип на поле в цвете резиденции (--acc), ниже имя и адрес. */
+  .res-pick { display: flex; flex-direction: column; margin-bottom: var(--msv-s12); background: var(--msv-white); border-radius: var(--msv-r20); box-shadow: var(--msv-e1); overflow: hidden; color: inherit; text-decoration: none; transition: transform var(--msv-fast) var(--msv-ease); }
   .res-pick:hover { transform: translateY(-1px); }
   .res-pick:focus-visible { outline: 2px solid var(--msv-violet); outline-offset: 2px; }
-  .res-pick__logo { flex: 0 0 auto; width: 64px; height: 64px; border-radius: 50%; object-fit: contain; }
-  .res-pick__body { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .res-pick__band { display: flex; align-items: center; justify-content: center; height: 112px; background: var(--acc); }
+  .res-pick__band img { width: 72px; height: 72px; border-radius: 50%; background: var(--msv-white); padding: 4px; object-fit: contain; }
+  .res-pick__body { display: flex; flex-direction: column; gap: 4px; padding: var(--msv-s16); }
   .res-pick__kind { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--msv-n500); }
-  .res-pick__map { font-size: var(--msv-note-size); margin-top: 4px; align-self: flex-start; }
-  .res-pick > svg { flex: 0 0 auto; color: var(--msv-n300); }
+  .res-pick__name { margin: 0; }
+  .res-pick__addr { color: var(--msv-graphite); }
+  .res-pick__map { font-size: var(--msv-note-size); margin-top: 4px; align-self: flex-start; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -35,42 +39,58 @@
     <h1 class="msv-sub head__title">Где будешь жить</h1>
   </div>
 
-  <p class="msv-body" style="margin:0 0 var(--msv-s24);color:var(--msv-n500)">Три резиденции в разных районах Москвы. Выбери, где хочешь жить — дальше покажем свободные места. <a class="msv-link" href="residences-designs.html">Пять вариантов дизайна</a></p>
+  <p class="msv-body" style="margin:0 0 var(--msv-s24);color:var(--msv-n500)">Три резиденции в разных районах Москвы. Выбери, где хочешь жить — дальше покажем свободные места. <a class="msv-link" href="residences-designs.html">Другие варианты дизайна</a></p>
 
-  <a class="res-pick" href="rooms.html?res=forma">
-    <img class="res-pick__logo" src="forma.png" alt="">
+  <a class="res-pick" href="rooms.html?res=forma" style="--acc:#FB344A">
+    <span class="res-pick__band"><img src="forma.png" alt=""></span>
     <span class="res-pick__body">
       <span class="res-pick__kind">Комфорт-резиденция</span>
-      <span class="msv-sub res-pick__name">Forma</span>
-      <span class="msv-note res-pick__addr">Москва, Конный пер., 12 · м. Шаболовская</span>
-      <a class="msv-link res-pick__map" href="https://yandex.ru/maps/-/CTtSY62w" target="_blank" rel="noopener" onclick="event.stopPropagation()">посмотреть на карте</a>
+      <span class="msv-h res-pick__name">Forma</span>
+      <span class="msv-body res-pick__addr">Москва, Конный пер., 12 · м. Шаболовская</span>
+      <span class="msv-note">16 комнат · 57 мест · свои санузлы в части комнат</span>
+      <span class="msv-link res-pick__map" role="link" tabindex="0" data-map="https://yandex.ru/maps/-/CTtSY62w">посмотреть на карте</span>
     </span>
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
   </a>
 
-  <a class="res-pick" href="rooms.html?res=uyut">
-    <img class="res-pick__logo" src="uyt.gif" alt="">
+  <a class="res-pick" href="rooms.html?res=uyut" style="--acc:#7EB2DD">
+    <span class="res-pick__band"><img src="uyt.gif" alt=""></span>
     <span class="res-pick__body">
       <span class="res-pick__kind">Эконом-резиденция</span>
-      <span class="msv-sub res-pick__name">Уют</span>
-      <span class="msv-note res-pick__addr">Москва, Варшавское шоссе, 18к2 · м. Нагатинская</span>
-      <a class="msv-link res-pick__map" href="https://yandex.ru/maps/-/CTtSYE5l" target="_blank" rel="noopener" onclick="event.stopPropagation()">посмотреть на карте</a>
+      <span class="msv-h res-pick__name">Уют</span>
+      <span class="msv-body res-pick__addr">Москва, Варшавское шоссе, 18к2 · м. Нагатинская</span>
+      <span class="msv-note">16 комнат · 78 мест · капсулы и комнаты до 8 мест</span>
+      <span class="msv-link res-pick__map" role="link" tabindex="0" data-map="https://yandex.ru/maps/-/CTtSYE5l">посмотреть на карте</span>
     </span>
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
   </a>
 
-  <a class="res-pick" href="rooms.html?res=molod">
-    <img class="res-pick__logo" src="molodejka.png" alt="">
+  <a class="res-pick" href="rooms.html?res=molod" style="--acc:#CBB6FF">
+    <span class="res-pick__band"><img src="molodejka.png" alt=""></span>
     <span class="res-pick__body">
       <span class="res-pick__kind">Квартира только для девушек-студенток</span>
-      <span class="msv-sub res-pick__name">Молодежка</span>
-      <span class="msv-note res-pick__addr">Москва, ул. Партизанская, 40 · м. Молодежная</span>
-      <a class="msv-link res-pick__map" href="https://yandex.ru/maps/-/CTtSaI6E" target="_blank" rel="noopener" onclick="event.stopPropagation()">посмотреть на карте</a>
+      <span class="msv-h res-pick__name">Молодежка</span>
+      <span class="msv-body res-pick__addr">Москва, ул. Партизанская, 40 · м. Молодежная</span>
+      <span class="msv-note">3 комнаты · 6 мест · по двое</span>
+      <span class="msv-link res-pick__map" role="link" tabindex="0" data-map="https://yandex.ru/maps/-/CTtSaI6E">посмотреть на карте</span>
     </span>
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
   </a>
 
 </div>
+<script>
+/* «Посмотреть на карте» внутри карточки-ссылки: ссылку в ссылку
+   вкладывать нельзя (браузер разрывает карточку), поэтому это span
+   с data-map, который открывает карту сам и не срабатывает как карточка. */
+(function () {
+  function openMap(e) {
+    var m = e.target.closest('[data-map]');
+    if (!m) return;
+    if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault(); e.stopPropagation();
+    window.open(m.getAttribute('data-map'), '_blank', 'noopener');
+  }
+  document.addEventListener('click', openMap);
+  document.addEventListener('keydown', openMap);
+})();
+</script>
 <script src="mark.js"></script>
 <script src="edit.js"></script>
 <script src="protect.js"></script>
