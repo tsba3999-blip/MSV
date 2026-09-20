@@ -22,7 +22,10 @@
   .paper dt { font-size: var(--msv-note-size); color: var(--msv-n500); margin-bottom: 2px; }
   .paper dd { margin: 0; font-weight: 600; }
   .paper__foot { margin-top: var(--msv-s24); padding-top: var(--msv-s12); border-top: 1px solid var(--msv-n100); font-size: var(--msv-note-size); color: var(--msv-n500); }
-  .paper__stamp { float: right; width: 96px; height: 96px; border: 2px dashed var(--msv-n300); border-radius: 50%; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 10px; color: var(--msv-n300); margin: 0 0 0 var(--msv-s12); }
+  /* Печать МСВ (stamp.png, прозрачный фон): полупрозрачно и под лёгким наклоном,
+     как настоящий оттиск; в PDF печатается так же */
+  .paper__stamp { float: right; width: 120px; height: 120px; margin: 0 0 var(--msv-s8) var(--msv-s12); opacity: .85; transform: rotate(-8deg); print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .paper__stamp img { display: block; width: 100%; height: 100%; object-fit: contain; }
   @media print {
     body { background: #fff; }
     .head, .foot, .tabbar, .msv-mark-btn, .edit-bar, .no-print { display: none !important; }
@@ -66,7 +69,7 @@
       <div><dt>Куратор</dt><dd id="vCur">Павел Дроздов · +7 916 300-40-50</dd></div>
     </dl>
     <div class="paper__foot">
-      <span class="paper__stamp">место<br>печати</span>
+      <span class="paper__stamp" aria-hidden="true"><img src="stamp.png" alt=""></span>
       Ваучер подтверждает право на заселение при предъявлении паспорта. Заезд с 14:00, выезд до 12:00. Вопросы — куратору или в поддержку МСВ.
     </div>
   </article>
