@@ -111,10 +111,22 @@ function serveStatic(root, req, res) {
 
   const ext = path.extname(file).toLowerCase();
   const type = MIME[ext] || 'application/octet-stream';
-  // HTML не кэшируем — правки должны быть видны сразу; остальное — на час
-  const cache = ext === '.html' ? 'no-cache' : 'public, max-age=3600';
+  // HTML, стили и скрипты — «переспрашивай каждый раз» (no-cache): после
+  // выкладки посетитель не получит новую страницу со старыми стилями.
+  // Переспрос дешёвый: по Last-Modified отвечаем 304 без тела.
+  // Картинки и шрифты меняются редко — их можно держать сутки.
+  const fresh = ext === '.html' || ext === '.css' || ext === '.js';
+  const cache = fresh ? 'no-cache' : 'public, max-age=86400';
+  const modified = stat.mtime.toUTCString();
 
-  res.writeHead(200, { 'Content-Type': type, 'Content-Length': stat.size, 'Cache-Control': cache });
+  const since = req.headers['if-modified-since'];
+  if (since && new Date(since).getTime() >= Math.floor(stat.mtimeMs / 1000) * 1000) {
+    res.writeHead(304, { 'Cache-Control': cache, 'Last-Modified': modified });
+    res.end();
+    return true;
+  }
+
+  res.writeHead(200, { 'Content-Type': type, 'Content-Length': stat.size, 'Cache-Control': cache, 'Last-Modified': modified });
   fs.createReadStream(file).pipe(res);
   return true;
 }

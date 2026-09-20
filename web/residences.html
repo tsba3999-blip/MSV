@@ -23,11 +23,18 @@
   .res-pick__name { margin: 0; }
   .res-pick__addr { color: var(--msv-graphite); }
   .res-pick__map { font-size: var(--msv-note-size); margin-top: 4px; align-self: flex-start; cursor: pointer; }
-  /* Монитор: три открытки в ряд */
+  /* Планшет и монитор: три открытки в ряд. На планшете карточка ~220 px —
+     имя размером подзаголовка, иначе «Молодежка» упрётся в край;
+     на мониторе (от 1100) карточка ~330 px — имя снова крупное. */
   @media (min-width: 768px) {
     .res-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--msv-s16); align-items: stretch; }
-    .res-pick { margin-bottom: 0; }
+    .res-pick { margin-bottom: 0; min-width: 0; }
+    .res-pick__body { overflow-wrap: anywhere; }
     .res-pick__band { height: 128px; }
+    .res-pick__name { font-size: var(--msv-sub-size); line-height: var(--msv-sub-line); letter-spacing: var(--msv-sub-track); }
+  }
+  @media (min-width: 1100px) {
+    .res-pick__name { font-size: var(--msv-h-size); line-height: var(--msv-h-line); letter-spacing: var(--msv-h-track); }
   }
 </style>
 </head>
