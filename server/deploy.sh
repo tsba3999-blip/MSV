@@ -47,8 +47,16 @@ npm install --omit=dev --silent
 
 echo "==> База данных"
 sudo -u postgres psql -v ON_ERROR_STOP=1 msv -f db/schema.sql >/dev/null
-sudo -u postgres psql -v ON_ERROR_STOP=1 msv -f db/seed.sql >/dev/null
-echo "    схема и первичные данные применены"
+echo "    схема применена"
+# seed.sql — демонстрационная раскладка комнат и мест. Только на пустую базу:
+# после seed-people.sh в базе реальные места заказчика, и повторный seed.sql
+# затирал бы их демо-данными при каждой выкладке.
+if [ "$(cd /tmp && sudo -u postgres psql -Atc 'SELECT count(*) FROM residences' msv)" = "0" ]; then
+  sudo -u postgres psql -v ON_ERROR_STOP=1 msv -f db/seed.sql >/dev/null
+  echo "    первичные данные применены (база была пустой)"
+else
+  echo "    первичные данные не трогаем: в базе уже есть резиденции"
+fi
 
 # Таблицы создаёт postgres, а сайт ходит под пользователем из DATABASE_URL —
 # без явных прав он получает «permission denied for table users».

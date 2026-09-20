@@ -285,11 +285,10 @@
 .room__price { align-items: center; }
 .room__price b { margin-left: auto; }
 .room__price .msv-btn { flex: 0 0 auto; }
-.room__none { flex: 0 0 auto; min-width: 72px; text-align: center; font-size: var(--msv-note-size); color: var(--msv-n300); }
 @media (max-width: 400px) {
   /* На узком телефоне цена уходит под подпись, кнопка остаётся справа */
   .room__price { flex-wrap: wrap; }
   .room__price span:first-child { flex: 1 1 100%; }
   .room__price b { margin-left: 0; }
-  .room__price .msv-btn, .room__none { margin-left: auto; }
+  .room__price .msv-btn { margin-left: auto; }
 }

@@ -87,7 +87,8 @@ MSV.ready(function (ctx) {
       var tiers = {};
       beds.forEach(function (b) {
         var k = b.tier || 'Место';
-        tiers[k] = tiers[k] || { kind: k === 'нижнее' ? 'Нижнее место' : (k === 'верхнее' ? 'Верхнее место' : 'Место'), left: 0, price: b.price, ids: [] };
+        // Без яруса — обычная кровать, не двухъярусная: «Отдельное место»
+        tiers[k] = tiers[k] || { kind: k === 'нижнее' ? 'Нижнее место' : (k === 'верхнее' ? 'Верхнее место' : 'Отдельное место'), left: 0, price: b.price, ids: [] };
         if (!busy[b.id]) { tiers[k].left++; tiers[k].ids.push(b.id); }
       });
       var list = Object.keys(tiers).map(function (k) { return tiers[k]; }).sort(function (a, b) { return a.price - b.price; });
@@ -169,22 +170,19 @@ MSV.ready(function (ctx) {
     }
 
     // Кнопка «Выбрать» — у каждого вида места (верхнее / нижнее): у них
-    // разная цена, и выбор происходит именно здесь. Одно красное действие
-    // на экран: красная — только у первого свободного места первой карточки.
-    var primaryUsed = false;
+    // разная цена, и выбор происходит именно здесь. Все кнопки одинаковые;
+    // у выкупленных мест — неактивная «Продано» (решение заказчика 21.09.2026).
     list.innerHTML = rooms.map(function (r) {
       var prices = r.beds.map(function (b, ti) {
         var out = b.left === 0;
         var btn;
         if (out) {
-          btn = '<span class="room__none">нет</span>';
+          btn = '<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" disabled>Продано</button>';
         } else {
-          var kind = primaryUsed ? 'msv-btn--secondary' : 'msv-btn--primary';
-          primaryUsed = true;
-          btn = '<button class="msv-btn msv-btn--s ' + kind + '" type="button" data-pick="' + esc(r.id) + '" data-tier="' + ti + '">Выбрать</button>';
+          btn = '<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-pick="' + esc(r.id) + '" data-tier="' + ti + '">Выбрать</button>';
         }
         return '<div class="room__price' + (out ? ' room__price--out' : '') + '">' +
-          '<span>' + esc(b.kind) + ' · ' + (out ? 'мест нет' : b.left + ' ' + plural(b.left, 'место', 'места', 'мест')) + '</span>' +
+          '<span>' + esc(b.kind) + ' · ' + (out ? 'продано' : b.left + ' ' + plural(b.left, 'место', 'места', 'мест')) + '</span>' +
           '<b>' + money(b.price) + '</b>' + btn + '</div>';
       }).join('');
 
