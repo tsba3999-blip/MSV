@@ -6,14 +6,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="icon" href="favicon4.png" type="image/png">
 <meta name="theme-color" content="#F5F1EA">
-<title>Репутация: тридцать круглых — МСВ</title>
+<title>Репутация: восемь вариантов — МСВ</title>
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="resident.css">
 <style>
   /* ============================================================
-     Тридцать круглых и полукруглых индикаторов репутации.
-     Шкала −5…+5, значение VALUE (сейчас 2,4). Ниже нуля — красный,
-     выше — лайм, графит — текущее. Оживают при открытии; «Ещё раз».
+     Индикатор репутации, восемь вариантов (номера сохранены из
+     прежних тридцати: 4, 5, 9, 10, 13, 14, 23, 24).
+
+     Правила шкалы (решение заказчика 21.09.2026):
+       · плюс — без потолка: шкала сама растёт (до 5, 10, 20, 50, 100…);
+       · минус — три «жизни»: −1 = сгорела одна жизнь; сгорели все три —
+         расторжение договора.
+     Слева — три ячейки жизней (красные), ноль — на границе, справа —
+     открытая шкала (лайм). Значение VALUE (сейчас 2,4).
      ============================================================ */
   .page { padding-bottom: var(--msv-s48); }
   .grid { display: grid; grid-template-columns: 1fr; gap: var(--msv-s16); }
@@ -22,20 +28,28 @@
   .v__t { margin: 0 0 var(--msv-s4); font-size: 17px; line-height: 22px; }
   .v__d { margin: 0 0 var(--msv-s12); color: var(--msv-n500); }
   .v__num { display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 26px; padding: 0 6px; margin-right: var(--msv-s8); font-size: 13px; font-weight: 700; color: var(--msv-white); background: var(--msv-graphite); border-radius: 13px; vertical-align: middle; }
-  .g { display: block; width: 100%; max-width: 260px; margin: 0 auto; }
+  .g { display: block; width: 100%; max-width: 280px; margin: 0 auto; }
   .g svg { display: block; width: 100%; height: auto; overflow: visible; }
   .big { font: 700 32px/1 var(--msv-font); letter-spacing: -.02em; fill: var(--msv-graphite); }
   .mid { font: 700 18px/1 var(--msv-font); fill: var(--msv-graphite); }
   .cap { font: 600 10px/1 var(--msv-font); letter-spacing: .08em; text-transform: uppercase; fill: var(--msv-n500); }
   .tick { font: 600 11px/1 var(--msv-font); fill: var(--msv-graphite); }
   .again { display: inline-flex; align-items: center; height: var(--msv-btn-s); padding: 0 var(--msv-s16); margin-top: var(--msv-s8); font: 600 13px/1 var(--msv-font); color: var(--msv-graphite); background: var(--msv-beige); border: 0; border-radius: 999px; cursor: pointer; }
+  .demo { display: flex; flex-wrap: wrap; gap: var(--msv-s8); margin: 0 0 var(--msv-s16); }
+  .demo button { height: var(--msv-chip); padding: 0 var(--msv-s12); font: 600 13px/1 var(--msv-font); color: var(--msv-graphite); background: var(--msv-white); border: 1px solid var(--msv-n100); border-radius: 999px; cursor: pointer; }
+  .demo button[aria-pressed="true"] { color: var(--msv-white); background: var(--msv-graphite); border-color: var(--msv-graphite); }
+
+  /* анимация: .mv едет к --tf / --dash, .spring — с перелётом; .reset выключает переходы для сброса */
   .mv { transition: all 1.3s cubic-bezier(.2,.9,.2,1); }
   .g.run .mv { transform: var(--tf, none); stroke-dashoffset: var(--dash, 0); opacity: var(--op, 1); }
   .spring { transition: all 1.5s cubic-bezier(.34,1.35,.64,1); }
   .g.run .spring { transform: var(--tf, none); }
   .ln { opacity: .15; transition: opacity .3s ease, transform .4s cubic-bezier(.34,1.4,.64,1); }
   .g.run .ln.on { opacity: 1; }
-  @media (prefers-reduced-motion: reduce) { .mv, .spring, .ln { transition: none; } }
+  .g.reset .mv, .g.reset .spring, .g.reset .ln { transition: none !important; }
+  .life { transition: opacity .4s ease, transform .4s cubic-bezier(.34,1.4,.64,1); transform-box: fill-box; transform-origin: center; }
+  .life--lost { opacity: .18; }
+  @media (prefers-reduced-motion: reduce) { .mv, .spring, .ln, .life { transition: none; } }
 </style>
 </head>
 <body>
@@ -49,10 +63,17 @@
         <path d="M15 6l-6 6 6 6"/>
       </svg>
     </a>
-    <h1 class="msv-sub head__title"><a class="head__title-link" href="reputation.html">Репутация: тридцать круглых</a></h1>
+    <h1 class="msv-sub head__title"><a class="head__title-link" href="reputation.html">Репутация: восемь вариантов</a></h1>
   </div>
 
-  <p class="msv-body" style="margin:0 0 var(--msv-s24);color:var(--msv-n500)">Только круглые и полукруглые. Шкала −5…+5, значение 2,4. Оживают при открытии; «Ещё раз» — повторить. Выберите номер — поставлю его как основной.</p>
+  <p class="msv-body" style="margin:0 0 var(--msv-s12);color:var(--msv-n500)">Слева — три жизни (сгорают при минусе; ноль жизней — расторжение договора), справа — открытая шкала: растёт вместе с репутацией. Посмотрите на разных значениях:</p>
+  <div class="demo" id="demo" role="group" aria-label="Значение для показа">
+    <button type="button" data-v="2.4" aria-pressed="true">+2,4</button>
+    <button type="button" data-v="7">+7</button>
+    <button type="button" data-v="23">+23</button>
+    <button type="button" data-v="-1.5">−1,5 (сгорела жизнь)</button>
+    <button type="button" data-v="-3">−3 (расторжение)</button>
+  </div>
 
   <div class="grid" id="list"></div>
 
@@ -61,157 +82,117 @@
 <script>
 (function () {
   'use strict';
-  var VALUE = 2.4, MIN = -5, MAX = 5;
-  var pos = VALUE >= 0, F = Math.abs(VALUE) / MAX, T = (VALUE - MIN) / (MAX - MIN);   // F — от нуля до края, T — от −5 до +5
-  var COL = pos ? 'var(--msv-lime)' : 'var(--msv-red)', G = 'var(--msv-graphite)', N1 = 'var(--msv-n100)', N3 = 'var(--msv-n300)', RED = 'var(--msv-red)', LIME = 'var(--msv-lime)', W = '#fff';
-  function fmt(v) { return (v > 0 ? '+' : '') + v.toFixed(1).replace('.', ','); }
+  var VALUE = 2.4;
+  var LIVES = 3;
+  var pos, posMax, lives, F, T, COL, LOST;
+  var G = 'var(--msv-graphite)', N1 = 'var(--msv-n100)', N3 = 'var(--msv-n300)', RED = 'var(--msv-red)', LIME = 'var(--msv-lime)', W = '#fff';
+
+  /* Потолок положительной шкалы — «красивое» число не меньше значения */
+  function niceMax(v) { var steps = [5, 10, 20, 50, 100, 200, 500, 1000]; for (var i = 0; i < steps.length; i++) if (v <= steps[i]) return steps[i]; return Math.ceil(v / 1000) * 1000; }
+  function recompute() {
+    pos = VALUE >= 0;
+    posMax = niceMax(Math.max(5, VALUE));
+    lives = pos ? LIVES : Math.max(0, LIVES + Math.floor(VALUE));   // −1,5 → 1 сгорела, 2 осталось
+    LOST = lives === 0;
+    COL = pos ? LIME : RED;
+    // T — положение на общей шкале: от −3 (0) до +posMax (1); ноль — на границе
+    var lo = -LIVES, hi = posMax, v = Math.max(lo, Math.min(hi, VALUE));
+    T = (v - lo) / (hi - lo);
+    F = pos ? VALUE / posMax : Math.min(1, -VALUE / LIVES);
+  }
+  function fmt(v) { return (v > 0 ? '+' : '') + (Math.abs(v) >= 10 ? Math.round(v).toString() : v.toFixed(1).replace('.', ',')); }
   function P(cx, cy, r, deg) { var a = (deg - 90) * Math.PI / 180; return [(cx + Math.cos(a) * r).toFixed(1), (cy + Math.sin(a) * r).toFixed(1)]; }
   function arc(cx, cy, r, a0, a1) { var p0 = P(cx, cy, r, a0), p1 = P(cx, cy, r, a1); return 'M' + p0.join(' ') + ' A' + r + ' ' + r + ' 0 ' + (Math.abs(a1 - a0) > 180 ? 1 : 0) + ' ' + (a1 > a0 ? 1 : 0) + ' ' + p1.join(' '); }
+  // угол значения v на шкале с охватом span (ноль — на границе жизней и плюса)
+  function ang(span, v) { var lo = -LIVES, hi = posMax; v = Math.max(lo, Math.min(hi, v)); return -span / 2 + (v - lo) / (hi - lo) * span; }
   function big(x, y, s) { return '<text class="big" x="' + x + '" y="' + y + '" text-anchor="middle"' + (s ? ' style="' + s + '"' : '') + ' data-count>0</text>'; }
-  function cap(x, y, t) { return '<text class="cap" x="' + x + '" y="' + y + '" text-anchor="middle">' + t + '</text>'; }
-  function fillArc(id, cx, cy, r, a0, a1, w, col, extra) { return '<path id="' + id + '" class="mv" d="' + arc(cx, cy, r, a0, a1) + '" fill="none" stroke="' + col + '" stroke-width="' + w + '" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" style="--dash:' + (100 - F * 100) + '"' + (extra || '') + '/>'; }
-  // угол значения на шкале со сдвигом: полный охват span, ноль в середине
-  function angOf(span) { return -span / 2 + T * span; }
-  function ticks(cx, cy, r, span, len, every) { var s = ''; for (var v = MIN; v <= MAX; v++) { if (every && v % every) continue; var a = -span / 2 + (v - MIN) / (MAX - MIN) * span, p0 = P(cx, cy, r, a), p1 = P(cx, cy, r - len, a); s += '<line x1="' + p0[0] + '" y1="' + p0[1] + '" x2="' + p1[0] + '" y2="' + p1[1] + '" stroke="' + (v < 0 ? RED : G) + '" stroke-width="2" stroke-linecap="round"/>'; } return s; }
-  function needle(id, cx, cy, len, span, cls) { return '<g id="' + id + '" class="' + (cls || 'spring') + '" style="transform-origin:' + cx + 'px ' + cy + 'px;transform:rotate(' + (-span / 2) + 'deg);--tf:rotate(' + angOf(span) + 'deg)"><path d="M' + (cx - 4) + ' ' + cy + ' L' + cx + ' ' + (cy - len) + ' L' + (cx + 4) + ' ' + cy + ' Z" fill="' + G + '"/><circle cx="' + cx + '" cy="' + cy + '" r="7" fill="' + G + '"/><circle cx="' + cx + '" cy="' + cy + '" r="3" fill="' + W + '"/></g>'; }
-  function seq(g, sel, order, delay) { var el = g.querySelectorAll(sel); el.forEach(function (e) { e.classList.remove('on'); }); return function (on) { if (!on) return; order.forEach(function (i, k) { setTimeout(function () { el[i].classList.add('on'); }, 100 + k * delay); }); }; }
+  function cap(x, y, t, s) { return '<text class="cap" x="' + x + '" y="' + y + '" text-anchor="middle"' + (s ? ' style="' + s + '"' : '') + '>' + t + '</text>'; }
+  function lbl(cx, cy, r, span, v, t, col) { var p = P(cx, cy, r, ang(span, v)); return '<text class="tick" x="' + p[0] + '" y="' + (+p[1] + 4) + '" text-anchor="middle"' + (col ? ' fill="' + col + '"' : '') + '>' + t + '</text>'; }
+  // заливка от нуля к значению
+  function fill(cx, cy, r, span, w, col, extra) { var a0 = ang(span, 0), a1 = ang(span, VALUE); if (Math.abs(a1 - a0) < .01) a1 = a0 + (pos ? .01 : -.01); return '<path class="mv" d="' + arc(cx, cy, r, a0, a1) + '" fill="none" stroke="' + col + '" stroke-width="' + w + '" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" style="--dash:0"' + (extra || '') + '/>'; }
+  // риски по всей шкале: на жизнях — по одной, на плюсе — по «шагу»
+  function ticks(cx, cy, r, span, len) { var s = '', step = posMax / 5; var vs = [-3, -2, -1, 0]; for (var v = step; v <= posMax + .001; v += step) vs.push(v); vs.forEach(function (v) { var a = ang(span, v), p0 = P(cx, cy, r, a), p1 = P(cx, cy, r - len, a); s += '<line x1="' + p0[0] + '" y1="' + p0[1] + '" x2="' + p1[0] + '" y2="' + p1[1] + '" stroke="' + (v < 0 ? RED : G) + '" stroke-width="2" stroke-linecap="round"/>'; }); return s; }
+  function needle(cx, cy, len, span) { return '<g class="spring" style="transform-origin:' + cx + 'px ' + cy + 'px;transform:rotate(' + ang(span, -LIVES) + 'deg);--tf:rotate(' + ang(span, VALUE) + 'deg)"><path d="M' + (cx - 4) + ' ' + cy + ' L' + cx + ' ' + (cy - len) + ' L' + (cx + 4) + ' ' + cy + ' Z" fill="' + G + '"/><circle cx="' + cx + '" cy="' + cy + '" r="7" fill="' + G + '"/><circle cx="' + cx + '" cy="' + cy + '" r="3" fill="' + W + '"/></g>'; }
+  // три жизни — сердечки; сгоревшие бледные
+  function heart(x, y, s, i) { return '<path class="life' + (i >= lives ? ' life--lost' : '') + '" data-life="' + i + '" transform="translate(' + x + ' ' + y + ') scale(' + s + ')" d="M0 3.2 C-1 1.4 -4.2 0.4 -4.2 -2 C-4.2 -3.6 -3 -4.6 -1.8 -4.6 C-0.9 -4.6 -0.3 -4.1 0 -3.4 C0.3 -4.1 0.9 -4.6 1.8 -4.6 C3 -4.6 4.2 -3.6 4.2 -2 C4.2 0.4 1 1.4 0 3.2 Z" fill="' + RED + '"/>'; }
+  function livesRow(x, y, s) { return heart(x - 14 * s, y, s, 0) + heart(x, y, s, 1) + heart(x + 14 * s, y, s, 2); }
+  function status(x, y) { return LOST ? '<text class="cap" x="' + x + '" y="' + y + '" text-anchor="middle" style="fill:var(--msv-red)">расторжение договора</text>' : cap(x, y, lives === 3 ? 'три жизни' : (lives === 2 ? 'осталось две жизни' : 'осталась одна жизнь')); }
 
   var V = [];
-  // 1
-  V.push(['Тонкое кольцо с точкой', 'Полный круг, тонкая линия. От верха по часовой наливается цвет, на конце — точка-маркер.',
-    '<svg viewBox="0 0 220 220"><circle cx="110" cy="110" r="92" fill="none" stroke="' + N1 + '" stroke-width="4"/>' + fillArc('a', 110, 110, 92, 0, pos ? 180 : -180, 4, COL) +
-    '<circle class="mv" cx="110" cy="18" r="7" fill="' + W + '" stroke="' + G + '" stroke-width="3" style="transform-origin:110px 110px;--tf:rotate(' + (pos ? 180 * F : -180 * F) + 'deg)"/>' + big(110, 120) + cap(110, 142, 'репутация') + '</svg>']);
-  // 2
-  V.push(['Толстое кольцо', 'Широкое кольцо, скруглённые концы, число крупно. Самый спокойный и «мобильный» вариант.',
-    '<svg viewBox="0 0 220 220"><circle cx="110" cy="110" r="84" fill="none" stroke="' + N1 + '" stroke-width="22"/>' + fillArc('a', 110, 110, 84, 0, pos ? 180 : -180, 22, COL) + big(110, 120) + cap(110, 142, 'из +5') + '</svg>']);
-  // 3
-  V.push(['Полукруг сплошной', 'Классический полукруг: серая шкала, цветная заливка от нуля наверху к значению, число под дугой.',
-    '<svg viewBox="0 0 240 150"><path d="' + arc(120, 130, 100, -90, 90) + '" fill="none" stroke="' + N1 + '" stroke-width="18" stroke-linecap="round"/>' + fillArc('a', 120, 130, 100, 0, pos ? 90 : -90, 18, COL) +
-    '<text class="tick" x="20" y="150" text-anchor="middle" fill="' + RED + '">−5</text><text class="tick" x="220" y="150" text-anchor="middle">+5</text>' + big(120, 118) + '</svg>']);
-  // 4
-  V.push(['Полукруг с градиентом и треугольником', 'Дуга-градиент от красного через серый к лайму, снаружи ползёт треугольный указатель.',
-    '<svg viewBox="0 0 240 150"><defs><linearGradient id="gq4" x1="0" x2="1"><stop offset="0" stop-color="#FB344A"/><stop offset=".5" stop-color="#EAE4DA"/><stop offset="1" stop-color="#C8F03C"/></linearGradient></defs><path d="' + arc(120, 130, 96, -90, 90) + '" fill="none" stroke="url(#gq4)" stroke-width="16"/>' +
-    '<g class="spring" style="transform-origin:120px 130px;transform:rotate(-90deg);--tf:rotate(' + angOf(180) + 'deg)"><path d="M112 14 L120 26 L128 14 Z" fill="' + G + '"/></g>' + big(120, 118) + cap(120, 140, 'репутация') + '</svg>']);
-  // 5
-  V.push(['Прибор 270° со стрелкой', 'Три четверти круга, риски на каждом делении, подписи −5 / 0 / +5, стрелка с пружинящим ходом.',
-    '<svg viewBox="0 0 240 220"><path d="' + arc(120, 120, 96, -135, 0) + '" fill="none" stroke="' + RED + '" stroke-width="12" opacity=".75"/><path d="' + arc(120, 120, 96, 0, 135) + '" fill="none" stroke="' + LIME + '" stroke-width="12"/>' + ticks(120, 120, 84, 270, 10) +
-    '<text class="tick" x="' + P(120, 120, 62, -135)[0] + '" y="' + P(120, 120, 62, -135)[1] + '" text-anchor="middle" fill="' + RED + '">−5</text><text class="tick" x="120" y="62" text-anchor="middle">0</text><text class="tick" x="' + P(120, 120, 62, 135)[0] + '" y="' + P(120, 120, 62, 135)[1] + '" text-anchor="middle">+5</text>' +
-    needle('n', 120, 120, 78, 270) + big(120, 200) + '</svg>']);
-  // 6
-  V.push(['Сегменты 270°', 'Одиннадцать сегментов по дуге — по одному на деление. Текущий — графитовый и чуть выступает, остальные до него закрашены.',
-    (function () { var s = '<svg viewBox="0 0 240 220">'; for (var v = MIN; v <= MAX; v++) { var a0 = -135 + (v - MIN) * (270 / 11) + 1.5, a1 = a0 + 270 / 11 - 3, cur = Math.round(VALUE) === v; var r = cur ? 104 : 98; s += '<path class="ln" data-v="' + v + '" d="' + arc(120, 120, r, a0, a1) + '" fill="none" stroke="' + (cur ? G : (v < 0 ? RED : LIME)) + '" stroke-width="' + (cur ? 22 : 14) + '"/>'; } return s + big(120, 128) + cap(120, 150, 'репутация') + '</svg>'; })(),
-    function (g, on) { var order = []; var vs = Math.round(VALUE); if (pos) for (var v = 0; v <= vs; v++) order.push(v - MIN); else for (var w = 0; w >= vs; w--) order.push(w - MIN); seq(g, '.ln', order, 110)(on); }]);
-  // 7
-  V.push(['Кольцо из точек', 'Двадцать четыре точки по кругу. От верха по часовой точки «включаются» по очереди до значения.',
-    (function () { var s = '<svg viewBox="0 0 220 220">'; for (var i = 0; i < 24; i++) { var p = P(110, 110, 92, i * 15); s += '<circle class="ln" cx="' + p[0] + '" cy="' + p[1] + '" r="6" fill="' + (i < 12 ? LIME : RED) + '"/>'; } return s + big(110, 120) + cap(110, 142, 'из +5') + '</svg>'; })(),
-    function (g, on) { var n = Math.round(F * 12), order = []; for (var i = 0; i < n; i++) order.push(pos ? i : 23 - i); seq(g, '.ln', order, 70)(on); }]);
-  // 8
-  V.push(['Двойное кольцо', 'Снаружи — тонкая шкала с рисками, внутри — толстое кольцо-заливка. Читается и издалека, и вблизи.',
-    '<svg viewBox="0 0 220 220"><circle cx="110" cy="110" r="100" fill="none" stroke="' + N1 + '" stroke-width="2"/>' + ticks(110, 110, 104, 360, 8) + '<circle cx="110" cy="110" r="76" fill="none" stroke="' + N1 + '" stroke-width="16"/>' + fillArc('a', 110, 110, 76, 0, pos ? 180 : -180, 16, COL) + big(110, 120) + '</svg>']);
-  // 9
-  V.push(['Радуга', 'Три дуги-полосы: красная (риск), серая (ноль), лаймовая. Стрелка показывает, в какой ты полосе.',
-    '<svg viewBox="0 0 240 150"><path d="' + arc(120, 130, 100, -90, -30) + '" fill="none" stroke="' + RED + '" stroke-width="20"/><path d="' + arc(120, 130, 100, -30, 30) + '" fill="none" stroke="' + N3 + '" stroke-width="20"/><path d="' + arc(120, 130, 100, 30, 90) + '" fill="none" stroke="' + LIME + '" stroke-width="20"/>' +
-    needle('n', 120, 130, 82, 180) + big(120, 116) + '</svg>']);
-  // 10
-  V.push(['Кольцо с зазором внизу', 'Кольцо на 300° с разрывом внизу. Ноль — вверху; минус уходит влево красным, плюс — вправо лаймом.',
-    '<svg viewBox="0 0 220 220"><path d="' + arc(110, 110, 88, -150, 150) + '" fill="none" stroke="' + N1 + '" stroke-width="14" stroke-linecap="round"/>' + fillArc('a', 110, 110, 88, 0, pos ? 150 : -150, 14, COL) + '<line x1="110" y1="14" x2="110" y2="30" stroke="' + G + '" stroke-width="3"/>' + big(110, 120) + cap(110, 142, 'репутация') + '</svg>']);
-  // 11
-  V.push(['Пирог', 'Полный диск делится как пирог: закрашивается сектор, пропорциональный значению. Центр — белый круг с числом.',
-    '<svg viewBox="0 0 220 220"><circle cx="110" cy="110" r="96" fill="' + N1 + '"/><path id="s" fill="' + COL + '"/><circle cx="110" cy="110" r="52" fill="' + W + '"/>' + big(110, 120) + '</svg>',
-    function (g, on) { var p = g.querySelector('#s'), t0 = Date.now(), end = 180 * F; (function step() { var k = on ? Math.min(1, (Date.now() - t0) / 1300) : 0; var a = end * (1 - Math.pow(1 - k, 3)); var pt = P(110, 110, 96, pos ? a : -a); p.setAttribute('d', a < .5 ? '' : 'M110 110 L110 14 A96 96 0 ' + (a > 180 ? 1 : 0) + ' ' + (pos ? 1 : 0) + ' ' + pt.join(' ') + ' Z'); if (on && k < 1) setTimeout(step, 16); })(); }]);
-  // 12
-  V.push(['Штриховое кольцо', 'Кольцо из коротких штрихов (60 штук). Закрашенные штрихи — набранная репутация, штрихи «тикают» по очереди.',
-    (function () { var s = '<svg viewBox="0 0 220 220">'; for (var i = 0; i < 60; i++) { var p0 = P(110, 110, 96, i * 6), p1 = P(110, 110, 84, i * 6); s += '<line class="ln" x1="' + p0[0] + '" y1="' + p0[1] + '" x2="' + p1[0] + '" y2="' + p1[1] + '" stroke="' + (i < 30 ? LIME : RED) + '" stroke-width="3" stroke-linecap="round"/>'; } return s + big(110, 120) + cap(110, 142, 'из +5') + '</svg>'; })(),
-    function (g, on) { var n = Math.round(F * 30), order = []; for (var i = 0; i < n; i++) order.push(pos ? i : 59 - i); seq(g, '.ln', order, 28)(on); }]);
-  // 13
-  V.push(['Полукруг: шкала снаружи, заливка внутри', 'Тонкая шкала с рисками по внешнему краю, под ней толстая заливка. Два слоя — как у настоящих приборов.',
-    '<svg viewBox="0 0 240 150"><path d="' + arc(120, 130, 110, -90, 90) + '" fill="none" stroke="' + N3 + '" stroke-width="2"/>' + ticks(120, 130, 110, 180, 8) + '<path d="' + arc(120, 130, 88, -90, 90) + '" fill="none" stroke="' + N1 + '" stroke-width="18"/>' + fillArc('a', 120, 130, 88, 0, pos ? 90 : -90, 18, COL) + big(120, 118) + '</svg>']);
-  // 14
-  V.push(['Автомобильный', 'Тёмный диск, светящаяся дуга и стрелка с шариком на конце — как спидометр в машине.',
-    '<svg viewBox="0 0 240 200"><defs><filter id="gl14"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="120" cy="120" r="104" fill="' + G + '"/><path d="' + arc(120, 120, 84, -135, 135) + '" fill="none" stroke="#4D6480" stroke-width="10"/>' + fillArc('a', 120, 120, 84, 0, pos ? 135 : -135, 10, COL, ' filter="url(#gl14)"') +
-    '<g class="spring" style="transform-origin:120px 120px;transform:rotate(-135deg);--tf:rotate(' + angOf(270) + 'deg)"><line x1="120" y1="120" x2="120" y2="48" stroke="' + W + '" stroke-width="3"/><circle cx="120" cy="48" r="6" fill="' + COL + '"/></g><circle cx="120" cy="120" r="8" fill="' + W + '"/>' + big(120, 178, 'fill:#fff') + '</svg>']);
-  // 15
-  V.push(['Кнопка с кольцом', 'Графитовый круг с числом, как кнопка, и тонкое цветное кольцо вокруг — наливается по часовой.',
-    '<svg viewBox="0 0 220 220"><circle cx="110" cy="110" r="70" fill="' + G + '"/><circle cx="110" cy="110" r="92" fill="none" stroke="' + N1 + '" stroke-width="6"/>' + fillArc('a', 110, 110, 92, 0, pos ? 180 : -180, 6, COL) + big(110, 120, 'fill:#fff') + '<text class="cap" x="110" y="142" text-anchor="middle" style="fill:#B8B1A5">репутация</text></svg>']);
-  // 16
-  V.push(['Зубцы', 'Полукруг из 21 зубца. Зубцы до значения закрашены, остальные серые; каждый зубец — половина деления.',
-    (function () { var s = '<svg viewBox="0 0 240 150">'; for (var i = 0; i < 21; i++) { var a = -90 + i * 9, p0 = P(120, 130, 104, a), p1 = P(120, 130, 78, a); s += '<line class="ln" x1="' + p0[0] + '" y1="' + p0[1] + '" x2="' + p1[0] + '" y2="' + p1[1] + '" stroke="' + (i < 10 ? RED : (i === 10 ? G : LIME)) + '" stroke-width="6" stroke-linecap="round"/>'; } return s + big(120, 118) + '</svg>'; })(),
-    function (g, on) { var n = Math.round(F * 10), order = [10]; for (var i = 1; i <= n; i++) order.push(pos ? 10 + i : 10 - i); seq(g, '.ln', order, 80)(on); }]);
-  // 17
-  V.push(['Две стороны от верха', 'Ноль — вверху. Минус закрашивает кольцо против часовой красным, плюс — по часовой лаймом. Другая половина остаётся серой шкалой.',
-    '<svg viewBox="0 0 220 220"><path d="' + arc(110, 110, 88, -180, 0) + '" fill="none" stroke="#FEE7EA" stroke-width="16"/><path d="' + arc(110, 110, 88, 0, 180) + '" fill="none" stroke="#EEF9D3" stroke-width="16"/>' + fillArc('a', 110, 110, 88, 0, pos ? 180 : -180, 16, COL) + '<line x1="110" y1="12" x2="110" y2="32" stroke="' + G + '" stroke-width="3"/>' + big(110, 120) + cap(110, 142, 'репутация') + '</svg>']);
-  // 18
-  V.push(['Свечение', 'Кольцо с мягким свечением за заливкой — как индикатор на тёмной панели, но на светлом фоне.',
-    '<svg viewBox="0 0 220 220"><defs><filter id="gl18" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="6"/></filter></defs><circle cx="110" cy="110" r="86" fill="none" stroke="' + N1 + '" stroke-width="12"/>' + fillArc('b', 110, 110, 86, 0, pos ? 180 : -180, 20, COL, ' filter="url(#gl18)" opacity=".7"') + fillArc('a', 110, 110, 86, 0, pos ? 180 : -180, 12, COL) + big(110, 120) + '</svg>']);
-  // 19
-  V.push(['Чаша', 'Полукруг перевёрнут: дуга внизу, как чаша, число над ней. Заливка идёт от нижней точки в сторону значения.',
-    '<svg viewBox="0 0 240 150"><path d="' + arc(120, 20, 100, 90, 270) + '" fill="none" stroke="' + N1 + '" stroke-width="18" stroke-linecap="round"/>' + fillArc('a', 120, 20, 100, 180, pos ? 90 : 270, 18, COL) + big(120, 46) + cap(120, 68, 'репутация') + '</svg>']);
-  // 20
-  V.push(['Прогресс с обводкой', 'Кольцо-прогресс с белой обводкой заливки, чтобы цвет отделялся от шкалы, и подпись «из +5».',
-    '<svg viewBox="0 0 220 220"><circle cx="110" cy="110" r="88" fill="none" stroke="' + N1 + '" stroke-width="18"/>' + fillArc('b', 110, 110, 88, 0, pos ? 180 : -180, 22, W) + fillArc('a', 110, 110, 88, 0, pos ? 180 : -180, 14, COL) + big(110, 120) + cap(110, 142, 'из +5') + '</svg>']);
-  // 21
-  V.push(['Капли по дуге', 'Десять капель по полукругу — пять красных, пять лаймовых. Наполняются от нуля по одной.',
-    (function () { var s = '<svg viewBox="0 0 240 150">'; for (var i = 0; i < 10; i++) { var a = -81 + i * 18, p = P(120, 130, 96, a); s += '<g class="ln" style="transform-box:fill-box;transform-origin:center;transform:scale(.6)"><path d="M' + p[0] + ' ' + (p[1] - 12) + ' c8 10 10 14 10 18 a10 10 0 0 1 -20 0 c0 -4 2 -8 10 -18 z" fill="' + (i < 5 ? RED : LIME) + '"/></g>'; } return s + big(120, 118) + '</svg>'; })(),
-    function (g, on) { var n = Math.round(F * 5), order = []; for (var i = 0; i < n; i++) order.push(pos ? 5 + i : 4 - i); var el = g.querySelectorAll('.ln'); el.forEach(function (e) { e.classList.remove('on'); e.style.transform = 'scale(.6)'; }); if (!on) return; order.forEach(function (i, k) { setTimeout(function () { el[i].classList.add('on'); el[i].style.transform = 'scale(1)'; }, 100 + k * 160); }); }]);
-  // 22
-  V.push(['Ротор', 'Шкала с делениями вращается, а маркер сверху стоит на месте — как барабан. Значение подъезжает под маркер.',
-    (function () { var s = '<svg viewBox="0 0 220 220"><g class="spring" style="transform-origin:110px 110px;transform:rotate(135deg);--tf:rotate(' + (-angOf(270)) + 'deg)">'; for (var v = MIN; v <= MAX; v++) { var a = -135 + (v - MIN) * 27, p = P(110, 110, 84, a); s += '<text class="tick" x="' + p[0] + '" y="' + (+p[1] + 4) + '" text-anchor="middle" transform="rotate(' + a + ' ' + p[0] + ' ' + p[1] + ')"' + (v < 0 ? ' fill="' + RED + '"' : '') + '>' + (v > 0 ? '+' : '') + v + '</text>'; } s += '<path d="' + arc(110, 110, 100, -135, 135) + '" fill="none" stroke="' + N1 + '" stroke-width="3"/></g>'; return s + '<path d="M102 6 L110 20 L118 6 Z" fill="' + G + '"/>' + big(110, 120) + '</svg>'; })()]);
-  // 23
-  V.push(['Полукруг с числами', 'Все одиннадцать делений подписаны по дуге. Стрелка-луч из центра, число крупно под ней.',
-    (function () { var s = '<svg viewBox="0 0 240 150"><path d="' + arc(120, 130, 100, -90, 90) + '" fill="none" stroke="' + N1 + '" stroke-width="3"/>'; for (var v = MIN; v <= MAX; v++) { var a = -90 + (v - MIN) * 18, p = P(120, 130, 112, a); s += '<text class="tick" x="' + p[0] + '" y="' + (+p[1] + 4) + '" text-anchor="middle"' + (v < 0 ? ' fill="' + RED + '"' : '') + '>' + (v > 0 ? '+' : '') + v + '</text>'; } return s + '<g class="spring" style="transform-origin:120px 130px;transform:rotate(-90deg);--tf:rotate(' + angOf(180) + 'deg)"><line x1="120" y1="130" x2="120" y2="40" stroke="' + COL + '" stroke-width="6" stroke-linecap="round"/></g><circle cx="120" cy="130" r="8" fill="' + G + '"/>' + big(120, 112) + '</svg>'; })()]);
-  // 24
-  V.push(['Три кольца', 'Концентрические кольца, как «кольца активности»: репутация, платежи, участие. Внешнее — главное.',
-    '<svg viewBox="0 0 220 220"><circle cx="110" cy="110" r="94" fill="none" stroke="' + N1 + '" stroke-width="12"/>' + fillArc('a', 110, 110, 94, 0, pos ? 180 : -180, 12, COL) +
-    '<circle cx="110" cy="110" r="74" fill="none" stroke="' + N1 + '" stroke-width="12"/><path class="mv" d="' + arc(110, 110, 74, 0, 180) + '" fill="none" stroke="var(--msv-sky)" stroke-width="12" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" style="--dash:10"/>' +
-    '<circle cx="110" cy="110" r="54" fill="none" stroke="' + N1 + '" stroke-width="12"/><path class="mv" d="' + arc(110, 110, 54, 0, 180) + '" fill="none" stroke="var(--msv-lavender)" stroke-width="12" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" style="--dash:55"/>' + '<text class="mid" x="110" y="117" text-anchor="middle" data-count>0</text></svg>']);
-  // 25
-  V.push(['Закрашенный сектор полукруга', 'Полукруг заливается изнутри — как веер: от центра к дуге, от нуля к значению.',
-    '<svg viewBox="0 0 240 150"><path d="M20 130 A100 100 0 0 1 220 130 Z" fill="' + N1 + '"/><path id="s" fill="' + COL + '"/><path d="' + arc(120, 130, 100, -90, 90) + '" fill="none" stroke="' + G + '" stroke-width="3"/><line x1="120" y1="130" x2="120" y2="30" stroke="' + W + '" stroke-width="2"/>' + big(120, 118) + '</svg>',
-    function (g, on) { var p = g.querySelector('#s'), t0 = Date.now(), end = 90 * F; (function step() { var k = on ? Math.min(1, (Date.now() - t0) / 1300) : 0; var a = end * (1 - Math.pow(1 - k, 3)); var pt = P(120, 130, 100, pos ? a : -a); p.setAttribute('d', a < .5 ? '' : 'M120 130 L120 30 A100 100 0 0 ' + (pos ? 1 : 0) + ' ' + pt.join(' ') + ' Z'); if (on && k < 1) setTimeout(step, 16); })(); }]);
-  // 26
-  V.push(['Плитка с мини-кольцом', 'Карточка как на главной: слева число и подпись, справа небольшое кольцо. Для главной резидента.',
-    '<svg viewBox="0 0 320 130"><rect x="0" y="0" width="320" height="130" rx="20" fill="' + (pos ? '#EEF9D3' : '#FEE7EA') + '"/><text class="cap" x="24" y="38" text-anchor="start">Репутация</text><text class="big" x="24" y="86" text-anchor="start" style="font-size:40px" data-count>0</text><text class="tick" x="24" y="110" text-anchor="start" fill="var(--msv-n500)">из +5</text>' +
-    '<circle cx="256" cy="65" r="40" fill="none" stroke="rgba(52,73,94,.12)" stroke-width="10"/>' + fillArc('a', 256, 65, 40, 0, pos ? 180 : -180, 10, G) + '</svg>']);
-  // 27
-  V.push(['Арка ворот', 'Толстая арка, в проёме — число. Арка наливается цветом от левого основания к правому.',
-    '<svg viewBox="0 0 240 160"><path d="' + arc(120, 140, 96, -90, 90) + '" fill="none" stroke="' + N1 + '" stroke-width="28"/>' + '<path id="a" class="mv" d="' + arc(120, 140, 96, -90, 90) + '" fill="none" stroke="' + COL + '" stroke-width="28" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" style="--dash:' + (100 - T * 100) + '"/>' + big(120, 132) + '</svg>']);
-  // 28
-  V.push(['Циркуль', 'Длинная стрелка выходит за кольцо и указывает на подпись снаружи; кольцо тонкое, риски снаружи.',
-    '<svg viewBox="0 0 240 240"><circle cx="120" cy="120" r="72" fill="none" stroke="' + N1 + '" stroke-width="3"/>' + ticks(120, 120, 88, 270, 8) +
-    '<text class="tick" x="' + P(120, 120, 104, -135)[0] + '" y="' + P(120, 120, 104, -135)[1] + '" text-anchor="middle" fill="' + RED + '">−5</text><text class="tick" x="120" y="20" text-anchor="middle">0</text><text class="tick" x="' + P(120, 120, 104, 135)[0] + '" y="' + P(120, 120, 104, 135)[1] + '" text-anchor="middle">+5</text>' +
-    '<g class="spring" style="transform-origin:120px 120px;transform:rotate(-135deg);--tf:rotate(' + angOf(270) + 'deg)"><line x1="120" y1="120" x2="120" y2="30" stroke="' + G + '" stroke-width="3" stroke-linecap="round"/><path d="M114 40 L120 26 L126 40 Z" fill="' + COL + '"/></g><circle cx="120" cy="120" r="6" fill="' + G + '"/>' + big(120, 128) + '</svg>']);
-  // 29
-  V.push(['Сейчас и месяц назад', 'Два полукруга друг напротив друга: верхний — репутация сейчас, нижний (зеркально) — месяц назад. Видно движение.',
-    '<svg viewBox="0 0 240 240"><path d="' + arc(120, 120, 96, -90, 90) + '" fill="none" stroke="' + N1 + '" stroke-width="16"/>' + fillArc('a', 120, 120, 96, 0, pos ? 90 : -90, 16, COL) +
-    '<path d="' + arc(120, 120, 96, 90, 270) + '" fill="none" stroke="' + N1 + '" stroke-width="16"/><path class="mv" d="' + arc(120, 120, 96, 180, 90) + '" fill="none" stroke="' + N3 + '" stroke-width="16" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" style="--dash:66"/>' +
-    big(120, 110) + cap(120, 130, 'сейчас') + '<text class="mid" x="120" y="166" text-anchor="middle" fill="var(--msv-n500)" style="fill:#6B665E">+1,7</text>' + cap(120, 184, 'месяц назад') + '</svg>']);
-  // 30
-  V.push(['Орбита', 'Кольцо-орбита, по ней от верха летит маленький спутник и оставляет след. Число — планета в центре.',
-    '<svg viewBox="0 0 220 220"><circle cx="110" cy="110" r="90" fill="none" stroke="' + N1 + '" stroke-width="2" stroke-dasharray="3 5"/>' + fillArc('a', 110, 110, 90, 0, pos ? 180 : -180, 3, COL) +
-    '<g class="mv" style="transform-origin:110px 110px;--tf:rotate(' + (pos ? 180 * F : -180 * F) + 'deg)"><circle cx="110" cy="20" r="8" fill="' + G + '"/><circle cx="110" cy="20" r="3" fill="' + W + '"/></g><circle cx="110" cy="110" r="52" fill="' + COL + '"/>' + big(110, 120) + '</svg>']);
+  V.push([4, 'Полукруг с градиентом и треугольником', 'Дуга-градиент: красная зона жизней, ноль, дальше лайм до текущего потолка шкалы. Снаружи — треугольный указатель; под дугой — жизни и число.',
+    function () { var z = T0(); return '<svg viewBox="0 0 280 175"><defs><linearGradient id="gq4" x1="0" x2="1"><stop offset="0" stop-color="#FB344A"/><stop offset="' + z + '" stop-color="#FB344A"/><stop offset="' + (z + .04) + '" stop-color="#EAE4DA"/><stop offset="1" stop-color="#C8F03C"/></linearGradient></defs>' +
+      '<path d="' + arc(140, 140, 110, -90, 90) + '" fill="none" stroke="url(#gq4)" stroke-width="16"/>' + lbl(140, 140, 88, 180, -3, '−3', RED) + lbl(140, 140, 88, 180, 0, '0') + lbl(140, 140, 88, 180, posMax, '+' + posMax) +
+      '<g class="spring" style="transform-origin:140px 140px;transform:rotate(-90deg);--tf:rotate(' + ang(180, VALUE) + 'deg)"><path d="M132 14 L140 26 L148 14 Z" fill="' + G + '"/></g>' + big(140, 118) + livesRow(140, 152, 1.6) + status(140, 172) + '</svg>'; }]);
+  V.push([5, 'Прибор 270° со стрелкой', 'Три четверти круга: красная дуга жизней слева, лаймовая — открытая шкала. Риски по делениям, стрелка с пружинящим ходом.',
+    function () { return '<svg viewBox="0 0 280 250"><path d="' + arc(140, 130, 100, ang(270, -3), ang(270, 0)) + '" fill="none" stroke="' + RED + '" stroke-width="12" opacity=".75"/><path d="' + arc(140, 130, 100, ang(270, 0), ang(270, posMax)) + '" fill="none" stroke="' + LIME + '" stroke-width="12"/>' + ticks(140, 130, 88, 270, 10) +
+      lbl(140, 130, 64, 270, -3, '−3', RED) + lbl(140, 130, 64, 270, 0, '0') + lbl(140, 130, 64, 270, posMax, '+' + posMax) + needle(140, 130, 80, 270) + big(140, 214) + livesRow(140, 234, 1.6) + '</svg>'; }]);
+  V.push([9, 'Радуга', 'Три полосы: красная — жизни, серая — около нуля, лаймовая — рост. Стрелка показывает, в какой ты полосе; сердечки — сколько жизней осталось.',
+    function () { return '<svg viewBox="0 0 280 175"><path d="' + arc(140, 140, 110, ang(180, -3), ang(180, 0)) + '" fill="none" stroke="' + RED + '" stroke-width="20"/><path d="' + arc(140, 140, 110, ang(180, 0), ang(180, posMax * .2)) + '" fill="none" stroke="' + N3 + '" stroke-width="20"/><path d="' + arc(140, 140, 110, ang(180, posMax * .2), ang(180, posMax)) + '" fill="none" stroke="' + LIME + '" stroke-width="20"/>' +
+      needle(140, 140, 90, 180) + big(140, 118) + livesRow(140, 152, 1.6) + status(140, 172) + '</svg>'; }]);
+  V.push([10, 'Кольцо с зазором', 'Кольцо на 300° с разрывом внизу. Ноль — не наверху, а на границе жизней и плюса; заливка идёт от него в сторону значения.',
+    function () { return '<svg viewBox="0 0 260 260"><path d="' + arc(130, 130, 104, -150, ang(300, 0)) + '" fill="none" stroke="#FEE7EA" stroke-width="14" stroke-linecap="round"/><path d="' + arc(130, 130, 104, ang(300, 0), 150) + '" fill="none" stroke="#EEF9D3" stroke-width="14" stroke-linecap="round"/>' + fill(130, 130, 104, 300, 14, COL) +
+      '<line x1="' + P(130, 130, 114, ang(300, 0))[0] + '" y1="' + P(130, 130, 114, ang(300, 0))[1] + '" x2="' + P(130, 130, 94, ang(300, 0))[0] + '" y2="' + P(130, 130, 94, ang(300, 0))[1] + '" stroke="' + G + '" stroke-width="3"/>' +
+      lbl(130, 130, 80, 300, -3, '−3', RED) + lbl(130, 130, 80, 300, posMax, '+' + posMax) + big(130, 128) + livesRow(130, 156, 1.6) + status(130, 178) + '</svg>'; }]);
+  V.push([13, 'Шкала снаружи, заливка внутри', 'Тонкая шкала с рисками по внешнему краю и толстая заливка внутри. Заливка — от нуля: вправо лаймом, влево (по жизням) красным.',
+    function () { return '<svg viewBox="0 0 280 175"><path d="' + arc(140, 140, 122, -90, 90) + '" fill="none" stroke="' + N3 + '" stroke-width="2"/>' + ticks(140, 140, 122, 180, 8) + '<path d="' + arc(140, 140, 98, -90, 90) + '" fill="none" stroke="' + N1 + '" stroke-width="18"/>' + fill(140, 140, 98, 180, 18, COL) +
+      lbl(140, 140, 138, 180, -3, '−3', RED) + lbl(140, 140, 138, 180, 0, '0') + lbl(140, 140, 138, 180, posMax, '+' + posMax) + big(140, 118) + livesRow(140, 152, 1.6) + status(140, 172) + '</svg>'; }]);
+  V.push([14, 'Автомобильный', 'Тёмный диск, светящаяся дуга и стрелка с шариком. Красный сектор жизней слева, шкала роста справа, число и жизни внизу.',
+    function () { return '<svg viewBox="0 0 280 250"><defs><filter id="gl14"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="140" cy="130" r="118" fill="' + G + '"/>' +
+      '<path d="' + arc(140, 130, 96, ang(270, -3), ang(270, 0)) + '" fill="none" stroke="#7A3644" stroke-width="10"/><path d="' + arc(140, 130, 96, ang(270, 0), ang(270, posMax)) + '" fill="none" stroke="#4D6480" stroke-width="10"/>' + fill(140, 130, 96, 270, 10, COL, ' filter="url(#gl14)"') +
+      '<g class="spring" style="transform-origin:140px 130px;transform:rotate(' + ang(270, -3) + 'deg);--tf:rotate(' + ang(270, VALUE) + 'deg)"><line x1="140" y1="130" x2="140" y2="52" stroke="' + W + '" stroke-width="3"/><circle cx="140" cy="52" r="6" fill="' + COL + '"/></g><circle cx="140" cy="130" r="8" fill="' + W + '"/>' +
+      lbl(140, 130, 76, 270, -3, '−3', '#FF8A96') + lbl(140, 130, 76, 270, posMax, '+' + posMax, '#C8F03C') + big(140, 196, 'fill:#fff') + livesRow(140, 218, 1.6) + status(140, 240) + '</svg>'; }]);
+  V.push([23, 'Полукруг с числами', 'Подписано каждое деление: −3, −2, −1, 0 и шаги роста до потолка. Стрелка-луч из центра, число крупно, жизни под ним.',
+    function () { var s = '<svg viewBox="0 0 280 175"><path d="' + arc(140, 140, 112, -90, 90) + '" fill="none" stroke="' + N1 + '" stroke-width="3"/>'; var step = posMax / 5; [-3, -2, -1, 0].forEach(function (v) { s += lbl(140, 140, 126, 180, v, v, v < 0 ? RED : null); }); for (var v = step; v <= posMax + .001; v += step) s += lbl(140, 140, 126, 180, v, '+' + Math.round(v));
+      return s + '<g class="spring" style="transform-origin:140px 140px;transform:rotate(-90deg);--tf:rotate(' + ang(180, VALUE) + 'deg)"><line x1="140" y1="140" x2="140" y2="44" stroke="' + COL + '" stroke-width="6" stroke-linecap="round"/></g><circle cx="140" cy="140" r="8" fill="' + G + '"/>' + big(140, 118) + livesRow(140, 152, 1.6) + status(140, 172) + '</svg>'; }]);
+  V.push([24, 'Три кольца', 'Как «кольца активности»: внешнее — репутация (доля от текущего потолка), среднее — платежи, внутреннее — участие. Жизни — сердечки в центре.',
+    function () { return '<svg viewBox="0 0 260 260"><circle cx="130" cy="130" r="112" fill="none" stroke="' + N1 + '" stroke-width="12"/><path class="mv" d="' + arc(130, 130, 112, 0, pos ? 359.9 : -359.9) + '" fill="none" stroke="' + COL + '" stroke-width="12" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" style="--dash:' + (100 - F * 100) + '"/>' +
+      '<circle cx="130" cy="130" r="90" fill="none" stroke="' + N1 + '" stroke-width="12"/><path class="mv" d="' + arc(130, 130, 90, 0, 359.9) + '" fill="none" stroke="var(--msv-sky)" stroke-width="12" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" style="--dash:10"/>' +
+      '<circle cx="130" cy="130" r="68" fill="none" stroke="' + N1 + '" stroke-width="12"/><path class="mv" d="' + arc(130, 130, 68, 0, 359.9) + '" fill="none" stroke="var(--msv-lavender)" stroke-width="12" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" style="--dash:55"/>' +
+      big(130, 128) + livesRow(130, 150, 1.4) + cap(130, 170, 'до +' + posMax) + '</svg>'; }]);
 
-  /* ---------- сборка ---------- */
+  function T0() { return LIVES / (LIVES + posMax); }   // доля шкалы, занятая жизнями (для градиента)
+
+  /* ---------- сборка / перерисовка ---------- */
   var list = document.getElementById('list');
-  V.forEach(function (v, i) {
-    var sec = document.createElement('section'); sec.className = 'v';
-    sec.innerHTML = '<h2 class="msv-sub v__t"><span class="v__num">' + (i + 1) + '</span>' + v[0] + '</h2><p class="msv-note v__d">' + v[1] + '</p><div class="g" id="g' + (i + 1) + '">' + v[2] + '</div><button class="again" type="button">Ещё раз</button>';
-    list.appendChild(sec);
-    var g = sec.querySelector('.g');
-    sec.querySelector('.again').addEventListener('click', function () { run(g, v[3]); });
-    setTimeout(function () { run(g, v[3]); }, 150 + i * 70);
-  });
+  function build() {
+    recompute();
+    list.innerHTML = '';
+    V.forEach(function (v, i) {
+      var sec = document.createElement('section'); sec.className = 'v';
+      sec.innerHTML = '<h2 class="msv-sub v__t"><span class="v__num">' + v[0] + '</span>' + v[1] + '</h2><p class="msv-note v__d">' + v[2] + '</p><div class="g" id="g' + v[0] + '">' + v[3]() + '</div><button class="again" type="button">Ещё раз</button>';
+      list.appendChild(sec);
+      var g = sec.querySelector('.g');
+      sec.querySelector('.again').addEventListener('click', function () { run(g); });
+      setTimeout(function () { run(g); }, 150 + i * 90);
+    });
+  }
   function count(root, ms) {
     root.querySelectorAll('[data-count]').forEach(function (el) {
       var t0 = Date.now();
       (function step() { var p = Math.min(1, (Date.now() - t0) / ms), e = 1 - Math.pow(1 - p, 3); el.textContent = fmt(VALUE * e); if (p < 1) setTimeout(step, 16); })();
     });
   }
-  function run(g, init) {
-    g.classList.remove('run'); if (init) init(g, false);
+  /* Сброс без переходов (класс .reset), затем запуск — так «Ещё раз» всегда
+     начинается с нуля, а не «докручивает» с середины */
+  function run(g) {
+    g.classList.add('reset'); g.classList.remove('run');
     g.querySelectorAll('[data-count]').forEach(function (el) { el.textContent = fmt(0); });
+    g.querySelectorAll('.life').forEach(function (h) { h.classList.remove('life--lost'); });
     void g.offsetWidth;
-    setTimeout(function () { g.classList.add('run'); if (init) init(g, true); count(g, 1300); }, 40);
+    g.classList.remove('reset');
+    void g.offsetWidth;
+    setTimeout(function () {
+      g.classList.add('run'); count(g, 1300);
+      // сгоревшие жизни гаснут по одной после того, как стрелка доехала
+      g.querySelectorAll('.life').forEach(function (h) { var i = +h.dataset.life; if (i >= lives) setTimeout(function () { h.classList.add('life--lost'); }, 900 + (LIVES - 1 - i) * 220); });
+    }, 40);
   }
+  document.getElementById('demo').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-v]'); if (!b) return;
+    document.querySelectorAll('#demo button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+    VALUE = parseFloat(b.dataset.v); build();
+  });
+  build();
 })();
 </script>
 <script src="mark.js"></script>
