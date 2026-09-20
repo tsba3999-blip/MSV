@@ -92,6 +92,7 @@
   var params = new URLSearchParams(location.search);
   var room = params.get('room') || 'не выбрана';
   var size = params.get('size') || '';
+  var kind = (params.get('kind') || '').toLowerCase();   // «верхнее место» / «нижнее место» — выбрано на странице комнат
   var month = params.get('month') || 'не выбран';
   var year = params.get('year') || '';
 
@@ -117,7 +118,7 @@
   var rows = [
     ['Резидент', 'Артём Логинов'],
     ['Резиденция', 'Уют'],
-    ['Комната', room + (size ? ', ' + size + '-местная' : '')],
+    ['Комната', room + (size ? ', ' + size + '-местная' : '') + (kind ? ', ' + kind : '')],
     ['Место', 'Верхнее'],
     [COUNT > 1 ? 'Месяцы' : 'Месяц', month + (year ? ' ' + year : '')],
     ['Стоимость месяца', money(PRICE)]

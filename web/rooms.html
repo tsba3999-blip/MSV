@@ -168,21 +168,25 @@ MSV.ready(function (ctx) {
       return;
     }
 
-    // Одно красное действие на экран: красная кнопка только у первой карточки
-    list.innerHTML = rooms.map(function (r, i) {
-      var free = r.beds.reduce(function (s, b) { return s + b.left; }, 0);
-      var prices = r.beds.map(function (b) {
+    // Кнопка «Выбрать» — у каждого вида места (верхнее / нижнее): у них
+    // разная цена, и выбор происходит именно здесь. Одно красное действие
+    // на экран: красная — только у первого свободного места первой карточки.
+    var primaryUsed = false;
+    list.innerHTML = rooms.map(function (r) {
+      var prices = r.beds.map(function (b, ti) {
         var out = b.left === 0;
+        var btn;
+        if (out) {
+          btn = '<span class="room__none">нет</span>';
+        } else {
+          var kind = primaryUsed ? 'msv-btn--secondary' : 'msv-btn--primary';
+          primaryUsed = true;
+          btn = '<button class="msv-btn msv-btn--s ' + kind + '" type="button" data-pick="' + esc(r.id) + '" data-tier="' + ti + '">Выбрать</button>';
+        }
         return '<div class="room__price' + (out ? ' room__price--out' : '') + '">' +
           '<span>' + esc(b.kind) + ' · ' + (out ? 'мест нет' : b.left + ' ' + plural(b.left, 'место', 'места', 'мест')) + '</span>' +
-          '<b>' + money(b.price) + '</b></div>';
+          '<b>' + money(b.price) + '</b>' + btn + '</div>';
       }).join('');
-
-      var canPick = free > 0;
-      var btn = canPick
-        ? '<button class="msv-btn msv-btn--m ' + (i === 0 ? 'msv-btn--primary' : 'msv-btn--secondary') +
-          '" type="button" data-pick="' + esc(r.id) + '">Выбрать</button>'
-        : '<button class="msv-btn msv-btn--m msv-btn--secondary" type="button" disabled>Мест нет</button>';
 
       return '<article class="room">' +
         '<span class="msv-note room__kind">' + r.size + '-местная комната</span>' +
@@ -193,8 +197,7 @@ MSV.ready(function (ctx) {
         '<div class="room__shots">' + shots(r) + '</div>' +
         '<p class="msv-body room__text">' + esc(r.text) + '</p>' +
         '<div class="room__prices">' + prices + '</div>' +
-        '<p class="msv-note" style="margin:0 0 var(--msv-s12)">Цены при условии заключения «годового контракта» (проживание минимум до конца августа).</p>' +
-        btn +
+        '<p class="msv-note" style="margin:0">Цены при условии заключения «годового контракта» (проживание минимум до конца августа).</p>' +
       '</article>';
     }).join('');
   }
@@ -237,13 +240,16 @@ MSV.ready(function (ctx) {
   list.addEventListener('click', function (e) {
     var btn = e.target.closest('[data-pick]');
     if (!btn) return;
-    var id = btn.dataset.pick;
-    var room = ROOMS.filter(function (r) { return r.id === id; })[0];
+    var room = ROOMS.filter(function (r) { return r.id === btn.dataset.pick; })[0];
     if (!room) return;
-    // Первое свободное место в комнате — конкретное место резидент выберет позже с куратором
-    var freeBed = (room.bedIds && room.bedIds[0]) || '';
+    // Вид места выбран здесь (верхнее / нижнее); конкретную кровать этого
+    // вида резидент уточнит с куратором — берём первую свободную
+    var tier = room.beds[Number(btn.dataset.tier)] || room.beds[0];
+    var bed = (tier && tier.ids && tier.ids[0]) || '';
     location.href = 'month.html?room=' + encodeURIComponent(room.name) +
-                    '&size=' + room.size + '&bed=' + encodeURIComponent(freeBed) + '&price=' + (room.price || 0);
+                    '&size=' + room.size + '&bed=' + encodeURIComponent(bed) +
+                    '&kind=' + encodeURIComponent(tier ? tier.kind : '') +
+                    '&price=' + (tier ? tier.price : room.price || 0);
   });
 
   render();
