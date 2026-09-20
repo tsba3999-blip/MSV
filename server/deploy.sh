@@ -50,6 +50,18 @@ sudo -u postgres psql -v ON_ERROR_STOP=1 msv -f db/schema.sql >/dev/null
 sudo -u postgres psql -v ON_ERROR_STOP=1 msv -f db/seed.sql >/dev/null
 echo "    схема и первичные данные применены"
 
+# Таблицы создаёт postgres, а сайт ходит под пользователем из DATABASE_URL —
+# без явных прав он получает «permission denied for table users».
+DB_USER="$(grep -oP '^DATABASE_URL=postgres://\K[^:@]+' "$APP/server/.env" || echo msv)"
+sudo -u postgres psql -v ON_ERROR_STOP=1 msv >/dev/null <<SQL
+GRANT USAGE ON SCHEMA public TO "$DB_USER";
+GRANT ALL ON ALL TABLES IN SCHEMA public TO "$DB_USER";
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO "$DB_USER";
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON TABLES TO "$DB_USER";
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON SEQUENCES TO "$DB_USER";
+SQL
+echo "    права на таблицы выданы пользователю $DB_USER"
+
 echo "==> Права"
 id -u msv >/dev/null 2>&1 || useradd --system --home "$APP" --shell /usr/sbin/nologin msv
 chown -R msv:msv "$APP"
