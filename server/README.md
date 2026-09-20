@@ -38,6 +38,20 @@
 
 ## Развернуть
 
+Обычно вручную не нужно: после отправки в GitHub всё делает
+`.github/workflows/deploy.yml` (см. `КАК_ВЫКЛАДЫВАТЬ.md` в корне).
+
+Первая установка на сервер, где стояла старая версия (сделано 20.09.2026):
+
+```bash
+cd /var/www/MSV && git pull
+bash server/setup-env.sh      # создаёт /opt/msv/server/.env из старого /opt/msv/.env
+bash server/reset-old-db.sh   # удаляет таблицы старой версии (тестовые данные)
+bash server/deploy.sh
+```
+
+Обновление вручную:
+
 ```bash
 cd /var/www/MSV && git pull
 bash server/deploy.sh
