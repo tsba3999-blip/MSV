@@ -386,3 +386,25 @@
 .disc[aria-expanded="true"] svg { transform: rotate(180deg); }
 .disc__body { grid-column: 1 / -1; padding: var(--msv-s8) 0 0; color: var(--msv-n500); }
 .disc__body[hidden] { display: none; }
+
+/* ============================================================
+   Широкий экран: планшет и монитор
+   На телефоне — одна колонка 460. От 768 px колонка расширяется,
+   список меню встаёт в две колонки; от 1100 px — ещё шире.
+   Таббар остаётся по центру, как на телефоне.
+   ============================================================ */
+
+@media (min-width: 768px) {
+  .page { max-width: 760px; padding-left: var(--msv-s32); padding-right: var(--msv-s32); }
+  .head { margin-left: calc(var(--msv-s32) * -1); margin-right: calc(var(--msv-s32) * -1); }
+
+  /* Меню резидента: 15 строк в две колонки вместо одной длинной */
+  .rows { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .row { border-bottom: 1px solid var(--msv-n100); }
+  .row:nth-child(odd) { border-right: 1px solid var(--msv-n100); }
+  .row:last-child, .row:nth-last-child(2):nth-child(odd) { border-bottom: 0; }
+}
+
+@media (min-width: 1100px) {
+  .page { max-width: 1040px; }
+}

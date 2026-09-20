@@ -146,6 +146,20 @@
 
   .tile--event .tile__label { color: var(--msv-n300); }
   .tile__thumb { flex: 0 0 auto; width: 44px; height: 44px; border-radius: var(--msv-r11); background: var(--msv-white); }
+
+  /* ---------- Монитор: колонка шире, бенто в четыре колонки ----------
+     Оплата занимает 2×2 слева, четыре малые плитки — справа квадратом,
+     событие дня — во всю ширину под ними. На телефоне — как было. */
+  @media (min-width: 768px) {
+    .app { max-width: 760px; padding: 0 var(--msv-s32); }
+    .bento { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .tile--pay { grid-column: span 2; grid-row: span 2; min-height: 236px; }
+    .tile--event { grid-column: 1 / -1; }
+  }
+  @media (min-width: 1100px) {
+    .app { max-width: 1040px; }
+    .tile--small { min-height: 132px; }
+  }
   .tile__evtitle { margin: var(--msv-s4) 0 0; font-size: var(--msv-sub-size); line-height: var(--msv-sub-line); font-weight: 600; }
 
   /* Плашка ошибки: серый фон, красная обводка, треугольник и текст.

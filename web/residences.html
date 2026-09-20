@@ -23,6 +23,12 @@
   .res-pick__name { margin: 0; }
   .res-pick__addr { color: var(--msv-graphite); }
   .res-pick__map { font-size: var(--msv-note-size); margin-top: 4px; align-self: flex-start; cursor: pointer; }
+  /* Монитор: три открытки в ряд */
+  @media (min-width: 768px) {
+    .res-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--msv-s16); align-items: stretch; }
+    .res-pick { margin-bottom: 0; }
+    .res-pick__band { height: 128px; }
+  }
 </style>
 </head>
 <body>
@@ -41,6 +47,7 @@
 
   <p class="msv-body" style="margin:0 0 var(--msv-s24);color:var(--msv-n500)">Три резиденции в разных районах Москвы. Выбери, где хочешь жить — дальше покажем свободные места. <a class="msv-link" href="residences-designs.html">Другие варианты дизайна</a></p>
 
+  <div class="res-grid">
   <a class="res-pick" href="rooms.html?res=forma" style="--acc:#FB344A">
     <span class="res-pick__band"><img src="forma.png" alt=""></span>
     <span class="res-pick__body">
@@ -73,6 +80,7 @@
       <span class="msv-link res-pick__map" role="link" tabindex="0" data-map="https://yandex.ru/maps/-/CTtSaI6E">посмотреть на карте</span>
     </span>
   </a>
+  </div>
 
 </div>
 <script>
