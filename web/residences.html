@@ -11,36 +11,38 @@
 <link rel="stylesheet" href="resident.css">
 <style>
   .page { padding-bottom: var(--msv-s32); }
-  /* Открытка с цветной полосой (выбран заказчиком из десяти вариантов, 21.09.2026).
-     Логотип на поле в цвете резиденции (--acc), ниже имя и адрес. */
-  .res-pick { display: flex; flex-direction: column; margin-bottom: var(--msv-s12); background: var(--msv-white); border-radius: var(--msv-r20); box-shadow: var(--msv-e1); overflow: hidden; color: inherit; text-decoration: none; transition: transform var(--msv-fast) var(--msv-ease); }
+  /* «Бенто» (выбран заказчиком 21.09.2026 вместо открыток): первая
+     резиденция — широкой плиткой во всю ширину, две другие — половинками
+     под ней. Плитка в светлом оттенке цвета резиденции (--acc), в углу
+     цветное пятно, сверху баннер-логотип, текст прижат вниз. */
+  .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--msv-s12); }
+  .res-pick { position: relative; display: flex; flex-direction: column; gap: 2px; min-height: 200px; padding: var(--msv-s16); background: color-mix(in srgb, var(--acc) 24%, var(--msv-white)); border-radius: var(--msv-r20); overflow: hidden; color: inherit; text-decoration: none; transition: transform var(--msv-fast) var(--msv-ease); }
   .res-pick:hover { transform: translateY(-1px); }
   .res-pick:focus-visible { outline: 2px solid var(--msv-violet); outline-offset: 2px; }
-  /* Полоса = баннер резиденции (415×116): высота из пропорций картинки,
-     фон в цвете резиденции виден только пока баннер грузится. */
-  .res-pick__band { display: block; aspect-ratio: 415 / 116; background: var(--acc); }
-  .res-pick__band img { display: block; width: 100%; height: 100%; object-fit: cover; }
-  .res-pick__body { display: flex; flex-direction: column; gap: 4px; padding: var(--msv-s16); }
-  .res-pick__kind { font-size: 11px; line-height: 16px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--msv-n500); }
-  .res-pick__name { margin: 0; }
-  .res-pick__addr { color: var(--msv-graphite); }
-  .res-pick__map { font-size: var(--msv-note-size); margin-top: 4px; align-self: flex-start; cursor: pointer; }
-  /* Планшет и монитор: три открытки в ряд. На планшете карточка ~220 px —
-     имя размером подзаголовка, иначе «Молодежка» упрётся в край;
-     на мониторе (от 1100) карточка ~330 px — имя снова крупное. */
+  .res-pick--wide { grid-column: 1 / -1; }
+  .res-pick__blob { position: absolute; right: -40px; bottom: -60px; width: 180px; height: 180px; border-radius: 50%; background: var(--acc); opacity: .22; pointer-events: none; }
+  /* баннер-логотип 415×116: со своим фоном, поэтому как табличка со скруглением */
+  .res-pick__logo { position: relative; display: block; width: 100%; max-width: 236px; aspect-ratio: 415 / 116; margin-bottom: auto; border-radius: var(--msv-r11); box-shadow: var(--msv-e1); object-fit: cover; }
+  .res-pick--wide .res-pick__logo { max-width: 300px; }
+  .res-pick__kind { position: relative; margin-top: var(--msv-s12); font-size: 10px; line-height: 16px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--msv-n500); }
+  .res-pick__name { position: relative; margin: 0; }
+  .res-pick__meta { position: relative; color: var(--msv-graphite); }
+  .res-pick__note { position: relative; }
+  .res-pick__map { position: relative; margin-top: 4px; align-self: flex-start; font-size: var(--msv-note-size); cursor: pointer; }
+  /* Телефон: одна колонка, все плитки одинаковые */
+  @media (max-width: 400px) { .res-grid { grid-template-columns: 1fr; } .res-pick { min-height: 0; } }
+  /* Планшет и монитор: плитки выше, имена крупнее, широкая — как афиша */
   @media (min-width: 768px) {
-    .res-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--msv-s16); align-items: stretch; }
-    .res-pick { margin-bottom: 0; min-width: 0; }
-    .res-pick__body { overflow-wrap: anywhere; }
-    .res-pick__name { font-size: var(--msv-sub-size); line-height: var(--msv-sub-line); letter-spacing: var(--msv-sub-track); }
-    /* тип резиденции — всегда две строки, чтобы имена стояли на одном уровне */
-    .res-pick__kind { min-height: 32px; font-size: 10px; letter-spacing: .06em; }
-  }
-  @media (min-width: 1100px) {
-    .res-pick__name { font-size: var(--msv-h-size); line-height: var(--msv-h-line); letter-spacing: var(--msv-h-track); }
+    .res-grid { gap: var(--msv-s16); }
+    .res-pick { min-height: 240px; padding: var(--msv-s20); }
+    .res-pick--wide { min-height: 220px; }
     .res-pick__kind { font-size: 11px; letter-spacing: .08em; }
   }
-
+  @media (min-width: 1100px) {
+    .res-pick__logo { max-width: 260px; }
+    .res-pick--wide .res-pick__logo { max-width: 340px; }
+    .res-pick__blob { width: 240px; height: 240px; right: -60px; bottom: -90px; }
+  }
 </style>
 </head>
 <body>
@@ -60,37 +62,34 @@
   <p class="msv-body" style="margin:0 0 var(--msv-s16);color:var(--msv-n500)">Три резиденции в разных районах Москвы. Выбери, где хочешь жить — дальше покажем свободные места.</p>
 
   <div class="res-grid">
-  <a class="res-pick" href="rooms.html?res=forma" style="--acc:#FB344A">
-    <span class="res-pick__band"><img src="logo-forma.jpg" alt="Forma — резиденция высокой культуры для студентов у м. Шаболовская"></span>
-    <span class="res-pick__body">
-      <span class="res-pick__kind">Комфорт-резиденция</span>
-      <span class="msv-h res-pick__name">Forma</span>
-      <span class="msv-body res-pick__addr">Москва, Конный пер., 12 · м. Шаболовская</span>
-      <span class="msv-note">16 комнат · 57 мест · свои санузлы в части комнат</span>
-      <span class="msv-link res-pick__map" role="link" tabindex="0" data-map="https://yandex.ru/maps/-/CTtSY62w">посмотреть на карте</span>
-    </span>
+  <a class="res-pick res-pick--wide" href="rooms.html?res=forma" style="--acc:#FB344A">
+    <span class="res-pick__blob"></span>
+    <img class="res-pick__logo" src="logo-forma.jpg" alt="Forma — резиденция высокой культуры для студентов у м. Шаболовская">
+    <span class="res-pick__kind">Комфорт-резиденция</span>
+    <span class="msv-h res-pick__name">Forma</span>
+    <span class="msv-body res-pick__meta">м. Шаболовская · Москва, Конный пер., 12</span>
+    <span class="msv-note res-pick__note">16 комнат · 57 мест · свои санузлы в части комнат</span>
+    <span class="msv-link res-pick__map" role="link" tabindex="0" data-map="https://yandex.ru/maps/-/CTtSY62w">посмотреть на карте</span>
   </a>
 
   <a class="res-pick" href="rooms.html?res=uyut" style="--acc:#7EB2DD">
-    <span class="res-pick__band"><img src="logo-uyut.jpg" alt="Уют на Варшавке — резиденция высокой культуры для студентов у м. Нагатинская"></span>
-    <span class="res-pick__body">
-      <span class="res-pick__kind">Эконом-резиденция</span>
-      <span class="msv-h res-pick__name">Уют</span>
-      <span class="msv-body res-pick__addr">Москва, Варшавское шоссе, 18к2 · м. Нагатинская</span>
-      <span class="msv-note">16 комнат · 78 мест · капсулы и комнаты до 8 мест</span>
-      <span class="msv-link res-pick__map" role="link" tabindex="0" data-map="https://yandex.ru/maps/-/CTtSYE5l">посмотреть на карте</span>
-    </span>
+    <span class="res-pick__blob"></span>
+    <img class="res-pick__logo" src="logo-uyut.jpg" alt="Уют на Варшавке — резиденция высокой культуры для студентов у м. Нагатинская">
+    <span class="res-pick__kind">Эконом-резиденция</span>
+    <span class="msv-sub res-pick__name">Уют</span>
+    <span class="msv-note res-pick__meta">м. Нагатинская · Варшавское шоссе, 18к2</span>
+    <span class="msv-note res-pick__note">16 комнат · 78 мест</span>
+    <span class="msv-link res-pick__map" role="link" tabindex="0" data-map="https://yandex.ru/maps/-/CTtSYE5l">посмотреть на карте</span>
   </a>
 
   <a class="res-pick" href="rooms.html?res=molod" style="--acc:#CBB6FF">
-    <span class="res-pick__band"><img src="logo-molod.jpg" alt="Молодежка — квартира для девушек-студенток у метро Молодежная"></span>
-    <span class="res-pick__body">
-      <span class="res-pick__kind">Квартира для девушек-студенток</span>
-      <span class="msv-h res-pick__name">Молодежка</span>
-      <span class="msv-body res-pick__addr">Москва, ул. Партизанская, 40 · м. Молодежная</span>
-      <span class="msv-note">3 комнаты · 6 мест · по двое</span>
-      <span class="msv-link res-pick__map" role="link" tabindex="0" data-map="https://yandex.ru/maps/-/CTtSaI6E">посмотреть на карте</span>
-    </span>
+    <span class="res-pick__blob"></span>
+    <img class="res-pick__logo" src="logo-molod.jpg" alt="Молодежка — квартира для девушек-студенток у метро Молодежная">
+    <span class="res-pick__kind">Квартира для девушек-студенток</span>
+    <span class="msv-sub res-pick__name">Молодежка</span>
+    <span class="msv-note res-pick__meta">м. Молодежная · ул. Партизанская, 40</span>
+    <span class="msv-note res-pick__note">3 комнаты · 6 мест · по двое</span>
+    <span class="msv-link res-pick__map" role="link" tabindex="0" data-map="https://yandex.ru/maps/-/CTtSaI6E">посмотреть на карте</span>
   </a>
   </div>
 
