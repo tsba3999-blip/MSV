@@ -139,6 +139,21 @@ async function verifyPin(rawContact, rawPin) {
   return { ok: true, user, firstLogin: !row.first_login };
 }
 
+/* ВРЕМЕННО, только в DEMO_MODE: открытый вход по роли, без кода.
+   Кнопка на первой странице сразу открывает кабинет под первой
+   учётной записью этой роли. Когда DEMO_MODE=0 — отвечает отказом,
+   и остаётся обычный вход по коду. */
+async function demoLogin(rawRole) {
+  if (!config.demoMode) return { ok: false, error: 'Открытый вход выключен' };
+  const role = String(rawRole || '');
+  if (!RANK.hasOwnProperty(role)) return { ok: false, error: 'Неизвестная роль' };
+  const r = await query(
+    `SELECT id, role, name FROM users WHERE role = $1 AND is_active ORDER BY id LIMIT 1`, [role]);
+  const user = r.rows[0];
+  if (!user) return { ok: false, error: 'В базе нет ни одной учётной записи с ролью ' + role };
+  return { ok: true, user };
+}
+
 async function afterLogin(userId, firstLogin) {
   await query(
     `UPDATE users SET pin_attempts = 0, locked_until = NULL,
@@ -234,7 +249,7 @@ function atLeast(session, role) {
 }
 
 module.exports = {
-  normalizeContact, requestPin, verifyPin, setPin, invite, validPin,
+  normalizeContact, requestPin, verifyPin, demoLogin, setPin, invite, validPin,
   sessionCookie, clearCookie, readSession, atLeast,
   _internal: { sign, verify, hashPin, newPin }
 };

@@ -36,6 +36,16 @@ module.exports = function register(route) {
          { 'Set-Cookie': auth.sessionCookie(r.user) });
   });
 
+  /* ВРЕМЕННО: открытый вход по роли, только пока DEMO_MODE=1.
+     Кнопка на первой странице → сразу кабинет. Убрать вместе с DEMO_MODE. */
+  route('POST', '/api/auth/demo-login', async (req, res) => {
+    const body = await readJson(req);
+    const r = await auth.demoLogin(body.role);
+    if (!r.ok) return fail(res, 403, r.error);
+    json(res, 200, { role: r.user.role, name: r.user.name, firstLogin: false },
+         { 'Set-Cookie': auth.sessionCookie(r.user) });
+  });
+
   /* Смена пина в кабинете. Нужен текущий вход. */
   route('POST', '/api/auth/set-pin', async (req, res) => {
     const s = auth.readSession(req);
