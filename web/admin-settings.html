@@ -1,0 +1,206 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Сайт и его программное обеспечение охраняются ГК РФ (ст. 1259, 1261). Копирование без разрешения правообладателя запрещено. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#34495E">
+<title>Настройки — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="cabinet.css">
+<link rel="stylesheet" href="form.css">
+<style>
+  .set { margin-bottom: var(--msv-s24); padding: var(--msv-s20); background: var(--msv-white); border-radius: var(--msv-r20); box-shadow: var(--msv-e1); }
+  .set__title { margin: 0 0 var(--msv-s8); }
+  .set__text { margin: 0 0 var(--msv-s16); color: var(--msv-n500); }
+  .set__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--msv-s12); }
+  .set .msv-field { margin-bottom: 0; }
+  .tog { display: flex; align-items: center; gap: var(--msv-s12); min-height: 44px; cursor: pointer; }
+  .tog input { width: 20px; height: 20px; accent-color: var(--msv-red); }
+</style>
+<style>
+  body { --role: var(--msv-graphite); --role-ink: var(--msv-graphite); }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <aside class="side">
+    <img class="side__logo" src="msv-1200-white.png" width="1200" height="209"
+         alt="МСВ — Москва в студентов верит!">
+
+    <a class="side__who" href="admin-profile.html" title="Мой профиль и настройки">
+      <span class="side__name">Ирина Соколова</span>
+      <span class="side__role">Администратор</span>
+    </a>
+
+    <nav class="side__nav" aria-label="Разделы кабинета">
+      <a class="side__link" href="cabinet-admin.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>
+        Обзор
+      </a>
+      <a class="side__link" href="admin-residences.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V8l7-4 7 4v13"/><path d="M9 21v-6h6v6"/><path d="M9 11h.01"/><path d="M15 11h.01"/></svg>
+        Резиденции
+      </a>
+      <a class="side__link" href="admin-shahmatka.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M9 10v9"/></svg>
+        Шахматка
+      </a>
+      <a class="side__link" href="admin-residents.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6.5a3 3 0 0 1 0 5.8"/><path d="M18 20a5.5 5.5 0 0 0-3-4.6"/></svg>
+        Резиденты
+      </a>
+      <a class="side__link" href="admin-tickets.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M8 3v4"/><path d="M16 3v4"/><path d="M9 14l2 2 4-4"/></svg>
+        Заявки
+      </a>
+      <a class="side__link" href="admin-charges.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 12h5a3.5 3.5 0 0 0 0-7H9v14"/><path d="M7 15h7"/></svg>
+        Начисления
+      </a>
+      <a class="side__link" href="admin-staff.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6.5a3 3 0 0 1 0 5.8"/><path d="M18 20a5.5 5.5 0 0 0-3-4.6"/></svg>
+        Сотрудники
+      </a>
+      <a class="side__link" href="admin-reputation.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l2.4 5 5.6.8-4 3.9 1 5.5-5-2.7-5 2.7 1-5.5-4-3.9 5.6-.8z"/></svg>
+        Репутация
+      </a>
+      <a class="side__link" href="admin-rights.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l8-8"/><path d="M17 6l2 2"/></svg>
+        Права доступа
+      </a>
+      <a class="side__link" href="admin-settings.html" aria-current="page">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v2"/><path d="M12 19v2"/><path d="M4.5 7.5l1.7 1"/><path d="M17.8 15.5l1.7 1"/><path d="M4.5 16.5l1.7-1"/><path d="M17.8 8.5l1.7-1"/></svg>
+        Настройки
+      </a>
+    </nav>
+
+    <div class="side__out">
+      <a class="side__exit" href="index.html" data-logout>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/>
+        </svg>
+        Выйти
+      </a>
+    </div>
+  </aside>
+
+  <div class="work">
+    <header class="work__top">
+      <h1 class="msv-sub work__title">Настройки</h1>
+    </header>
+
+    <main class="work__body">
+      <p class="msv-note notice">Настройки сохраняются на сервере. Без него страница показывает вид, но не запоминает.</p>
+
+      <section class="set">
+        <h2 class="msv-sub set__title">Резервные копии</h2>
+        <p class="msv-body set__text">Копия базы делается ночью в 03:30. Скрипт сам решает, пора ли, по периоду ниже.</p>
+        <div class="set__grid">
+          <label class="msv-field"><span class="msv-field__label">Раз в сколько дней</span>
+            <input class="msv-input" data-key="backup_every_days" inputmode="numeric" value="1"></label>
+          <label class="msv-field"><span class="msv-field__label">Сколько копий хранить</span>
+            <input class="msv-input" data-key="backup_keep" inputmode="numeric" value="3"></label>
+        </div>
+      </section>
+
+      <section class="set">
+        <h2 class="msv-sub set__title">Telegram</h2>
+        <p class="msv-body set__text">Бот создаётся у @BotFather за минуту — он выдаст токен. Номер чата: добавь бота в служебную группу и напиши в неё; номер покажет @userinfobot или @getidsbot.</p>
+        <div class="set__grid">
+          <label class="msv-field"><span class="msv-field__label">Токен бота</span>
+            <input class="msv-input" data-key="tg_bot_token" type="password" placeholder="123456:ABC-DEF…"></label>
+          <label class="msv-field"><span class="msv-field__label">Служебный чат (chat_id)</span>
+            <input class="msv-input" data-key="tg_admin_chat" placeholder="-1001234567890"></label>
+        </div>
+        <button class="msv-btn msv-btn--m msv-btn--tertiary" type="button" id="testTg" style="margin-top:var(--msv-s12)">Отправить проверочное сообщение</button>
+        <p class="msv-note" id="testMsg" hidden style="margin-top:var(--msv-s8)"></p>
+      </section>
+
+      <section class="set">
+        <h2 class="msv-sub set__title">Что отправлять администрации</h2>
+        <p class="msv-body set__text">В служебный чат Telegram.</p>
+        <label class="tog"><input type="checkbox" data-key="notify_admin_tickets"> <span>Новые заявки в сервис</span></label>
+        <label class="tog"><input type="checkbox" data-key="notify_admin_partners"> <span>Заявки на подключение объектов</span></label>
+        <label class="tog"><input type="checkbox" data-key="notify_admin_debts"> <span>Просрочки оплаты после 15 числа</span></label>
+      </section>
+
+      <section class="set">
+        <h2 class="msv-sub set__title">Что отправлять резидентам</h2>
+        <p class="msv-body set__text">В каналы, которые резидент указал в анкете: Telegram, Max, почта. Telegram работает, когда резидент один раз написал боту — ссылка для этого есть у него в кабинете. Почта и Max ждут провайдера.</p>
+        <label class="tog"><input type="checkbox" data-key="notify_resident_pay"> <span>Напоминания об оплате — 14 числа и при просрочке</span></label>
+        <label class="tog"><input type="checkbox" data-key="notify_resident_tickets"> <span>Смена статуса заявки</span></label>
+        <label class="tog"><input type="checkbox" data-key="notify_resident_news"> <span>Новости и события резиденции</span></label>
+      </section>
+
+      <div style="display:flex;gap:var(--msv-s8);align-items:center;margin-top:var(--msv-s24)">
+        <button class="msv-btn msv-btn--m msv-btn--primary" type="button" id="save">Сохранить настройки</button>
+        <span class="msv-note" id="saveMsg" hidden></span>
+      </div>
+    </main>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var fields = Array.prototype.slice.call(document.querySelectorAll('[data-key]'));
+
+  function api(method, url, body) {
+    return fetch(url, { method: method, credentials: 'same-origin',
+      headers: body ? { 'Content-Type': 'application/json' } : {}, body: body ? JSON.stringify(body) : undefined })
+      .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j }; }); });
+  }
+
+  api('GET', '/api/settings').then(function (r) {
+    if (r.s !== 200) return;
+    fields.forEach(function (f) {
+      var v = r.j[f.dataset.key];
+      if (v === undefined) return;
+      if (f.type === 'checkbox') f.checked = v === '1'; else f.value = v;
+    });
+  }).catch(function () {});
+
+  document.getElementById('save').addEventListener('click', function () {
+    var body = {};
+    fields.forEach(function (f) { body[f.dataset.key] = f.type === 'checkbox' ? (f.checked ? '1' : '0') : f.value.trim(); });
+    var msg = document.getElementById('saveMsg');
+    api('POST', '/api/settings', body).then(function (r) {
+      msg.textContent = r.s === 200 ? 'Сохранено' : (r.j.error || 'Не удалось сохранить');
+      msg.hidden = false;
+    }).catch(function () { msg.textContent = 'Сервер не отвечает'; msg.hidden = false; });
+  });
+
+  document.getElementById('testTg').addEventListener('click', function () {
+    var msg = document.getElementById('testMsg');
+    msg.textContent = 'Отправляю…'; msg.hidden = false;
+    api('POST', '/api/notify/test').then(function (r) {
+      msg.textContent = r.s === 200 ? 'Сообщение ушло — проверь чат.' : (r.j.error || 'Не удалось');
+    }).catch(function () { msg.textContent = 'Сервер не отвечает'; });
+  });
+})();
+</script>
+
+<script src="mark.js"></script>
+<script src="zoom.js"></script>
+<script src="edit.js"></script>
+<script src="protect.js"></script>
+</body>
+</html>

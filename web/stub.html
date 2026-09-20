@@ -1,0 +1,34 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#F5F1EA">
+<title>Раздел — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="resident.css">
+</head>
+<body>
+<div class="page">
+  <div class="head">
+    <a class="head__back" href="javascript:history.back()" aria-label="Назад">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+    </a>
+    <h1 class="msv-sub head__title" id="t">Раздел</h1>
+  </div>
+  <p class="msv-body" style="margin:0 0 var(--msv-s16);color:var(--msv-n500)" id="lead">Страница в работе.</p>
+  <p class="msv-body">Здесь появится содержимое раздела. Текст временный — заменим, как только определим, что именно тут должно быть.</p>
+</div>
+<script>
+(function () {
+  var p = new URLSearchParams(location.search);
+  var t = p.get('t'); if (t) { document.getElementById('t').textContent = t; document.title = t + ' — МСВ'; }
+})();
+</script>
+<script src="mark.js"></script>
+<script src="edit.js"></script>
+<script src="protect.js"></script>
+</body>
+</html>

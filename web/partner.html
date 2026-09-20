@@ -1,0 +1,112 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Сайт и его программное обеспечение охраняются ГК РФ (ст. 1259, 1261). Копирование без разрешения правообладателя запрещено. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#F5F1EA">
+<title>Регистрация средства размещения — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="form.css">
+<style>
+  .done { display: none; text-align: center; padding: var(--msv-s48) 0; }
+  .done--on { display: block; }
+  .done__mark {
+    width: 64px; height: 64px; margin: 0 auto var(--msv-s24);
+    border-radius: 50%; background: var(--msv-lime);
+    display: flex; align-items: center; justify-content: center; color: var(--msv-graphite);
+  }
+  .form--hidden { display: none; }
+</style>
+</head>
+<body>
+
+<div class="form">
+
+  <div class="form__head">
+    <a class="form__back" href="index.html" aria-label="Вернуться на первую страницу">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 6l-6 6 6 6"/>
+      </svg>
+    </a>
+    <span class="msv-note" style="color:var(--msv-n500)">Средство размещения</span>
+  </div>
+
+  <div id="ask">
+    <h1 class="msv-h" style="margin:var(--msv-s16) 0 var(--msv-s12)">Подключить отель или общежитие</h1>
+    <p class="msv-body" style="margin:0 0 var(--msv-s32);color:var(--msv-n500)">Оставь заявку — мы свяжемся и расскажем, как подключить объект к сети МСВ.</p>
+
+    <label class="msv-field">
+      <span class="msv-field__label">Название объекта</span>
+      <input class="msv-input" id="objName" placeholder="Общежитие на Шаболовке">
+    </label>
+
+    <label class="msv-field">
+      <span class="msv-field__label">Город</span>
+      <input class="msv-input" id="objCity" placeholder="Москва">
+    </label>
+
+    <label class="msv-field">
+      <span class="msv-field__label">Как к тебе обращаться</span>
+      <input class="msv-input" id="person" autocomplete="name" placeholder="Иван Петров">
+    </label>
+
+    <label class="msv-field">
+      <span class="msv-field__label">Телефон или почта для связи</span>
+      <input class="msv-input" id="contact" autocomplete="tel" placeholder="+7 999 000-00-00">
+    </label>
+
+    <div class="msv-error msg" id="err" hidden role="alert" style="margin-bottom:var(--msv-s16)">
+      <svg class="msv-error__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+           stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M8 2.5 15 14H1z"/><path d="M8 6.5v3.2"/><path d="M8 12h.01"/>
+      </svg>
+      <span>Заполни название объекта и контакт — без них не сможем перезвонить.</span>
+    </div>
+
+    <div class="form__foot">
+      <button class="msv-btn msv-btn--block msv-btn--primary" id="send" type="button">Оставить заявку</button>
+    </div>
+  </div>
+
+  <div class="done" id="done">
+    <div class="done__mark">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M5 12.5l4.5 4.5L19 7.5"/>
+      </svg>
+    </div>
+    <h1 class="msv-h" style="margin:0 0 var(--msv-s12)">Заявка принята</h1>
+    <p class="msv-body" style="margin:0 0 var(--msv-s32);color:var(--msv-n500)">Свяжемся в течение двух рабочих дней.</p>
+    <a class="msv-btn msv-btn--block msv-btn--secondary" href="index.html">На первую страницу</a>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var send = document.getElementById('send');
+  var err = document.getElementById('err');
+
+  send.addEventListener('click', function () {
+    var name = document.getElementById('objName').value.trim();
+    var contact = document.getElementById('contact').value.trim();
+    if (!name || !contact) { err.hidden = false; return; }
+    err.hidden = true;
+    // ЗДЕСЬ БУДЕТ ЗАПРОС К СЕРВЕРУ: POST /api/partners { name, city, person, contact }
+    document.getElementById('ask').style.display = 'none';
+    document.getElementById('done').classList.add('done--on');
+    window.scrollTo(0, 0);
+  });
+})();
+</script>
+
+<script src="mark.js"></script>
+<script src="zoom.js"></script>
+<script src="edit.js"></script>
+<script src="protect.js"></script>
+</body>
+</html>

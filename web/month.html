@@ -1,0 +1,155 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Сайт и его программное обеспечение охраняются ГК РФ (ст. 1259, 1261). Копирование без разрешения правообладателя запрещено. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#F5F1EA">
+<title>Месяц оплаты — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="form.css">
+<link rel="stylesheet" href="rooms.css">
+</head>
+<body>
+
+<div class="form">
+
+  <div class="form__head">
+    <a class="form__back" href="rooms.html" aria-label="Вернуться к выбору комнаты">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 6l-6 6 6 6"/>
+      </svg>
+    </a>
+    <span class="msv-note" style="color:var(--msv-n500)">Месяц оплаты</span>
+  </div>
+
+  <p class="msv-body" style="margin:0 0 var(--msv-s24);color:var(--msv-n500)">Выбирай не текущий месяц, а тот, за который платишь. Можно отметить несколько — оплатишь сразу за все.</p>
+
+  <div class="year">
+    <button class="year__btn" type="button" id="prevYear" aria-label="Предыдущий год">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 6l-6 6 6 6"/>
+      </svg>
+    </button>
+    <span class="msv-sub year__value" id="yearValue">2026</span>
+    <button class="year__btn" type="button" id="nextYear" aria-label="Следующий год">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M9 6l6 6-6 6"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="months" id="months" role="group" aria-label="Месяц оплаты"></div>
+
+  <p class="msv-note tip">Оплата вносится до 15 числа. После 15 начисляются пени 3000 руб. и понижается рейтинг.</p>
+
+  <div class="form__foot">
+    <button class="msv-btn msv-btn--block msv-btn--primary" id="go" type="button" disabled>Проверить данные</button>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь',
+                'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+
+  var params = new URLSearchParams(location.search);
+  var room = params.get('room') || '';
+  var size = params.get('size') || '';
+
+  var now = new Date();
+  var curY = now.getFullYear();
+  var curM = now.getMonth();          // 0-11
+
+  /* Ближайший месяц к оплате — следующий за текущим.
+     Считаем через getMonth()+1 с переносом года, а не прибавлением
+     к дате: 31 января плюс месяц дало бы 3 марта. */
+  var nextY = curM === 11 ? curY + 1 : curY;
+  var nextM = curM === 11 ? 0 : curM + 1;
+
+  var year = nextY;
+  var picked = [];                    // [{ y, m }, …] — можно выбрать несколько месяцев
+
+  var grid = document.getElementById('months');
+  var yearValue = document.getElementById('yearValue');
+  var prev = document.getElementById('prevYear');
+  var next = document.getElementById('nextYear');
+  var go = document.getElementById('go');
+
+  function isPast(y, m) {
+    return y < curY || (y === curY && m <= curM);
+  }
+
+  function render() {
+    yearValue.textContent = year;
+    prev.disabled = year <= curY;
+    next.disabled = year >= curY + 2;
+
+    grid.innerHTML = MONTHS.map(function (name, m) {
+      var past = isPast(year, m);
+      var isNext = year === nextY && m === nextM;
+      var on = picked.some(function (p) { return p.y === year && p.m === m; });
+
+      return '<button class="month' + (isNext && !on ? ' month--next' : '') + '" type="button" ' +
+             'data-m="' + m + '" aria-pressed="' + (on ? 'true' : 'false') + '"' +
+             (past ? ' disabled' : '') + '>' + name + '</button>';
+    }).join('');
+
+    go.disabled = !picked.length;
+    go.textContent = picked.length > 1 ? 'Оплатить ' + picked.length + ' ' + plural(picked.length, 'месяц', 'месяца', 'месяцев') : 'Проверить данные';
+  }
+
+  function plural(n, one, few, many) {
+    var a = Math.abs(n) % 100, b = a % 10;
+    if (a > 10 && a < 20) return many;
+    if (b > 1 && b < 5) return few;
+    if (b === 1) return one;
+    return many;
+  }
+
+  grid.addEventListener('click', function (e) {
+    var btn = e.target.closest('.month');
+    if (!btn || btn.disabled) return;
+    var m = Number(btn.dataset.m);
+    var idx = -1;
+    picked.forEach(function (p, i) { if (p.y === year && p.m === m) idx = i; });
+    if (idx >= 0) picked.splice(idx, 1); else picked.push({ y: year, m: m });
+    picked.sort(function (a, b) { return (a.y - b.y) || (a.m - b.m); });
+    render();
+  });
+
+  prev.addEventListener('click', function () { if (year > curY) { year--; render(); } });
+  next.addEventListener('click', function () { if (year < curY + 2) { year++; render(); } });
+
+  go.addEventListener('click', function () {
+    if (!picked.length) return;
+    var first = picked[0], last = picked[picked.length - 1];
+    var from = first.y + '-' + String(first.m + 1).padStart(2, '0') + '-01';
+    var label = picked.length === 1 ? MONTHS[first.m]
+      : MONTHS[first.m] + (first.y !== last.y ? ' ' + first.y : '') + ' — ' + MONTHS[last.m];
+    location.href = 'checkout.html?room=' + encodeURIComponent(room) +
+                    '&size=' + encodeURIComponent(size) +
+                    '&month=' + encodeURIComponent(label) +
+                    '&year=' + last.y + '&count=' + picked.length +
+                    '&bed=' + encodeURIComponent(params.get('bed') || '') +
+                    '&price=' + encodeURIComponent(params.get('price') || '') +
+                    '&from=' + from;
+  });
+
+  render();
+})();
+</script>
+
+<script src="mark.js"></script>
+<script src="zoom.js"></script>
+<script src="edit.js"></script>
+<script src="protect.js"></script>
+</body>
+</html>

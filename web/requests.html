@@ -1,0 +1,133 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Сайт и его программное обеспечение охраняются ГК РФ (ст. 1259, 1261). Копирование без разрешения правообладателя запрещено. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#F5F1EA">
+<title>Запросы — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="resident.css">
+<link rel="stylesheet" href="form.css">
+</head>
+<body>
+
+<div class="page">
+
+  <div class="head">
+    <a class="head__back" href="menu.html" aria-label="Вернуться назад">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 6l-6 6 6 6"/>
+      </svg>
+    </a>
+    <h1 class="msv-sub head__title">Запросы</h1>
+  </div>
+
+  <p class="msv-body" style="margin:0 0 var(--msv-s16);color:var(--msv-n500)">Заказать документ или попросить исправить данные. Готовое появится в «Мои документы», о ходе сообщим в уведомлениях.</p>
+
+  <h2 class="msv-sub group__title">Заказать</h2>
+  <div class="rows" id="kinds">
+    <button class="row" type="button" data-kind="registration"><span class="row__text"><span class="row__name">Регистрацию</span><span class="msv-note row__note">Миграционный учёт по адресу резиденции. До 7 рабочих дней.</span></span><span class="row__end"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
+    <button class="row" type="button" data-kind="residence_cert"><span class="row__text"><span class="row__name">Справку о проживании</span><span class="msv-note row__note">Для вуза, банка, работодателя. До 2 рабочих дней.</span></span><span class="row__end"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
+    <button class="row" type="button" data-kind="guardian_contract"><span class="row__text"><span class="row__name">Договор для опеки</span><span class="msv-note row__note">Если тебе нет 18 — копия договора для родителей или попечителя.</span></span><span class="row__end"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
+    <button class="row" type="button" data-kind="fix"><span class="row__text"><span class="row__name">Исправление личных данных</span><span class="msv-note row__note">Опечатка в фамилии, сменился телефон, новый паспорт.</span></span><span class="row__end"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
+    <a class="row" href="waitlist.html"><span class="row__text"><span class="row__name">Переселение</span><span class="msv-note row__note">Встать в очередь на другую комнату или место — сообщим, когда освободится.</span></span><span class="row__end"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></a>
+  </div>
+
+  <div id="form" hidden style="padding:var(--msv-s16);background:var(--msv-white);border-radius:var(--msv-r12);box-shadow:var(--msv-e1);margin-top:var(--msv-s12)">
+    <h2 class="msv-sub group__title" id="formTitle"></h2>
+    <textarea class="msv-area" id="note" maxlength="500" style="min-height:96px;width:100%;box-sizing:border-box" placeholder="Уточнение, если нужно: для какого вуза, что исправить, куда переселить"></textarea>
+    <div style="display:flex;gap:var(--msv-s8);margin-top:var(--msv-s12)">
+      <button class="msv-btn msv-btn--m msv-btn--primary" type="button" id="send">Отправить запрос</button>
+      <button class="msv-btn msv-btn--m msv-btn--tertiary" type="button" id="cancel">Отмена</button>
+    </div>
+  </div>
+
+  <h2 class="msv-sub group__title" style="margin-top:var(--msv-s32)">Мои запросы</h2>
+  <div id="list"></div>
+
+</div>
+
+<nav class="tabbar" aria-label="Разделы кабинета">
+  <a class="tab" href="cabinet-resident.html" aria-label="Главная">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5"/><path d="M6 10v10h12V10"/></svg>
+    <span class="tab__cap">Главная</span>
+  </a>
+  <a class="tab" href="payments.html" aria-label="Оплата">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M10 16.5V8h2.6a2.2 2.2 0 0 1 0 4.4H10"/><path d="M9 14.2h4"/></svg>
+    <span class="tab__cap">Оплата</span>
+  </a>
+  <a class="tab" href="repair.html" aria-label="Заявки">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/><path d="M10 13v3h4v-3"/></svg>
+    <span class="tab__cap">Заявки</span>
+  </a>
+  <a class="tab" href="documents.html" aria-label="Документы">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
+    <span class="tab__cap">Документы</span>
+  </a>
+  <a class="tab" href="menu.html" aria-current="page">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
+    <span class="tab__cap">Профиль</span>
+  </a>
+</nav>
+
+<script>
+(function () {
+  'use strict';
+  var NAMES = { registration: 'Регистрация', residence_cert: 'Справка о проживании', guardian_contract: 'Договор для опеки', fix: 'Исправление данных', relocation: 'Переселение' };
+  var demo = [
+    { kind: 'residence_cert', status: 'Готово', at: '02.09.2026', note: 'для МИСИС' },
+    { kind: 'registration', status: 'В работе', at: '28.08.2026', note: '' }
+  ];
+  var kind = null;
+  var form = document.getElementById('form'), list = document.getElementById('list');
+
+  function render(items) {
+    var TAG = { 'Принят': 'var(--msv-ice)', 'В работе': 'var(--msv-yellow)', 'Готово': 'var(--msv-lime)', 'Отклонён': 'var(--msv-n100)' };
+    list.innerHTML = items.length ? '<div class="rows">' + items.map(function (x) {
+      return '<div class="row" style="cursor:default"><span class="row__text"><span class="row__name">' + (NAMES[x.kind] || x.kind) +
+        (x.note ? ' <span class="msv-note">· ' + x.note.replace(/</g, '&lt;') + '</span>' : '') + '</span>' +
+        '<span class="msv-note row__note">' + x.at + '</span></span>' +
+        '<span class="row__end"><span style="padding:2px 9px;border-radius:11px;font-size:11px;font-weight:700;background:' + (TAG[x.status] || 'var(--msv-n100)') + ';color:var(--msv-graphite)">' + x.status + '</span></span></div>';
+    }).join('') + '</div>' : '<p class="msv-note" style="text-align:center;padding:var(--msv-s24) 0">Запросов ещё не было.</p>';
+  }
+
+  function load() {
+    if (location.protocol === 'file:') { render(demo); return; }
+    fetch('/api/requests', { credentials: 'same-origin' }).then(function (r) { return r.status === 200 ? r.json() : demo; }).then(render).catch(function () { render(demo); });
+  }
+
+  document.getElementById('kinds').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-kind]'); if (!b) return;
+    kind = b.dataset.kind;
+    document.getElementById('formTitle').textContent = NAMES[kind];
+    form.hidden = false; document.getElementById('note').focus();
+    form.scrollIntoView({ block: 'nearest' });
+  });
+  document.getElementById('cancel').addEventListener('click', function () { form.hidden = true; kind = null; });
+
+  document.getElementById('send').addEventListener('click', function () {
+    if (!kind) return;
+    var body = { kind: kind, note: document.getElementById('note').value.trim() };
+    var now = new Date(), at = String(now.getDate()).padStart(2, '0') + '.' + String(now.getMonth() + 1).padStart(2, '0') + '.' + now.getFullYear();
+    function ok() { demo.unshift({ kind: kind, status: 'Принят', at: at, note: body.note }); form.hidden = true; document.getElementById('note').value = ''; kind = null; load(); }
+    if (location.protocol === 'file:') { ok(); return; }
+    fetch('/api/requests', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      .then(function (r) { if (r.status === 201) ok(); else alert('Не удалось отправить'); }).catch(function () { alert('Сервер не отвечает'); });
+  });
+
+  // ?type=fix — открыть сразу нужный запрос
+  var pre = new URLSearchParams(location.search).get('type');
+  if (pre && NAMES[pre]) { var btn = document.querySelector('[data-kind="' + pre + '"]'); if (btn) btn.click(); }
+  load();
+})();
+</script>
+<script src="mark.js"></script>
+<script src="zoom.js"></script>
+<script src="edit.js"></script>
+<script src="protect.js"></script>
+
+</body>
+</html>

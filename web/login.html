@@ -1,0 +1,463 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Сайт и его программное обеспечение охраняются ГК РФ (ст. 1259, 1261). Копирование без разрешения правообладателя запрещено. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#F5F1EA">
+<title>Вход — Москва в студентов верит!</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  html, body { height: 100%; }
+
+  .page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100svh;
+    max-width: 460px;
+    margin: 0 auto;
+    padding: 0 var(--msv-s24) max(var(--msv-s24), env(safe-area-inset-bottom));
+  }
+
+  .head {
+    display: flex;
+    align-items: center;
+    gap: var(--msv-s12);
+    height: var(--msv-header);
+    margin: 0 calc(var(--msv-s24) * -1);
+    padding: 0 var(--msv-s16);
+  }
+
+  .head__back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--msv-tap);
+    height: var(--msv-tap);
+    color: var(--msv-graphite);
+    background: transparent;
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .head__back:hover { background: var(--msv-n100); }
+  .head__back:focus-visible { outline: 2px solid var(--msv-violet); outline-offset: 2px; }
+
+  .role {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--msv-s8);
+    margin-bottom: var(--msv-s12);
+    padding: 4px 12px 4px 8px;
+    border-radius: calc(var(--msv-chip) / 2);
+    background: var(--msv-n100);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 16px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--msv-graphite);
+  }
+
+  .role__dot { width: 10px; height: 10px; border-radius: 50%; background: var(--msv-red); }
+  .role--staff .role__dot { background: var(--msv-sky); }
+  .role--admin .role__dot { background: var(--msv-graphite); }
+
+  .title { margin-bottom: var(--msv-s8); }
+  .lead { color: var(--msv-n500); margin-bottom: var(--msv-s32); }
+
+  .step { display: none; }
+  .step--on { display: block; }
+
+  /* Ячейки пинкода */
+  /* minmax(0, 1fr), а не просто 1fr: у поля ввода есть собственная
+     минимальная ширина, и колонка 1fr не может стать уже неё — сетка
+     вылезала за края. */
+  .pin {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--msv-s12);
+    margin-bottom: var(--msv-s16);
+  }
+
+  .pin__cell {
+    width: 100%;
+    min-width: 0;
+    height: 64px;
+    padding: 0;
+    font-family: var(--msv-font);
+    font-size: 24px;
+    font-weight: 600;
+    text-align: center;
+    color: var(--msv-graphite);
+    background: var(--msv-white);
+    border: 2px solid var(--msv-n300);
+    border-radius: var(--msv-r11);
+    transition: border-color var(--msv-fast) var(--msv-ease);
+    -moz-appearance: textfield;
+  }
+
+  .pin__cell::-webkit-outer-spin-button,
+  .pin__cell::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+  .pin__cell:focus { outline: none; border-color: var(--msv-graphite); }
+  .pin--error .pin__cell { background: var(--msv-n100); border-color: var(--msv-red); }
+
+  .resend {
+    padding: 0;
+    font: inherit;
+    font-size: var(--msv-note-size);
+    line-height: var(--msv-note-line);
+    font-weight: 500;
+    color: var(--msv-link);
+    background: none;
+    border: 0;
+    cursor: pointer;
+    text-decoration: underline wavy var(--msv-link);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+
+  .resend[disabled] { color: var(--msv-n500); text-decoration: none; cursor: default; }
+
+  .msg { margin-bottom: var(--msv-s16); }
+  .msg[hidden] { display: none; }
+
+  .foot { margin-top: auto; padding-top: var(--msv-s32); }
+
+  /* Убрать вместе с DEMO_PIN */
+  .demo-hint {
+    margin-top: var(--msv-s16);
+    padding: var(--msv-s8) var(--msv-s12);
+    background: var(--msv-lavender);
+    border-radius: var(--msv-r11);
+    color: var(--msv-graphite);
+  }
+
+  .sent { margin-bottom: var(--msv-s24); }
+  .sent b { font-weight: 600; }
+</style>
+</head>
+<body>
+
+<main class="page">
+
+  <div class="head">
+    <a class="head__back" href="index.html" aria-label="Вернуться на первую страницу">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 6l-6 6 6 6"/>
+      </svg>
+    </a>
+    <span class="msv-note" id="headTitle" style="color:var(--msv-n500)">Вход</span>
+  </div>
+
+  <span class="role" id="roleBadge"><span class="role__dot"></span><span id="roleName">Резидент</span></span>
+
+  <h1 class="msv-h title" id="pageTitle">Вход</h1>
+  <p class="msv-body lead" id="pageLead">Введи почту или телефон — пришлём пинкод.</p>
+
+  <!-- Шаг 1: контакт -->
+  <section class="step step--on" id="step1" aria-labelledby="pageTitle">
+    <div class="msv-error msg" id="err1" hidden role="alert">
+      <svg class="msv-error__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+           stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M8 2.5 15 14H1z"/><path d="M8 6.5v3.2"/><path d="M8 12h.01"/>
+      </svg>
+      <span id="err1Text"></span>
+    </div>
+
+    <label class="msv-field">
+      <span class="msv-field__label">Почта или телефон</span>
+      <input class="msv-input" id="contact" type="text" inputmode="email"
+             autocomplete="username" placeholder="ivan@mail.ru или +7 999 000-00-00">
+    </label>
+    <p class="msv-note msv-field__hint">После трёх неверных кодов вход с этого номера закрывается на полчаса.</p>
+
+    <div class="foot">
+      <button class="msv-btn msv-btn--block msv-btn--primary" id="btnSend" type="button">Дальше</button>
+    </div>
+  </section>
+
+  <!-- Шаг 2: пинкод -->
+  <section class="step" id="step2" aria-label="Ввод пинкода">
+    <p class="msv-body sent">Код для <b id="sentTo"></b>.
+      <button class="resend" type="button" id="btnChange" style="text-decoration:none;color:var(--msv-n500)">Изменить</button>
+    </p>
+
+    <div class="msv-error msg" id="err2" hidden role="alert">
+      <svg class="msv-error__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+           stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M8 2.5 15 14H1z"/><path d="M8 6.5v3.2"/><path d="M8 12h.01"/>
+      </svg>
+      <span id="err2Text"></span>
+    </div>
+
+    <div class="pin" id="pin">
+      <input class="pin__cell" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="Первая цифра">
+      <input class="pin__cell" type="text" inputmode="numeric" maxlength="1" aria-label="Вторая цифра">
+      <input class="pin__cell" type="text" inputmode="numeric" maxlength="1" aria-label="Третья цифра">
+      <input class="pin__cell" type="text" inputmode="numeric" maxlength="1" aria-label="Четвёртая цифра">
+    </div>
+
+    <p class="msv-note" id="btnResend" hidden></p>
+
+    <!-- Убрать вместе с DEMO_PIN -->
+    <p class="msv-note demo-hint">Отправка кодов ещё не подключена. Для проверки введи 7777.</p>
+
+    <div class="foot">
+      <button class="msv-btn msv-btn--block msv-btn--primary" id="btnLogin" type="button" disabled>Войти</button>
+    </div>
+  </section>
+
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ============================================================
+     ВРЕМЕННАЯ ЗАГЛУШКА — УБРАТЬ ПЕРЕД ЗАПУСКОМ
+
+     Настоящей отправки пинкода пока нет. Чтобы можно было пройти
+     весь путь, вход открывается по коду ниже с любым контактом.
+
+     Это дыра: код знает каждый, кто откроет исходный текст страницы.
+     Пока в системе нет ни настоящих людей, ни данных, это допустимо.
+     Как только появятся — поставить DEMO_PIN = null и подключить
+     сервер в двух местах, помеченных ЗДЕСЬ БУДЕТ ЗАПРОС К СЕРВЕРУ.
+     ============================================================ */
+  var DEMO_PIN = '7777';
+
+  /* ---------- Роль из адреса ---------- */
+
+  var ROLES = {
+    resident: { name: 'Резидент',      title: 'Вход для резидентов',    lead: 'Введи телефон и четырёхзначный код. Код выдаёт модератор после собеседования психолога.' },
+    staff:    { name: 'Сотрудник',     title: 'Вход для сотрудников',   lead: 'Введи рабочую почту и свой код.' },
+    admin:    { name: 'Администратор', title: 'Вход для администратора', lead: 'Введи рабочую почту и свой код.' }
+  };
+
+  var params = new URLSearchParams(location.search);
+  var role = params.get('role');
+  if (!Object.prototype.hasOwnProperty.call(ROLES, role)) role = 'resident';
+  var cfg = ROLES[role];
+  var CABINET = { resident: 'cabinet-resident.html', staff: 'cabinet-staff.html', admin: 'cabinet-admin.html' };
+
+  document.getElementById('roleName').textContent = cfg.name;
+  document.getElementById('roleBadge').className = 'role role--' + role;
+  document.getElementById('pageTitle').textContent = cfg.title;
+  document.getElementById('headTitle').textContent = 'Вход';
+  document.getElementById('pageLead').textContent = cfg.lead;
+  document.title = cfg.title + ' — Москва в студентов верит!';
+
+  /* ---------- Элементы ---------- */
+
+  var step1 = document.getElementById('step1');
+  var step2 = document.getElementById('step2');
+  var contact = document.getElementById('contact');
+  var btnSend = document.getElementById('btnSend');
+  var btnLogin = document.getElementById('btnLogin');
+  var btnResend = document.getElementById('btnResend');
+  var btnChange = document.getElementById('btnChange');
+  var pin = document.getElementById('pin');
+  var cells = Array.prototype.slice.call(pin.querySelectorAll('.pin__cell'));
+  var sentTo = document.getElementById('sentTo');
+
+
+  /* ---------- Сообщения об ошибке ---------- */
+
+  function showError(which, text) {
+    var box = document.getElementById('err' + which);
+    document.getElementById('err' + which + 'Text').textContent = text;
+    box.hidden = false;
+  }
+
+  function clearError(which) { document.getElementById('err' + which).hidden = true; }
+
+  /* ---------- Проверка контакта ---------- */
+
+  function normalize(value) {
+    var v = String(value || '').trim();
+    if (v.indexOf('@') !== -1) {
+      // почта: одна собака, точка в домене, без пробелов
+      return /^[^\s@]+@[^\s@.]+\.[^\s@]{2,}$/.test(v) ? { kind: 'email', value: v.toLowerCase() } : null;
+    }
+    var digits = v.replace(/\D/g, '');
+    if (digits.length === 11 && (digits.charAt(0) === '7' || digits.charAt(0) === '8')) {
+      return { kind: 'phone', value: '+7' + digits.slice(1) };
+    }
+    if (digits.length === 10) return { kind: 'phone', value: '+7' + digits };
+    return null;
+  }
+
+  /* ---------- Шаг 1 → 2 ---------- */
+
+  var current = null;
+
+  btnSend.addEventListener('click', function () {
+    clearError(1);
+    var parsed = normalize(contact.value);
+    if (!parsed) {
+      contact.classList.add('msv-input--error');
+      showError(1, 'Проверь запись. Почта — вида ivan@mail.ru, телефон — 11 цифр.');
+      contact.focus();
+      return;
+    }
+    contact.classList.remove('msv-input--error');
+    current = parsed;
+
+    setBusy(btnSend, true);
+
+    // ЗДЕСЬ БУДЕТ ЗАПРОС К СЕРВЕРУ:
+    //   POST /api/auth/request-pin  { contact: current.value, role: role }
+    // Пока подключения нет — переходим к шагу 2 без запроса.
+    setTimeout(function () {
+      setBusy(btnSend, false);
+      sentTo.textContent = current.value;
+      step1.classList.remove('step--on');
+      step2.classList.add('step--on');
+      cells[0].focus();
+    }, 300);
+  });
+
+  btnChange.addEventListener('click', function () {
+    step2.classList.remove('step--on');
+    step1.classList.add('step--on');
+    clearError(2);
+    clearPin();
+    contact.focus();
+  });
+
+  /* ---------- Ячейки пинкода ---------- */
+
+  function pinValue() {
+    return cells.map(function (c) { return c.value; }).join('');
+  }
+
+  function clearPin() {
+    cells.forEach(function (c) { c.value = ''; });
+    pin.classList.remove('pin--error');
+    btnLogin.disabled = true;
+  }
+
+  function syncLoginButton() {
+    btnLogin.disabled = pinValue().length !== 4;
+  }
+
+  cells.forEach(function (cell, i) {
+    cell.addEventListener('input', function () {
+      cell.value = cell.value.replace(/\D/g, '').slice(0, 1);
+      pin.classList.remove('pin--error');
+      clearError(2);
+      if (cell.value && i < cells.length - 1) cells[i + 1].focus();
+      syncLoginButton();
+      if (pinValue().length === 4) btnLogin.focus();
+    });
+
+    cell.addEventListener('keydown', function (e) {
+      if (e.key === 'Backspace' && !cell.value && i > 0) {
+        e.preventDefault();
+        cells[i - 1].value = '';
+        cells[i - 1].focus();
+        syncLoginButton();
+      }
+      if (e.key === 'ArrowLeft' && i > 0) { e.preventDefault(); cells[i - 1].focus(); }
+      if (e.key === 'ArrowRight' && i < cells.length - 1) { e.preventDefault(); cells[i + 1].focus(); }
+    });
+
+    // Вставка кода целиком из смс
+    cell.addEventListener('paste', function (e) {
+      e.preventDefault();
+      var text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 4);
+      if (!text) return;
+      for (var k = 0; k < text.length && k < cells.length; k++) cells[k].value = text.charAt(k);
+      syncLoginButton();
+      cells[Math.min(text.length, cells.length - 1)].focus();
+    });
+  });
+
+  /* ---------- Вход ---------- */
+
+  btnLogin.addEventListener('click', function () {
+    var code = pinValue();
+    if (code.length !== 4) return;
+    clearError(2);
+    setBusy(btnLogin, true);
+
+    var next = params.get('next');
+    var safeNext = (next && /^[\w-]+\.html$/.test(next)) ? next : null;
+
+    function go(serverRole, firstLogin) {
+      // Роль — из учётной записи на сервере. Кнопка на первой странице
+      // ничего не решает: сотрудник через кнопку резидента попадёт к себе.
+      var r = serverRole && CABINET[serverRole] ? serverRole : role;
+      if (firstLogin && r === 'resident') { location.href = 'profile-1.html'; return; }
+      location.href = safeNext || CABINET[r];
+    }
+
+    function refuse(text) {
+      setBusy(btnLogin, false);
+      pin.classList.add('pin--error');
+      clearPin();
+      cells[0].focus();
+      showError(2, text || 'Код не подошёл. Проверь цифры и введи ещё раз.');
+    }
+
+    // Страница открыта с диска — сервера заведомо нет
+    if (location.protocol === 'file:') {
+      setTimeout(function () {
+        if (DEMO_PIN && code === DEMO_PIN) { go(role, false); return; }
+        refuse();
+      }, 300);
+      return;
+    }
+
+    fetch('/api/auth/verify-pin', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contact: current.value, pin: code })
+    }).then(function (r) {
+      return r.json().then(function (j) { return { status: r.status, body: j || {} }; }, function () { return { status: r.status, body: {} }; });
+    }).then(function (r) {
+      if (r.status === 200) { go(r.body.role, r.body.firstLogin); return; }
+      refuse(r.body.error);
+    }).catch(function () {
+      // Сервер не отвечает — работаем как без него, чтобы демонстрация не встала
+      if (DEMO_PIN && code === DEMO_PIN) { go(role, false); return; }
+      refuse('Сервер не отвечает. Попробуй позже.');
+    });
+  });
+
+  /* ---------- Состояние загрузки кнопки ---------- */
+
+  function setBusy(btn, busy) {
+    if (busy) {
+      btn.dataset.label = btn.textContent;
+      btn.style.minWidth = btn.offsetWidth + 'px';
+      btn.textContent = '· · ·';
+      btn.disabled = true;
+    } else {
+      btn.textContent = btn.dataset.label || btn.textContent;
+      btn.style.minWidth = '';
+      btn.disabled = false;
+      if (btn === btnLogin) syncLoginButton();
+    }
+  }
+
+  /* Enter в поле контакта запускает отправку */
+  contact.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); btnSend.click(); }
+  });
+
+})();
+</script>
+
+<script src="mark.js"></script>
+<script src="zoom.js"></script>
+<script src="edit.js"></script>
+<script src="protect.js"></script>
+</body>
+</html>

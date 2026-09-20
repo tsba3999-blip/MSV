@@ -1,0 +1,214 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Сайт и его программное обеспечение охраняются ГК РФ (ст. 1259, 1261). Копирование без разрешения правообладателя запрещено. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#F5F1EA">
+<title>Проверка данных — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="form.css">
+<link rel="stylesheet" href="rooms.css">
+<style>
+  .qr-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--msv-s8); margin-top: var(--msv-s12); }
+  .qr-actions[hidden] { display: none; }
+  .qr-actions .msv-btn { gap: 6px; }
+</style>
+</head>
+<body>
+
+<div class="form">
+
+  <div class="form__head">
+    <a class="form__back" href="month.html" aria-label="Вернуться к выбору месяца">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 6l-6 6 6 6"/>
+      </svg>
+    </a>
+    <span class="msv-note" style="color:var(--msv-n500)">Проверка данных</span>
+  </div>
+
+  <dl class="recap" id="recap"></dl>
+
+  <label class="check">
+    <input class="check__box" type="checkbox" id="deposit">
+    <span class="check__text">
+      <span class="check__name">Внести депозит сразу</span>
+      <span class="msv-note check__note">Сумма к оплате удваивается. Депозит возвращается при выезде.</span>
+    </span>
+  </label>
+
+  <div class="payer">
+    <p class="msv-sub payer__title">Платит не резидент?</p>
+    <p class="msv-body payer__text">Сделай код и отправь тому, кто оплачивает. Сумма и назначение платежа уже внутри.</p>
+    <button class="msv-btn msv-btn--m msv-btn--secondary" type="button" id="qrBtn">Сгенерировать QR</button>
+    <div class="qr" id="qr">
+      <svg viewBox="0 0 100 100" width="100%" height="100%" role="img" aria-label="Заглушка кода оплаты">
+        <rect width="100" height="100" fill="#EAE4DA"/>
+        <rect x="10" y="10" width="24" height="24" fill="#34495E"/>
+        <rect x="16" y="16" width="12" height="12" fill="#EAE4DA"/>
+        <rect x="66" y="10" width="24" height="24" fill="#34495E"/>
+        <rect x="72" y="16" width="12" height="12" fill="#EAE4DA"/>
+        <rect x="10" y="66" width="24" height="24" fill="#34495E"/>
+        <rect x="16" y="72" width="12" height="12" fill="#EAE4DA"/>
+        <rect x="44" y="44" width="8" height="8" fill="#34495E"/>
+        <rect x="58" y="52" width="8" height="8" fill="#34495E"/>
+        <rect x="44" y="66" width="8" height="8" fill="#34495E"/>
+        <rect x="66" y="58" width="8" height="8" fill="#34495E"/>
+      </svg>
+    </div>
+    <div class="qr-actions" id="qrActions" hidden>
+      <button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" id="qrShare">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4"/><path d="M15.4 6.5l-6.8 4"/></svg>
+        Поделиться
+      </button>
+      <button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" id="qrCopy">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>
+        Скопировать ссылку
+      </button>
+      <span class="msv-note" id="qrMsg" hidden></span>
+    </div>
+    <p class="msv-note" id="qrNote" hidden style="margin-top:var(--msv-s8)">Это заглушка. Настоящий код придёт от банка, когда подключим оплату.</p>
+  </div>
+
+  <a class="msv-btn msv-btn--block msv-btn--tertiary" href="autopay.html" style="margin-bottom:var(--msv-s16)">Настроить ежемесячный автоплатёж</a>
+
+  <div class="form__foot">
+    <div class="total">
+      <span class="msv-body">К оплате</span>
+      <b id="total">0 руб.</b>
+    </div>
+    <button class="msv-btn msv-btn--block msv-btn--primary" id="pay" type="button">Перейти к оплате</button>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var params = new URLSearchParams(location.search);
+  var room = params.get('room') || 'не выбрана';
+  var size = params.get('size') || '';
+  var month = params.get('month') || 'не выбран';
+  var year = params.get('year') || '';
+
+  /* Цена места — из выбранной комнаты; если не передана, ставим типовую */
+  var PRICE = Number(params.get('price')) || 24200;
+
+  function money(n) {
+    return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u2009') + '\u2009руб.';
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  /* ---------- Сводка ---------- */
+
+  var COUNT = Math.max(1, Number(params.get('count')) || 1);
+  var RENT = PRICE * COUNT;
+  // 4. Депозит уже внесён — блок не показываем вовсе
+  var DEPOSIT_PAID = params.get('deposit') === 'paid';
+
+  var rows = [
+    ['Резидент', 'Артём Логинов'],
+    ['Резиденция', 'Уют'],
+    ['Комната', room + (size ? ', ' + size + '-местная' : '')],
+    ['Место', 'Верхнее'],
+    [COUNT > 1 ? 'Месяцы' : 'Месяц', month + (year ? ' ' + year : '')],
+    ['Стоимость месяца', money(PRICE)]
+  ];
+  if (COUNT > 1) rows.push(['За ' + COUNT + ' мес.', money(RENT)]);
+
+  document.getElementById('recap').innerHTML = rows.map(function (r) {
+    return '<div class="recap__row"><dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1]) + '</dd></div>';
+  }).join('');
+
+  /* ---------- Итог ---------- */
+
+  var deposit = document.getElementById('deposit');
+  var total = document.getElementById('total');
+
+  function syncTotal() {
+    total.textContent = money(RENT + (deposit.checked ? PRICE : 0));   // депозит — одна месячная плата
+  }
+  function hideDeposit() { deposit.checked = false; deposit.closest('.check').hidden = true; syncTotal(); }
+  if (DEPOSIT_PAID) hideDeposit();
+  // с сервером: если депозит уже есть в начислениях — блок не показываем
+  if (location.protocol !== 'file:') {
+    fetch('/api/me/home', { credentials: 'same-origin' }).then(function (r) { return r.status === 200 ? r.json() : null; })
+      .then(function (d) { if (d && d.booking && d.booking.depositPaid) hideDeposit(); }).catch(function () {});
+  }
+
+  deposit.addEventListener('change', syncTotal);
+  syncTotal();
+
+  /* ---------- Код для оплаты другим человеком ---------- */
+
+  var qrBtn = document.getElementById('qrBtn');
+  var qr = document.getElementById('qr');
+  var qrNote = document.getElementById('qrNote');
+
+  var qrActions = document.getElementById('qrActions');
+  qrBtn.addEventListener('click', function () {
+    var on = qr.classList.toggle('qr--on');
+    qrNote.hidden = !on; qrActions.hidden = !on;
+    qrBtn.textContent = on ? 'Скрыть код' : 'Сгенерировать QR';
+  });
+
+  /* Ссылка на оплату — её получит тот, кто платит. Пока банка нет,
+     ссылка ведёт на эту же страницу с суммой; потом сюда встанет
+     платёжная ссылка банка. */
+  function payLink() {
+    return location.origin + location.pathname + '?pay=' + encodeURIComponent(total.textContent) + '&for=' + encodeURIComponent(rows[0][1]);
+  }
+  var qrMsg = document.getElementById('qrMsg');
+  function flash(t) { qrMsg.textContent = t; qrMsg.hidden = false; setTimeout(function () { qrMsg.hidden = true; }, 2500); }
+
+  document.getElementById('qrShare').addEventListener('click', function () {
+    var data = { title: 'Оплата проживания МСВ', text: 'Оплата за ' + rows[0][1] + ': ' + total.textContent, url: payLink() };
+    if (navigator.share) navigator.share(data).catch(function () {});
+    else { copyText(data.url); flash('Поделиться на этом устройстве нельзя — ссылка скопирована'); }
+  });
+  document.getElementById('qrCopy').addEventListener('click', function () { copyText(payLink()); flash('Ссылка скопирована'); });
+
+  function copyText(t) {
+    if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(t).catch(function () { legacy(t); }); return; }
+    legacy(t);
+    function legacy(v) { var ta = document.createElement('textarea'); ta.value = v; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e) {} document.body.removeChild(ta); }
+  }
+
+  /* ---------- Оплата ---------- */
+
+  document.getElementById('pay').addEventListener('click', function () {
+    var btn = this;
+    var bedId = params.get('bed');
+    var from = params.get('from');
+
+    if (location.protocol === 'file:' || !bedId || !from) { location.href = 'cabinet-resident.html'; return; }
+
+    btn.disabled = true;
+    fetch('/api/bookings', { method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bedId: bedId, from: from, deposit: deposit.checked }) })
+      .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j || {} }; }, function () { return { s: r.status, j: {} }; }); })
+      .then(function (r) {
+        if (r.s === 201) { location.href = 'cabinet-resident.html'; return; }
+        btn.disabled = false;
+        alert(r.j.error || 'Не удалось забронировать');
+      })
+      .catch(function () { btn.disabled = false; alert('Сервер не отвечает'); });
+  });
+})();
+</script>
+
+<script src="mark.js"></script>
+<script src="zoom.js"></script>
+<script src="edit.js"></script>
+<script src="protect.js"></script>
+</body>
+</html>

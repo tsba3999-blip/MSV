@@ -1,0 +1,388 @@
+/* © 2026 МСВ. Все права защищены. Программа для ЭВМ охраняется ст. 1259, 1261 ГК РФ. Использование без разрешения правообладателя запрещено. Подробнее: /legal.html */
+/* ============================================================
+   МСВ — внутренние экраны резидента
+   Меню, уведомления, заявки, документы, история оплат, репутация.
+   ============================================================ */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  max-width: 460px;
+  margin: 0 auto;
+  padding: 0 var(--msv-s24) calc(var(--msv-tabbar) + var(--msv-s32));
+}
+
+/* ---------- Шапка вложенного экрана ---------- */
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--msv-s12);
+  height: var(--msv-header);
+  margin: 0 calc(var(--msv-s24) * -1);
+  padding: 0 var(--msv-s16);
+}
+
+.head__back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--msv-tap);
+  height: var(--msv-tap);
+  color: var(--msv-graphite);
+  border-radius: 50%;
+  text-decoration: none;
+}
+
+.head__back:hover { background: var(--msv-n100); }
+.head__back:focus-visible { outline: 2px solid var(--msv-violet); outline-offset: 2px; }
+
+.head__title { flex: 1 1 auto; min-width: 0; margin: 0; }
+
+/* ---------- Карточка профиля в меню ---------- */
+
+.who {
+  display: flex;
+  align-items: center;
+  gap: var(--msv-s12);
+  margin-bottom: var(--msv-s24);
+}
+
+.who__face {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--msv-lavender);
+  color: var(--msv-graphite);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.who__text { min-width: 0; }
+.who__name { display: block; }
+.who__place { display: block; margin-top: 2px; }
+
+/* ---------- Список строк ---------- */
+
+.rows {
+  margin: 0 0 var(--msv-s24);
+  background: var(--msv-white);
+  border-radius: var(--msv-r12);
+  overflow: hidden;
+  box-shadow: var(--msv-e1);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--msv-s12);
+  width: 100%;
+  min-height: 56px;
+  padding: var(--msv-s8) var(--msv-s16);
+  color: var(--msv-graphite);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--msv-n100);
+  font-family: var(--msv-font);
+  font-size: var(--msv-body-size);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.row:last-child { border-bottom: 0; }
+.row:hover { background: var(--msv-n100); }
+.row:focus-visible { outline: 2px solid var(--msv-violet); outline-offset: -2px; }
+
+.row__icon { flex: 0 0 auto; display: flex; color: var(--msv-graphite); }
+.row__text { flex: 1 1 auto; min-width: 0; }
+.row__name { display: block; }
+.row__note { display: block; margin-top: 2px; }
+.row__end { flex: 0 0 auto; display: flex; align-items: center; gap: var(--msv-s8); color: var(--msv-n300); }
+.row__tag { color: var(--msv-n500); font-size: var(--msv-note-size); font-weight: 500; }
+
+.row__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  background: var(--msv-red);
+  color: var(--msv-white);
+  border-radius: 11px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.row__dot { flex: 0 0 auto; width: 8px; height: 8px; border-radius: 50%; background: var(--msv-sky); }
+
+.group__title { margin: 0 0 var(--msv-s12); }
+
+/* ---------- Уведомления ---------- */
+
+.note-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--msv-s12);
+  margin-bottom: var(--msv-s12);
+  padding: var(--msv-s16);
+  background: var(--msv-white);
+  border-radius: var(--msv-r12);
+  box-shadow: var(--msv-e1);
+}
+
+.note-card--alarm {
+  background: var(--msv-n100);
+  border: 1px solid var(--msv-red);
+  box-shadow: none;
+}
+
+.note-card__mark {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: var(--msv-graphite);
+}
+
+.note-card__mark--pay { background: var(--msv-yellow); }
+.note-card__mark--info { background: var(--msv-lavender); }
+.note-card__mark--ok { background: var(--msv-lime); }
+.note-card__mark--alarm { background: transparent; color: var(--msv-red); }
+
+.note-card__body { flex: 1 1 auto; min-width: 0; }
+.note-card__text { margin: 0; }
+.note-card__when { display: block; margin-top: var(--msv-s8); }
+
+/* ---------- Заявка технику ---------- */
+
+.pick { display: grid; gap: var(--msv-s8); margin-bottom: var(--msv-s12); }
+
+.pick__opt {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--msv-s12);
+  padding: var(--msv-s12) var(--msv-s16);
+  background: var(--msv-white);
+  border: 2px solid transparent;
+  border-radius: var(--msv-r12);
+  box-shadow: var(--msv-e1);
+  cursor: pointer;
+  transition: border-color var(--msv-fast) var(--msv-ease);
+}
+
+.pick__opt:hover { border-color: var(--msv-n300); }
+.pick__opt:focus-within { outline: 2px solid var(--msv-violet); outline-offset: 2px; }
+.pick__opt:has(input:checked) { border-color: var(--msv-red); }
+
+.pick__radio {
+  position: relative;
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  margin: 2px 0 0;
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--msv-white);
+  border: 2px solid var(--msv-n300);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.pick__radio:checked { border-color: var(--msv-red); }
+
+.pick__radio:checked::after {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--msv-red);
+}
+
+.pick__name { display: block; font-weight: 600; }
+
+.hint {
+  margin: 0 0 var(--msv-s24);
+  padding: var(--msv-s12) var(--msv-s16);
+  background: var(--msv-ice);
+  border-radius: var(--msv-r12);
+  color: var(--msv-graphite);
+}
+
+.hint[hidden] { display: none; }
+
+.msv-select {
+  display: block;
+  width: 100%;
+  height: var(--msv-field);
+  padding: 0 var(--msv-s16);
+  font-family: var(--msv-font);
+  font-size: var(--msv-body-size);
+  color: var(--msv-graphite);
+  background: var(--msv-white);
+  border: 2px solid var(--msv-n300);
+  border-radius: var(--msv-r11);
+  cursor: pointer;
+}
+
+.msv-select:focus { outline: none; border-color: var(--msv-graphite); }
+
+/* ---------- История оплат ---------- */
+
+.sum-card {
+  margin-bottom: var(--msv-s24);
+  padding: var(--msv-s20);
+  background: var(--msv-graphite);
+  border-radius: var(--msv-r20);
+  color: var(--msv-white);
+}
+
+.sum-card__label { color: var(--msv-n300); }
+.sum-card__value { margin: var(--msv-s8) 0 0; }
+.sum-card__note { display: block; margin-top: var(--msv-s8); color: var(--msv-n100); }
+
+.pay-head {
+  display: grid;
+  grid-template-columns: 52px 1fr 1fr 64px;
+  gap: var(--msv-s12);
+  padding: 0 var(--msv-s16) var(--msv-s8);
+}
+
+.pay-head span:last-child { text-align: left; }
+
+.pay-row {
+  display: grid;
+  grid-template-columns: 52px 1fr 1fr 64px;
+  gap: var(--msv-s12);
+  align-items: baseline;
+  padding: var(--msv-s12) var(--msv-s16);
+  border-bottom: 1px solid var(--msv-n100);
+  font-variant-numeric: tabular-nums;
+}
+
+.pay-row:last-child { border-bottom: 0; }
+.pay-row b { font-weight: 600; text-align: left; white-space: nowrap; }
+.pay-row__extra { display: block; margin-top: 2px; }
+
+.good {
+  margin: var(--msv-s24) 0 0;
+  padding: var(--msv-s12) var(--msv-s16);
+  background: var(--msv-lime);
+  border-radius: var(--msv-r12);
+  color: var(--msv-graphite);
+}
+
+/* ---------- Репутация ---------- */
+
+.score {
+  margin-bottom: var(--msv-s16);
+  padding: var(--msv-s20);
+  background: var(--msv-white);
+  border-radius: var(--msv-r20);
+  box-shadow: var(--msv-e1);
+}
+
+.score__value { margin: 0 0 var(--msv-s16); }
+.score__bar { display: flex; gap: var(--msv-s4); }
+
+.score__seg {
+  flex: 1 1 0;
+  height: 8px;
+  border-radius: var(--msv-r4);
+  background: var(--msv-n100);
+}
+
+.score__seg--on { background: var(--msv-lime); }
+
+.log { margin: 0; }
+
+.log__item {
+  display: flex;
+  gap: var(--msv-s12);
+  padding: var(--msv-s12) 0;
+  border-bottom: 1px solid var(--msv-n100);
+}
+
+.log__item:last-child { border-bottom: 0; }
+.log__when { flex: 0 0 76px; }
+.log__body { flex: 1 1 auto; min-width: 0; }
+.log__what { display: block; font-size: 14px; font-weight: 600; }
+.log__what--bad { color: var(--msv-red); }
+.log__more { display: block; margin-top: 2px; font-size: 14px; line-height: 18px; color: var(--msv-n500); }
+
+/* ---------- Подвал с главной кнопкой ---------- */
+
+.foot { margin-top: auto; padding-top: var(--msv-s32); }
+
+/* ---------- Плавающий таббар ---------- */
+
+.tabbar {
+  position: fixed;
+  left: var(--msv-s16);
+  right: var(--msv-s16);
+  bottom: max(var(--msv-s16), env(safe-area-inset-bottom));
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: var(--msv-s4);
+  height: var(--msv-tabbar);
+  max-width: 428px;
+  margin: 0 auto;
+  padding: 10px;
+  background: var(--msv-graphite);
+  border-radius: calc(var(--msv-tabbar) / 2);
+  box-shadow: var(--msv-e2);
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--msv-s8);
+  min-width: var(--msv-tap);
+  height: var(--msv-tap);
+  padding: 0 10px;
+  color: var(--msv-n300);
+  text-decoration: none;
+  border-radius: calc(var(--msv-tap) / 2);
+  transition: background var(--msv-base) var(--msv-ease), color var(--msv-base) var(--msv-ease);
+}
+
+.tab:focus-visible { outline: 2px solid var(--msv-white); outline-offset: 2px; }
+.tab__cap { display: none; font-size: 13px; font-weight: 600; line-height: 1; }
+
+.tab[aria-current="page"] {
+  padding: 0 16px;
+  background: var(--msv-red);
+  color: var(--msv-white);
+}
+
+.tab[aria-current="page"] .tab__cap { display: block; }
+
+/* Внесённый депозит — отдельный неброский тон */
+.pay-row--deposit { background: var(--msv-ice); }
+.pay-row--deposit .msv-num { color: var(--msv-graphite); }
+
+/* Скидка — отдельный столбик со стрелкой; текст раскрывается под строкой */
+.disc {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; font: 700 12px var(--msv-font); color: #4A6B12;
+  background: var(--msv-lime); border: 0; border-radius: 10px; cursor: pointer;
+}
+.disc svg { transition: transform var(--msv-fast) var(--msv-ease); }
+.disc[aria-expanded="true"] svg { transform: rotate(180deg); }
+.disc__body { grid-column: 1 / -1; padding: var(--msv-s8) 0 0; color: var(--msv-n500); }
+.disc__body[hidden] { display: none; }

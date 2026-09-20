@@ -1,0 +1,186 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#34495E">
+<title>Репутация резидентов — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="cabinet.css">
+<link rel="stylesheet" href="form.css">
+<style>
+  .set { margin-bottom: var(--msv-s24); padding: var(--msv-s20); background: var(--msv-white); border-radius: var(--msv-r20); box-shadow: var(--msv-e1); }
+  .set__title { margin: 0 0 var(--msv-s12); }
+  .set__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--msv-s12); }
+  .set .msv-field { margin-bottom: 0; }
+</style>
+<style>
+  body { --role: var(--msv-graphite); --role-ink: var(--msv-graphite); }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <aside class="side">
+    <img class="side__logo" src="msv-1200-white.png" width="1200" height="209"
+         alt="МСВ — Москва в студентов верит!">
+
+    <a class="side__who" href="admin-profile.html" title="Мой профиль">
+      <span class="side__name">Ирина Соколова</span>
+      <span class="side__role">Администратор</span>
+    </a>
+
+    <nav class="side__nav" aria-label="Разделы кабинета">
+      <a class="side__link" href="cabinet-admin.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>
+        Обзор
+      </a>
+      <a class="side__link" href="admin-residences.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V8l7-4 7 4v13"/><path d="M9 21v-6h6v6"/><path d="M9 11h.01"/><path d="M15 11h.01"/></svg>
+        Резиденции
+      </a>
+      <a class="side__link" href="admin-shahmatka.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M9 10v9"/></svg>
+        Шахматка
+      </a>
+      <a class="side__link" href="admin-residents.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6.5a3 3 0 0 1 0 5.8"/><path d="M18 20a5.5 5.5 0 0 0-3-4.6"/></svg>
+        Резиденты
+      </a>
+      <a class="side__link" href="admin-tickets.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M8 3v4"/><path d="M16 3v4"/><path d="M9 14l2 2 4-4"/></svg>
+        Заявки
+      </a>
+      <a class="side__link" href="admin-charges.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 12h5a3.5 3.5 0 0 0 0-7H9v14"/><path d="M7 15h7"/></svg>
+        Начисления
+      </a>
+      <a class="side__link" href="admin-staff.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6.5a3 3 0 0 1 0 5.8"/><path d="M18 20a5.5 5.5 0 0 0-3-4.6"/></svg>
+        Сотрудники
+      </a>
+      <a class="side__link" href="admin-reputation.html" aria-current="page">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l2.4 5 5.6.8-4 3.9 1 5.5-5-2.7-5 2.7 1-5.5-4-3.9 5.6-.8z"/></svg>
+        Репутация
+      </a>
+      <a class="side__link" href="admin-rights.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l8-8"/><path d="M17 6l2 2"/></svg>
+        Права доступа
+      </a>
+      <a class="side__link" href="admin-settings.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v2"/><path d="M12 19v2"/><path d="M4.5 7.5l1.7 1"/><path d="M17.8 15.5l1.7 1"/><path d="M4.5 16.5l1.7-1"/><path d="M17.8 8.5l1.7-1"/></svg>
+        Настройки
+      </a>
+    </nav>
+
+    <div class="side__out">
+      <a class="side__exit" href="index.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/>
+        </svg>
+        Выйти
+      </a>
+    </div>
+  </aside>
+
+  <div class="work">
+    <header class="work__top">
+      <h1 class="msv-sub work__title">Репутация резидентов: токены</h1>
+    </header>
+
+    <main class="work__body">
+      <p class="msv-note notice">Токены — плюсы и минусы к репутации резидента. Заносит модератор или администратор. Без сервера — до обновления страницы.</p>
+
+      <div class="set" style="max-width:720px">
+        <h2 class="msv-sub set__title">Начислить токены</h2>
+        <div class="set__grid">
+          <label class="msv-field"><span class="msv-field__label">Резидент</span>
+            <input class="msv-input" id="who" list="people" placeholder="Начни вводить фамилию"><datalist id="people"></datalist></label>
+          <label class="msv-field"><span class="msv-field__label">Событие</span>
+            <select class="msv-select" id="kind">
+              <option value="+1.0">Организация события · +1,0</option>
+              <option value="+0.5">Помощь соседям, волонтёрство · +0,5</option>
+              <option value="+0.4">Все платежи вовремя полгода · +0,4</option>
+              <option value="+0.3">Благодарность от сотрудника · +0,3</option>
+              <option value="-0.5">Шум, беспорядок, замечание · −0,5</option>
+              <option value="-1.0">Просрочка оплаты · −1,0</option>
+              <option value="-2.0">Грубое нарушение правил · −2,0</option>
+              <option value="custom">Другое — своя сумма</option>
+            </select></label>
+          <label class="msv-field" id="customWrap" hidden><span class="msv-field__label">Токены (от −5 до +5)</span>
+            <input class="msv-input" id="custom" inputmode="decimal" placeholder="+0,7 или −1,5"></label>
+        </div>
+        <input class="msv-input" id="details" placeholder="Что именно произошло — резидент увидит этот текст" style="margin-top:var(--msv-s12)">
+        <button class="msv-btn msv-btn--m msv-btn--primary" type="button" id="add" style="margin-top:var(--msv-s12)">Начислить</button>
+        <span class="msv-note" id="msg" hidden style="margin-left:var(--msv-s12)"></span>
+      </div>
+
+      <h2 class="msv-sub" style="margin:0 0 var(--msv-s12)">Последние начисления</h2>
+      <table class="grid" id="log">
+        <thead><tr><th>Дата</th><th>Резидент</th><th>Событие</th><th class="num">Токены</th><th>Кто занёс</th></tr></thead>
+        <tbody>
+          <tr><td>12.09.26</td><td>Логинов Артём</td><td>Просрочка оплаты</td><td class="num" style="color:var(--msv-red);font-weight:700">−1,0</td><td>система</td></tr>
+          <tr><td>28.08.26</td><td>Логинов Артём</td><td>Помощь на переезде</td><td class="num" style="color:#4A6B12;font-weight:700">+0,5</td><td>Павел Дроздов</td></tr>
+          <tr><td>14.07.26</td><td>Логинов Артём</td><td>Шум после 23:00</td><td class="num" style="color:var(--msv-red);font-weight:700">−0,5</td><td>Мария Гущина</td></tr>
+        </tbody>
+      </table>
+    </main>
+  </div>
+
+</div>
+
+<script src="api.js"></script>
+<script src="residences.js"></script>
+<script src="demo-bookings.js"></script>
+<script src="residents-uyut.js"></script>
+<script src="residents-forma.js"></script>
+<script>
+MSV.ready(function (ctx) {
+  'use strict';
+  var names = {};
+  ctx.residences.forEach(function (res) { ctx.bookings(res).residents.forEach(function (r) { names[r.name] = r.id; }); });
+  document.getElementById('people').innerHTML = Object.keys(names).sort().map(function (n) { return '<option value="' + n.replace(/"/g,'&quot;') + '">'; }).join('');
+
+  var kind = document.getElementById('kind'), wrap = document.getElementById('customWrap');
+  kind.addEventListener('change', function () { wrap.hidden = kind.value !== 'custom'; });
+
+  document.getElementById('add').addEventListener('click', function () {
+    var who = document.getElementById('who').value.trim(), m = document.getElementById('msg');
+    var delta = kind.value === 'custom' ? parseFloat(document.getElementById('custom').value.replace(',', '.').replace('−', '-')) : parseFloat(kind.value);
+    var details = document.getElementById('details').value.trim();
+    if (!who || isNaN(delta) || Math.abs(delta) > 5 || !details) { m.textContent = 'Нужны резидент, токены от −5 до +5 и описание'; m.hidden = false; return; }
+    var title = kind.value === 'custom' ? details : kind.options[kind.selectedIndex].text.split(' · ')[0];
+    function ok() {
+      var now = new Date(), d = String(now.getDate()).padStart(2,'0') + '.' + String(now.getMonth()+1).padStart(2,'0') + '.' + String(now.getFullYear()).slice(2);
+      document.querySelector('#log tbody').insertAdjacentHTML('afterbegin', '<tr><td>' + d + '</td><td>' + who.replace(/</g,'&lt;') + '</td><td>' + title.replace(/</g,'&lt;') + '</td><td class="num" style="color:' + (delta < 0 ? 'var(--msv-red)' : '#4A6B12') + ';font-weight:700">' + (delta > 0 ? '+' : '−') + Math.abs(delta).toFixed(1).replace('.', ',') + '</td><td>' + (ctx.me ? ctx.me.name : 'вы') + '</td></tr>');
+      m.textContent = 'Начислено. Резидент увидит запись в своей репутации.'; m.hidden = false;
+      document.getElementById('details').value = '';
+    }
+    if (!ctx.live) { ok(); return; }
+    ctx.api('POST', '/api/reputation', { userId: names[who], delta: delta, title: title, details: details })
+      .then(function (r) { if (r.status === 201) ok(); else { m.textContent = r.body && r.body.error || 'Не удалось'; m.hidden = false; } })
+      .catch(function () { m.textContent = 'Сервер не отвечает'; m.hidden = false; });
+  });
+});
+</script>
+<script src="mark.js"></script>
+<script src="zoom.js"></script>
+<script src="edit.js"></script>
+<script src="protect.js"></script>
+
+</body>
+</html>

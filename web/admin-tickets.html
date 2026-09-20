@@ -1,0 +1,257 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Сайт и его программное обеспечение охраняются ГК РФ (ст. 1259, 1261). Копирование без разрешения правообладателя запрещено. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#34495E">
+<title>Заявки — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="cabinet.css">
+<style>
+  body { --role: var(--msv-graphite); --role-ink: var(--msv-graphite); }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <aside class="side">
+    <img class="side__logo" src="msv-1200-white.png" width="1200" height="209"
+         alt="МСВ — Москва в студентов верит!">
+
+    <a class="side__who" href="admin-profile.html" title="Мой профиль и настройки">
+      <span class="side__name">Ирина Соколова</span>
+      <span class="side__role">Администратор</span>
+    </a>
+
+    <nav class="side__nav" aria-label="Разделы кабинета">
+      <a class="side__link" href="cabinet-admin.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>
+        Обзор
+      </a>
+      <a class="side__link" href="admin-residences.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V8l7-4 7 4v13"/><path d="M9 21v-6h6v6"/><path d="M9 11h.01"/><path d="M15 11h.01"/></svg>
+        Резиденции
+      </a>
+      <a class="side__link" href="admin-shahmatka.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M9 10v9"/></svg>
+        Шахматка
+      </a>
+      <a class="side__link" href="admin-residents.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6.5a3 3 0 0 1 0 5.8"/><path d="M18 20a5.5 5.5 0 0 0-3-4.6"/></svg>
+        Резиденты
+      </a>
+      <a class="side__link" href="admin-tickets.html" aria-current="page">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M8 3v4"/><path d="M16 3v4"/><path d="M9 14l2 2 4-4"/></svg>
+        Заявки
+      </a>
+      <a class="side__link" href="admin-charges.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 12h5a3.5 3.5 0 0 0 0-7H9v14"/><path d="M7 15h7"/></svg>
+        Начисления
+      </a>
+      <a class="side__link" href="admin-staff.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6.5a3 3 0 0 1 0 5.8"/><path d="M18 20a5.5 5.5 0 0 0-3-4.6"/></svg>
+        Сотрудники
+      </a>
+      <a class="side__link" href="admin-reputation.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l2.4 5 5.6.8-4 3.9 1 5.5-5-2.7-5 2.7 1-5.5-4-3.9 5.6-.8z"/></svg>
+        Репутация
+      </a>
+      <a class="side__link" href="admin-rights.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l8-8"/><path d="M17 6l2 2"/></svg>
+        Права доступа
+      </a>
+      <a class="side__link" href="admin-settings.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v2"/><path d="M12 19v2"/><path d="M4.5 7.5l1.7 1"/><path d="M17.8 15.5l1.7 1"/><path d="M4.5 16.5l1.7-1"/><path d="M17.8 8.5l1.7-1"/></svg>
+        Настройки
+      </a>
+    </nav>
+
+    <div class="side__out">
+      <a class="side__exit" href="index.html" data-logout>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/>
+        </svg>
+        Выйти
+      </a>
+    </div>
+  </aside>
+
+  <div class="work">
+    <header class="work__top">
+      <h1 class="msv-sub work__title">Заявки в сервис</h1>
+    </header>
+
+    <main class="work__body">
+      <p class="msv-note notice">Заявки вымышленные: сервер ещё не подключён. Просроченные подняты наверх.</p>
+
+      <div class="bar">
+        <input class="bar__search" id="q" type="search" placeholder="Фамилия, комната, категория или текст" aria-label="Поиск">
+        <button class="bar__chip" type="button" data-st="" aria-pressed="true">Все</button>
+        <button class="bar__chip" type="button" data-st="Принята" aria-pressed="false">Принята</button>
+        <button class="bar__chip" type="button" data-st="В работе" aria-pressed="false">В работе</button>
+        <button class="bar__chip" type="button" data-st="Выполнена" aria-pressed="false">Выполнена</button>
+        <button class="bar__chip" type="button" data-only="overdue" aria-pressed="false">Просрочены</button>
+        <span class="msv-note bar__count" id="count"></span>
+      </div>
+
+      <table class="grid">
+        <thead>
+          <tr>
+            <th>Заявка</th><th>Кто и где</th><th>Срочность</th>
+            <th>Мастер</th><th>Статус</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </main>
+  </div>
+
+</div>
+
+<script src="api.js"></script>
+<script src="residences.js"></script>
+<script src="demo-bookings.js"></script>
+<script src="residents-uyut.js"></script>
+<script src="residents-forma.js"></script>
+<script src="demo-tickets.js"></script>
+<script>
+MSV.ready(function (ctx) {
+  'use strict';
+
+  var RES = ctx.residences;
+
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function plural(n, one, few, many) {
+    var a = Math.abs(n) % 100, b = a % 10;
+    if (a > 10 && a < 20) return many;
+    if (b > 1 && b < 5) return few;
+    if (b === 1) return one;
+    return many;
+  }
+
+  /* Сколько прошло: до суток — в часах, дальше — в днях. */
+  function ago(hours) {
+    if (hours < 1) return 'только что';
+    if (hours < 24) return hours + ' ' + plural(hours, 'час', 'часа', 'часов') + ' назад';
+    var d = Math.floor(hours / 24);
+    return d + ' ' + plural(d, 'день', 'дня', 'дней') + ' назад';
+  }
+
+  var ALL = ctx.tickets();
+
+  ALL.sort(function (a, b) {
+    if (a.overdue !== b.overdue) return a.overdue ? -1 : 1;
+    return b.created - a.created;
+  });
+
+  var state = { q: '', st: '', overdue: false };
+  var rowsBox = document.getElementById('rows');
+  var countBox = document.getElementById('count');
+
+  function matches(t) {
+    if (state.st && t.status !== state.st) return false;
+    if (state.overdue && !t.overdue) return false;
+    if (state.q) {
+      var hay = (t.resident + ' ' + t.room + ' ' + t.bed + ' ' + t.category + ' ' +
+                 t.text + ' ' + t.residence).toLowerCase().replace(/ё/g, 'е');
+      if (hay.indexOf(state.q) === -1) return false;
+    }
+    return true;
+  }
+
+  var STATUS_TAG = {
+    'Принята': 'tag--info',
+    'В работе': 'tag--warn',
+    'Выполнена': 'tag--ok',
+    'Отклонена': 'tag--bad'
+  };
+
+  var PRIO_TAG = {
+    critical: 'tag--bad',
+    urgent: 'tag--warn',
+    normal: 'tag--info',
+    consult: 'tag--mute'
+  };
+
+  function render() {
+    var list = ALL.filter(matches);
+    var over = ALL.filter(function (t) { return t.overdue; }).length;
+    countBox.textContent = list.length + ' из ' + ALL.length +
+      (over ? ' · просрочено ' + over : '');
+
+    if (!list.length) {
+      rowsBox.innerHTML = '<tr><td colspan="5" class="grid__empty">Заявок по такому запросу нет.</td></tr>';
+      return;
+    }
+
+    rowsBox.innerHTML = list.map(function (t) {
+      var late = t.overdue
+        ? '<span class="tag tag--bad">просрочена</span>' : '';
+
+      return '<tr>' +
+        '<td><span class="who-cell__name">' + esc(t.category) + ' ' + late + '</span>' +
+          '<span class="msv-note sub">' + esc(t.text) + '</span></td>' +
+        '<td>' + esc(t.resident) +
+          '<span class="msv-note sub">' + esc(t.bed) + ' · ' + esc(t.room) + ' · ' + esc(t.residence) + '</span></td>' +
+        '<td><span class="tag ' + PRIO_TAG[t.priority] + '">' + esc(t.priorityName) + '</span>' +
+          '<span class="msv-note sub">срок ' + t.deadlineHours + ' ч · ' + esc(ago(t.ageHours)) + '</span></td>' +
+        '<td>' + (t.master ? esc(t.master) : '<span class="msv-note">не назначен</span>') + '</td>' +
+        '<td><span class="tag ' + STATUS_TAG[t.status] + '">' + esc(t.status) + '</span></td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  var timer = null;
+  document.getElementById('q').addEventListener('input', function (e) {
+    clearTimeout(timer);
+    var v = e.target.value;
+    timer = setTimeout(function () {
+      state.q = v.trim().toLowerCase().replace(/ё/g, 'е');
+      render();
+    }, 150);
+  });
+
+  document.querySelector('.bar').addEventListener('click', function (e) {
+    var chip = e.target.closest('.bar__chip');
+    if (!chip) return;
+
+    if (chip.hasAttribute('data-st')) {
+      document.querySelectorAll('[data-st]').forEach(function (c) { c.setAttribute('aria-pressed', 'false'); });
+      chip.setAttribute('aria-pressed', 'true');
+      state.st = chip.getAttribute('data-st');
+    } else if (chip.hasAttribute('data-only')) {
+      var on = chip.getAttribute('aria-pressed') === 'true';
+      chip.setAttribute('aria-pressed', on ? 'false' : 'true');
+      state.overdue = !on;
+    }
+    render();
+  });
+
+  render();
+});
+</script>
+
+<script src="mark.js"></script>
+<script src="zoom.js"></script>
+<script src="edit.js"></script>
+<script src="protect.js"></script>
+</body>
+</html>

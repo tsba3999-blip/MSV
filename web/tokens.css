@@ -1,0 +1,456 @@
+/* © 2026 МСВ. Все права защищены. Программа для ЭВМ охраняется ст. 1259, 1261 ГК РФ. Использование без разрешения правообладателя запрещено. Подробнее: /legal.html */
+/* ============================================================
+   МСВ — дизайн-токены
+   Источник: Брендбук мобильного приложения МСВ, издание 1.0,
+   сентябрь 2026. Значения перенесены дословно.
+
+   Этот файл — единственное место, где заданы цвета, шрифты,
+   отступы и радиусы. Во всех остальных файлах цвета берутся
+   только отсюда: правка здесь меняет весь сайт разом.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&display=swap');
+
+:root {
+
+  /* ---------- Основная палитра ---------- */
+
+  --msv-red:        #FB344A;   /* бренд и главное действие */
+  --msv-red-press:  #D9210F;   /* нажатие primary */
+  --msv-graphite:   #34495E;   /* основной текст, тёмные поверхности */
+  --msv-beige:      #F5F1EA;   /* фон экранов */
+  --msv-white:      #FFFFFF;
+
+  /* ---------- Нейтральная шкала (пять значений, шестого нет) ---------- */
+
+  --msv-n0:   #FFFFFF;   /* карточки, белые поверхности */
+  --msv-n100: #EAE4DA;   /* разделители, disabled, скелетоны */
+  --msv-n300: #B8B1A5;   /* обводка поля, неактивная иконка */
+  --msv-n500: #6B665E;   /* вторичный текст, примечания */
+  --msv-n900: #34495E;   /* основной текст, таббар */
+
+  /* ---------- Акценты (не более двух на экран) ---------- */
+
+  --msv-lime:     #C8F03C;   /* свободно, успех */
+  --msv-violet:   #6E3BFF;   /* события, ссылки, фокус */
+  --msv-lavender: #CBB6FF;   /* соседи, чаты, информация */
+  --msv-yellow:   #FFD93D;   /* оплата, дедлайны */
+  --msv-aqua:     #56C3D0;   /* связь, онлайн-статусы */
+  --msv-sky:      #7EB2DD;   /* данные и документы */
+  --msv-olive:    #90A955;   /* вложенные сервисы */
+  --msv-ice:      #A2D2FF;   /* подложка сообщений */
+
+  /* ---------- Семантика ---------- */
+
+  --msv-success: var(--msv-lime);
+  --msv-warning: var(--msv-yellow);
+  --msv-info:    var(--msv-lavender);
+  --msv-confirm: #35B265;              /* галочка подтверждения ввода */
+  /* Ошибка цветом не кодируется: плашка N100 + обводка 1px красным
+     + иконка-треугольник + текст причины. См. .msv-error ниже. */
+
+  /* ---------- Ссылки ---------- */
+
+  --msv-link:         #6E3BFF;
+  --msv-link-press:   #4A18E0;
+  --msv-link-visited: #8F6BFF;
+  --msv-link-dark:    #C8F03C;   /* ссылка на графите */
+
+  /* ---------- Роли кабинетов ---------- */
+
+  --msv-role-resident: var(--msv-red);        /* бежевый фон + красное действие */
+  --msv-role-staff:    var(--msv-sky);        /* данные и документы */
+  --msv-role-admin:    var(--msv-graphite);   /* тёмные поверхности */
+
+  /* ---------- Типографика ---------- */
+
+  --msv-font: 'Golos Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  --msv-h-size:   32px;  --msv-h-line:   36px;  --msv-h-track:   -0.015em;
+  --msv-sub-size: 20px;  --msv-sub-line: 26px;  --msv-sub-track: -0.005em;
+  --msv-body-size: 15px; --msv-body-line: 22px;
+  --msv-note-size: 12px; --msv-note-line: 16px; --msv-note-track: 0.01em;
+  --msv-num-size:  14px; --msv-num-line:  18px;
+
+  /* ---------- Шкала отступов (кратно 4) ---------- */
+
+  --msv-s4: 4px;    --msv-s8: 8px;    --msv-s12: 12px;  --msv-s16: 16px;
+  --msv-s20: 20px;  --msv-s24: 24px;  --msv-s32: 32px;  --msv-s48: 48px;
+  --msv-s64: 64px;
+
+  /* ---------- Радиусы ---------- */
+
+  --msv-r4:  4px;    /* бейдж */
+  --msv-r11: 11px;   /* поле ввода, чип, аватар в списке */
+  --msv-r12: 12px;   /* карточка списка */
+  --msv-r20: 20px;   /* бенто-плитка */
+  --msv-r28: 28px;   /* модальное окно, лист-шторка */
+  /* Кнопка, таббар и круглый аватар — капсула: радиус = половина высоты */
+
+  /* ---------- Высоты ---------- */
+
+  --msv-btn-l: 52px;  --msv-btn-m: 44px;  --msv-btn-s: 36px;
+  --msv-field: 52px;  --msv-chip: 36px;
+  --msv-statusbar: 44px;  --msv-header: 56px;  --msv-tabbar: 64px;
+  --msv-tap: 44px;    /* минимальная область нажатия */
+
+  /* ---------- Тени: два уровня, третьего нет ---------- */
+
+  --msv-e1: 0 1px 5px rgba(52, 73, 94, .10);
+  --msv-e2: 0 3px 9px rgba(52, 73, 94, .18);
+
+  /* ---------- Анимация ---------- */
+
+  --msv-fast:   90ms;    /* нажатие, чип */
+  --msv-base:   200ms;   /* появление, таб */
+  --msv-slow:   320ms;   /* модальное окно */
+  --msv-ease:   cubic-bezier(.2, 0, 0, 1);
+  --msv-enter:  cubic-bezier(0, 0, 0, 1);
+  --msv-exit:   cubic-bezier(.3, 0, 1, 1);
+  --msv-spring: cubic-bezier(.34, 1.4, .64, 1);
+
+  /* ---------- Модуль наклона 14° ---------- */
+
+  --msv-skew: -14deg;
+  --msv-skew-back: 14deg;
+}
+
+/* ============================================================
+   Базовый слой
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* scrollbar-gutter: stable — место под полосу прокрутки занято всегда,
+   даже когда прокрутки нет. Без этого при переходе с длинной страницы
+   на короткую полоса исчезала, и всё содержимое сдвигалось на её
+   ширину: казалось, что кнопки и иконки «скачут». */
+html { -webkit-text-size-adjust: 100%; scrollbar-gutter: stable; }
+
+body {
+  margin: 0;
+  font-family: var(--msv-font);
+  font-size: var(--msv-body-size);
+  line-height: var(--msv-body-line);
+  font-weight: 400;
+  color: var(--msv-graphite);
+  background: var(--msv-beige);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Переносы в интерфейсе отключены (правило набора брендбука) */
+body, h1, h2, h3, p, button, a, label { hyphens: none; }
+
+/* ============================================================
+   Типографика
+   ============================================================ */
+
+.msv-h {
+  margin: 0;
+  font-size: var(--msv-h-size);
+  line-height: var(--msv-h-line);
+  font-weight: 600;
+  letter-spacing: var(--msv-h-track);
+}
+
+.msv-sub {
+  margin: 0;
+  font-size: var(--msv-sub-size);
+  line-height: var(--msv-sub-line);
+  font-weight: 600;
+  letter-spacing: var(--msv-sub-track);
+}
+
+.msv-body { margin: 0; font-size: var(--msv-body-size); line-height: var(--msv-body-line); }
+
+.msv-note {
+  margin: 0;
+  font-size: var(--msv-note-size);
+  line-height: var(--msv-note-line);
+  font-weight: 500;
+  letter-spacing: var(--msv-note-track);
+  color: var(--msv-n500);
+}
+
+.msv-num {
+  font-size: var(--msv-num-size);
+  line-height: var(--msv-num-line);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Разряды в числах разделяются тонким пробелом — он ставится в тексте (U+2009) */
+
+/* Планшет и веб: шкала 1,25× от 768 px и 1,5× от 1280 px */
+@media (min-width: 768px) {
+  :root {
+    --msv-h-size: 40px;   --msv-h-line: 45px;
+    --msv-sub-size: 25px; --msv-sub-line: 33px;
+    --msv-body-size: 15px; --msv-body-line: 22px;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --msv-h-size: 48px;   --msv-h-line: 54px;
+    --msv-sub-size: 30px; --msv-sub-line: 39px;
+  }
+}
+
+/* ============================================================
+   Ссылки — единственный цвет системы фиолетовый, волна 1 px
+   ============================================================ */
+
+.msv-link {
+  color: var(--msv-link);
+  text-decoration: underline wavy var(--msv-link);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.msv-link:active { color: var(--msv-link-press); text-decoration-color: var(--msv-link-press); }
+.msv-link:visited { color: var(--msv-link-visited); }
+
+.msv-link--on-dark,
+.msv-link--on-dark:link,
+.msv-link--on-dark:visited,
+.msv-link--on-dark:hover {
+  color: var(--msv-link-dark);
+  text-decoration-color: var(--msv-link-dark);
+}
+
+.msv-link--on-dark:active { color: var(--msv-white); text-decoration-color: var(--msv-white); }
+
+/* На красном ссылка всегда белая, волна белая — в любом кегле и в любом
+   состоянии. :visited и :active перечислены явно: у псевдокласса вес выше,
+   и без этого посещённая ссылка становилась фиолетовой, а фиолетовый
+   на красном брендбук запрещает. */
+.msv-link--on-red,
+.msv-link--on-red:link,
+.msv-link--on-red:visited,
+.msv-link--on-red:hover,
+.msv-link--on-red:active {
+  color: var(--msv-white);
+  text-decoration-color: var(--msv-white);
+}
+
+/* ============================================================
+   Кнопки — радиус капсула, подпись 600
+   ============================================================ */
+
+.msv-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--msv-s8);
+  height: var(--msv-btn-l);
+  padding: 0 var(--msv-s24);
+  border: 0;
+  border-radius: calc(var(--msv-btn-l) / 2);
+  font-family: var(--msv-font);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--msv-fast) var(--msv-ease),
+              transform var(--msv-fast) var(--msv-ease),
+              opacity var(--msv-fast) var(--msv-ease);
+}
+
+.msv-btn:active { transform: scale(.97); }
+
+.msv-btn:focus-visible {
+  outline: 2px solid var(--msv-violet);
+  outline-offset: 2px;
+}
+
+.msv-btn[disabled] { opacity: .35; cursor: default; transform: none; box-shadow: none; }
+
+.msv-btn--m { height: var(--msv-btn-m); padding: 0 var(--msv-s20); font-size: 15px; border-radius: calc(var(--msv-btn-m) / 2); }
+.msv-btn--s { height: var(--msv-btn-s); padding: 0 var(--msv-s16); font-size: 13px; border-radius: calc(var(--msv-btn-s) / 2); }
+
+.msv-btn--block { display: flex; width: 100%; }
+
+/* Primary — одна на экран */
+.msv-btn--primary { background: var(--msv-red); color: var(--msv-white); }
+.msv-btn--primary:hover { background: #E82742; }
+.msv-btn--primary:active { background: var(--msv-red-press); }
+
+.msv-btn--secondary { background: var(--msv-graphite); color: var(--msv-white); }
+.msv-btn--secondary:hover { background: #2B3D50; }
+.msv-btn--secondary:active { background: #22303D; }
+
+.msv-btn--tertiary { background: transparent; color: var(--msv-graphite); }
+.msv-btn--tertiary:hover { background: var(--msv-n100); }
+
+.msv-btn--destructive {
+  background: transparent;
+  color: var(--msv-red);
+  box-shadow: inset 0 0 0 2px var(--msv-red);
+}
+.msv-btn--destructive:hover { background: var(--msv-red); color: var(--msv-white); }
+
+/* На красном полотне: белая заливка — главное действие, обводка — остальные */
+.msv-btn--on-red-fill { background: var(--msv-white); color: var(--msv-red); }
+.msv-btn--on-red-fill:hover { background: #FFF0F2; }
+
+.msv-btn--on-red-line {
+  background: transparent;
+  color: var(--msv-white);
+  box-shadow: inset 0 0 0 2px var(--msv-white);
+}
+.msv-btn--on-red-line:hover { background: rgba(255, 255, 255, .14); }
+
+/* На красном фиолетовая обводка фокуса запрещена — берём белую */
+.msv-btn--on-red-fill:focus-visible,
+.msv-btn--on-red-line:focus-visible { outline-color: var(--msv-white); }
+
+/* ============================================================
+   Поле ввода — высота 52, радиус 11, обводка 2 px
+   ============================================================ */
+
+.msv-field { display: block; margin-bottom: var(--msv-s12); }
+
+.msv-field__label {
+  display: block;
+  margin-bottom: var(--msv-s4);
+  font-size: var(--msv-note-size);
+  line-height: var(--msv-note-line);
+  font-weight: 500;
+  letter-spacing: var(--msv-note-track);
+  color: var(--msv-n500);
+}
+
+.msv-input {
+  display: block;
+  width: 100%;
+  height: var(--msv-field);
+  padding: 0 var(--msv-s16);
+  font-family: var(--msv-font);
+  font-size: var(--msv-body-size);
+  color: var(--msv-graphite);
+  background: var(--msv-white);
+  border: 2px solid var(--msv-n300);
+  border-radius: var(--msv-r11);
+  transition: border-color var(--msv-fast) var(--msv-ease);
+}
+
+.msv-input::placeholder { color: var(--msv-n300); }
+.msv-input:focus { outline: none; border-color: var(--msv-graphite); }
+.msv-input:disabled { background: var(--msv-n100); color: var(--msv-n300); border-color: var(--msv-n100); }
+
+.msv-input--ok { border-color: var(--msv-confirm); }
+.msv-input--error { background: var(--msv-n100); border-color: var(--msv-red); }
+
+.msv-field__hint { margin-top: var(--msv-s4); }
+
+/* ============================================================
+   Плашка ошибки — серый фон, красная обводка, треугольник, текст
+   Цветом ошибка не кодируется.
+   ============================================================ */
+
+.msv-error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--msv-s8);
+  padding: var(--msv-s12) var(--msv-s16);
+  background: var(--msv-n100);
+  border: 1px solid var(--msv-red);
+  border-radius: var(--msv-r12);
+  font-size: var(--msv-note-size);
+  line-height: var(--msv-note-line);
+  color: var(--msv-graphite);
+}
+
+.msv-error__icon { flex: 0 0 auto; width: 16px; height: 16px; color: var(--msv-red); }
+
+/* ============================================================
+   Логотип
+   Знак вставляется только исходным файлом — воспроизведение
+   вёрсткой, шрифтом или перерисовкой брендбук запрещает.
+   Файлы: msv-1200-white.png — горизонтальная версия (не меньше
+   120 px по ширине), favicon4.png — только знак (не меньше 20 px).
+   Охранное поле — 50% от высоты знака со всех сторон.
+   ============================================================ */
+
+.msv-logo { display: block; height: auto; }
+
+/* ============================================================
+   Паттерн: плашки 8 px, шаг 20 px, наклон 76°, белый 35%
+   Не более 30% площади экрана.
+   ============================================================ */
+
+.msv-pattern {
+  background-image: repeating-linear-gradient(
+    76deg,
+    rgba(255, 255, 255, .35) 0 8px,
+    transparent 8px 20px
+  );
+}
+
+/* ============================================================
+   Карточки и плитки
+   ============================================================ */
+
+.msv-card {
+  padding: var(--msv-s16);
+  background: var(--msv-white);
+  border-radius: var(--msv-r12);
+  box-shadow: var(--msv-e1);
+}
+
+.msv-tile {
+  padding: var(--msv-s16);
+  border-radius: var(--msv-r20);
+}
+
+/* ============================================================
+   Уменьшенное движение
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 120ms !important;
+    scroll-behavior: auto !important;
+  }
+  .msv-btn:active { transform: none; }
+}
+
+
+/* ============================================================
+   Адаптивность: одни и те же страницы на телефоне и на компьютере
+
+   Телефон — базовая вёрстка: колонка до 460 px, таббар внизу.
+   Компьютер (от 900 px): колонка резидента расширяется до 720 px,
+   бенто-плитки встают в четыре столбца, формы получают два поля
+   в ряд там, где есть сетка. Кабинеты администратора и сотрудника
+   на компьютере — как есть (боковое меню); на телефоне меню уходит
+   в горизонтальную ленту сверху, таблицы прокручиваются вбок.
+   ============================================================ */
+
+@media (min-width: 900px) {
+  .page, .form, .onb, .app, .doc { max-width: 720px; }
+  .tabbar { max-width: 720px; }
+  .bento { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .form__grid, .set__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rows--wide { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--msv-s12); }
+  .petals { max-width: 640px; }
+}
+
+@media (min-width: 1280px) {
+  .page, .form, .onb, .app, .doc { max-width: 800px; }
+  .tabbar { max-width: 800px; }
+}
+
+/* Телефон: тонкие поля, крупные зоны касания уже есть в токенах */
+@media (max-width: 480px) {
+  .page, .form, .onb { padding-left: var(--msv-s16); padding-right: var(--msv-s16); }
+  .doc { padding-left: var(--msv-s16); padding-right: var(--msv-s16); }
+  .msv-mark-btn { top: 10px; right: 10px; width: 40px; height: 40px; }
+  .edit-bar { right: 60px !important; top: 10px !important; }
+  .edit-bar__meta { display: none; }
+}

@@ -1,0 +1,124 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Сайт и его программное обеспечение охраняются ГК РФ (ст. 1259, 1261). Копирование без разрешения правообладателя запрещено. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#F5F1EA">
+<title>Моя репутация — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="resident.css">
+<style>
+  .log__head { display: grid; grid-template-columns: 76px 1fr 56px; gap: var(--msv-s12); padding: 0 var(--msv-s16) var(--msv-s8); }
+  .log__item { align-items: flex-start; }
+  .token { flex: 0 0 56px; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .token--ok { color: #4A6B12; }
+  .token--bad { color: var(--msv-red); }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="head">
+    <a class="head__back" href="menu.html" aria-label="Вернуться назад">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 6l-6 6 6 6"/>
+      </svg>
+    </a>
+    <h1 class="msv-sub head__title">Моя репутация</h1>
+  </div>
+
+  <div class="score" style="padding:var(--msv-s16) var(--msv-s20) var(--msv-s8)">
+    <svg class="gauge" viewBox="0 0 320 240" width="100%" role="img" aria-label="Репутация" id="gauge">
+      <circle cx="160" cy="120" r="96" fill="none" stroke="var(--msv-n100)" stroke-width="14"/>
+      <path d="M92 188 A96 96 0 0 1 160 24" fill="none" stroke="var(--msv-red)" stroke-width="14" stroke-linecap="round" opacity=".85"/>
+      <path d="M160 24 A96 96 0 0 1 228 188" fill="none" stroke="var(--msv-lime)" stroke-width="14" stroke-linecap="round"/>
+      <g id="gTicks" font-family="var(--msv-font)" font-size="11" font-weight="600" fill="var(--msv-graphite)" text-anchor="middle"></g>
+      <g id="gNeedle" style="transform-origin:160px 120px;transform:rotate(-135deg)">
+        <line x1="160" y1="120" x2="160" y2="40" stroke="var(--msv-graphite)" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="160" cy="40" r="6" fill="var(--msv-red)"/>
+      </g>
+      <circle cx="160" cy="120" r="8" fill="var(--msv-graphite)"/>
+    </svg>
+    <p class="msv-h" style="margin:calc(var(--msv-s32) * -1) 0 var(--msv-s8);text-align:center;position:relative" id="gValue">2,4</p>
+    <p class="msv-note" style="text-align:center;margin:0 0 var(--msv-s8)">от −5 до +5 · ниже нуля — зона риска</p>
+  </div>
+
+  <h2 class="msv-sub group__title">На что влияет репутация</h2>
+  <p class="msv-body" style="margin:0 0 var(--msv-s24);color:var(--msv-n500)">Репутация — это доверие резиденции к тебе, выраженное числом. От неё зависит очередь на переселение в лучшую комнату, размер депозита при продлении и участие в закрытых событиях. Ниже нуля — разговор с куратором и, если ничего не меняется, расторжение договора. Текст временный, заменим.</p>
+
+  <p class="msv-body" style="margin:0 0 var(--msv-s24);color:var(--msv-n500)">Репутация складывается из штрафов, неустоек и начислений за участие и помощь. Записи вносит модератор или администратор вручную.</p>
+
+  <h2 class="msv-sub group__title">История формирования репутации</h2>
+  <div class="log__head msv-note"><span>Дата</span><span>Событие</span><span>Токены</span></div>
+  <div class="rows" style="padding:0 var(--msv-s16)">
+    <div class="log__item"><span class="msv-note log__when">12.09.26</span><span class="log__body"><span class="log__what log__what--bad">Просрочка оплаты</span><span class="log__more">Пени 3000 руб. за первый день. Начислено автоматически.</span></span><span class="token token--bad">−1,0</span></div>
+    <div class="log__item"><span class="msv-note log__when">28.08.26</span><span class="log__body"><span class="log__what">Помощь на переезде</span><span class="log__more">Помог заселиться двум первокурсникам. Отметил куратор.</span></span><span class="token token--ok">+0,5</span></div>
+    <div class="log__item"><span class="msv-note log__when">14.07.26</span><span class="log__body"><span class="log__what log__what--bad">Шум после 23:00</span><span class="log__more">Замечание от соседей по блоку. Разобрано с куратором.</span></span><span class="token token--bad">−0,5</span></div>
+    <div class="log__item"><span class="msv-note log__when">02.06.26</span><span class="log__body"><span class="log__what">Организация вечера настолок</span><span class="log__more">Провёл вечер в лаундже, пришли 18 человек.</span></span><span class="token token--ok">+1,0</span></div>
+    <div class="log__item"><span class="msv-note log__when">15.05.26</span><span class="log__body"><span class="log__what">Все платежи вовремя</span><span class="log__more">Полгода без просрочек.</span></span><span class="token token--ok">+0,4</span></div>
+  </div>
+
+</div>
+
+<nav class="tabbar" aria-label="Разделы кабинета">
+  <a class="tab" href="cabinet-resident.html" aria-label="Главная">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5"/><path d="M6 10v10h12V10"/></svg>
+    <span class="tab__cap">Главная</span>
+  </a>
+  <a class="tab" href="payments.html" aria-label="Оплата">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M10 16.5V8h2.6a2.2 2.2 0 0 1 0 4.4H10"/><path d="M9 14.2h4"/></svg>
+    <span class="tab__cap">Оплата</span>
+  </a>
+  <a class="tab" href="repair.html" aria-label="Заявки">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/><path d="M10 13v3h4v-3"/></svg>
+    <span class="tab__cap">Заявки</span>
+  </a>
+  <a class="tab" href="documents.html" aria-label="Документы">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
+    <span class="tab__cap">Документы</span>
+  </a>
+  <a class="tab" href="menu.html" aria-current="page">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
+    <span class="tab__cap">Профиль</span>
+  </a>
+</nav>
+
+<script>
+(function () {
+  'use strict';
+  var VALUE = 2.4;                                  // с сервера: /api/me/home → reputation
+  var MIN = -5, MAX = 5, cx = 160, cy = 120, r = 96;
+  function angle(v) { return -135 + (v - MIN) / (MAX - MIN) * 270; }   // −5 → −135°, 0 → 0°, +5 → +135°
+
+  var g = document.getElementById('gTicks'), out = '';
+  for (var v = MIN; v <= MAX; v++) {
+    var a = (angle(v) - 90) * Math.PI / 180;
+    var x1 = cx + Math.cos(a) * (r - 12), y1 = cy + Math.sin(a) * (r - 12), x2 = cx + Math.cos(a) * (r - 22), y2 = cy + Math.sin(a) * (r - 22);
+    out += '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) + '" stroke="var(--msv-graphite)" stroke-width="2"/>';
+    var tx = cx + Math.cos(a) * (r - 36), ty = cy + Math.sin(a) * (r - 36) + 4;
+    out += '<text x="' + tx.toFixed(1) + '" y="' + ty.toFixed(1) + '"' + (v < 0 ? ' fill="var(--msv-red)"' : '') + '>' + (v > 0 ? '+' : '') + v + '</text>';
+  }
+  g.innerHTML = out;
+  document.getElementById('gValue').textContent = (VALUE > 0 ? '+' : '') + String(VALUE).replace('.', ',');
+  document.getElementById('gauge').setAttribute('aria-label', 'Репутация ' + String(VALUE).replace('.', ',') + ' из 5');
+
+  // стрелка едет к значению, чуть перелетает и качается, как настоящий прибор
+  var n = document.getElementById('gNeedle'), target = angle(VALUE);
+  requestAnimationFrame(function () {
+    n.style.transition = 'transform 1.1s cubic-bezier(.2,.9,.2,1)';
+    setTimeout(function () { n.style.transform = 'rotate(' + (target + 6) + 'deg)'; }, 120);
+    setTimeout(function () { n.style.transition = 'transform .35s ease'; n.style.transform = 'rotate(' + (target - 3) + 'deg)'; }, 1260);
+    setTimeout(function () { n.style.transform = 'rotate(' + target + 'deg)'; }, 1620);
+  });
+})();
+</script>
+<script src="mark.js"></script>
+<script src="zoom.js"></script>
+<script src="edit.js"></script>
+<script src="protect.js"></script>
+</body>
+</html>

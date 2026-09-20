@@ -1,0 +1,120 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#F5F1EA">
+<title>Ваучер на заселение — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="resident.css">
+<style>
+  .paper { background: var(--msv-white); border-radius: var(--msv-r12); box-shadow: var(--msv-e1); padding: var(--msv-s24); margin-bottom: var(--msv-s16); }
+  .paper__brand { display: flex; align-items: center; justify-content: space-between; gap: var(--msv-s12); padding-bottom: var(--msv-s16); border-bottom: 2px solid var(--msv-red); margin-bottom: var(--msv-s16); }
+  .paper__mark { display: inline-block; padding: 4px 12px; background: var(--msv-red); color: var(--msv-white); font-weight: 700; letter-spacing: .04em; border-radius: 6px; transform: skewX(-14deg); }
+  .paper__title { margin: 0 0 var(--msv-s4); }
+  .paper__no { color: var(--msv-n500); }
+  .paper dl { margin: var(--msv-s16) 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: var(--msv-s12) var(--msv-s16); }
+  .paper dt { font-size: var(--msv-note-size); color: var(--msv-n500); margin-bottom: 2px; }
+  .paper dd { margin: 0; font-weight: 600; }
+  .paper__foot { margin-top: var(--msv-s24); padding-top: var(--msv-s12); border-top: 1px solid var(--msv-n100); font-size: var(--msv-note-size); color: var(--msv-n500); }
+  .paper__stamp { float: right; width: 96px; height: 96px; border: 2px dashed var(--msv-n300); border-radius: 50%; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 10px; color: var(--msv-n300); margin: 0 0 0 var(--msv-s12); }
+  @media print {
+    body { background: #fff; }
+    .head, .foot, .tabbar, .msv-mark-btn, .edit-bar, .no-print { display: none !important; }
+    .page { max-width: none; padding: 0; }
+    .paper { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="head">
+    <a class="head__back" href="documents.html" aria-label="Вернуться назад">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 6l-6 6 6 6"/>
+      </svg>
+    </a>
+    <h1 class="msv-sub head__title">Ваучер на заселение</h1>
+  </div>
+
+  <p class="msv-note no-print" style="margin:0 0 var(--msv-s16)">Покажи с телефона при заезде или распечатай. Куратор пока назначается вручную — здесь образец.</p>
+
+  <article class="paper" id="voucher">
+    <div class="paper__brand">
+      <span class="paper__mark">МСВ</span>
+      <span class="msv-note">Москва в студентов верит!</span>
+    </div>
+    <h2 class="msv-sub paper__title">Ваучер на заселение</h2>
+    <p class="msv-note paper__no" id="vNo">№ 2026-0412 · выдан 08.07.2026</p>
+    <dl>
+      <div><dt>Резидент</dt><dd id="vName">Логинов Артём Сергеевич</dd></div>
+      <div><dt>Телефон</dt><dd id="vPhone">+7 926 127-39-11</dd></div>
+      <div><dt>Резиденция</dt><dd id="vRes">Уют на Варшавке</dd></div>
+      <div><dt>Адрес</dt><dd id="vAddr">Москва, Варшавское шоссе — уточняется</dd></div>
+      <div><dt>Комната и место</dt><dd id="vRoom">№1 Иваново · 1.3.в, верхнее</dd></div>
+      <div><dt>Оплачено с</dt><dd id="vPaid">1 сентября 2026</dd></div>
+      <div><dt>Дата заезда</dt><dd id="vIn">1 сентября 2026, с 14:00</dd></div>
+      <div><dt>Куратор</dt><dd id="vCur">Павел Дроздов · +7 916 300-40-50</dd></div>
+    </dl>
+    <div class="paper__foot">
+      <span class="paper__stamp">место<br>печати</span>
+      Ваучер подтверждает право на заселение при предъявлении паспорта. Заезд с 14:00, выезд до 12:00. Вопросы — куратору или в поддержку МСВ.
+    </div>
+  </article>
+
+  <div class="foot no-print">
+    <button class="msv-btn msv-btn--block msv-btn--primary" type="button" onclick="window.print()">Распечатать или сохранить в PDF</button>
+    <p class="msv-note" style="margin-top:var(--msv-s8);text-align:center">В окне печати выбери «Сохранить как PDF» — файл ляжет на телефон.</p>
+  </div>
+
+</div>
+
+<nav class="tabbar" aria-label="Разделы кабинета">
+  <a class="tab" href="cabinet-resident.html" aria-label="Главная">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5"/><path d="M6 10v10h12V10"/></svg>
+    <span class="tab__cap">Главная</span>
+  </a>
+  <a class="tab" href="payments.html" aria-label="Оплата">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="3"/><path d="M3 10h18"/></svg>
+    <span class="tab__cap">Оплата</span>
+  </a>
+  <a class="tab" href="repair.html" aria-label="Заявки">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M8 3v4"/><path d="M16 3v4"/><path d="M9 14l2 2 4-4"/></svg>
+    <span class="tab__cap">Заявки</span>
+  </a>
+  <a class="tab" href="documents.html" aria-current="page">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
+    <span class="tab__cap">Документы</span>
+  </a>
+  <a class="tab" href="menu.html" aria-label="Профиль">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
+    <span class="tab__cap">Профиль</span>
+  </a>
+</nav>
+<script>
+(function () {
+  'use strict';
+  if (location.protocol === 'file:') return;
+  fetch('/api/me/home', { credentials: 'same-origin' }).then(function (r) { return r.status === 200 ? r.json() : null; }).then(function (d) {
+    if (!d || !d.booking) return;
+    var set = function (id, v) { if (v) document.getElementById(id).textContent = v; };
+    var fmt = function (iso) { if (!iso) return ''; var p = iso.split('-'); var M = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря']; return Number(p[2]) + ' ' + M[Number(p[1]) - 1] + ' ' + p[0]; };
+    set('vName', d.me.name); set('vPhone', d.me.phone); set('vRes', d.booking.residence);
+    set('vRoom', d.booking.room + ' · ' + d.booking.label + (d.booking.tier ? ', ' + d.booking.tier : ''));
+    set('vPaid', fmt(d.booking.from)); set('vIn', fmt(d.booking.from) + ', с 14:00');
+    set('vNo', '№ ' + d.booking.id.padStart(4, '0') + ' · выдан ' + fmt(d.booking.from));
+  }).catch(function () {});
+})();
+</script>
+<script src="mark.js"></script>
+<script src="zoom.js"></script>
+<script src="edit.js"></script>
+<script src="protect.js"></script>
+
+</body>
+</html>

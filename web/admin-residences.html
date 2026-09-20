@@ -1,0 +1,292 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Сайт и его программное обеспечение охраняются ГК РФ (ст. 1259, 1261). Копирование без разрешения правообладателя запрещено. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#34495E">
+<title>Резиденции — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="cabinet.css">
+<link rel="stylesheet" href="form.css">
+<style>
+  .rm { margin-bottom: var(--msv-s16); padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r12); box-shadow: var(--msv-e1); }
+  .rm__head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--msv-s8); margin-bottom: var(--msv-s12); }
+  .rm__name { flex: 1 1 220px; min-width: 0; height: 40px; padding: 0 var(--msv-s12); font: 600 16px var(--msv-font); color: var(--msv-graphite); background: transparent; border: 1px solid transparent; border-radius: 8px; }
+  .rm__name:hover, .rm__name:focus { border-color: var(--msv-n300); background: var(--msv-beige); outline: none; }
+  .rm__sex, .rm__note { height: 40px; padding: 0 var(--msv-s12); font: 13px var(--msv-font); color: var(--msv-graphite); background: var(--msv-beige); border: 1px solid transparent; border-radius: 8px; }
+  .rm__note { flex: 2 1 240px; min-width: 0; }
+  .rm__sex:focus, .rm__note:focus { outline: none; border-color: var(--msv-graphite); }
+  .rm__photos { display: flex; flex-wrap: wrap; gap: var(--msv-s8); margin-bottom: var(--msv-s12); }
+  .rm__photo { position: relative; width: 96px; height: 72px; border-radius: var(--msv-r11); overflow: hidden; }
+  .rm__photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .rm__photo-del { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; font-size: 16px; line-height: 1; color: #fff; background: rgba(16,22,31,.7); border: 0; border-radius: 50%; cursor: pointer; }
+  .rm__photo-add { width: 96px; height: 72px; font-size: 24px; color: var(--msv-red); background: transparent; border: 2px dashed var(--msv-n300); border-radius: var(--msv-r11); cursor: pointer; }
+  .rm__photo-add:hover { border-color: var(--msv-red); }
+  .rm__beds { width: 100%; border-collapse: collapse; margin-bottom: var(--msv-s8); }
+  .rm__beds th { text-align: left; font: 500 12px var(--msv-font); color: var(--msv-n500); padding: 0 var(--msv-s8) var(--msv-s4); }
+  .rm__beds td { padding: 2px var(--msv-s8); border-top: 1px solid var(--msv-n100); }
+  .rm__beds .num { text-align: right; }
+  .rm__cell { width: 100%; height: 36px; padding: 0 var(--msv-s8); font: 13px var(--msv-font); color: var(--msv-graphite); background: transparent; border: 1px solid transparent; border-radius: 6px; }
+  .rm__cell:hover, .rm__cell:focus { border-color: var(--msv-n300); background: var(--msv-beige); outline: none; }
+  .rm__cell--num { text-align: right; font-variant-numeric: tabular-nums; max-width: 140px; }
+  .rm__x { width: 28px; height: 28px; font-size: 18px; line-height: 1; color: var(--msv-n500); background: transparent; border: 0; border-radius: 50%; cursor: pointer; }
+  .rm__x:hover { color: var(--msv-red); background: var(--msv-n100); }
+</style>
+<style>
+  body { --role: var(--msv-graphite); --role-ink: var(--msv-graphite); }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <aside class="side">
+    <img class="side__logo" src="msv-1200-white.png" width="1200" height="209"
+         alt="МСВ — Москва в студентов верит!">
+
+    <a class="side__who" href="admin-profile.html" title="Мой профиль и настройки">
+      <span class="side__name">Ирина Соколова</span>
+      <span class="side__role">Администратор</span>
+    </a>
+
+    <nav class="side__nav" aria-label="Разделы кабинета">
+      <a class="side__link" href="cabinet-admin.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>
+        Обзор
+      </a>
+      <a class="side__link" href="admin-residences.html" aria-current="page">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V8l7-4 7 4v13"/><path d="M9 21v-6h6v6"/><path d="M9 11h.01"/><path d="M15 11h.01"/></svg>
+        Резиденции
+      </a>
+      <a class="side__link" href="admin-shahmatka.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M9 10v9"/></svg>
+        Шахматка
+      </a>
+      <a class="side__link" href="admin-residents.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6.5a3 3 0 0 1 0 5.8"/><path d="M18 20a5.5 5.5 0 0 0-3-4.6"/></svg>
+        Резиденты
+      </a>
+      <a class="side__link" href="admin-tickets.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M8 3v4"/><path d="M16 3v4"/><path d="M9 14l2 2 4-4"/></svg>
+        Заявки
+      </a>
+      <a class="side__link" href="admin-charges.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 12h5a3.5 3.5 0 0 0 0-7H9v14"/><path d="M7 15h7"/></svg>
+        Начисления
+      </a>
+      <a class="side__link" href="admin-staff.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6.5a3 3 0 0 1 0 5.8"/><path d="M18 20a5.5 5.5 0 0 0-3-4.6"/></svg>
+        Сотрудники
+      </a>
+      <a class="side__link" href="admin-reputation.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l2.4 5 5.6.8-4 3.9 1 5.5-5-2.7-5 2.7 1-5.5-4-3.9 5.6-.8z"/></svg>
+        Репутация
+      </a>
+      <a class="side__link" href="admin-rights.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l8-8"/><path d="M17 6l2 2"/></svg>
+        Права доступа
+      </a>
+      <a class="side__link" href="admin-settings.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v2"/><path d="M12 19v2"/><path d="M4.5 7.5l1.7 1"/><path d="M17.8 15.5l1.7 1"/><path d="M4.5 16.5l1.7-1"/><path d="M17.8 8.5l1.7-1"/></svg>
+        Настройки
+      </a>
+    </nav>
+
+    <div class="side__out">
+      <a class="side__exit" href="index.html" data-logout>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/>
+        </svg>
+        Выйти
+      </a>
+    </div>
+  </aside>
+
+  <div class="work">
+    <header class="work__top">
+      <h1 class="msv-sub work__title">Резиденции: комнаты, места, цены, фото</h1>
+    </header>
+
+    <main class="work__body">
+      <p class="msv-note notice"><b>Как править:</b> щёлкните название, примечание, обозначение места или цену — они редактируются на месте. <b>Фото:</b> кнопка «+» под названием комнаты; любое фото открывается крупно по щелчку, крестик удаляет. Без сервера правки живут до обновления страницы.</p>
+
+      <div class="bar">
+        <button class="bar__chip" type="button" data-res="forma" aria-pressed="true">FORMA</button>
+        <button class="bar__chip" type="button" data-res="uyut" aria-pressed="false">Уют</button>
+        <button class="bar__chip" type="button" data-res="molod" aria-pressed="false">Молодежка</button>
+        <span class="msv-note bar__count" id="count"></span>
+        <button class="msv-btn msv-btn--m msv-btn--primary" type="button" id="addRoom">Добавить комнату</button>
+      </div>
+
+      <div id="rooms"></div>
+    </main>
+  </div>
+
+</div>
+
+<script src="api.js"></script>
+<script src="residences.js"></script>
+<script>
+MSV.ready(function (ctx) {
+  'use strict';
+
+  var RES = ctx.residences;
+  var cur = RES[0];
+  var photos = {};        // roomId -> [ {url, name} ] — до сервера живёт в памяти страницы
+
+  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function money(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '\u2009'); }
+
+  var picker = document.createElement('input');
+  picker.type = 'file'; picker.accept = 'image/*'; picker.multiple = true; picker.style.display = 'none';
+  document.body.appendChild(picker);
+  var pickFor = null;
+
+  picker.addEventListener('change', function () {
+    if (!pickFor) return;
+    var list = photos[pickFor] = photos[pickFor] || [];
+    Array.prototype.forEach.call(picker.files || [], function (file) {
+      if (file.type.indexOf('image/') !== 0) return;
+      // ЗДЕСЬ БУДЕТ ЗАПРОС К СЕРВЕРУ: POST /api/upload → url; затем POST /api/rooms/:id/photos { url }
+      list.push({ url: URL.createObjectURL(file), name: file.name });
+    });
+    picker.value = ''; pickFor = null;
+    render();
+  });
+
+  function render() {
+    var beds = cur.beds;
+    var byRoom = {};
+    beds.forEach(function (b) { (byRoom[b.roomId] = byRoom[b.roomId] || []).push(b); });
+    document.getElementById('count').textContent = cur.rooms.length + ' комнат · ' + beds.length + ' мест';
+
+    document.getElementById('rooms').innerHTML = cur.rooms.map(function (r) {
+      var list = byRoom[r.id] || [];
+      var ph = photos[r.id] || [];
+
+      return '<section class="rm" data-room="' + esc(r.id) + '">' +
+        '<div class="rm__head">' +
+          '<input class="rm__name" data-f="name" value="' + esc(r.name) + '" aria-label="Название комнаты">' +
+          '<select class="rm__sex" data-f="gender" aria-label="Пол">' +
+            '<option value=""' + (!r.gender ? ' selected' : '') + '>пол не задан</option>' +
+            '<option value="ж"' + (r.gender === 'ж' ? ' selected' : '') + '>женская</option>' +
+            '<option value="м"' + (r.gender === 'м' ? ' selected' : '') + '>мужская</option>' +
+          '</select>' +
+          '<input class="rm__note" data-f="note" value="' + esc(r.note || '') + '" placeholder="Примечание: свой санузел, окно в коридор…" aria-label="Примечание">' +
+          '<button class="msv-btn msv-btn--s msv-btn--destructive" type="button" data-act="delRoom" title="Удалить комнату">Удалить</button>' +
+        '</div>' +
+
+        '<div class="rm__photos zoomable">' +
+          ph.map(function (p, i) {
+            return '<span class="rm__photo"><img src="' + esc(p.url) + '" alt="' + esc(r.name) + ' — фото ' + (i + 1) + '" data-zoom>' +
+              '<button type="button" class="rm__photo-del" data-act="delPhoto" data-i="' + i + '" aria-label="Удалить фото">&times;</button></span>';
+          }).join('') +
+          '<button type="button" class="rm__photo-add" data-act="addPhoto" aria-label="Добавить фото">+</button>' +
+        '</div>' +
+
+        '<table class="rm__beds"><thead><tr><th>Место</th><th>Ярус</th><th class="num">Цена в месяц, руб.</th><th></th></tr></thead><tbody>' +
+          list.map(function (b) {
+            return '<tr data-bed="' + esc(b.id) + '">' +
+              '<td><input class="rm__cell" data-f="label" value="' + esc(b.label) + '" aria-label="Обозначение места"></td>' +
+              '<td><select class="rm__cell" data-f="tier" aria-label="Ярус">' +
+                '<option value=""' + (!b.tier ? ' selected' : '') + '>—</option>' +
+                '<option value="нижнее"' + (b.tier === 'нижнее' ? ' selected' : '') + '>нижнее</option>' +
+                '<option value="верхнее"' + (b.tier === 'верхнее' ? ' selected' : '') + '>верхнее</option>' +
+              '</select></td>' +
+              '<td class="num"><input class="rm__cell rm__cell--num" data-f="price" inputmode="numeric" value="' + b.price + '" aria-label="Цена"></td>' +
+              '<td class="num"><button type="button" class="rm__x" data-act="delBed" aria-label="Удалить место">&times;</button></td>' +
+            '</tr>';
+          }).join('') +
+        '</tbody></table>' +
+        '<button type="button" class="msv-btn msv-btn--s msv-btn--tertiary" data-act="addBed">+ место</button>' +
+      '</section>';
+    }).join('');
+  }
+
+  /* ---------- Правки — сразу в данные ---------- */
+
+  document.getElementById('rooms').addEventListener('change', function (e) {
+    var f = e.target.dataset.f; if (!f) return;
+    var roomEl = e.target.closest('[data-room]'), bedEl = e.target.closest('[data-bed]');
+    if (bedEl) {
+      var bed = cur.beds.filter(function (b) { return b.id === bedEl.dataset.bed; })[0];
+      if (!bed) return;
+      if (f === 'price') { var v = Number(String(e.target.value).replace(/\D/g, '')); bed.price = isFinite(v) ? v : bed.price; e.target.value = bed.price; }
+      else bed[f] = e.target.value;
+      // ЗДЕСЬ БУДЕТ ЗАПРОС К СЕРВЕРУ: PATCH /api/beds/:id
+    } else if (roomEl) {
+      var room = cur.rooms.filter(function (r) { return r.id === roomEl.dataset.room; })[0];
+      if (!room) return;
+      room[f] = e.target.value;
+      // ЗДЕСЬ БУДЕТ ЗАПРОС К СЕРВЕРУ: PATCH /api/rooms/:id
+    }
+  });
+
+  document.getElementById('rooms').addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-act]'); if (!btn) return;
+    var roomEl = btn.closest('[data-room]'); var roomId = roomEl && roomEl.dataset.room;
+    var act = btn.dataset.act;
+
+    if (act === 'addPhoto') { pickFor = roomId; picker.click(); return; }
+    if (act === 'delPhoto') { (photos[roomId] || []).splice(Number(btn.dataset.i), 1); render(); return; }
+
+    if (act === 'delBed') {
+      var bedId = btn.closest('[data-bed]').dataset.bed;
+      if (!confirm('Удалить место? Если на нём есть брони, сервер откажет.')) return;
+      cur.beds = cur.beds.filter(function (b) { return b.id !== bedId; }); render(); return;
+      // ЗДЕСЬ БУДЕТ ЗАПРОС К СЕРВЕРУ: DELETE /api/beds/:id
+    }
+    if (act === 'addBed') {
+      var n = cur.beds.filter(function (b) { return b.roomId === roomId; }).length + 1;
+      var room = cur.rooms.filter(function (r) { return r.id === roomId; })[0];
+      cur.beds.push({ id: roomId + '-new-' + Date.now(), roomId: roomId, label: (room ? room.number : '?') + '.' + n, tier: '', price: 0 });
+      render(); return;
+    }
+    if (act === 'delRoom') {
+      if (!confirm('Удалить комнату со всеми местами?')) return;
+      cur.rooms = cur.rooms.filter(function (r) { return r.id !== roomId; });
+      cur.beds = cur.beds.filter(function (b) { return b.roomId !== roomId; });
+      render(); return;
+    }
+  });
+
+  document.getElementById('addRoom').addEventListener('click', function () {
+    var no = cur.rooms.length + 1;
+    var id = cur.id + '-new-' + Date.now();
+    cur.rooms.push({ id: id, buildingId: cur.id, number: String(no), name: '№' + no + ' Новая', gender: '', size: 0, note: '' });
+    render();
+    var el = document.querySelector('[data-room="' + id + '"] .rm__name');
+    if (el) { el.focus(); el.select(); }
+  });
+
+  document.querySelector('.bar').addEventListener('click', function (e) {
+    var chip = e.target.closest('.bar__chip'); if (!chip) return;
+    document.querySelectorAll('.bar__chip').forEach(function (c) { c.setAttribute('aria-pressed', 'false'); });
+    chip.setAttribute('aria-pressed', 'true');
+    cur = RES.filter(function (r) { return r.id === chip.dataset.res; })[0] || RES[0];
+    render();
+  });
+
+  render();
+});
+</script>
+<script src="mark.js"></script>
+<script src="zoom.js"></script>
+<script src="edit.js"></script>
+<script src="protect.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,258 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Сайт и его программное обеспечение охраняются ГК РФ (ст. 1259, 1261). Копирование без разрешения правообладателя запрещено. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#F5F1EA">
+<title>Выбор комнаты — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="form.css">
+<link rel="stylesheet" href="rooms.css">
+</head>
+<body>
+
+<div class="form">
+
+  <div class="form__head">
+    <a class="form__back" href="residences.html" aria-label="Вернуться к выбору адреса">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 6l-6 6 6 6"/>
+      </svg>
+    </a>
+    <span class="msv-note" style="color:var(--msv-n500)">Резиденция Уют</span>
+  </div>
+
+  <div class="filters">
+    <div class="filters__row">
+      <span class="msv-note filters__label">Комната</span>
+      <div class="chips" role="group" aria-label="Пол">
+        <button class="chip" type="button" data-sex="м" aria-pressed="false">Муж.</button>
+        <button class="chip" type="button" data-sex="ж" aria-pressed="false">Жен.</button>
+      </div>
+    </div>
+
+    <div class="filters__row">
+      <span class="msv-note filters__label">Наличие</span>
+      <div class="chips" role="group" aria-label="Наличие мест">
+        <button class="chip" type="button" data-free="1" aria-pressed="true">Только свободные места</button>
+        <button class="chip" type="button" data-free="" aria-pressed="false">Показать все места</button>
+      </div>
+    </div>
+
+    <div class="filters__row">
+      <span class="msv-note filters__label">Количество мест в комнате</span>
+      <div class="chips" role="group" aria-label="Количество мест">
+        <button class="chip" type="button" data-size="8" aria-pressed="false">8</button>
+        <button class="chip" type="button" data-size="6" aria-pressed="false">6</button>
+        <button class="chip" type="button" data-size="4" aria-pressed="false">4</button>
+        <button class="chip" type="button" data-size="2" aria-pressed="false">2</button>
+        <button class="chip" type="button" data-size="1" aria-pressed="false">1</button>
+        <button class="chip" type="button" data-size="" aria-pressed="true">Все</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="list" aria-live="polite"></div>
+
+</div>
+
+<script src="api.js"></script>
+<script src="residences.js"></script>
+<script src="demo-bookings.js"></script>
+<script src="residents-uyut.js"></script>
+<script src="residents-forma.js"></script>
+<script>
+MSV.ready(function (ctx) {
+  'use strict';
+
+  /* Комнаты — из данных резиденций (с сервера или демо), свободные места
+     считаются по броням на сегодня. Раньше здесь был выдуманный список. */
+  var SHOTS = [['#FFD93D','#CBB6FF','#56C3D0'],['#A2D2FF','#C8F03C','#E7BD83'],['#D04D87','#FFAB37','#7EB2DD'],['#90A955','#FFE558','#567EDD']];
+  var today = (function () { var n = new Date(); return Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()); })();
+  function day(iso) { var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso || '')); return m ? Date.UTC(+m[1], +m[2] - 1, +m[3]) : null; }
+
+  /* Резиденция из адреса — со страницы выбора адреса */
+  var wantRes = new URLSearchParams(location.search).get('res');
+  var ROOMS = [];
+  ctx.residences.forEach(function (res, ri) {
+    if (wantRes && res.id !== wantRes) return;
+    var d = ctx.bookings(res);
+    var busy = {};
+    d.bookings.forEach(function (b) { var f = day(b.from), t = day(b.to); if (f !== null && t !== null && f <= today && t >= today) busy[b.bedId] = true; });
+    res.rooms.forEach(function (r, i) {
+      var beds = res.beds.filter(function (b) { return b.roomId === r.id; });
+      var tiers = {};
+      beds.forEach(function (b) {
+        var k = b.tier || 'Место';
+        tiers[k] = tiers[k] || { kind: k === 'нижнее' ? 'Нижнее место' : (k === 'верхнее' ? 'Верхнее место' : 'Место'), left: 0, price: b.price, ids: [] };
+        if (!busy[b.id]) { tiers[k].left++; tiers[k].ids.push(b.id); }
+      });
+      var list = Object.keys(tiers).map(function (k) { return tiers[k]; }).sort(function (a, b) { return a.price - b.price; });
+      var freeIds = []; list.forEach(function (t) { freeIds = freeIds.concat(t.ids); });
+      ROOMS.push({
+        id: r.id, size: r.size || beds.length, sex: r.gender || '', name: r.name, residence: res.name,
+        shots: SHOTS[(ri * 7 + i) % SHOTS.length], more: 0,
+        text: r.note ? r.note.charAt(0).toUpperCase() + r.note.slice(1) : (res.title + '.'),
+        beds: list, bedIds: freeIds, price: list.length ? list[0].price : 0
+      });
+    });
+  });
+
+  var UNUSED_DEMO_ROOMS = [
+    { id: 'r1', size: 4, sex: 'ж', name: '№1 «Иваново»', shots: ['#FFD93D', '#CBB6FF', '#56C3D0'], more: 2,
+      text: 'Окна во двор, два стола, свой санузел. Кухня на этаже.',
+      beds: [ { kind: 'Верхнее место', left: 2, price: 24200 }, { kind: 'Нижнее место', left: 1, price: 27500 } ] },
+
+    { id: 'r2', size: 4, sex: 'м', name: '№4 «Суздаль»', shots: ['#A2D2FF', '#C8F03C', '#E7BD83'], more: 3,
+      text: 'Угловая комната, окна на две стороны. Рядом коворкинг.',
+      beds: [ { kind: 'Верхнее место', left: 1, price: 24200 }, { kind: 'Нижнее место', left: 0, price: 27500 } ] },
+
+    { id: 'r3', size: 2, sex: 'ж', name: '№7 «Ростов»', shots: ['#D04D87', '#FFAB37', '#7EB2DD'], more: 1,
+      text: 'Две кровати, большой шкаф, балкон. Тихий этаж.',
+      beds: [ { kind: 'Место в двухместной', left: 2, price: 33040 } ] },
+
+    { id: 'r4', size: 8, sex: 'м', name: '№12 «Углич»', shots: ['#90A955', '#FFE558', '#567EDD'], more: 4,
+      text: 'Просторный блок, четыре двухъярусные кровати, две душевые.',
+      beds: [ { kind: 'Верхнее место', left: 3, price: 19800 }, { kind: 'Нижнее место', left: 2, price: 22400 } ] },
+
+    { id: 'r5', size: 1, sex: 'ж', name: '№15 «Плёс»', shots: ['#CBB6FF', '#C8F03C', '#FDD232'], more: 0,
+      text: 'Отдельная комната с рабочим местом и своим санузлом.',
+      beds: [ { kind: 'Одноместная', left: 1, price: 46900 } ] }
+  ];
+
+  var list = document.getElementById('list');
+  var filter = { sex: '', size: '', free: '1' };
+  var notice = document.querySelector('.form__head .msv-sub');
+  if (notice) notice.textContent = ctx.residences.length > 1 ? 'Все резиденции' : (ctx.residences[0] || {}).title || 'Резиденция';
+
+  function money(n) {
+    // Разряды разделяются тонким пробелом, валюта — «руб.»
+    return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u2009') + '\u2009руб.';
+  }
+
+  function plural(n, one, few, many) {
+    var a = Math.abs(n) % 100, b = a % 10;
+    if (a > 10 && a < 20) return many;
+    if (b > 1 && b < 5) return few;
+    if (b === 1) return one;
+    return many;
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function shots(room) {
+    var html = room.shots.map(function (c, i) {
+      // Пока фото нет — цветные плашки. Когда появятся, здесь будет <img data-zoom>
+      return '<span class="room__shot" style="background:' + esc(c) + '" title="Фото ' + (i + 1) + ' появится после загрузки администратором"></span>';
+    }).join('');
+    if (room.more > 0) html += '<span class="room__more">+' + room.more + '</span>';
+    return html;
+  }
+
+  function render() {
+    var rooms = ROOMS.filter(function (r) {
+      if (filter.sex && r.sex !== filter.sex) return false;
+      if (filter.size && String(r.size) !== filter.size) return false;
+      if (filter.free && !r.beds.some(function (b) { return b.left > 0; })) return false;
+      return true;
+    });
+
+    if (!rooms.length) {
+      list.innerHTML = '<p class="msv-body rooms__empty">' + (filter.free ? 'Свободных мест с такими условиями нет. Нажми «Показать все места» или встань в <a class="msv-link" href="waitlist.html">очередь</a>.' : 'Комнат с такими условиями нет.') + '</p>';
+      return;
+    }
+
+    // Одно красное действие на экран: красная кнопка только у первой карточки
+    list.innerHTML = rooms.map(function (r, i) {
+      var free = r.beds.reduce(function (s, b) { return s + b.left; }, 0);
+      var prices = r.beds.map(function (b) {
+        var out = b.left === 0;
+        return '<div class="room__price' + (out ? ' room__price--out' : '') + '">' +
+          '<span>' + esc(b.kind) + ' · ' + (out ? 'мест нет' : b.left + ' ' + plural(b.left, 'место', 'места', 'мест')) + '</span>' +
+          '<b>' + money(b.price) + '</b></div>';
+      }).join('');
+
+      var canPick = free > 0;
+      var btn = canPick
+        ? '<button class="msv-btn msv-btn--m ' + (i === 0 ? 'msv-btn--primary' : 'msv-btn--secondary') +
+          '" type="button" data-pick="' + esc(r.id) + '">Выбрать</button>'
+        : '<button class="msv-btn msv-btn--m msv-btn--secondary" type="button" disabled>Мест нет</button>';
+
+      return '<article class="room">' +
+        '<span class="msv-note room__kind">' + r.size + '-местная комната</span>' +
+        '<div class="room__head">' +
+          '<h2 class="msv-sub room__name">' + esc(r.name) + ' <span class="msv-note" style="font-weight:500">' + esc(r.residence) + '</span></h2>' +
+          '<span class="sex-tag sex-tag--' + (r.sex === 'ж' ? 'f' : 'm') + '">' + (r.sex === 'ж' ? 'Женская' : 'Мужская') + '</span>' +
+        '</div>' +
+        '<div class="room__shots">' + shots(r) + '</div>' +
+        '<p class="msv-body room__text">' + esc(r.text) + '</p>' +
+        '<div class="room__prices">' + prices + '</div>' +
+        '<p class="msv-note" style="margin:0 0 var(--msv-s12)">Цены при условии заключения «годового контракта» (проживание минимум до конца августа).</p>' +
+        btn +
+      '</article>';
+    }).join('');
+  }
+
+  /* ---------- Фильтры ---------- */
+
+  document.querySelector('.filters').addEventListener('click', function (e) {
+    var chip = e.target.closest('.chip');
+    if (!chip) return;
+
+    var key = chip.hasAttribute('data-sex') ? 'sex' : (chip.hasAttribute('data-free') ? 'free' : 'size');
+    var attr = 'data-' + key;
+    var value = chip.getAttribute(attr);
+    var on = chip.getAttribute('aria-pressed') === 'true';
+
+    var group = chip.parentNode.querySelectorAll('.chip');
+    Array.prototype.forEach.call(group, function (c) { c.setAttribute('aria-pressed', 'false'); });
+
+    if (key === 'free') {                      // переключатель из двух состояний
+      chip.setAttribute('aria-pressed', 'true'); filter.free = value; render(); return;
+    }
+    if (on && value !== '') {
+      filter[key] = '';                        // повторное нажатие снимает фильтр
+    } else {
+      chip.setAttribute('aria-pressed', 'true');
+      filter[key] = value;
+    }
+
+    // «Все» — это снятый фильтр, отмечаем его, когда ничего не выбрано
+    if (key === 'size' && filter.size === '') {
+      var all = document.querySelector('.chip[data-size=""]');
+      if (all) all.setAttribute('aria-pressed', 'true');
+    }
+
+    render();
+  });
+
+  /* ---------- Выбор комнаты ---------- */
+
+  list.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-pick]');
+    if (!btn) return;
+    var id = btn.dataset.pick;
+    var room = ROOMS.filter(function (r) { return r.id === id; })[0];
+    if (!room) return;
+    // Первое свободное место в комнате — конкретное место резидент выберет позже с куратором
+    var freeBed = (room.bedIds && room.bedIds[0]) || '';
+    location.href = 'month.html?room=' + encodeURIComponent(room.name) +
+                    '&size=' + room.size + '&bed=' + encodeURIComponent(freeBed) + '&price=' + (room.price || 0);
+  });
+
+  render();
+});
+</script>
+
+<script src="mark.js"></script>
+<script src="zoom.js"></script>
+<script src="edit.js"></script>
+<script src="protect.js"></script>
+</body>
+</html>

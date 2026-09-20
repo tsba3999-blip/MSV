@@ -1,0 +1,310 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Сайт и его программное обеспечение охраняются ГК РФ (ст. 1259, 1261). Копирование без разрешения правообладателя запрещено. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#F5F1EA">
+<title>Главная — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="resident.css">
+<style>
+  html, body { height: 100%; }
+  body { background: var(--msv-beige); }
+
+  .app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100svh;
+    max-width: 460px;
+    margin: 0 auto;
+    padding: 0 var(--msv-s24);
+  }
+
+  /* ---------- Шапка: приветствие плюс строка резиденции ---------- */
+
+  .top {
+    display: flex;
+    align-items: center;
+    gap: var(--msv-s12);
+    min-height: var(--msv-header);
+    padding: var(--msv-s8) 0;
+  }
+
+  .top__text { flex: 1 1 auto; min-width: 0; }
+  .top__name { display: block; }
+  .top__place { margin-top: var(--msv-s4); }
+
+  .top__act {
+    position: relative;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--msv-tap);
+    height: var(--msv-tap);
+    color: var(--msv-graphite);
+    background: transparent;
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .top__act:hover { background: var(--msv-n100); }
+  .top__act:focus-visible { outline: 2px solid var(--msv-violet); outline-offset: 2px; }
+
+  .top__dot {
+    position: absolute;
+    top: 8px;
+    right: 9px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--msv-red);
+    border: 2px solid var(--msv-beige);
+  }
+
+  /* ---------- Бенто: 4 колонки, зазор 12, радиус 20 ---------- */
+
+  .bento {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--msv-s12);
+    padding-bottom: calc(var(--msv-tabbar) + var(--msv-s32));
+  }
+
+  .tile {
+    display: flex;
+    flex-direction: column;
+    padding: var(--msv-s16);
+    border-radius: var(--msv-r20);
+    text-decoration: none;
+    color: inherit;
+    transition: transform var(--msv-fast) var(--msv-ease);
+  }
+
+  .tile:active { transform: scale(.98); }
+  .tile:focus-visible { outline: 2px solid var(--msv-violet); outline-offset: 2px; }
+
+  /* Плитка оплаты 2×2 — первая и единственная красная на экране */
+  .tile--pay {
+    grid-column: span 2;
+    min-height: 168px;
+    background: var(--msv-red);
+    color: var(--msv-white);
+  }
+
+  .tile--pay .tile__label { color: var(--msv-white); opacity: .82; }
+
+  .tile__label {
+    font-size: 11px;
+    line-height: 16px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .tile__sum {
+    margin: var(--msv-s8) 0 0;
+    font-size: var(--msv-h-size);
+    line-height: var(--msv-h-line);
+    font-weight: 600;
+    letter-spacing: var(--msv-h-track);
+  }
+
+  .tile__due { margin: var(--msv-s4) 0 0; font-size: var(--msv-body-size); opacity: .9; }
+
+  /* Единственный белый подблок внутри красного — капсула главного действия */
+  .tile__cta {
+    align-self: flex-start;
+    margin-top: auto;
+    padding-top: var(--msv-s16);
+  }
+
+  /* Плитки 1×1: иконка сверху, подпись снизу — и больше ничего */
+  .tile--small { min-height: 112px; }
+  .tile--aqua { background: var(--msv-aqua); }
+  .tile--lime { background: var(--msv-lime); }
+  .tile--lav  { background: var(--msv-lavender); }
+  .tile--plain { background: var(--msv-white); box-shadow: var(--msv-e1); }
+
+  .tile__icon { flex: 0 0 auto; }
+  .tile__cap { margin-top: auto; padding-top: var(--msv-s12); font-size: 15px; line-height: 20px; font-weight: 600; }
+
+  /* Событие дня 2×1, графит */
+  .tile--event {
+    grid-column: span 2;
+    min-height: 96px;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--msv-s12);
+    background: var(--msv-graphite);
+    color: var(--msv-white);
+  }
+
+  .tile--event .tile__label { color: var(--msv-n300); }
+  .tile__thumb { flex: 0 0 auto; width: 44px; height: 44px; border-radius: var(--msv-r11); background: var(--msv-white); }
+  .tile__evtitle { margin: var(--msv-s4) 0 0; font-size: var(--msv-sub-size); line-height: var(--msv-sub-line); font-weight: 600; }
+
+  /* ---------- Заглушка для неготовых разделов ---------- */
+
+  .stub {
+    margin: 0 0 var(--msv-s12);
+    padding: var(--msv-s12) var(--msv-s16);
+    background: var(--msv-lavender);
+    border-radius: var(--msv-r12);
+    color: var(--msv-graphite);
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <header class="top">
+    <div class="top__text">
+      <span class="msv-sub top__name">Привет, Артём</span>
+      <span class="msv-note top__place">метро Нагатинская · блок 4Б</span>
+    </div>
+
+    <a class="top__act" href="notifications.html" aria-label="Уведомления, есть непрочитанные">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M18 9a6 6 0 1 0-12 0c0 6-3 7-3 7h18s-3-1-3-7"/>
+        <path d="M10.5 20.5a2 2 0 0 0 3 0"/>
+      </svg>
+      <span class="top__dot" aria-hidden="true"></span>
+    </a>
+
+    <a class="top__act" href="index.html" aria-label="Выйти из аккаунта">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <path d="M16 17l5-5-5-5"/><path d="M21 12H9"/>
+      </svg>
+    </a>
+  </header>
+
+  <p class="msv-note stub">Данные на экране вымышленные: сервер ещё не подключён.</p>
+
+  <main class="bento">
+
+    <!-- Красная плитка всегда первая и единственная красная на экране -->
+    <a class="tile tile--pay" href="checkout.html" aria-label="К оплате 12 400 рублей до 25 сентября">
+      <span class="tile__label">К оплате</span>
+      <span class="tile__sum">12&#8201;400 руб.</span>
+      <span class="tile__due">до 25 сентября</span>
+      <span class="tile__cta">
+        <span class="msv-btn msv-btn--m" style="background:var(--msv-white);color:var(--msv-red)">Оплатить</span>
+      </span>
+    </a>
+
+    <a class="tile tile--small tile--aqua" href="stub.html?t=Прачечная">
+      <svg class="tile__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="4" y="3" width="16" height="18" rx="3"/><circle cx="12" cy="13" r="4"/><path d="M8 6.5h.01"/>
+      </svg>
+      <span class="tile__cap">Прачечная</span>
+    </a>
+
+    <a class="tile tile--small tile--lime" href="stub.html?t=Пропуск">
+      <svg class="tile__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="5" width="18" height="14" rx="3"/><path d="M8 9v6"/><path d="M12 9v6"/>
+      </svg>
+      <span class="tile__cap">Пропуск</span>
+    </a>
+
+    <a class="tile tile--small tile--lav" href="stub.html?t=Соседи">
+      <svg class="tile__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6.5a3 3 0 0 1 0 5.8"/><path d="M18 20a5.5 5.5 0 0 0-3-4.6"/>
+      </svg>
+      <span class="tile__cap">Соседи</span>
+    </a>
+
+    <a class="tile tile--small tile--plain" href="repair.html">
+      <svg class="tile__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/><path d="M10 13v3h4v-3"/></svg>
+      <span class="tile__cap">Заявление</span>
+    </a>
+
+    <a class="tile tile--event" href="stub.html?t=Четверг, 19:00 Вечер настолок">
+      <span class="tile__thumb" aria-hidden="true"></span>
+      <span>
+        <span class="tile__label">Четверг, 19:00</span>
+        <span class="tile__evtitle">Вечер настолок</span>
+      </span>
+    </a>
+
+  </main>
+</div>
+
+<script>
+/* Главная резидента: с сервером — настоящие имя, место, сумма к оплате.
+   Без него — образец из вёрстки. */
+(function () {
+  'use strict';
+  if (location.protocol === 'file:') return;
+  fetch('/api/me/home', { credentials: 'same-origin' })
+    .then(function (r) { return r.status === 200 ? r.json() : null; })
+    .then(function (d) {
+      if (!d) return;
+      var stub = document.querySelector('.stub'); if (stub) stub.remove();
+      var first = (d.me.name || '').split(' ')[1] || d.me.name;
+      var nm = document.querySelector('.top__name'); if (nm) nm.textContent = 'Привет, ' + first;
+      var pl = document.querySelector('.top__place');
+      if (pl) pl.textContent = d.booking ? (d.booking.residence + ' · ' + d.booking.room + ' · ' + (d.booking.tier || 'место')) : 'место ещё не выбрано';
+
+      var pay = document.querySelector('.tile--pay');
+      if (pay && d.booking) {
+        var bal = d.booking.balance;
+        var money = function (n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '\u2009') + ' руб.'; };
+        pay.querySelector('.tile__sum').textContent = money(Math.max(0, bal));
+        pay.querySelector('.tile__due').textContent = bal > 0 ? 'к оплате сейчас' : 'всё оплачено';
+        pay.querySelector('.tile__label').textContent = bal > 0 ? 'К оплате' : 'Баланс';
+      }
+    })
+    .catch(function () {});
+})();
+</script>
+<nav class="tabbar" aria-label="Разделы кабинета">
+  <a class="tab" href="cabinet-resident.html" aria-current="page">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5"/><path d="M6 10v10h12V10"/></svg>
+    <span class="tab__cap">Главная</span>
+  </a>
+
+  <a class="tab" href="payments.html" aria-label="Оплата">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M10 16.5V8h2.6a2.2 2.2 0 0 1 0 4.4H10"/><path d="M9 14.2h4"/></svg>
+    <span class="tab__cap">Оплата</span>
+  </a>
+
+  <a class="tab" href="repair.html" aria-label="Заявки">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/><path d="M10 13v3h4v-3"/></svg>
+    <span class="tab__cap">Заявки</span>
+  </a>
+
+  <a class="tab" href="documents.html" aria-label="Документы">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
+    <span class="tab__cap">Документы</span>
+  </a>
+
+  <a class="tab" href="menu.html" aria-label="Профиль">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
+    <span class="tab__cap">Профиль</span>
+  </a>
+</nav>
+
+<script src="mark.js"></script>
+<script src="zoom.js"></script>
+<script src="edit.js"></script>
+<script src="protect.js"></script>
+</body>
+</html>

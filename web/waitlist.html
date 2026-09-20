@@ -1,0 +1,109 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#F5F1EA">
+<title>Очередь на место — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="resident.css">
+<link rel="stylesheet" href="form.css">
+</head>
+<body>
+
+<div class="page">
+
+  <div class="head">
+    <a class="head__back" href="requests.html" aria-label="Вернуться назад">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 6l-6 6 6 6"/>
+      </svg>
+    </a>
+    <h1 class="msv-sub head__title">Очередь на место</h1>
+  </div>
+
+  <p class="msv-body" style="margin:0 0 var(--msv-s16);color:var(--msv-n500)">Хочешь переехать в другую комнату или резиденцию — встань в очередь. Как только подходящее место освободится, сообщим сразу всем, кто его ждёт. Место получит тот, кто первым оплатит.</p>
+
+  <div class="rows" style="padding:var(--msv-s16)">
+    <label class="msv-field"><span class="msv-field__label">Резиденция</span>
+      <select class="msv-select" id="res"><option value="">Любая</option><option value="forma">FORMA</option><option value="uyut">Уют</option><option value="molod">Молодежка</option></select></label>
+    <label class="msv-field"><span class="msv-field__label">Комната</span>
+      <select class="msv-select" id="size"><option value="">Любая</option><option value="1">1-местная</option><option value="2">2-местная</option><option value="4">4-местная</option><option value="6">6-местная</option><option value="8">8-местная</option><option value="12">Капсулы</option></select></label>
+    <label class="msv-field"><span class="msv-field__label">Место</span>
+      <select class="msv-select" id="tier"><option value="">Любое</option><option value="нижнее">Нижнее</option><option value="верхнее">Верхнее</option></select></label>
+    <input class="msv-input" id="note" placeholder="Пожелание: к друзьям в №4, поближе к кухне" style="margin-top:var(--msv-s4)">
+    <button class="msv-btn msv-btn--block msv-btn--primary" type="button" id="add" style="margin-top:var(--msv-s16)">Встать в очередь</button>
+    <p class="msv-note" id="msg" hidden style="margin-top:var(--msv-s8);text-align:center"></p>
+  </div>
+
+  <h2 class="msv-sub group__title">Мои заявки</h2>
+  <div id="list"></div>
+
+</div>
+
+<nav class="tabbar" aria-label="Разделы кабинета">
+  <a class="tab" href="cabinet-resident.html" aria-label="Главная">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5"/><path d="M6 10v10h12V10"/></svg>
+    <span class="tab__cap">Главная</span>
+  </a>
+  <a class="tab" href="payments.html" aria-label="Оплата">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="3"/><path d="M3 10h18"/></svg>
+    <span class="tab__cap">Оплата</span>
+  </a>
+  <a class="tab" href="repair.html" aria-label="Заявки">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M8 3v4"/><path d="M16 3v4"/><path d="M9 14l2 2 4-4"/></svg>
+    <span class="tab__cap">Заявки</span>
+  </a>
+  <a class="tab" href="documents.html" aria-label="Документы">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
+    <span class="tab__cap">Документы</span>
+  </a>
+  <a class="tab" href="menu.html" aria-current="page">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
+    <span class="tab__cap">Профиль</span>
+  </a>
+</nav>
+<script>
+(function () {
+  'use strict';
+  var RES = { forma: 'FORMA', uyut: 'Уют', molod: 'Молодежка' };
+  var demo = [{ id: 'd1', residence: 'FORMA', roomSize: 2, tier: 'нижнее', note: 'к друзьям', at: '02.09.2026', notifiedAt: null }];
+  var list = document.getElementById('list');
+
+  function render(items) {
+    list.innerHTML = items.length ? '<div class="rows">' + items.map(function (x) {
+      return '<div class="row" style="cursor:default"><span class="row__text"><span class="row__name">' + (x.residence || 'Любая') + ' · ' + (x.roomSize ? x.roomSize + '-местная' : 'любая комната') + ' · ' + (x.tier || 'любое место') + '</span>' +
+        '<span class="msv-note row__note">с ' + x.at + (x.note ? ' · ' + String(x.note).replace(/</g,'&lt;') : '') + (x.notifiedAt ? ' · сообщали о свободном месте' : '') + '</span></span>' +
+        '<span class="row__end"><button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" data-del="' + x.id + '">Снять</button></span></div>';
+    }).join('') + '</div>' : '<p class="msv-note" style="text-align:center;padding:var(--msv-s24) 0">Заявок нет.</p>';
+  }
+  function load() {
+    if (location.protocol === 'file:') { render(demo); return; }
+    fetch('/api/waitlist', { credentials: 'same-origin' }).then(function (r) { return r.status === 200 ? r.json() : demo; })
+      .then(function (a) { render(a.map(function (x) { x.at = x.at ? new Date(x.at).toLocaleDateString('ru-RU') : ''; return x; })); }).catch(function () { render(demo); });
+  }
+  document.getElementById('add').addEventListener('click', function () {
+    var body = { residenceId: document.getElementById('res').value, roomSize: document.getElementById('size').value, tier: document.getElementById('tier').value, note: document.getElementById('note').value.trim() };
+    var m = document.getElementById('msg');
+    function ok() { m.textContent = 'Вы в очереди. Сообщим, как только место освободится.'; m.hidden = false; load(); }
+    if (location.protocol === 'file:') { demo.unshift({ id: 'd' + Date.now(), residence: RES[body.residenceId] || 'Любая', roomSize: body.roomSize, tier: body.tier, note: body.note, at: new Date().toLocaleDateString('ru-RU') }); ok(); return; }
+    fetch('/api/waitlist', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      .then(function (r) { if (r.status === 201) ok(); else { m.textContent = 'Не удалось'; m.hidden = false; } }).catch(function () { m.textContent = 'Сервер не отвечает'; m.hidden = false; });
+  });
+  list.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-del]'); if (!b) return;
+    if (location.protocol === 'file:') { demo = demo.filter(function (x) { return x.id !== b.dataset.del; }); render(demo); return; }
+    fetch('/api/waitlist/' + b.dataset.del, { method: 'DELETE', credentials: 'same-origin' }).then(load);
+  });
+  load();
+})();
+</script>
+<script src="mark.js"></script>
+<script src="edit.js"></script>
+<script src="protect.js"></script>
+
+</body>
+</html>

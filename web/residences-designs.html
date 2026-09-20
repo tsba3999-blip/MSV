@@ -1,0 +1,238 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#F5F1EA">
+<title>Варианты выбора резиденции — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="resident.css">
+<style>
+  .v { margin-bottom: var(--msv-s24); padding: var(--msv-s16) var(--msv-s16) var(--msv-s8); background: var(--msv-white); border-radius: var(--msv-r20); box-shadow: var(--msv-e1); }
+  .v__t { margin: 0 0 var(--msv-s4); } .v__d { margin: 0 0 var(--msv-s12); }
+  .v a.msv-link { font-size: var(--msv-note-size); }
+  .c1, .c2, .c3, .c4, .c5 { display: flex; color: inherit; text-decoration: none; border-radius: var(--msv-r20); overflow: hidden; margin-bottom: var(--msv-s12); background: var(--msv-beige); transition: transform var(--msv-fast) var(--msv-ease); }
+  .c1:hover, .c2:hover, .c3:hover, .c4:hover, .c5:hover { transform: translateY(-1px); }
+
+  .c1 { flex-direction: column; }
+  .c1__band { display: flex; align-items: center; justify-content: center; height: 112px; background: var(--acc); }
+  .c1__band img { width: 72px; height: 72px; border-radius: 50%; background: var(--msv-white); padding: 4px; }
+  .c1__body { display: flex; flex-direction: column; gap: 4px; padding: var(--msv-s16); }
+  .c1__kind { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--msv-n500); }
+  .c1__name { margin: 0; } .c1__addr { color: var(--msv-graphite); }
+
+  .c2-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--msv-s12); }
+  .c2 { flex-direction: column; align-items: center; text-align: center; padding: var(--msv-s20) var(--msv-s12); gap: 4px; margin: 0; border-top: 4px solid var(--acc); }
+  .c2__logo { width: 64px; height: 64px; border-radius: 50%; margin-bottom: var(--msv-s8); }
+  .c2__kind { font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--msv-n500); }
+  .c2__metro { color: var(--msv-graphite); font-weight: 600; }
+
+  .c3 { align-items: center; gap: var(--msv-s16); padding: var(--msv-s16); }
+  .c3__num { flex: 0 0 auto; font: 700 40px/1 var(--msv-font); color: var(--acc); letter-spacing: -.04em; }
+  .c3__body { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .c3__name { margin: 0; font-size: 22px; } .c3__kind { font-size: 13px; font-weight: 500; color: var(--msv-n500); }
+  .c3__logo { flex: 0 0 auto; width: 44px; height: 44px; border-radius: 50%; }
+
+  .c4 { align-items: center; gap: var(--msv-s12); padding: var(--msv-s16); background: var(--msv-white); border: 1px solid var(--msv-n100); }
+  .c4__pin { flex: 0 0 auto; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: var(--msv-white); background: var(--acc); border-radius: 50%; }
+  .c4__body { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .c4__metro { font: 700 18px/1.2 var(--msv-font); }
+  .c4__name { margin: 0; font-weight: 600; } .c4__logo { flex: 0 0 auto; width: 40px; height: 40px; border-radius: 50%; opacity: .9; }
+
+  .c5 { align-items: center; gap: var(--msv-s16); padding: var(--msv-s16); border-left: 6px solid var(--acc); }
+  .c5__logo { flex: 0 0 auto; width: 52px; height: 52px; border-radius: 50%; }
+  .c5__body { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .c5__name { margin: 0; }
+  .c5__side { flex: 0 0 45%; display: flex; flex-direction: column; gap: 2px; text-align: right; }
+  .c5__side .msv-link { align-self: flex-end; }
+  .c5__metro { font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="page" style="max-width:560px">
+
+  <div class="head">
+    <a class="head__back" href="residences.html" aria-label="Вернуться назад">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 6l-6 6 6 6"/>
+      </svg>
+    </a>
+    <h1 class="msv-sub head__title">Где будешь жить: варианты</h1>
+  </div>
+
+  <p class="msv-body" style="margin:0 0 var(--msv-s24);color:var(--msv-n500)">Пять вариантов страницы «Где будешь жить». Все ссылки рабочие. Выберите номер — поставлю его как основной.</p>
+
+  <section class="v"><h2 class="msv-sub v__t">1. Открытки с цветной полосой</h2>
+    <p class="msv-note v__d">Логотип на цветном поле резиденции, ниже крупное имя и адрес. Три вертикальные карточки, читаются как афиши.</p>
+      <a class="c1" href="rooms.html?res=forma" style="--acc:#FB344A">
+        <span class="c1__band"><img src="forma.png" alt=""></span>
+        <span class="c1__body">
+          <span class="c1__kind">Комфорт-резиденция</span>
+          <span class="msv-h c1__name">Forma</span>
+          <span class="msv-body c1__addr">Москва, Конный пер., 12 · м. Шаболовская</span>
+          <span class="msv-note">16 комнат · 57 мест · свои санузлы в части комнат</span>
+          <a class="msv-link " href="https://yandex.ru/maps/-/CTtSY62w" target="_blank" rel="noopener" onclick="event.stopPropagation()">посмотреть на карте</a>
+        </span>
+      </a>
+      <a class="c1" href="rooms.html?res=uyut" style="--acc:#7EB2DD">
+        <span class="c1__band"><img src="uyt.gif" alt=""></span>
+        <span class="c1__body">
+          <span class="c1__kind">Эконом-резиденция</span>
+          <span class="msv-h c1__name">Уют</span>
+          <span class="msv-body c1__addr">Москва, Варшавское шоссе, 18к2 · м. Нагатинская</span>
+          <span class="msv-note">16 комнат · 78 мест · капсулы и комнаты до 8 мест</span>
+          <a class="msv-link " href="https://yandex.ru/maps/-/CTtSYE5l" target="_blank" rel="noopener" onclick="event.stopPropagation()">посмотреть на карте</a>
+        </span>
+      </a>
+      <a class="c1" href="rooms.html?res=molod" style="--acc:#CBB6FF">
+        <span class="c1__band"><img src="molodejka.png" alt=""></span>
+        <span class="c1__body">
+          <span class="c1__kind">Квартира только для девушек-студенток</span>
+          <span class="msv-h c1__name">Молодежка</span>
+          <span class="msv-body c1__addr">Москва, ул. Партизанская, 40 · м. Молодежная</span>
+          <span class="msv-note">3 комнаты · 6 мест · по двое</span>
+          <a class="msv-link " href="https://yandex.ru/maps/-/CTtSaI6E" target="_blank" rel="noopener" onclick="event.stopPropagation()">посмотреть на карте</a>
+        </span>
+      </a></section>
+
+  <section class="v"><h2 class="msv-sub v__t">2. Три колонки-визитки</h2>
+    <p class="msv-note v__d">Логотип по центру, всё по центру, три в ряд на широком экране, столбиком на телефоне. Компактно и строго.</p>
+    <div class="c2-grid">
+      <a class="c2" href="rooms.html?res=forma" style="--acc:#FB344A">
+        <img class="c2__logo" src="forma.png" alt="">
+        <span class="c2__kind">Комфорт-резиденция</span>
+        <span class="msv-sub c2__name">Forma</span>
+        <span class="msv-note c2__metro">м. Шаболовская</span>
+        <span class="msv-note c2__addr">Москва, Конный пер., 12</span>
+        <a class="msv-link " href="https://yandex.ru/maps/-/CTtSY62w" target="_blank" rel="noopener" onclick="event.stopPropagation()">посмотреть на карте</a>
+      </a>
+      <a class="c2" href="rooms.html?res=uyut" style="--acc:#7EB2DD">
+        <img class="c2__logo" src="uyt.gif" alt="">
+        <span class="c2__kind">Эконом-резиденция</span>
+        <span class="msv-sub c2__name">Уют</span>
+        <span class="msv-note c2__metro">м. Нагатинская</span>
+        <span class="msv-note c2__addr">Москва, Варшавское шоссе, 18к2</span>
+        <a class="msv-link " href="https://yandex.ru/maps/-/CTtSYE5l" target="_blank" rel="noopener" onclick="event.stopPropagation()">посмотреть на карте</a>
+      </a>
+      <a class="c2" href="rooms.html?res=molod" style="--acc:#CBB6FF">
+        <img class="c2__logo" src="molodejka.png" alt="">
+        <span class="c2__kind">Квартира только для девушек-студенток</span>
+        <span class="msv-sub c2__name">Молодежка</span>
+        <span class="msv-note c2__metro">м. Молодежная</span>
+        <span class="msv-note c2__addr">Москва, ул. Партизанская, 40</span>
+        <a class="msv-link " href="https://yandex.ru/maps/-/CTtSaI6E" target="_blank" rel="noopener" onclick="event.stopPropagation()">посмотреть на карте</a>
+      </a></div></section>
+
+  <section class="v"><h2 class="msv-sub v__t">3. Нумерованный список</h2>
+    <p class="msv-note v__d">Крупные номера 01–03 в фирменном цвете, имя резиденции рядом с типом, логотип справа маленьким. Как оглавление — быстро сравнивать.</p>
+      <a class="c3" href="rooms.html?res=forma" style="--acc:#FB344A">
+        <span class="c3__num">01</span>
+        <span class="c3__body">
+          <span class="msv-h c3__name">Forma <span class="c3__kind">комфорт-резиденция</span></span>
+          <span class="msv-body c3__addr">Москва, Конный пер., 12</span>
+          <span class="msv-note">м. Шаболовская · <a class="msv-link " href="https://yandex.ru/maps/-/CTtSY62w" target="_blank" rel="noopener" onclick="event.stopPropagation()">посмотреть на карте</a></span>
+        </span>
+        <img class="c3__logo" src="forma.png" alt="">
+      </a>
+      <a class="c3" href="rooms.html?res=uyut" style="--acc:#7EB2DD">
+        <span class="c3__num">02</span>
+        <span class="c3__body">
+          <span class="msv-h c3__name">Уют <span class="c3__kind">эконом-резиденция</span></span>
+          <span class="msv-body c3__addr">Москва, Варшавское шоссе, 18к2</span>
+          <span class="msv-note">м. Нагатинская · <a class="msv-link " href="https://yandex.ru/maps/-/CTtSYE5l" target="_blank" rel="noopener" onclick="event.stopPropagation()">посмотреть на карте</a></span>
+        </span>
+        <img class="c3__logo" src="uyt.gif" alt="">
+      </a>
+      <a class="c3" href="rooms.html?res=molod" style="--acc:#CBB6FF">
+        <span class="c3__num">03</span>
+        <span class="c3__body">
+          <span class="msv-h c3__name">Молодежка <span class="c3__kind">квартира только для девушек-студенток</span></span>
+          <span class="msv-body c3__addr">Москва, ул. Партизанская, 40</span>
+          <span class="msv-note">м. Молодежная · <a class="msv-link " href="https://yandex.ru/maps/-/CTtSaI6E" target="_blank" rel="noopener" onclick="event.stopPropagation()">посмотреть на карте</a></span>
+        </span>
+        <img class="c3__logo" src="molodejka.png" alt="">
+      </a></section>
+
+  <section class="v"><h2 class="msv-sub v__t">4. По станциям метро</h2>
+    <p class="msv-note v__d">Главное — метро крупно, ведь студент выбирает по дороге до вуза. Метка-булавка в цвете резиденции, логотип справа.</p>
+      <a class="c4" href="rooms.html?res=forma" style="--acc:#FB344A">
+        <span class="c4__pin"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5a7 7 0 0 0-14 0C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>
+        <span class="c4__body">
+          <span class="c4__metro">м. Шаболовская</span>
+          <span class="msv-sub c4__name">Forma</span>
+          <span class="msv-note c4__kind">Комфорт-резиденция</span>
+          <span class="msv-note c4__addr">Москва, Конный пер., 12 · <a class="msv-link " href="https://yandex.ru/maps/-/CTtSY62w" target="_blank" rel="noopener" onclick="event.stopPropagation()">посмотреть на карте</a></span>
+        </span>
+        <img class="c4__logo" src="forma.png" alt="">
+      </a>
+      <a class="c4" href="rooms.html?res=uyut" style="--acc:#7EB2DD">
+        <span class="c4__pin"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5a7 7 0 0 0-14 0C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>
+        <span class="c4__body">
+          <span class="c4__metro">м. Нагатинская</span>
+          <span class="msv-sub c4__name">Уют</span>
+          <span class="msv-note c4__kind">Эконом-резиденция</span>
+          <span class="msv-note c4__addr">Москва, Варшавское шоссе, 18к2 · <a class="msv-link " href="https://yandex.ru/maps/-/CTtSYE5l" target="_blank" rel="noopener" onclick="event.stopPropagation()">посмотреть на карте</a></span>
+        </span>
+        <img class="c4__logo" src="uyt.gif" alt="">
+      </a>
+      <a class="c4" href="rooms.html?res=molod" style="--acc:#CBB6FF">
+        <span class="c4__pin"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5a7 7 0 0 0-14 0C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>
+        <span class="c4__body">
+          <span class="c4__metro">м. Молодежная</span>
+          <span class="msv-sub c4__name">Молодежка</span>
+          <span class="msv-note c4__kind">Квартира только для девушек-студенток</span>
+          <span class="msv-note c4__addr">Москва, ул. Партизанская, 40 · <a class="msv-link " href="https://yandex.ru/maps/-/CTtSaI6E" target="_blank" rel="noopener" onclick="event.stopPropagation()">посмотреть на карте</a></span>
+        </span>
+        <img class="c4__logo" src="molodejka.png" alt="">
+      </a></section>
+
+  <section class="v"><h2 class="msv-sub v__t">5. Две колонки: кто и где</h2>
+    <p class="msv-note v__d">Слева логотип и имя, справа метро, адрес и карта. Полоска-акцент по левому краю в цвете резиденции. Спокойный, деловой.</p>
+      <a class="c5" href="rooms.html?res=forma" style="--acc:#FB344A">
+        <img class="c5__logo" src="forma.png" alt="">
+        <span class="c5__body">
+          <span class="msv-sub c5__name">Forma</span>
+          <span class="msv-note c5__kind">Комфорт-резиденция</span>
+        </span>
+        <span class="c5__side">
+          <span class="c5__metro">м. Шаболовская</span>
+          <span class="msv-note">Москва, Конный пер., 12</span>
+          <a class="msv-link " href="https://yandex.ru/maps/-/CTtSY62w" target="_blank" rel="noopener" onclick="event.stopPropagation()">посмотреть на карте</a>
+        </span>
+      </a>
+      <a class="c5" href="rooms.html?res=uyut" style="--acc:#7EB2DD">
+        <img class="c5__logo" src="uyt.gif" alt="">
+        <span class="c5__body">
+          <span class="msv-sub c5__name">Уют</span>
+          <span class="msv-note c5__kind">Эконом-резиденция</span>
+        </span>
+        <span class="c5__side">
+          <span class="c5__metro">м. Нагатинская</span>
+          <span class="msv-note">Москва, Варшавское шоссе, 18к2</span>
+          <a class="msv-link " href="https://yandex.ru/maps/-/CTtSYE5l" target="_blank" rel="noopener" onclick="event.stopPropagation()">посмотреть на карте</a>
+        </span>
+      </a>
+      <a class="c5" href="rooms.html?res=molod" style="--acc:#CBB6FF">
+        <img class="c5__logo" src="molodejka.png" alt="">
+        <span class="c5__body">
+          <span class="msv-sub c5__name">Молодежка</span>
+          <span class="msv-note c5__kind">Квартира только для девушек-студенток</span>
+        </span>
+        <span class="c5__side">
+          <span class="c5__metro">м. Молодежная</span>
+          <span class="msv-note">Москва, ул. Партизанская, 40</span>
+          <a class="msv-link " href="https://yandex.ru/maps/-/CTtSaI6E" target="_blank" rel="noopener" onclick="event.stopPropagation()">посмотреть на карте</a>
+        </span>
+      </a></section>
+
+</div>
+<script src="mark.js"></script>
+<script src="edit.js"></script>
+<script src="protect.js"></script>
+
+</body>
+</html>

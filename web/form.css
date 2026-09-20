@@ -1,0 +1,327 @@
+/* © 2026 МСВ. Все права защищены. Программа для ЭВМ охраняется ст. 1259, 1261 ГК РФ. Использование без разрешения правообладателя запрещено. Подробнее: /legal.html */
+/* ============================================================
+   МСВ — анкета резидента
+   Стили, общие для обоих шагов.
+   ============================================================ */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  max-width: 460px;
+  margin: 0 auto;
+  padding: 0 var(--msv-s24) max(var(--msv-s24), env(safe-area-inset-bottom));
+}
+
+/* ---------- Шапка вложенного экрана ---------- */
+
+.form__head {
+  display: flex;
+  align-items: center;
+  gap: var(--msv-s12);
+  height: var(--msv-header);
+  margin: 0 calc(var(--msv-s24) * -1);
+  padding: 0 var(--msv-s16);
+}
+
+.form__back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--msv-tap);
+  height: var(--msv-tap);
+  color: var(--msv-graphite);
+  border-radius: 50%;
+  text-decoration: none;
+}
+
+.form__back:hover { background: var(--msv-n100); }
+.form__back:focus-visible { outline: 2px solid var(--msv-violet); outline-offset: 2px; }
+
+/* ---------- Индикатор шага ---------- */
+
+.progress { margin-bottom: var(--msv-s24); }
+
+.progress__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--msv-s8);
+}
+
+.progress__track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--msv-n100);
+  overflow: hidden;
+}
+
+.progress__fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--msv-red);
+  transition: width var(--msv-base) ease-out;
+}
+
+/* ---------- Плашка-предупреждение ---------- */
+
+.warn {
+  margin: 0 0 var(--msv-s24);
+  padding: var(--msv-s12) var(--msv-s16);
+  background: var(--msv-lavender);
+  border-radius: var(--msv-r12);
+  color: var(--msv-graphite);
+}
+
+/* ---------- Секции ---------- */
+
+.sect { margin-bottom: var(--msv-s32); }
+.sect__title { margin: 0 0 var(--msv-s16); }
+
+/* ---------- Фотографии: квадраты 72, последний с пунктиром ---------- */
+
+.photos { display: flex; flex-wrap: wrap; gap: var(--msv-s12); }
+
+.photo {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--msv-r12);
+  background: var(--msv-n100);
+  overflow: hidden;
+}
+
+.photo__add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  padding: 0;
+  color: var(--msv-red);
+  background: transparent;
+  border: 2px dashed var(--msv-n300);
+  border-radius: var(--msv-r12);
+  cursor: pointer;
+  transition: border-color var(--msv-fast) var(--msv-ease);
+}
+
+.photo__add:hover { border-color: var(--msv-red); }
+.photo__add:focus-visible { outline: 2px solid var(--msv-violet); outline-offset: 2px; }
+.photo__add[disabled] { opacity: .35; cursor: default; }
+
+/* ---------- Подсказки при вводе ---------- */
+
+.msv-field--sug { position: relative; }
+
+.sug {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  z-index: 20;
+  display: none;
+  max-height: 288px;
+  margin-top: var(--msv-s4);
+  overflow-y: auto;
+  background: var(--msv-white);
+  border-radius: var(--msv-r12);
+  box-shadow: var(--msv-e2);
+}
+
+.sug--on { display: block; }
+
+.sug__item {
+  padding: var(--msv-s12) var(--msv-s16);
+  font-size: var(--msv-body-size);
+  line-height: var(--msv-body-line);
+  color: var(--msv-graphite);
+  border-bottom: 1px solid var(--msv-n100);
+  cursor: pointer;
+}
+
+.sug__item:last-child { border-bottom: 0; }
+.sug__item:hover,
+.sug__item--on { background: var(--msv-n100); }
+.sug__item b { font-weight: 600; color: var(--msv-red); }
+
+/* Сообщение для экранного диктора, на экране не видно */
+.sug__live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Поле даты нажимается целиком, поэтому и курсор соответствующий */
+.msv-input[type="date"] { cursor: pointer; }
+
+/* ---------- Чипы ---------- */
+
+.chips { display: flex; flex-wrap: wrap; gap: var(--msv-s8); }
+
+.chip {
+  min-height: var(--msv-chip);
+  padding: 0 var(--msv-s16);
+  font: 600 13px/1 var(--msv-font);
+  color: var(--msv-graphite);
+  background: transparent;
+  border: 1.5px solid var(--msv-n300);
+  border-radius: calc(var(--msv-chip) / 2);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--msv-fast) var(--msv-ease), color var(--msv-fast) var(--msv-ease),
+              border-color var(--msv-fast) var(--msv-ease);
+}
+
+.chip:hover { border-color: var(--msv-graphite); }
+.chip:focus-visible { outline: 2px solid var(--msv-violet); outline-offset: 2px; }
+
+.chip[aria-pressed="true"] {
+  color: var(--msv-white);
+  background: var(--msv-graphite);
+  border-color: var(--msv-graphite);
+}
+
+/* ---------- Лепестки увлечений ----------
+   Лепестковая форма из брендбука: радиусы 24/8 по диагонали,
+   направление чередуется через один тег. */
+
+.petals { display: flex; flex-wrap: wrap; gap: var(--msv-s8); }
+
+.petal {
+  min-height: var(--msv-chip);
+  padding: 0 var(--msv-s16);
+  font: 600 13px/1 var(--msv-font);
+  color: var(--msv-graphite);
+  border: 1.5px solid transparent;
+  border-radius: 24px 8px 24px 8px;
+  cursor: pointer;
+  transition: transform var(--msv-fast) var(--msv-ease), box-shadow var(--msv-fast) var(--msv-ease);
+}
+
+.petal--alt { border-radius: 8px 24px 8px 24px; }
+.petal:hover { transform: translateY(-1px); }
+.petal:focus-visible { outline: 2px solid var(--msv-violet); outline-offset: 2px; }
+
+.petal--lime   { background: var(--msv-lime); }
+.petal--lav    { background: var(--msv-lavender); }
+.petal--yellow { background: var(--msv-yellow); }
+.petal--ice    { background: var(--msv-ice); }
+.petal--white  { background: var(--msv-white); border-color: var(--msv-n300); }
+
+.petal[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--msv-graphite); }
+
+/* ---------- Карточки загрузки документов ---------- */
+
+.doc {
+  display: flex;
+  align-items: center;
+  gap: var(--msv-s12);
+  width: 100%;
+  margin-bottom: var(--msv-s12);
+  padding: var(--msv-s16);
+  text-align: left;
+  background: var(--msv-white);
+  border: 0;
+  border-radius: var(--msv-r12);
+  box-shadow: var(--msv-e1);
+  cursor: pointer;
+  transition: transform var(--msv-fast) var(--msv-ease);
+}
+
+.doc:active { transform: scale(.99); }
+.doc:focus-visible { outline: 2px solid var(--msv-violet); outline-offset: 2px; }
+
+.doc__icon {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--msv-r11);
+  color: var(--msv-graphite);
+}
+
+.doc__icon--sky { background: var(--msv-sky); }
+.doc__icon--olive { background: var(--msv-olive); }
+.doc__icon--plain { background: var(--msv-n100); }
+
+.doc__text { flex: 1 1 auto; min-width: 0; }
+.doc__name { display: block; font-size: var(--msv-body-size); font-weight: 600; }
+.doc__note { display: block; margin-top: 2px; }
+
+.doc__state { flex: 0 0 auto; display: flex; color: var(--msv-n300); }
+.doc__state--ok { color: var(--msv-confirm); }
+.doc__state--add { color: var(--msv-red); }
+
+/* ---------- Оценка: пять квадратов ---------- */
+
+.rate { display: flex; gap: var(--msv-s8); }
+
+.rate__btn {
+  width: 44px;
+  height: 44px;
+  font: 600 15px/1 var(--msv-font);
+  color: var(--msv-graphite);
+  background: var(--msv-white);
+  border: 2px solid var(--msv-n300);
+  border-radius: var(--msv-r11);
+  cursor: pointer;
+  transition: background var(--msv-fast) var(--msv-ease), border-color var(--msv-fast) var(--msv-ease);
+}
+
+.rate__btn:hover { border-color: var(--msv-graphite); }
+.rate__btn:focus-visible { outline: 2px solid var(--msv-violet); outline-offset: 2px; }
+
+.rate__btn[aria-pressed="true"] {
+  background: var(--msv-lime);
+  border-color: var(--msv-lime);
+}
+
+/* ---------- Многострочное поле ---------- */
+
+.msv-area {
+  display: block;
+  width: 100%;
+  min-height: 96px;
+  padding: var(--msv-s12) var(--msv-s16);
+  font-family: var(--msv-font);
+  font-size: var(--msv-body-size);
+  line-height: var(--msv-body-line);
+  color: var(--msv-graphite);
+  background: var(--msv-white);
+  border: 2px solid var(--msv-n300);
+  border-radius: var(--msv-r11);
+  resize: vertical;
+  transition: border-color var(--msv-fast) var(--msv-ease);
+}
+
+.msv-area::placeholder { color: var(--msv-n300); }
+.msv-area:focus { outline: none; border-color: var(--msv-graphite); }
+
+.counter { display: block; margin-top: var(--msv-s4); text-align: right; }
+
+/* ---------- Подвал с главной кнопкой ---------- */
+
+.form__foot { margin-top: auto; padding-top: var(--msv-s32); }
+
+/* ---------- Блок для несовершеннолетних ---------- */
+
+.minor {
+  margin: 0 0 var(--msv-s24);
+  padding: var(--msv-s16);
+  background: var(--msv-n100);
+  border: 1px solid var(--msv-red);
+  border-radius: var(--msv-r12);
+}
+
+.minor[hidden] { display: none; }
+.minor__title { display: flex; align-items: center; gap: var(--msv-s8); margin: 0 0 var(--msv-s8); }
+.minor__title svg { flex: 0 0 auto; color: var(--msv-red); }
+.minor__text { margin: 0 0 var(--msv-s12); color: var(--msv-graphite); }
+
+/* Две колонки полей на широком экране — класс ставится на группу полей */
+.form__grid { display: grid; grid-template-columns: 1fr; gap: 0 var(--msv-s16); }

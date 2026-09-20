@@ -1,0 +1,1081 @@
+/* © 2026 МСВ. Все права защищены. Программа для ЭВМ охраняется ст. 1259, 1261 ГК РФ. Использование без разрешения правообладателя запрещено. Подробнее: /legal.html */
+.msv-sh {
+  /* Цвета взяты из брендбука МСВ через tokens.css.
+     Здесь только сопоставление ролей шахматки фирменным цветам. */
+  --sh-accent: var(--msv-red, #FB344A);
+  --sh-accent-dark: var(--msv-red-press, #D9210F);
+  --sh-ink: var(--msv-graphite, #34495E);
+  --sh-muted: var(--msv-n500, #6B665E);
+  --sh-line: var(--msv-n100, #EAE4DA);
+  --sh-line-soft: #F2EEE6;
+  --sh-bg: var(--msv-white, #FFFFFF);
+  --sh-bg-alt: var(--msv-beige, #F5F1EA);
+  --sh-weekend: #EFEAE1;
+  --sh-today: rgba(251, 52, 74, .55);
+
+  /* Статусы — акценты палитры: небесный, лайм, красный, жёлтый, нейтраль */
+  --sh-booked-bg: #E6F0FA;
+  --sh-booked-br: var(--msv-sky, #7EB2DD);
+  --sh-booked-tx: #1B4C7A;
+
+  --sh-active-bg: #EEF9D8;
+  --sh-active-br: var(--msv-lime, #C8F03C);
+  --sh-active-tx: #4A6B12;
+
+  --sh-debt-bg: #FFE7EB;
+  --sh-debt-br: #FFB3BF;
+  --sh-debt-tx: #B0142A;
+
+  --sh-leaving-bg: #FFF6DE;
+  --sh-leaving-br: var(--msv-yellow, #FFD93D);
+  --sh-leaving-tx: #8A5B00;
+
+  --sh-done-bg: #F0ECE4;
+  --sh-done-br: var(--msv-n300, #B8B1A5);
+  --sh-done-tx: var(--msv-n500, #6B665E);
+
+  --sh-left-w: 84px;              /* вдвое уже прежних 130: только место и иконка яруса */
+  --sh-day-w: 40px;
+  --sh-row-h: 30px;
+  --sh-head-h: 52px;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 320px;
+  height: 100%;
+  color: var(--sh-ink);
+  background: var(--sh-bg);
+  border: 1px solid var(--sh-line);
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: var(--msv-font, 'Golos Text', sans-serif);
+  font-size: 13px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+.msv-sh *,
+.msv-sh *::before,
+.msv-sh *::after { box-sizing: border-box; }
+
+/* ---------- Панель инструментов ---------- */
+
+.msv-sh__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--sh-line);
+  background: var(--sh-bg);
+}
+
+.msv-sh__title {
+  margin: 0 8px 0 0;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+}
+
+.msv-sh__spacer { flex: 1 1 auto; }
+
+.msv-sh__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 12px;
+  font: inherit;
+  font-weight: 600;
+  color: var(--sh-ink);
+  background: var(--sh-bg);
+  border: 1px solid var(--sh-line);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease;
+}
+
+.msv-sh__btn:hover { background: var(--sh-bg-alt); border-color: #CFD8E3; }
+.msv-sh__btn:focus-visible { outline: 2px solid var(--sh-accent); outline-offset: 2px; }
+.msv-sh__btn[aria-pressed="true"] {
+  color: #fff;
+  background: var(--sh-accent);
+  border-color: var(--sh-accent);
+}
+
+.msv-sh__btn--icon { width: 32px; padding: 0; font-size: 15px; }
+
+.msv-sh__date,
+.msv-sh__search {
+  min-height: 32px;
+  padding: 0 10px;
+  font: inherit;
+  color: var(--sh-ink);
+  background: var(--sh-bg);
+  border: 1px solid var(--sh-line);
+  border-radius: 8px;
+}
+
+.msv-sh__search { width: 220px; }
+.msv-sh__date:focus-visible,
+.msv-sh__search:focus-visible { outline: 2px solid var(--sh-accent); outline-offset: 1px; }
+
+.msv-sh__zoom { display: inline-flex; }
+.msv-sh__zoom .msv-sh__btn { border-radius: 0; margin-left: -1px; }
+.msv-sh__zoom .msv-sh__btn:first-child { border-radius: 8px 0 0 8px; margin-left: 0; }
+.msv-sh__zoom .msv-sh__btn:last-child { border-radius: 0 8px 8px 0; }
+
+/* ---------- Легенда ---------- */
+
+.msv-sh__legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;      /* пояснения статусов — справа */
+  gap: 6px 16px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--sh-line);
+  background: var(--sh-bg-alt);
+  color: var(--sh-muted);
+  font-size: 12px;
+}
+
+.msv-sh__legend-item { display: inline-flex; align-items: center; gap: 6px; }
+
+.msv-sh__swatch {
+  width: 14px;
+  height: 10px;
+  border-radius: 3px;
+  border: 1px solid transparent;
+}
+
+/* ---------- Прокручиваемая область ---------- */
+
+/* min-height: 0 обязателен: без него flex-элемент растягивается по
+   содержимому, своя полоса прокрутки не появляется, и колесо мыши
+   крутит страницу целиком вместо шахматки. */
+.msv-sh__scroll {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.msv-sh__canvas { position: relative; width: max-content; min-width: 100%; }
+
+/* ---------- Шапка с датами ---------- */
+
+.msv-sh__head {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  background: var(--sh-bg);
+  box-shadow: 0 1px 0 var(--sh-line);
+}
+
+.msv-sh__head-left {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  flex: 0 0 var(--sh-left-w);
+  width: var(--sh-left-w);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;    /* на той же вертикали, что стрелки комнат */
+  padding: 0 12px 0 0;
+  background: var(--sh-bg);
+  border-right: 1px solid var(--sh-line);
+}
+
+/* Свернуть или развернуть все комнаты разом */
+.msv-sh__foldall {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  color: var(--sh-muted);
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+
+.msv-sh__foldall:hover { background: var(--sh-line); color: var(--sh-ink); }
+.msv-sh__foldall:focus-visible { outline: 2px solid var(--sh-accent); outline-offset: 2px; }
+.msv-sh__foldall svg { display: block; transition: transform .16s ease; }   /* block — без нижнего зазора строки, значок ровно в центре */
+.msv-sh__foldall[aria-pressed="true"] svg { transform: rotate(180deg); }
+
+.msv-sh__head-track { position: relative; flex: 0 0 auto; }
+
+.msv-sh__months { display: flex; height: 24px; }
+
+.msv-sh__month {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--sh-muted);
+  border-right: 1px solid var(--sh-line);
+  border-bottom: 1px solid var(--sh-line-soft);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.msv-sh__days { display: flex; height: 28px; }
+
+.msv-sh__day {
+  flex: 0 0 var(--sh-day-w);
+  width: var(--sh-day-w);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--sh-line-soft);
+  font-size: 11px;
+  line-height: 1.15;
+}
+
+.msv-sh__day b { font-size: 12px; font-weight: 700; }
+.msv-sh__day span { color: var(--sh-muted); font-size: 10px; }
+.msv-sh__day--weekend { background: var(--sh-weekend); opacity: .55; }
+.msv-sh__day--today b { color: var(--sh-accent); }
+.msv-sh__day--today span { color: var(--sh-accent); }
+
+/* ---------- Тело сетки ---------- */
+
+.msv-sh__body { position: relative; }
+
+.msv-sh__underlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--sh-left-w);
+  /* без z-index — иначе подложка образует свой слой, и красная нить
+     не сможет подняться над полосами броней */
+  pointer-events: none;
+}
+
+/* 30% плотности прежнего тона: выходные видно, но они не спорят
+   с полосами проживания. */
+.msv-sh__band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--sh-weekend);
+  opacity: .3;
+}
+
+.msv-sh__gridline {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--sh-line-soft);
+}
+
+.msv-sh__nowline--top { z-index: 4; }
+
+.msv-sh__nowline {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--sh-today);
+  z-index: 1;
+}
+
+/* ---------- Строки ---------- */
+
+/* Шапка комнаты. Верхняя граница толще обычной — по ней видно,
+   где кончается одна комната и начинается другая. */
+.msv-sh__group {
+  position: sticky;
+  left: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 34px;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--sh-ink);
+  background: var(--sh-bg-alt);
+  border-top: 3px solid var(--sh-line);
+  border-bottom: 1px solid var(--sh-line);
+}
+
+.msv-sh__body > .msv-sh__group:first-child { border-top-width: 1px; }
+
+
+/* Название и стрелка живут в зоне шириной с левый столбец, поэтому
+   стрелки всех комнат выстраиваются по одной вертикали независимо от
+   длины названия. */
+/* Левый столбец узкий, поэтому название комнаты выходит в область
+   сетки (в строке комнаты броней нет). Стрелка сворачивания стоит на
+   вертикали кнопки «свернуть всё» в шапке: правый край — левый
+   столбец минус 12 px, с учётом отступа строки 12 px. */
+.msv-sh__group-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.msv-sh__group-name { flex: 0 0 auto; white-space: nowrap; }
+
+.msv-sh__group-head .msv-sh__fold {
+  order: -1;                                   /* стрелка первой */
+  /* правый край стрелки = левый столбец − 12 px, как у кнопки «свернуть всё»:
+     отступ строки 12 + margin + 22 (кнопка) = left-w − 12 */
+  margin-left: calc(var(--sh-left-w) - 46px);
+  margin-right: 0;
+}
+
+.msv-sh__fold {
+  flex: 0 0 auto;
+  margin-left: auto;      /* прижата к правому краю зоны — общая вертикаль */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  color: var(--sh-muted);
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.msv-sh__fold:hover { background: var(--sh-line); color: var(--sh-ink); }
+.msv-sh__fold:focus-visible { outline: 2px solid var(--sh-accent); outline-offset: 1px; }
+
+.msv-sh__fold svg { transition: transform .16s ease; }
+.msv-sh__fold[aria-expanded="false"] svg { transform: rotate(180deg); }
+
+.msv-sh__group-count {
+  padding: 1px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--sh-muted);
+  background: var(--sh-bg);
+  border: 1px solid var(--sh-line);
+  border-radius: 20px;
+}
+
+.msv-sh__row {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid var(--sh-line-soft);
+}
+
+.msv-sh__row:hover .msv-sh__cell { background: #FAFBFD; }
+
+.msv-sh__cell {
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  flex: 0 0 var(--sh-left-w);
+  width: var(--sh-left-w);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px 0 8px;
+  background: var(--sh-bg);
+  border-right: 1px solid var(--sh-line);
+  transition: background .12s ease;
+}
+
+.msv-sh__bed { font-weight: 700; font-size: 11px; white-space: nowrap; letter-spacing: -.01em; }
+
+.msv-sh__room {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--sh-muted);
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.msv-sh__tier { flex: 0 0 auto; margin-left: auto; color: var(--sh-muted); }
+.msv-sh__room { display: none; }          /* ярус показан иконкой, слово в узком столбце не нужно */
+
+.msv-sh__tag {
+  flex: 0 0 auto;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 4px;
+  background: var(--sh-bg-alt);
+  color: var(--sh-muted);
+  border: 1px solid var(--sh-line);
+}
+
+.msv-sh__tag--f { color: #A3316B; background: #FCEBF3; border-color: #F3C9DD; }
+.msv-sh__tag--m { color: #1B4C9E; background: #E8F0FF; border-color: #C3D8FE; }
+
+.msv-sh__track { position: relative; flex: 0 0 auto; z-index: 1; }
+
+/* ---------- Полосы проживания ---------- */
+
+.msv-sh__bar {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 8px;
+  border: 1px solid;
+  border-radius: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+  transition: filter .12s ease, box-shadow .12s ease;
+}
+
+.msv-sh__bar:hover { filter: brightness(.96); box-shadow: 0 2px 6px rgba(22,32,47,.16); }
+.msv-sh__bar:focus-visible { outline: 2px solid var(--sh-accent); outline-offset: 1px; }
+.msv-sh__bar--selected { box-shadow: 0 0 0 2px var(--sh-accent); }
+
+.msv-sh__bar-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 2px;
+}
+
+.msv-sh__bar-dot {
+  flex: 0 0 auto;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* Вуз — второстепенная часть подписи: сжимается первым */
+.msv-sh__bar-sub {
+  flex: 0 1 auto;
+  min-width: 0;
+  font-weight: 400;
+  opacity: .72;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.msv-sh__bar-name { flex: 0 1 auto; }
+
+.msv-sh__bar--booked  { background: var(--sh-booked-bg);  border-color: var(--sh-booked-br);  color: var(--sh-booked-tx); }
+.msv-sh__bar--active  { background: var(--sh-active-bg);  border-color: var(--sh-active-br);  color: var(--sh-active-tx); }
+.msv-sh__bar--debt    { background: var(--sh-debt-bg);    border-color: var(--sh-debt-br);    color: var(--sh-debt-tx); }
+.msv-sh__bar--leaving { background: var(--sh-leaving-bg); border-color: var(--sh-leaving-br); color: var(--sh-leaving-tx); }
+.msv-sh__bar--done    { background: var(--sh-done-bg);    border-color: var(--sh-done-br);    color: var(--sh-done-tx); }
+
+/* День рождения: красная точка на нужной дате, поверх подписи */
+.msv-sh__bday {
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: var(--sh-accent);
+  box-shadow: 0 0 0 2px var(--sh-bg);
+  z-index: 1;
+}
+
+/* обрезка полосы, уходящей за границу видимого периода */
+.msv-sh__bar--cut-left  { border-left-width: 0;  border-top-left-radius: 0;  border-bottom-left-radius: 0; }
+.msv-sh__bar--cut-right { border-right-width: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; }
+
+
+
+.msv-sh__panel-title--empty { color: var(--sh-muted); font-weight: 500; }
+.msv-sh__panel-where {
+  padding: 0 0 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--sh-line);
+  font-size: 15px;
+  font-weight: 700;
+}
+.msv-sh__panel-where .msv-sh__panel-bed { color: var(--sh-muted); font-weight: 500; }
+
+.msv-sh__panel-close--float { position: absolute; top: 10px; right: 10px; z-index: 2; }
+.msv-sh__panel-body--flush { padding-top: 16px; }
+.msv-sh__panel-body--flush .msv-sh__sect:first-child { padding-right: 40px; }   /* место под крестик */
+
+/* Лепестки мессенджеров — форма из брендбука: радиусы 24/8 по диагонали */
+.msv-sh__petals { display: inline-flex; gap: 6px; margin-left: 8px; vertical-align: middle; }
+.msv-sh__petal {
+  display: inline-flex; align-items: center; height: 26px; padding: 0 12px;
+  font-size: 12px; font-weight: 700; color: var(--sh-ink); text-decoration: none;
+  border-radius: 24px 8px 24px 8px; transition: transform .09s ease;
+}
+.msv-sh__petal:hover { transform: translateY(-1px); }
+.msv-sh__petal--tg  { background: #A2D2FF; }
+.msv-sh__petal--max { background: #CBB6FF; border-radius: 8px 24px 8px 24px; }
+
+/* ---------- Телефон с мессенджерами ---------- */
+
+.msv-sh__phone { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+
+.msv-sh__mess {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-decoration: none;
+  border-radius: 11px;
+}
+
+.msv-sh__mess--tg { color: #14618F; background: #DFF0FA; }
+.msv-sh__mess--tg:hover { background: #C9E6F7; }
+.msv-sh__mess--max { color: #6B3BB8; background: #ECE3FF; }
+.msv-sh__mess--max:hover { background: #DDD0FB; }
+.msv-sh__mess:focus-visible { outline: 2px solid var(--sh-accent); outline-offset: 2px; }
+
+/* ---------- Возраст и метка несовершеннолетия ---------- */
+
+.msv-sh__age { color: var(--sh-muted); }
+
+.msv-sh__minor {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #B0142A;
+  background: var(--sh-debt-bg);
+  border: 1px solid var(--sh-debt-br);
+  border-radius: 11px;
+  vertical-align: 1px;
+}
+
+/* ---------- Список подписанных документов ---------- */
+
+.msv-sh__docs { margin: 0; padding: 0; list-style: none; }
+
+.msv-sh__docs li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.msv-sh__docs li + li { border-top: 0; }
+.msv-sh__docs li { border: 0; }               /* без разделительной полосы между документами */
+
+.msv-sh__docs-date {
+  color: var(--sh-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---------- Перетаскивание брони ---------- */
+
+/* touch-action — чтобы касание тащило бронь, а не прокручивало сетку.
+   user-select — чтобы нажатие не начинало выделять подпись: выделение
+   присылало pointercancel и обрывало перенос. */
+.msv-sh__bar {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+}
+
+.msv-sh__bar:active { cursor: grabbing; }
+.msv-sh--readonly .msv-sh__bar { cursor: pointer; }
+
+/* Пока тащим — сетка не перехватывает выделение, а строка-цель заметна */
+body.msv-sh-dragging .msv-sh__row { transition: none; }
+.msv-sh__bar--dragging { opacity: .35; }
+
+/* Пока тащим — гасим выделение текста и меняем курсор по всей странице */
+body.msv-sh-dragging { user-select: none; -webkit-user-select: none; cursor: grabbing; }
+body.msv-sh-dragging .msv-sh__bar { cursor: grabbing; }
+
+.msv-sh-ghost {
+  position: fixed;
+  z-index: 10000;
+  transform: translate(14px, -50%);
+  max-width: 320px;
+  height: 26px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  font-family: var(--msv-font, 'Golos Text', sans-serif);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--msv-white, #fff);
+  background: var(--msv-graphite, #34495E);
+  border-radius: 5px;
+  box-shadow: 0 6px 18px rgba(16, 22, 31, .28);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+
+.msv-sh-ghost--bad { background: var(--sh-accent, #FB344A); }
+
+/* Куда можно положить и куда нельзя */
+/* Строка-цель помечается только слева — вся горизонталь не светится */
+.msv-sh__row--target .msv-sh__cell {
+  background: var(--sh-bg-alt);
+  box-shadow: inset 3px 0 0 var(--sh-ink);
+}
+
+/* Призрак будущей брони: точно от заезда до выезда */
+.msv-sh__preview {
+  position: absolute;
+  top: 4px;
+  height: 22px;
+  border: 2px dashed;
+  border-radius: 5px;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.msv-sh__preview--ok  { border-color: #4A9A2E; background: rgba(74, 154, 46, .14); }
+.msv-sh__preview--bad { border-color: var(--sh-accent); background: rgba(251, 52, 74, .14); }
+
+/* Число заезда у левого края призрака */
+.msv-sh__preview__day {
+  position: absolute;
+  right: calc(100% + 6px);
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 1px 7px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 16px;
+  color: var(--sh-bg);
+  background: var(--sh-ink);
+  border-radius: 9px;
+  white-space: nowrap;
+}
+
+.msv-sh__preview--bad .msv-sh__preview__day { background: var(--sh-accent); }
+
+/* У левого края сетки подпись уехала бы за границу — переносим внутрь */
+.msv-sh__preview__day--inside { right: auto; left: 4px; }
+
+/* ---------- Пустое состояние ---------- */
+
+.msv-sh__empty {
+  position: sticky;
+  left: 0;
+  width: 100%;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--sh-muted);
+}
+
+.msv-sh__empty b { display: block; margin-bottom: 4px; color: var(--sh-ink); font-size: 14px; }
+
+/* ---------- Подсказка при наведении (скрин 4) ---------- */
+
+.msv-sh-tip {
+  position: fixed;
+  z-index: 9999;
+  max-width: 320px;
+  padding: 10px 12px;
+  background: #10161F;
+  color: #F2F5F9;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(10,16,24,.32);
+  font-family: var(--msv-font, 'Golos Text', sans-serif);
+  font-size: 12px;
+  line-height: 1.45;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-2px);
+  transition: opacity .12s ease, transform .12s ease;
+}
+
+.msv-sh-tip--on { opacity: 1; transform: translateY(0); }
+.msv-sh-tip:not(.msv-sh-tip--on) { pointer-events: none; }
+.msv-sh-tip ul { margin: 0; padding: 0 0 0 14px; list-style: disc; }
+.msv-sh-tip li { margin: 0 0 2px; }
+.msv-sh-tip li:last-child { margin-bottom: 0; }
+.msv-sh-tip b { color: #fff; font-weight: 600; }
+.msv-sh-tip .msv-sh-tip__debt { color: #FF8E9D; font-weight: 700; }
+
+/* ---------- Выезжающая панель (скрин 2 + структура скрина 3) ---------- */
+
+.msv-sh__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  background: rgba(16,22,31,.28);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease;
+}
+
+.msv-sh__scrim--on { opacity: 1; pointer-events: auto; }
+
+.msv-sh__panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  width: 380px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--sh-bg);
+  border-left: 1px solid var(--sh-line);
+  box-shadow: -12px 0 32px rgba(16,22,31,.14);
+  transform: translateX(100%);
+  transition: transform .24s cubic-bezier(.22,.61,.36,1);
+}
+
+.msv-sh__panel--on { transform: translateX(0); }
+
+.msv-sh__panel-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 14px 12px;
+  border-bottom: 1px solid var(--sh-line);
+}
+
+.msv-sh__panel-bed { font-weight: 500; color: var(--sh-muted); }
+.msv-sh__panel-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.msv-sh__panel-close {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--sh-muted);
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.msv-sh__panel-close:hover { background: var(--sh-bg-alt); color: var(--sh-ink); }
+.msv-sh__panel-close:focus-visible { outline: 2px solid var(--sh-accent); outline-offset: 2px; }
+
+.msv-sh__panel-body { flex: 1 1 auto; overflow: auto; padding: 0 0 12px; }
+
+.msv-sh__sect { padding: 14px; border-bottom: 1px solid var(--sh-line-soft); }
+.msv-sh__sect:last-child { border-bottom: 0; }
+
+.msv-sh__ident { display: flex; align-items: center; gap: 12px; }
+
+.msv-sh__avatar-btn {
+  flex: 0 0 auto;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 50%;
+  cursor: zoom-in;
+  line-height: 0;
+}
+
+.msv-sh__avatar-btn:focus-visible { outline: 2px solid var(--sh-accent); outline-offset: 2px; }
+.msv-sh__avatar-btn:hover .msv-sh__avatar { filter: brightness(.94); }
+
+.msv-sh__avatar {
+  display: block;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--sh-bg-alt);
+  border: 1px solid var(--sh-line);
+}
+
+.msv-sh__avatar--ph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--sh-muted);
+}
+
+.msv-sh__ident-name { font-size: 15px; font-weight: 700; }
+.msv-sh__ident-sub { margin-top: 2px; color: var(--sh-muted); font-size: 12px; }
+
+.msv-sh__badge {
+  display: inline-block;
+  padding: 2px 9px;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+
+.msv-sh__badge--booked  { background: var(--sh-booked-bg);  border-color: var(--sh-booked-br);  color: var(--sh-booked-tx); }
+.msv-sh__badge--active  { background: var(--sh-active-bg);  border-color: var(--sh-active-br);  color: var(--sh-active-tx); }
+.msv-sh__badge--debt    { background: var(--sh-debt-bg);    border-color: var(--sh-debt-br);    color: var(--sh-debt-tx); }
+.msv-sh__badge--leaving { background: var(--sh-leaving-bg); border-color: var(--sh-leaving-br); color: var(--sh-leaving-tx); }
+.msv-sh__badge--done    { background: var(--sh-done-bg);    border-color: var(--sh-done-br);    color: var(--sh-done-tx); }
+
+.msv-sh__field { margin-bottom: 12px; }
+.msv-sh__field:last-child { margin-bottom: 0; }
+.msv-sh__label { color: var(--sh-muted); font-size: 12px; margin-bottom: 2px; }
+.msv-sh__value { font-size: 13px; word-break: break-word; }
+.msv-sh__value--num { font-variant-numeric: tabular-nums; }
+.msv-sh__value a { color: var(--sh-accent); text-decoration: none; }
+.msv-sh__value a:hover { text-decoration: underline; }
+.msv-sh__value--empty { color: #9AA6B6; font-style: italic; }
+
+.msv-sh__pairs { display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; align-items: baseline; }
+.msv-sh__pairs dt { color: var(--sh-muted); font-size: 12px; margin: 0; }
+.msv-sh__pairs dd { margin: 0; font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
+.msv-sh__pairs dd.msv-sh__total { font-weight: 700; }
+.msv-sh__pairs dd.msv-sh__debt { color: var(--sh-accent); font-weight: 700; }
+.msv-sh__pairs dd.msv-sh__ok { color: #1B6B45; font-weight: 700; }
+
+.msv-sh__sect-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.msv-sh__sect-title { color: var(--sh-muted); font-size: 12px; }
+
+.msv-sh__pay { width: 100%; border-collapse: collapse; font-size: 12px; }
+.msv-sh__pay th {
+  text-align: left;
+  font-weight: 400;
+  color: var(--sh-muted);
+  padding: 0 0 6px;
+  border-bottom: 1px solid var(--sh-line-soft);
+}
+.msv-sh__pay th:nth-child(2), .msv-sh__pay td:nth-child(2) { text-align: right; }
+.msv-sh__pay th:nth-child(3), .msv-sh__pay td:nth-child(3) { text-align: right; }
+.msv-sh__pay td { padding: 7px 0; border-bottom: 1px solid var(--sh-line-soft); font-variant-numeric: tabular-nums; }
+.msv-sh__pay tr:last-child td { border-bottom: 0; }
+.msv-sh__pay td:nth-child(3) { color: var(--sh-muted); white-space: nowrap; }
+
+.msv-sh__panel-foot {
+  display: flex;
+  gap: 8px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--sh-line);
+  background: var(--sh-bg);
+}
+
+.msv-sh__panel-foot .msv-sh__btn--primary {
+  flex: 1 1 auto;
+  color: #fff;
+  background: var(--sh-accent);
+  border-color: var(--sh-accent);
+}
+
+.msv-sh__panel-foot .msv-sh__btn--primary:hover {
+  background: var(--sh-accent-dark);
+  border-color: var(--sh-accent-dark);
+}
+
+/* ---------- Фото крупным планом ---------- */
+
+.msv-sh-photo {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(16, 22, 31, .82);
+  cursor: zoom-out;
+}
+
+.msv-sh-photo__box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 100%;
+  cursor: default;
+}
+
+.msv-sh-photo img {
+  display: block;
+  max-width: min(80vw, 640px);
+  max-height: 76vh;
+  border-radius: 12px;
+  object-fit: contain;
+  background: var(--sh-bg-alt);
+}
+
+.msv-sh-photo__ph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: min(60vw, 280px);
+  height: min(60vw, 280px);
+  border-radius: 50%;
+  background: var(--sh-bg-alt);
+  color: var(--sh-muted);
+  font-family: var(--msv-font, 'Golos Text', sans-serif);
+  font-size: 76px;
+  font-weight: 700;
+}
+
+.msv-sh-photo__cap {
+  color: #fff;
+  font-family: var(--msv-font, 'Golos Text', sans-serif);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.msv-sh-photo__close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  font-size: 26px;
+  line-height: 1;
+  color: #fff;
+  background: rgba(255, 255, 255, .14);
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.msv-sh-photo__close:hover { background: rgba(255, 255, 255, .26); }
+.msv-sh-photo__close:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+/* ---------- Подтверждение переселения ---------- */
+
+.msv-sh-confirm {
+  position: fixed; inset: 0; z-index: 10002;
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+  background: rgba(16, 22, 31, .45);
+  font-family: var(--msv-font, 'Golos Text', sans-serif);
+}
+
+.msv-sh-confirm__box {
+  width: 100%; max-width: 440px; padding: 20px;
+  background: var(--sh-bg); border-radius: 16px; box-shadow: 0 12px 40px rgba(16, 22, 31, .3);
+  color: var(--sh-ink); font-size: 13px;
+}
+
+.msv-sh-confirm__title { margin: 0 0 14px; font-size: 16px; font-weight: 600; line-height: 1.3; }
+
+.msv-sh-confirm__row {
+  display: flex; justify-content: space-between; gap: 12px;
+  padding: 8px 0; border-bottom: 1px solid var(--sh-line);
+}
+.msv-sh-confirm__row span { color: var(--sh-muted); }
+.msv-sh-confirm__row b { font-weight: 600; text-align: right; }
+
+.msv-sh-confirm__sum {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+  margin: 14px 0 8px; padding: 12px 14px; border-radius: 10px;
+}
+.msv-sh-confirm__sum--pay { background: var(--sh-debt-bg); color: #B0142A; }
+.msv-sh-confirm__sum--back { background: var(--sh-active-bg); color: #4A6B12; }
+.msv-sh-confirm__sum b { font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.msv-sh-confirm__note { margin: 8px 0 0; color: var(--sh-muted); line-height: 1.45; }
+
+.msv-sh-confirm__actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+.msv-sh-confirm .msv-sh__btn--primary { color: #fff; background: var(--sh-accent); border-color: var(--sh-accent); }
+.msv-sh-confirm .msv-sh__btn--primary:hover { background: var(--sh-accent-dark); }
+
+/* ---------- Миграционный учёт ---------- */
+
+.msv-sh__reg td:nth-child(2),
+.msv-sh__reg th:nth-child(2) { text-align: left; }
+
+.msv-sh__reg td:nth-child(3),
+.msv-sh__reg th:nth-child(3) { text-align: right; white-space: nowrap; }
+
+.msv-sh__reg-place {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 15px;
+  color: var(--sh-muted);
+}
+
+.msv-sh__reg--ok td:nth-child(3) { color: #4A6B12; }
+.msv-sh__reg--soon td:nth-child(3) { color: #8A5B00; font-weight: 600; }
+.msv-sh__reg--out td { color: var(--sh-muted); }
+.msv-sh__reg--out td:nth-child(3) { color: var(--sh-accent); font-weight: 600; }
+
+/* ---------- Адаптив ---------- */
+
+@media (max-width: 760px) {
+  .msv-sh { --sh-left-w: 84px; --sh-day-w: 34px; }
+  /* тулбар переносится, поле поиска на всю ширину, кнопки в ряд */
+  .msv-sh__toolbar { flex-wrap: wrap; gap: 6px; padding: 8px; }
+  .msv-sh__search { flex: 1 1 100%; width: 100%; }
+  .msv-sh__title { width: 100%; }
+  .msv-sh__btn { height: 34px; padding: 0 10px; font-size: 12px; }
+  /* карточка — на весь экран, крестик крупнее */
+  .msv-sh__panel { width: 100%; max-width: none; }
+  .msv-sh__panel-close--float { width: 40px; height: 40px; font-size: 26px; }
+  /* сетка листается пальцем в обе стороны; перетаскивание брони —
+     удержанием, чтобы не мешать прокрутке */
+  .msv-sh__body { -webkit-overflow-scrolling: touch; }
+  .msv-sh__canvas { touch-action: pan-x pan-y; }
+  .msv-sh__bar-sub { display: none; }
+  .msv-sh__group-name { font-size: 12px; }
+}
+
+@media (max-width: 480px) {
+  .msv-sh { --sh-day-w: 30px; --sh-row-h: 36px; }
+  .msv-sh__head-day { font-size: 10px; }
+  .msv-sh__bar-name { font-size: 11px; }
+  .msv-sh-confirm__box { padding: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .msv-sh *,
+  .msv-sh-tip { transition: none !important; }
+}
+
+.msv-sh__ident-place { margin-top: 6px; font-size: 12px; line-height: 1.4; color: var(--sh-muted); }
+
+/* Красная нить «сегодня» — поверх всех полос броней */
+.msv-sh__underlay .msv-sh__nowline { z-index: 25; pointer-events: none; }   /* поверх всех броней */
+.msv-sh__underlay .msv-sh__band, .msv-sh__underlay .msv-sh__gridline { z-index: -1; }
+.msv-sh__body { position: relative; isolation: isolate; }

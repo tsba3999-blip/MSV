@@ -1,0 +1,148 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Сайт и его программное обеспечение охраняются ГК РФ (ст. 1259, 1261). Копирование без разрешения правообладателя запрещено. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#F5F1EA">
+<title>Сменить код — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="resident.css">
+<link rel="stylesheet" href="form.css">
+<style>
+  .pin { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--msv-s12); margin-bottom: var(--msv-s8); }
+  .pin__cell {
+    width: 100%; min-width: 0; height: 64px; padding: 0;
+    font: 600 24px var(--msv-font); text-align: center; color: var(--msv-graphite);
+    background: var(--msv-white); border: 2px solid var(--msv-n300); border-radius: var(--msv-r11);
+  }
+  .pin__cell:focus { outline: none; border-color: var(--msv-graphite); }
+  .pin--error .pin__cell { background: var(--msv-n100); border-color: var(--msv-red); }
+  .ok { display: none; text-align: center; padding: var(--msv-s48) 0; }
+  .ok--on { display: block; }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="head">
+    <a class="head__back" href="menu.html" aria-label="Вернуться в меню">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+    </a>
+    <h1 class="msv-sub head__title">Сменить код входа</h1>
+  </div>
+
+  <div id="form">
+    <p class="msv-body" style="margin:0 0 var(--msv-s24);color:var(--msv-n500)">Код выдал модератор при заселении. Замени его на свой — четыре цифры, которые помнишь только ты.</p>
+
+    <p class="msv-note" style="margin-bottom:var(--msv-s8)">Новый код</p>
+    <div class="pin" id="pin1">
+      <input class="pin__cell" type="password" inputmode="numeric" maxlength="1" aria-label="Первая цифра">
+      <input class="pin__cell" type="password" inputmode="numeric" maxlength="1" aria-label="Вторая цифра">
+      <input class="pin__cell" type="password" inputmode="numeric" maxlength="1" aria-label="Третья цифра">
+      <input class="pin__cell" type="password" inputmode="numeric" maxlength="1" aria-label="Четвёртая цифра">
+    </div>
+    <p class="msv-note" style="margin:0 0 var(--msv-s24)">Не подойдут четыре одинаковые цифры и 1234.</p>
+
+    <p class="msv-note" style="margin-bottom:var(--msv-s8)">Повтори</p>
+    <div class="pin" id="pin2">
+      <input class="pin__cell" type="password" inputmode="numeric" maxlength="1" aria-label="Первая цифра">
+      <input class="pin__cell" type="password" inputmode="numeric" maxlength="1" aria-label="Вторая цифра">
+      <input class="pin__cell" type="password" inputmode="numeric" maxlength="1" aria-label="Третья цифра">
+      <input class="pin__cell" type="password" inputmode="numeric" maxlength="1" aria-label="Четвёртая цифра">
+    </div>
+
+    <div class="msv-error" id="err" hidden role="alert" style="margin:var(--msv-s16) 0 0">
+      <svg class="msv-error__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2.5 15 14H1z"/><path d="M8 6.5v3.2"/><path d="M8 12h.01"/></svg>
+      <span id="errText"></span>
+    </div>
+
+    <div class="foot">
+      <button class="msv-btn msv-btn--block msv-btn--primary" id="save" type="button" disabled>Сохранить код</button>
+    </div>
+  </div>
+
+  <div class="ok" id="ok">
+    <h2 class="msv-h" style="margin:0 0 var(--msv-s12)">Код сменён</h2>
+    <p class="msv-body" style="margin:0 0 var(--msv-s32);color:var(--msv-n500)">Со следующего входа действует новый.</p>
+    <a class="msv-btn msv-btn--block msv-btn--secondary" href="menu.html">В меню</a>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  function cells(id) { return Array.prototype.slice.call(document.querySelectorAll('#' + id + ' .pin__cell')); }
+  var c1 = cells('pin1'), c2 = cells('pin2');
+  var save = document.getElementById('save');
+  var err = document.getElementById('err'), errText = document.getElementById('errText');
+
+  function val(cs) { return cs.map(function (c) { return c.value; }).join(''); }
+
+  function wire(cs, nextGroup) {
+    cs.forEach(function (cell, i) {
+      cell.addEventListener('input', function () {
+        cell.value = cell.value.replace(/\D/g, '').slice(0, 1);
+        if (cell.value && i < cs.length - 1) cs[i + 1].focus();
+        else if (cell.value && nextGroup) nextGroup[0].focus();
+        sync();
+      });
+      cell.addEventListener('keydown', function (e) {
+        if (e.key === 'Backspace' && !cell.value && i > 0) { e.preventDefault(); cs[i - 1].value = ''; cs[i - 1].focus(); sync(); }
+      });
+    });
+  }
+  wire(c1, c2); wire(c2, null);
+
+  function weak(p) {
+    if (!/^\d{4}$/.test(p)) return 'Код — четыре цифры';
+    if (/^(\d)\1{3}$/.test(p)) return 'Четыре одинаковые цифры — слишком просто';
+    if (p === '1234' || p === '4321' || p === '0000') return 'Слишком простой код';
+    return null;
+  }
+
+  function sync() {
+    err.hidden = true;
+    document.getElementById('pin1').classList.remove('pin--error');
+    document.getElementById('pin2').classList.remove('pin--error');
+    save.disabled = !(val(c1).length === 4 && val(c2).length === 4);
+  }
+
+  save.addEventListener('click', function () {
+    var a = val(c1), b = val(c2);
+    var bad = weak(a);
+    if (bad) { show(bad, 'pin1'); return; }
+    if (a !== b) { show('Коды не совпадают', 'pin2'); return; }
+
+    save.disabled = true;
+    fetch('/api/auth/set-pin', { method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pin: a }) })
+      .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j }; }); })
+      .then(function (r) {
+        if (r.s !== 200) { show(r.j.error || 'Не удалось сохранить', 'pin1'); save.disabled = false; return; }
+        document.getElementById('form').style.display = 'none';
+        document.getElementById('ok').classList.add('ok--on');
+      })
+      .catch(function () {
+        // страница открыта без сервера — показываем, как это будет выглядеть
+        document.getElementById('form').style.display = 'none';
+        document.getElementById('ok').classList.add('ok--on');
+      });
+  });
+
+  function show(text, group) {
+    errText.textContent = text; err.hidden = false;
+    document.getElementById(group).classList.add('pin--error');
+  }
+})();
+</script>
+<script src="mark.js"></script>
+<script src="zoom.js"></script>
+<script src="edit.js"></script>
+<script src="protect.js"></script>
+</body>
+</html>

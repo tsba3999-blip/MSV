@@ -1,0 +1,232 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Сайт и его программное обеспечение охраняются ГК РФ (ст. 1259, 1261). Копирование без разрешения правообладателя запрещено. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Сеть студенческих резиденций «Москва в студентов верит!». Личный кабинет резидента, сотрудника и администратора.">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#FB344A">
+<title>Москва в студентов верит!</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  /* Первая страница — красное полотно с паттерном.
+     Экран 04 прототипа, растянутый на любую ширину. */
+
+  html, body { height: 100%; }
+
+  .start {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 100svh;
+    background: var(--msv-red);
+    overflow: hidden;
+  }
+
+  /* Паттерн — полосой поверху, не заходя под знак и не мешая кнопкам.
+     Брендбук: не более 30% площади экрана. */
+  .start__pattern {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 22%;
+    opacity: .55;
+    pointer-events: none;
+  }
+
+  .start__inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 460px;
+    margin: 0 auto;
+    /* Верхний отступ отсчитывается от полосы паттерна: знак встаёт
+       сразу под ней, а не по центру экрана. svh, а не vh — иначе на
+       телефоне панель браузера съедает часть высоты. */
+    padding: calc(22svh + var(--msv-s24)) var(--msv-s24) max(var(--msv-s24), env(safe-area-inset-bottom));
+  }
+
+  .start__brand { display: block; }
+
+  /* Вход подтянут к знаку, а не прижат к низу */
+  .start__entry { margin-top: var(--msv-s32); }
+
+  /* Логотип вставлен исходным файлом: воспроизводить знак вёрсткой
+     или шрифтом брендбук запрещает. Горизонтальная версия не ставится
+     уже 120 px — ниже этого берётся только знак. */
+  .start__logo-link { display: block; width: 100%; max-width: 360px; margin: 0 auto; border-radius: 8px; }
+  .start__logo-link:focus-visible { outline: 2px solid var(--msv-white); outline-offset: 4px; }
+  .start__logo-link:hover .start__logo { opacity: .92; }
+
+  .start__logo {
+    display: block;
+    width: 100%;
+    max-width: 340px;
+    height: auto;
+  }
+
+  .start__actions { display: flex; flex-direction: column; gap: var(--msv-s12); }
+
+  .start__reg {
+    margin: var(--msv-s24) 0 0;
+    text-align: center;
+    color: var(--msv-white);
+    font-size: var(--msv-body-size);
+    line-height: var(--msv-body-line);
+  }
+
+  .start__reg a { font-weight: 600; }
+
+  /* Служебные входы: две фигуры одного размера, без подписей */
+  .start__staff {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--msv-s16);
+    margin-top: auto;          /* прижимает фигуры к нижнему краю */
+    padding-top: var(--msv-s32);
+  }
+
+  .staff-mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--msv-tap);
+    height: var(--msv-tap);
+    border-radius: 50%;
+    text-decoration: none;
+    opacity: .55;
+    transition: opacity var(--msv-base) var(--msv-ease),
+                background var(--msv-base) var(--msv-ease);
+  }
+
+  .staff-mark:hover { opacity: 1; background: rgba(255, 255, 255, .14); }
+  .staff-mark:focus-visible { opacity: 1; outline: 2px solid var(--msv-white); outline-offset: 2px; }
+  .staff-mark:active .staff-mark__shape { transform: scale(.9); }
+
+  /* Обе фигуры вписаны в один квадрат 20×20 — площадь и вес совпадают */
+  .staff-mark__shape {
+    display: block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--msv-white);
+    transition: transform var(--msv-fast) var(--msv-ease);
+  }
+
+  /* Буквы С и А одной высоты — как прежние фигуры */
+  .staff-mark__letter {
+    display: block;
+    height: 14px;
+    font: 700 14px/14px var(--msv-font);
+    color: var(--msv-white);
+    letter-spacing: .02em;
+  }
+
+  /* Для владельцев отелей и общежитий — такая же тихая, как фигуры */
+  .start__partner {
+    display: inline-flex;
+    align-items: center;
+    margin-left: var(--msv-s8);
+    padding: 0 var(--msv-s12);
+    min-height: var(--msv-tap);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--msv-white);
+    opacity: .55;
+    text-decoration: none;
+    border-radius: calc(var(--msv-tap) / 2);
+    white-space: nowrap;
+    transition: opacity var(--msv-base) var(--msv-ease), background var(--msv-base) var(--msv-ease);
+  }
+
+  .start__partner:hover { opacity: 1; background: rgba(255, 255, 255, .14); }
+  .start__partner:focus-visible { opacity: 1; outline: 2px solid var(--msv-white); outline-offset: 2px; }
+
+  .start__legal {
+    margin: var(--msv-s12) 0 0;
+    text-align: center;
+    font-size: 11px;
+    line-height: 16px;
+    color: var(--msv-white);
+    opacity: .5;
+  }
+  .start__legal a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+  .start__legal a:hover { opacity: 1; }
+
+  /* Широкий экран: две колонки — обещание слева, входы справа */
+  @media (min-width: 900px) {
+    .start__inner {
+      display: grid;
+      grid-template-columns: 1fr minmax(320px, 380px);
+      grid-template-rows: 1fr auto;
+      align-items: center;
+      gap: var(--msv-s64);
+      max-width: 1120px;
+      padding-top: var(--msv-s64);
+      padding-bottom: var(--msv-s64);
+    }
+    .start__brand { grid-column: 1; grid-row: 1; }
+    .start__entry { grid-column: 2; grid-row: 1; margin-top: 0; }
+    .start__staff { grid-column: 1; grid-row: 2; margin-top: 0; padding-top: 0; }
+    .start__pattern { height: 38%; opacity: .45; }
+    .start__logo { max-width: 480px; }
+    .start__staff { justify-content: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<main class="start">
+  <div class="start__pattern msv-pattern" aria-hidden="true"></div>
+
+  <div class="start__inner">
+
+    <div class="start__brand">
+      <a class="start__logo-link" href="login.html?role=resident" aria-label="Вход для резидентов"><img class="start__logo" src="msv-1200-white.png" width="1200" height="209"
+           alt="МСВ — Москва в студентов верит!"></a>
+    </div>
+
+    <div class="start__entry">
+      <nav class="start__actions" aria-label="Вход в личный кабинет">
+        <a class="msv-btn msv-btn--block msv-btn--on-red-fill" href="login.html?role=resident">
+          Вход для резидентов
+        </a>
+      </nav>
+
+      <p class="start__reg">
+        Ещё не живёшь у нас?
+        <a class="msv-link msv-link--on-red" href="signup.html">Как заселиться</a>
+      </p>
+    </div>
+
+    <!-- Служебные входы. По просьбе заказчика — без подписей: эти две
+         фигуры узнают только сотрудники и администрация. Подписи для
+         экранного диктора оставлены: без них человек с нарушением зрения
+         не сможет войти. Скрытость здесь не защита — доступ разграничивает
+         роль в учётной записи, а не вид кнопки. -->
+    <div class="start__staff">
+      <a class="staff-mark" href="login.html?role=staff" aria-label="Вход для сотрудников" title="Сотрудники">
+        <span class="staff-mark__letter" aria-hidden="true">С</span>
+      </a>
+      <a class="staff-mark" href="login.html?role=admin" aria-label="Вход для администратора" title="Администратор">
+        <span class="staff-mark__letter" aria-hidden="true">А</span>
+      </a>
+      <a class="start__partner" href="partner.html">Регистрация средства размещения</a>
+    </div>
+
+    <p class="start__legal">© 2026 МСВ. Все права защищены. <a href="legal.html">Правовая информация</a></p>
+
+  </div>
+</main>
+
+<script src="mark.js"></script>
+<script src="zoom.js"></script>
+<script src="edit.js"></script>
+<script src="protect.js"></script>
+</body>
+</html>

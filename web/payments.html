@@ -1,0 +1,83 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Сайт и его программное обеспечение охраняются ГК РФ (ст. 1259, 1261). Копирование без разрешения правообладателя запрещено. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#F5F1EA">
+<title>История моих оплат — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="resident.css">
+</head>
+<body>
+
+<div class="page">
+
+  <div class="head">
+    <a class="head__back" href="menu.html" aria-label="Вернуться назад">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 6l-6 6 6 6"/>
+      </svg>
+    </a>
+    <h1 class="msv-sub head__title">История моих оплат</h1>
+  </div>
+
+    <h2 class="msv-sub group__title">2026</h2>
+  <div class="pay-head msv-note">
+    <span>Дата</span><span>За период</span><span>Сумма</span><span>Скидка</span>
+  </div>
+  <div class="rows">
+      <div class="pay-row"><span class="msv-num">08.07</span><span class="msv-num">Август</span><b class="msv-num">37 760 руб.</b><span></span></div>
+      <div class="pay-row pay-row--disc" data-disc><span class="msv-num">09.06</span><span class="msv-num">Июль</span><b class="msv-num">33 984 руб.</b>
+        <button class="disc" type="button" aria-expanded="false" aria-label="Подробнее о скидке">10% <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="disc__body msv-note" hidden>Скидка 10% за оплату шести месяцев единовременно — п. 17.1.3 Правил проживания.</div>
+      </div>
+      <div class="pay-row pay-row--deposit"><span class="msv-num">31.05</span><span class="msv-num">Депозит</span><b class="msv-num">20 000 руб.</b><span></span></div>
+      <div class="pay-row"><span class="msv-num">12.05</span><span class="msv-num">Июнь</span><b class="msv-num">37 760 руб.</b><span></span></div>
+      <div class="pay-row"><span class="msv-num">10.04</span><span class="msv-num">Май</span><b class="msv-num">37 760 руб.</b><span></span></div>
+  </div>
+
+<p class="msv-note good">Все платежи вовремя. Платёжная дисциплина не нарушалась.</p>
+
+</div>
+
+<nav class="tabbar" aria-label="Разделы кабинета">
+  <a class="tab" href="cabinet-resident.html" aria-label="Главная">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5"/><path d="M6 10v10h12V10"/></svg>
+    <span class="tab__cap">Главная</span>
+  </a>
+  <a class="tab" href="payments.html" aria-current="page">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M10 16.5V8h2.6a2.2 2.2 0 0 1 0 4.4H10"/><path d="M9 14.2h4"/></svg>
+    <span class="tab__cap">Оплата</span>
+  </a>
+  <a class="tab" href="repair.html" aria-label="Заявки">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/><path d="M10 13v3h4v-3"/></svg>
+    <span class="tab__cap">Заявки</span>
+  </a>
+  <a class="tab" href="documents.html" aria-label="Документы">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
+    <span class="tab__cap">Документы</span>
+  </a>
+  <a class="tab" href="menu.html" aria-label="Профиль">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
+    <span class="tab__cap">Профиль</span>
+  </a>
+</nav>
+
+<script>
+  document.querySelectorAll('.disc').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var on = b.getAttribute('aria-expanded') === 'true';
+      b.setAttribute('aria-expanded', on ? 'false' : 'true');
+      b.parentNode.querySelector('.disc__body').hidden = on;
+    });
+  });
+</script>
+<script src="mark.js"></script>
+<script src="zoom.js"></script>
+<script src="edit.js"></script>
+<script src="protect.js"></script>
+</body>
+</html>

@@ -1,0 +1,298 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Сайт и его программное обеспечение охраняются ГК РФ (ст. 1259, 1261). Копирование без разрешения правообладателя запрещено. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#34495E">
+<title>Начисления — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="cabinet.css">
+<style>
+  body { --role: var(--msv-graphite); --role-ink: var(--msv-graphite); }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <aside class="side">
+    <img class="side__logo" src="msv-1200-white.png" width="1200" height="209"
+         alt="МСВ — Москва в студентов верит!">
+
+    <a class="side__who" href="admin-profile.html" title="Мой профиль и настройки">
+      <span class="side__name">Ирина Соколова</span>
+      <span class="side__role">Администратор</span>
+    </a>
+
+    <nav class="side__nav" aria-label="Разделы кабинета">
+      <a class="side__link" href="cabinet-admin.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>
+        Обзор
+      </a>
+      <a class="side__link" href="admin-residences.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V8l7-4 7 4v13"/><path d="M9 21v-6h6v6"/><path d="M9 11h.01"/><path d="M15 11h.01"/></svg>
+        Резиденции
+      </a>
+      <a class="side__link" href="admin-shahmatka.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M9 10v9"/></svg>
+        Шахматка
+      </a>
+      <a class="side__link" href="admin-residents.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6.5a3 3 0 0 1 0 5.8"/><path d="M18 20a5.5 5.5 0 0 0-3-4.6"/></svg>
+        Резиденты
+      </a>
+      <a class="side__link" href="admin-tickets.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M8 3v4"/><path d="M16 3v4"/><path d="M9 14l2 2 4-4"/></svg>
+        Заявки
+      </a>
+      <a class="side__link" href="admin-charges.html" aria-current="page">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 12h5a3.5 3.5 0 0 0 0-7H9v14"/><path d="M7 15h7"/></svg>
+        Начисления
+      </a>
+      <a class="side__link" href="admin-staff.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6.5a3 3 0 0 1 0 5.8"/><path d="M18 20a5.5 5.5 0 0 0-3-4.6"/></svg>
+        Сотрудники
+      </a>
+      <a class="side__link" href="admin-reputation.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l2.4 5 5.6.8-4 3.9 1 5.5-5-2.7-5 2.7 1-5.5-4-3.9 5.6-.8z"/></svg>
+        Репутация
+      </a>
+      <a class="side__link" href="admin-rights.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l8-8"/><path d="M17 6l2 2"/></svg>
+        Права доступа
+      </a>
+      <a class="side__link" href="admin-settings.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v2"/><path d="M12 19v2"/><path d="M4.5 7.5l1.7 1"/><path d="M17.8 15.5l1.7 1"/><path d="M4.5 16.5l1.7-1"/><path d="M17.8 8.5l1.7-1"/></svg>
+        Настройки
+      </a>
+    </nav>
+
+    <div class="side__out">
+      <a class="side__exit" href="index.html" data-logout>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/>
+        </svg>
+        Выйти
+      </a>
+    </div>
+  </aside>
+
+  <div class="work">
+    <header class="work__top">
+      <h1 class="msv-sub work__title">Начисления</h1>
+    </header>
+
+    <main class="work__body">
+      <p class="msv-note notice">Суммы вымышленные: сервер ещё не подключён. Пени начисляются по правилу из хендоффа — 3000 руб. после 15 числа.</p>
+
+      <div class="stats" id="stats"></div>
+
+      <div class="bar">
+        <input class="bar__search" id="q" type="search" placeholder="Фамилия, комната или место" aria-label="Поиск">
+        <button class="bar__chip" type="button" data-res="" aria-pressed="true">Все</button>
+        <button class="bar__chip" type="button" data-res="forma" aria-pressed="false">FORMA</button>
+        <button class="bar__chip" type="button" data-res="uyut" aria-pressed="false">Уют</button>
+        <button class="bar__chip" type="button" data-res="molod" aria-pressed="false">Молодежка</button>
+        <button class="bar__chip" type="button" data-only="debt" aria-pressed="false">Только долги</button>
+        <button class="bar__chip" type="button" data-only="penalty" aria-pressed="false">С пенями</button>
+        <span class="msv-note bar__count" id="count"></span>
+      </div>
+
+      <table class="grid">
+        <thead>
+          <tr>
+            <th>Резидент</th><th>За период</th>
+            <th class="num">Начислено</th><th class="num">Оплачено</th><th class="num">Остаток</th>
+            <th>Состояние</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </main>
+  </div>
+
+</div>
+
+<script src="api.js"></script>
+<script src="residences.js"></script>
+<script src="demo-bookings.js"></script>
+<script src="residents-uyut.js"></script>
+<script src="residents-forma.js"></script>
+<script>
+MSV.ready(function (ctx) {
+  'use strict';
+
+  var RES = ctx.residences;
+  var PENALTY = 3000;               // пени за первый день просрочки — из хендоффа
+  var DUE_DAY = 15;                 // оплата до 15 числа
+
+  var now = new Date();
+  var todayDay = now.getDate();
+  var MONTHS = ['январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь'];
+  var period = MONTHS[(now.getMonth() + 1) % 12] + ' ' + (now.getMonth() === 11 ? now.getFullYear() + 1 : now.getFullYear());
+
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function money(n) {
+    return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '\u2009') + '\u2009руб.';
+  }
+
+  function initials(name) {
+    var p = String(name).trim().split(/\s+/);
+    return p.length > 1 ? (p[0][0] + p[1][0]).toUpperCase() : p[0][0].toUpperCase();
+  }
+
+  /* Одна строка — одно начисление за следующий месяц по каждой живой брони.
+     Пени считаются автоматически, если после 15 числа остаток больше нуля. */
+  var ALL = [];
+  RES.forEach(function (res) {
+    var d = ctx.bookings(res);
+    var byId = {}; d.residents.forEach(function (r) { byId[r.id] = r; });
+    var bedById = {}; res.beds.forEach(function (b) { bedById[b.id] = b; });
+    var roomById = {}; res.rooms.forEach(function (r) { roomById[r.id] = r; });
+
+    d.bookings.forEach(function (b) {
+      var p = byId[b.residentId]; if (!p) return;
+      var bed = bedById[b.bedId];
+      var room = bed ? roomById[bed.roomId] : null;
+      var accrued = b.accrued || 0;
+      var paid = b.paid || 0;
+      var rest = Math.max(0, accrued - paid);
+      var penalty = (rest > 0.5 && todayDay > DUE_DAY) ? PENALTY : 0;
+
+      ALL.push({
+        id: b.id, res: res, name: p.name,
+        bed: bed ? bed.label : '', room: room ? (room.name || ('к. ' + room.number)) : '',
+        accrued: accrued, paid: paid, penalty: penalty
+      });
+    });
+  });
+  ALL.sort(function (a, b) {
+    var da = (a.accrued + a.penalty - a.paid), db = (b.accrued + b.penalty - b.paid);
+    if ((da > 0.5) !== (db > 0.5)) return da > 0.5 ? -1 : 1;
+    return a.name.localeCompare(b.name, 'ru');
+  });
+
+  var state = { q: '', res: '', only: {} };
+
+  function rest(x) { return Math.max(0, x.accrued + x.penalty - x.paid); }
+
+  function matches(x) {
+    if (state.res && x.res.id !== state.res) return false;
+    if (state.only.debt && !(rest(x) > 0.5)) return false;
+    if (state.only.penalty && !(x.penalty > 0)) return false;
+    if (state.q) {
+      var hay = (x.name + ' ' + x.bed + ' ' + x.room).toLowerCase().replace(/ё/g, 'е');
+      if (hay.indexOf(state.q) === -1) return false;
+    }
+    return true;
+  }
+
+  function render() {
+    var list = ALL.filter(matches);
+    var tAcc = 0, tPaid = 0, tRest = 0, tPen = 0, debtors = 0;
+    ALL.forEach(function (x) {
+      tAcc += x.accrued; tPaid += x.paid; tPen += x.penalty;
+      var r = rest(x); tRest += r; if (r > 0.5) debtors++;
+    });
+
+    document.getElementById('stats').innerHTML = [
+      ['Начислено за ' + period, money(tAcc), ALL.length + ' начислений', ''],
+      ['Получено', money(tPaid), Math.round(100 * tPaid / (tAcc || 1)) + '% от начисленного', ''],
+      ['Остаток к получению', money(tRest), debtors + ' чел. не закрыли месяц', tRest > 0 ? ' stat--debt' : ''],
+      ['Пени', money(tPen), tPen ? (tPen / PENALTY) + ' начислений по 3000' : 'просрочек нет', '']
+    ].map(function (x) {
+      return '<div class="stat' + x[3] + '"><span class="stat__label">' + esc(x[0]) + '</span>' +
+        '<span class="stat__value">' + esc(x[1]) + '</span>' +
+        '<span class="msv-note stat__note">' + esc(x[2]) + '</span></div>';
+    }).join('');
+
+    document.getElementById('count').textContent = list.length + ' из ' + ALL.length;
+
+    document.getElementById('rows').innerHTML = list.length ? list.map(function (x) {
+      var r = rest(x);
+      var st, cls;
+      if (r < 0.5) { st = 'оплачено'; cls = 'tag--ok'; }
+      else if (x.penalty > 0) { st = 'просрочено, пени ' + money(x.penalty); cls = 'tag--bad'; }
+      else if (x.paid > 0.5) { st = 'частично'; cls = 'tag--warn'; }
+      else { st = 'не оплачено'; cls = 'tag--info'; }
+
+      return '<tr data-id="' + esc(x.id) + '">' +
+        '<td><span class="who-cell"><span class="who-cell__face">' + esc(initials(x.name)) + '</span>' +
+          '<span><span class="who-cell__name">' + esc(x.name) + '</span>' +
+          '<span class="msv-note sub">' + esc(x.bed) + ' · ' + esc(x.room) + ' · ' + esc(x.res.name) + '</span></span></span></td>' +
+        '<td>' + esc(period) + '</td>' +
+        '<td class="num">' + esc(money(x.accrued + x.penalty)) +
+          (x.penalty ? '<span class="msv-note sub">вкл. пени ' + esc(money(x.penalty)) + '</span>' : '') + '</td>' +
+        '<td class="num">' + esc(money(x.paid)) + '</td>' +
+        '<td class="num">' + (r > 0.5 ? '<b>' + esc(money(r)) + '</b>' : '—') + '</td>' +
+        '<td><span class="tag ' + cls + '">' + esc(st) + '</span></td>' +
+        '<td class="num">' + (r > 0.5
+          ? '<button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" data-act="paid">Отметить оплату</button>'
+          : '') + '</td>' +
+      '</tr>';
+    }).join('') : '<tr><td colspan="7" class="grid__empty">Ничего не нашлось.</td></tr>';
+  }
+
+  document.getElementById('rows').addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-act="paid"]');
+    if (!btn) return;
+    var x = ALL.filter(function (y) { return y.id === btn.closest('tr').dataset.id; })[0];
+    if (!x) return;
+    var amount = Math.max(0, x.accrued + x.penalty - x.paid);
+    function apply() { x.paid = x.accrued + x.penalty; render(); }
+    if (!ctx.live) { apply(); return; }
+    ctx.api('POST', '/api/payments', { bookingId: x.id, amount: amount, method: 'cash' })
+      .then(function (r) { if (r.status === 201) apply(); else alert(r.body && r.body.error || 'Не удалось'); })
+      .catch(function () { alert('Сервер не отвечает'); });
+  });
+
+  var timer = null;
+  document.getElementById('q').addEventListener('input', function (e) {
+    clearTimeout(timer);
+    var v = e.target.value;
+    timer = setTimeout(function () { state.q = v.trim().toLowerCase().replace(/ё/g, 'е'); render(); }, 150);
+  });
+
+  document.querySelector('.bar').addEventListener('click', function (e) {
+    var chip = e.target.closest('.bar__chip');
+    if (!chip) return;
+    if (chip.hasAttribute('data-res')) {
+      document.querySelectorAll('[data-res]').forEach(function (c) { c.setAttribute('aria-pressed', 'false'); });
+      chip.setAttribute('aria-pressed', 'true');
+      state.res = chip.getAttribute('data-res');
+    } else {
+      var key = chip.getAttribute('data-only');
+      var on = chip.getAttribute('aria-pressed') === 'true';
+      chip.setAttribute('aria-pressed', on ? 'false' : 'true');
+      state.only[key] = !on;
+    }
+    render();
+  });
+
+  render();
+});
+</script>
+
+<script src="mark.js"></script>
+<script src="zoom.js"></script>
+<script src="edit.js"></script>
+<script src="protect.js"></script>
+</body>
+</html>

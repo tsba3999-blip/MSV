@@ -1,0 +1,29 @@
+# systemd-служба МСВ
+# Положить в /etc/systemd/system/msv.service, затем:
+#   systemctl daemon-reload && systemctl enable --now msv
+#
+# Заменяет службу, которую создал deploy-msv.sh: имя то же,
+# поэтому старая перезапишется.
+
+[Unit]
+Description=MSV — сервер сайта
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=msv
+Group=msv
+WorkingDirectory=/opt/msv/server
+EnvironmentFile=/opt/msv/server/.env
+ExecStart=/usr/bin/node index.js
+Restart=on-failure
+RestartSec=3
+# Ограничиваем, что процесс может трогать
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/msv/server
+
+[Install]
+WantedBy=multi-user.target

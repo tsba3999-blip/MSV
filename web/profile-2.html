@@ -1,0 +1,302 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Сайт и его программное обеспечение охраняются ГК РФ (ст. 1259, 1261). Копирование без разрешения правообладателя запрещено. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#F5F1EA">
+<title>Анкета, шаг 2 — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="form.css">
+</head>
+<body>
+
+<div class="form">
+
+  <div class="form__head">
+    <a class="form__back" href="profile-1.html" aria-label="Вернуться к первому шагу">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 6l-6 6 6 6"/>
+      </svg>
+    </a>
+    <span class="msv-note" style="color:var(--msv-n500)">Анкета</span>
+  </div>
+
+  <div class="progress">
+    <div class="progress__row">
+      <span class="msv-note">Шаг 2 из 2</span>
+      <span class="msv-note">100%</span>
+    </div>
+    <div class="progress__track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
+      <div class="progress__fill" style="width:100%"></div>
+    </div>
+  </div>
+
+  <section class="sect">
+    <h2 class="msv-sub sect__title">Документы</h2>
+
+    <button class="doc" type="button" data-doc="passport">
+      <span class="doc__icon doc__icon--sky">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="12" cy="10" r="2.5"/><path d="M8.5 17h7"/>
+        </svg>
+      </span>
+      <span class="doc__text">
+        <span class="doc__name">Паспорт</span>
+        <span class="msv-note doc__note" data-note>Фото и страница с пропиской · 2 файла</span>
+      </span>
+      <span class="doc__state" data-state>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 5v14"/><path d="M5 12h14"/>
+        </svg>
+      </span>
+    </button>
+
+    <button class="doc" type="button" data-doc="student">
+      <span class="doc__icon doc__icon--olive">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 9l9-4 9 4-9 4z"/><path d="M7 11v5c0 1.4 2.2 2.5 5 2.5s5-1.1 5-2.5v-5"/>
+        </svg>
+      </span>
+      <span class="doc__text">
+        <span class="doc__name">Студенческий билет <span class="msv-note">(если есть)</span></span>
+        <span class="msv-note doc__note" data-note>Загрузить</span>
+      </span>
+      <span class="doc__state doc__state--add" data-state>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 5v14"/><path d="M5 12h14"/>
+        </svg>
+      </span>
+    </button>
+
+    <button class="doc" type="button" data-doc="other">
+      <span class="doc__icon doc__icon--plain">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>
+        </svg>
+      </span>
+      <span class="doc__text">
+        <span class="doc__name">Другие документы</span>
+        <span class="msv-note doc__note" data-note>Необязательно</span>
+      </span>
+      <span class="doc__state" data-state>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 5v14"/><path d="M5 12h14"/>
+        </svg>
+      </span>
+    </button>
+  </section>
+
+  <section class="sect">
+    <h2 class="msv-sub sect__title">О себе</h2>
+    <p class="msv-note" style="margin-bottom:var(--msv-s8)">Чем занимаешься, что любишь.</p>
+    <textarea class="msv-area" id="about" maxlength="600"
+              placeholder="Играю в волейбол, собираю винил, учусь на третьем курсе"></textarea>
+    <span class="msv-note counter" id="aboutCount">0 из 600</span>
+
+    <p class="msv-note" style="margin:var(--msv-s16) 0 var(--msv-s8)">Чем увлекаешься — отметь, что подходит</p>
+    <div class="petals" id="petals" role="group" aria-label="Увлечения"></div>
+    <label class="msv-field" id="ownField" hidden style="margin-top:var(--msv-s12)">
+      <span class="msv-field__label">Свой вариант</span>
+      <input class="msv-input" id="ownHobby" placeholder="Например, реставрация мебели">
+    </label>
+  </section>
+
+  <section class="sect">
+    <h2 class="msv-sub sect__title">Оценка здоровья</h2>
+    <p class="msv-note" style="margin-bottom:var(--msv-s12)">Как оцениваешь своё самочувствие в целом: 1 — плохо, 5 — отлично.</p>
+    <div class="rate" role="group" aria-label="Оценка здоровья от 1 до 5">
+      <button class="rate__btn" type="button" data-rate="1" aria-pressed="false">1</button>
+      <button class="rate__btn" type="button" data-rate="2" aria-pressed="false">2</button>
+      <button class="rate__btn" type="button" data-rate="3" aria-pressed="false">3</button>
+      <button class="rate__btn" type="button" data-rate="4" aria-pressed="false">4</button>
+      <button class="rate__btn" type="button" data-rate="5" aria-pressed="false">5</button>
+    </div>
+    <p class="msv-note" style="margin-top:var(--msv-s12)">Оценка нужна, чтобы куратор знал, кому предложить помощь. На заселение она не влияет.</p>
+
+    <div id="whyBox" hidden style="margin-top:var(--msv-s16)">
+      <p class="msv-note" style="margin-bottom:var(--msv-s8)">Если хочешь добавить о себе что-то ещё.</p>
+      <textarea class="msv-area" id="why" maxlength="300" style="min-height:72px"
+                placeholder="Например: аллергия на пыль, хронический гастрит, всё в порядке"></textarea>
+    </div>
+  </section>
+
+  <div class="form__foot">
+    <button class="msv-btn msv-btn--block msv-btn--primary" id="next" type="button">Выбрать место для проживания</button>
+    <p class="msv-note" id="nextMsg" hidden style="margin-top:var(--msv-s8);text-align:center"></p>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- Счётчик знаков ---------- */
+
+  var about = document.getElementById('about');
+  var aboutCount = document.getElementById('aboutCount');
+  var LIMIT = 600;
+
+  function syncCount() {
+    aboutCount.textContent = about.value.length + ' из ' + LIMIT;
+  }
+
+  about.addEventListener('input', syncCount);
+  syncCount();
+
+  /* ---------- Увлечения: лепестки, можно несколько ---------- */
+
+  var HOBBIES = ['блогинг', 'нейросети', 'программирование', '3D-моделирование', 'киберспорт', 'VR/AR',
+    'графический дизайн', 'рисование', 'кастомизация', 'скейтбординг', 'танцы', 'музыка', 'аниме',
+    'видеоигры', 'волонтёрство', 'иностранные языки', 'экология', 'путешествия', 'чтение книг',
+    'садоводство', 'рукоделие', 'свой вариант'];
+
+  /* Цвета из брендбука для тегов: лайм, лавандовый, жёлтый, ледяной,
+     белый — повтор допускается через один. */
+  var PETAL_COLORS = ['lime', 'lav', 'yellow', 'ice', 'white'];
+
+  var petals = document.getElementById('petals');
+  petals.innerHTML = HOBBIES.map(function (h, i) {
+    var own = h === 'свой вариант';
+    return '<button class="petal petal--' + PETAL_COLORS[i % PETAL_COLORS.length] +
+      (i % 2 ? ' petal--alt' : '') + '" type="button" aria-pressed="false"' +
+      (own ? ' data-own' : '') + '>' + h + '</button>';
+  }).join('');
+
+  petals.addEventListener('click', function (e) {
+    var b = e.target.closest('.petal');
+    if (!b) return;
+    var on = b.getAttribute('aria-pressed') === 'true';
+    b.setAttribute('aria-pressed', on ? 'false' : 'true');
+    if (b.hasAttribute('data-own')) {
+      var f = document.getElementById('ownField');
+      f.hidden = on;
+      if (!on) document.getElementById('ownHobby').focus();
+    }
+  });
+
+  /* ---------- Оценка: выбирается одна ---------- */
+
+  var rates = Array.prototype.slice.call(document.querySelectorAll('.rate__btn'));
+
+  rates.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var on = b.getAttribute('aria-pressed') === 'true';
+      rates.forEach(function (x) { x.setAttribute('aria-pressed', 'false'); });
+      b.setAttribute('aria-pressed', on ? 'false' : 'true');
+      // Поставил оценку — спрашиваем почему
+      document.getElementById('whyBox').hidden = on;
+    });
+  });
+
+  /* ---------- Загрузка документов ---------- */
+
+  var picker = document.createElement('input');
+  picker.type = 'file';
+  picker.multiple = true;
+  picker.accept = 'image/*,application/pdf';
+  picker.style.display = 'none';
+  document.body.appendChild(picker);
+
+  var target = null;
+
+  document.querySelectorAll('.doc').forEach(function (card) {
+    card.addEventListener('click', function () {
+      target = card;
+      picker.click();
+    });
+  });
+
+  picker.addEventListener('change', function () {
+    var n = (picker.files || []).length;
+    picker.value = '';
+    if (!target || !n) { target = null; return; }
+
+    var note = target.querySelector('[data-note]');
+    var state = target.querySelector('[data-state]');
+
+    note.textContent = n + ' ' + plural(n, 'файл', 'файла', 'файлов') + ' загружено';
+    state.className = 'doc__state doc__state--ok';
+    state.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+      'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+    target = null;
+  });
+
+  function plural(n, one, few, many) {
+    var a = Math.abs(n) % 100, b = a % 10;
+    if (a > 10 && a < 20) return many;
+    if (b > 1 && b < 5) return few;
+    if (b === 1) return one;
+    return many;
+  }
+
+  /* ---------- Сохранение шага 2 при уходе и восстановление ---------- */
+  function collect2() {
+    var hobbies = Array.prototype.map.call(document.querySelectorAll('.petal[aria-pressed="true"]'), function (b) { return b.textContent.trim(); });
+    var rate = document.querySelector('.rate__btn[aria-pressed="true"]');
+    return { about: document.getElementById('about').value, hobbies: hobbies, own: document.getElementById('ownHobby').value,
+             rate: rate ? rate.dataset.rate : '', why: document.getElementById('why').value };
+  }
+  try {
+    var saved2 = JSON.parse(sessionStorage.getItem('msv.profile2') || 'null');
+    if (saved2) {
+      document.getElementById('about').value = saved2.about || '';
+      document.getElementById('about').dispatchEvent(new Event('input'));
+      document.querySelectorAll('.petal').forEach(function (b) { if ((saved2.hobbies || []).indexOf(b.textContent.trim()) >= 0) b.setAttribute('aria-pressed', 'true'); });
+      if ((saved2.hobbies || []).indexOf('свой вариант') >= 0) { document.getElementById('ownField').hidden = false; document.getElementById('ownHobby').value = saved2.own || ''; }
+      if (saved2.rate) { var rb = document.querySelector('.rate__btn[data-rate="' + saved2.rate + '"]'); if (rb) { rb.setAttribute('aria-pressed', 'true'); document.getElementById('whyBox').hidden = false; } }
+      document.getElementById('why').value = saved2.why || '';
+    }
+  } catch (e) {}
+  window.addEventListener('pagehide', function () { try { sessionStorage.setItem('msv.profile2', JSON.stringify(collect2())); } catch (e) {} });
+
+  /* ---------- Отправка анкеты ---------- */
+
+  document.getElementById('next').addEventListener('click', function () {
+    var step1 = {};
+    try { step1 = JSON.parse(sessionStorage.getItem('msv.profile1') || '{}'); } catch (e) {}
+
+    var hobbies = Array.prototype.map.call(document.querySelectorAll('.petal[aria-pressed="true"]:not([data-own])'), function (b) { return b.textContent.trim(); });
+    var own = document.getElementById('ownHobby').value.trim();
+    if (own) hobbies.push(own);
+    var rate = document.querySelector('.rate__btn[aria-pressed="true"]');
+
+    var profile = Object.assign({}, step1, {
+      about: [document.getElementById('about').value.trim(), hobbies.length ? 'Увлечения: ' + hobbies.join(', ') : ''].filter(Boolean).join('\n'),
+      healthScore: rate ? Number(rate.dataset.rate) : null,
+      healthNote: document.getElementById('why').value.trim()
+    });
+
+    var btn = this, msg = document.getElementById('nextMsg');
+    if (location.protocol === 'file:') { location.href = 'residences.html'; return; }
+
+    btn.disabled = true; msg.textContent = 'Сохраняю анкету…'; msg.hidden = false;
+    fetch('/api/me/profile', { method: 'PUT', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(profile) })
+      .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j || {} }; }, function () { return { s: r.status, j: {} }; }); })
+      .then(function (r) {
+        if (r.s === 200) { location.href = 'residences.html'; return; }
+        btn.disabled = false;
+        msg.textContent = r.s === 401 ? 'Сессия истекла — войди ещё раз.' : (r.j.error || 'Не удалось сохранить анкету');
+      })
+      .catch(function () { btn.disabled = false; msg.textContent = 'Сервер не отвечает. Попробуй ещё раз.'; });
+  });
+})();
+</script>
+
+<script src="mark.js"></script>
+<script src="zoom.js"></script>
+<script src="edit.js"></script>
+<script src="protect.js"></script>
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Сайт и его программное обеспечение охраняются ГК РФ (ст. 1259, 1261). Копирование без разрешения правообладателя запрещено. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#F5F1EA">
+<title>Заявка технику — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="resident.css">
+<link rel="stylesheet" href="form.css">
+</head>
+<body>
+
+<div class="page">
+
+  <div class="head">
+    <a class="head__back" href="menu.html" aria-label="Вернуться назад">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 6l-6 6 6 6"/>
+      </svg>
+    </a>
+    <h1 class="msv-sub head__title">Заявка технику</h1>
+  </div>
+
+  <section style="margin-bottom:var(--msv-s24)">
+    <p class="msv-note" style="margin-bottom:var(--msv-s8)">Категория</p>
+    <div class="chips" role="group" aria-label="Категория">
+      <button class="chip" type="button" data-group="cat" aria-pressed="true">Сантехника</button>
+      <button class="chip" type="button" data-group="cat" aria-pressed="false">Электрика</button>
+      <button class="chip" type="button" data-group="cat" aria-pressed="false">Бытовая техника</button>
+      <button class="chip" type="button" data-group="cat" aria-pressed="false">Мебель</button>
+      <button class="chip" type="button" data-group="cat" aria-pressed="false">Вентиляция</button>
+      <button class="chip" type="button" data-group="cat" aria-pressed="false">Улучшения</button>
+    </div>
+  </section>
+
+  <label class="msv-field">
+    <span class="msv-field__label">Место</span>
+    <select class="msv-select" id="place">
+      <option>В комнате</option>
+      <option>В блоке</option>
+      <option>В общем коридоре</option>
+      <option>На кухне</option>
+      <option>В душевой</option>
+      <option>В лаундже</option>
+    </select>
+  </label>
+
+  <label class="msv-field">
+    <span class="msv-field__label">Номер комнаты</span>
+    <input class="msv-input" id="room" placeholder="Если поломка в комнате">
+  </label>
+
+  <section style="margin-bottom:var(--msv-s24)">
+    <p class="msv-note" style="margin-bottom:var(--msv-s8)">Что случилось</p>
+    <textarea class="msv-area" id="what" maxlength="1000"
+              placeholder="Не закрывается окно в комнате, ручка проворачивается"></textarea>
+    <span class="msv-note" style="display:block;margin-top:var(--msv-s4);text-align:right" id="count">0 из 1000</span>
+  </section>
+
+  <section style="margin-bottom:var(--msv-s24)">
+    <p class="msv-note" style="margin-bottom:var(--msv-s8)">Насколько срочно</p>
+    <div class="pick">
+      <label class="pick__opt">
+        <input class="pick__radio" type="radio" name="prio" value="0" data-note="Течёт вода, нет электричества, дым или запах газа. Мастер выезжает сразу.">
+        <span><span class="pick__name">Критическая авария</span></span>
+      </label>
+      <label class="pick__opt">
+        <input class="pick__radio" type="radio" name="prio" value="1" data-note="Не работает то, без чего трудно жить: душ, холодильник, замок. До конца дня.">
+        <span><span class="pick__name">Срочная поломка</span></span>
+      </label>
+      <label class="pick__opt">
+        <input class="pick__radio" type="radio" name="prio" value="2" data-note="Скрипит, подтекает, плохо закрывается. До трёх рабочих дней." checked>
+        <span><span class="pick__name">Текущая неисправность</span></span>
+      </label>
+      <label class="pick__opt">
+        <input class="pick__radio" type="radio" name="prio" value="3" data-note="Не уверен, что сломалось, или нужен совет. До пяти рабочих дней.">
+        <span><span class="pick__name">Консультация или проверка</span></span>
+      </label>
+    </div>
+    <p class="msv-note hint" id="hint"></p>
+  </section>
+
+  <section style="margin-bottom:var(--msv-s24)">
+    <p class="msv-note" style="margin-bottom:var(--msv-s8)">Фото и видео</p>
+    <div class="photos" id="files">
+      <button class="photo__add" type="button" id="addFile" aria-label="Прикрепить файл">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <path d="M12 5v14"/><path d="M5 12h14"/>
+        </svg>
+      </button>
+    </div>
+    <span class="msv-note" style="display:block;margin-top:var(--msv-s4);text-align:right" id="fileCount">0 из 5</span>
+  </section>
+
+  <div class="foot">
+    <button class="msv-btn msv-btn--block msv-btn--primary" id="send" type="button" disabled>Отправить заявку</button>
+    <p class="msv-note" style="margin-top:var(--msv-s8);text-align:center" id="why">Опиши, что случилось — тогда кнопка станет активной</p>
+  </div>
+
+</div>
+
+<nav class="tabbar" aria-label="Разделы кабинета">
+  <a class="tab" href="cabinet-resident.html" aria-label="Главная">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5"/><path d="M6 10v10h12V10"/></svg>
+    <span class="tab__cap">Главная</span>
+  </a>
+  <a class="tab" href="payments.html" aria-label="Оплата">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M10 16.5V8h2.6a2.2 2.2 0 0 1 0 4.4H10"/><path d="M9 14.2h4"/></svg>
+    <span class="tab__cap">Оплата</span>
+  </a>
+  <a class="tab" href="repair.html" aria-current="page">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/><path d="M10 13v3h4v-3"/></svg>
+    <span class="tab__cap">Заявки</span>
+  </a>
+  <a class="tab" href="documents.html" aria-label="Документы">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
+    <span class="tab__cap">Документы</span>
+  </a>
+  <a class="tab" href="menu.html" aria-label="Профиль">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
+    <span class="tab__cap">Профиль</span>
+  </a>
+</nav>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- Категория ---------- */
+
+  document.querySelector('.chips').addEventListener('click', function (e) {
+    var chip = e.target.closest('.chip');
+    if (!chip) return;
+    document.querySelectorAll('.chip[data-group="cat"]').forEach(function (c) {
+      c.setAttribute('aria-pressed', 'false');
+    });
+    chip.setAttribute('aria-pressed', 'true');
+  });
+
+  /* ---------- Описание ---------- */
+
+  var what = document.getElementById('what');
+  var count = document.getElementById('count');
+  var send = document.getElementById('send');
+  var why = document.getElementById('why');
+
+  function sync() {
+    var n = what.value.trim().length;
+    count.textContent = what.value.length + ' из 1000';
+    send.disabled = n === 0;
+    why.hidden = n > 0;
+  }
+
+  what.addEventListener('input', sync);
+  sync();
+
+  /* ---------- Приоритет: пояснение выбранного ---------- */
+
+  var hint = document.getElementById('hint');
+  var radios = Array.prototype.slice.call(document.querySelectorAll('.pick__radio'));
+
+  function syncHint() {
+    var on = radios.filter(function (r) { return r.checked; })[0];
+    if (!on) { hint.hidden = true; return; }
+    hint.textContent = on.dataset.note;
+    hint.hidden = false;
+  }
+
+  radios.forEach(function (r) { r.addEventListener('change', syncHint); });
+  syncHint();
+
+  /* ---------- Вложения ---------- */
+
+  var MAX = 5;
+  var files = document.getElementById('files');
+  var addFile = document.getElementById('addFile');
+  var fileCount = document.getElementById('fileCount');
+
+  var picker = document.createElement('input');
+  picker.type = 'file';
+  picker.accept = 'image/*,video/*';
+  picker.multiple = true;
+  picker.style.display = 'none';
+  document.body.appendChild(picker);
+
+  addFile.addEventListener('click', function () { picker.click(); });
+
+  picker.addEventListener('change', function () {
+    Array.prototype.slice.call(picker.files || []).forEach(function (file) {
+      if (files.querySelectorAll('.photo').length >= MAX) return;
+      var box = document.createElement('div');
+      box.className = 'photo';
+      if (file.type.indexOf('image/') === 0) {
+        var img = document.createElement('img');
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block';
+        img.alt = '';
+        var url = URL.createObjectURL(file);
+        img.src = url;
+        img.addEventListener('load', function () { URL.revokeObjectURL(url); });
+        box.appendChild(img);
+      } else {
+        box.style.cssText += ';display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--msv-n500)';
+        box.textContent = 'видео';
+      }
+      files.insertBefore(box, addFile);
+    });
+    picker.value = '';
+    var n = files.querySelectorAll('.photo').length;
+    fileCount.textContent = n + ' из ' + MAX;
+    addFile.disabled = n >= MAX;
+  });
+
+  /* ---------- Отправка ---------- */
+
+  send.addEventListener('click', function () {
+    // ЗДЕСЬ БУДЕТ ЗАПРОС К СЕРВЕРУ: POST /api/tickets
+    location.href = 'my-tickets.html';
+  });
+})();
+</script>
+
+<script src="mark.js"></script>
+<script src="zoom.js"></script>
+<script src="edit.js"></script>
+<script src="protect.js"></script>
+</body>
+</html>

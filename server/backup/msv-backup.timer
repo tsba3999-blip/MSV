@@ -1,0 +1,16 @@
+# Проверка раз в сутки в 03:30 по времени сервера. Делать ли копию —
+# решает сам скрипт по настройке backup_every_days.
+#   cp msv-backup.* /etc/systemd/system/
+#   systemctl daemon-reload && systemctl enable --now msv-backup.timer
+#   systemctl list-timers msv-backup.timer   — когда следующий запуск
+
+[Unit]
+Description=MSV — резервная копия каждую ночь
+
+[Timer]
+OnCalendar=*-*-* 03:30:00
+Persistent=true
+RandomizedDelaySec=10min
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,273 @@
+/* © 2026 МСВ. Все права защищены. Программа для ЭВМ охраняется ст. 1259, 1261 ГК РФ. Использование без разрешения правообладателя запрещено. Подробнее: /legal.html */
+/* ============================================================
+   МСВ — выбор комнаты, месяц оплаты, проверка данных
+   ============================================================ */
+
+/* ---------- Карточка комнаты ---------- */
+
+.room {
+  margin-bottom: var(--msv-s12);
+  padding: var(--msv-s16);
+  background: var(--msv-white);
+  border-radius: var(--msv-r12);
+  box-shadow: var(--msv-e1);
+}
+
+.room__kind { display: block; }
+
+.room__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--msv-s8);
+  margin: var(--msv-s4) 0 var(--msv-s12);
+}
+
+.room__name { margin: 0; }
+.room__sex { flex: 0 0 auto; }
+
+/* Плашка пола — те же розовый и голубой, что у меток Ж и М в шахматке */
+.sex-tag {
+  flex: 0 0 auto;
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  border-radius: 11px;
+  border: 1px solid;
+}
+.sex-tag--f { color: #A3316B; background: #FCEBF3; border-color: #F3C9DD; }
+.sex-tag--m { color: #1B4C9E; background: #E8F0FF; border-color: #C3D8FE; }
+
+/* Полоса снимков: три превью и счётчик остальных */
+.room__shots { display: flex; gap: var(--msv-s8); margin-bottom: var(--msv-s12); }
+
+.room__shot {
+  flex: 1 1 0;
+  height: 72px;
+  border-radius: var(--msv-r11);
+  overflow: hidden;
+}
+
+.room__more {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 72px;
+  border-radius: var(--msv-r11);
+  background: var(--msv-n100);
+  color: var(--msv-n500);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.room__text { margin: 0 0 var(--msv-s12); color: var(--msv-n500); }
+
+.room__prices { margin: 0 0 var(--msv-s16); border-top: 1px solid var(--msv-n100); }
+
+.room__price {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--msv-s12);
+  padding: var(--msv-s8) 0;
+  border-bottom: 1px solid var(--msv-n100);
+}
+
+.room__price span:first-child { color: var(--msv-n500); font-size: var(--msv-body-size); }
+.room__price b { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.room__price--out span:first-child,
+.room__price--out b { color: var(--msv-n300); font-weight: 400; }
+
+.rooms__empty {
+  padding: var(--msv-s32) var(--msv-s16);
+  text-align: center;
+  color: var(--msv-n500);
+}
+
+.filters { margin-bottom: var(--msv-s24); }
+.filters__label { display: block; margin-bottom: var(--msv-s8); }
+.filters__row { margin-bottom: var(--msv-s16); }
+.filters__row:last-child { margin-bottom: 0; }
+
+/* ---------- Месяцы оплаты ---------- */
+
+.year {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--msv-s16);
+  margin-bottom: var(--msv-s16);
+}
+
+.year__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--msv-chip);
+  height: var(--msv-chip);
+  color: var(--msv-graphite);
+  background: var(--msv-white);
+  border: 0;
+  border-radius: 50%;
+  box-shadow: var(--msv-e1);
+  cursor: pointer;
+}
+
+.year__btn:hover { background: var(--msv-n100); }
+.year__btn:focus-visible { outline: 2px solid var(--msv-violet); outline-offset: 2px; }
+.year__btn[disabled] { opacity: .35; cursor: default; }
+
+.year__value { min-width: 4em; text-align: center; }
+
+.months {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--msv-s12);
+  margin-bottom: var(--msv-s16);
+}
+
+.month {
+  min-width: 0;
+  height: 56px;
+  font: 600 15px/1 var(--msv-font);
+  color: var(--msv-graphite);
+  background: var(--msv-white);
+  border: 2px solid transparent;
+  border-radius: var(--msv-r12);
+  cursor: pointer;
+  transition: background var(--msv-fast) var(--msv-ease), color var(--msv-fast) var(--msv-ease);
+}
+
+.month:hover:not([disabled]) { border-color: var(--msv-graphite); }
+.month:focus-visible { outline: 2px solid var(--msv-violet); outline-offset: 2px; }
+
+.month[disabled] { background: var(--msv-n100); color: var(--msv-n300); cursor: default; }
+
+/* Ближайший к оплате выделен обводкой, но не цветом */
+.month--next { border-color: var(--msv-n300); }
+
+.month[aria-pressed="true"] {
+  background: var(--msv-red);
+  border-color: var(--msv-red);
+  color: var(--msv-white);
+}
+
+.tip {
+  margin: 0 0 var(--msv-s16);
+  padding: var(--msv-s12) var(--msv-s16);
+  background: var(--msv-yellow);
+  border-radius: var(--msv-r12);
+  color: var(--msv-graphite);
+}
+
+/* ---------- Проверка данных ---------- */
+
+.recap {
+  margin: 0 0 var(--msv-s16);
+  padding: var(--msv-s4) var(--msv-s16);
+  background: var(--msv-white);
+  border-radius: var(--msv-r12);
+  box-shadow: var(--msv-e1);
+}
+
+.recap__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--msv-s12);
+  padding: var(--msv-s12) 0;
+  border-bottom: 1px solid var(--msv-n100);
+}
+
+.recap__row:last-child { border-bottom: 0; }
+.recap__row dt { margin: 0; color: var(--msv-n500); font-size: var(--msv-body-size); }
+.recap__row dd { margin: 0; text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* ---------- Чекбокс депозита ---------- */
+
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--msv-s12);
+  margin-bottom: var(--msv-s16);
+  padding: var(--msv-s16);
+  background: var(--msv-white);
+  border-radius: var(--msv-r12);
+  box-shadow: var(--msv-e1);
+  cursor: pointer;
+}
+
+.check__box {
+  position: relative;
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--msv-white);
+  border: 2px solid var(--msv-n300);
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background var(--msv-fast) var(--msv-ease), border-color var(--msv-fast) var(--msv-ease);
+}
+
+.check__box:checked { background: var(--msv-confirm); border-color: var(--msv-confirm); }
+
+.check__box:checked::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 6px;
+  height: 11px;
+  border: solid var(--msv-white);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.check__box:focus-visible { outline: 2px solid var(--msv-violet); outline-offset: 2px; }
+
+.check__text { flex: 1 1 auto; }
+.check__name { display: block; font-size: var(--msv-body-size); font-weight: 600; }
+.check__note { display: block; margin-top: 2px; }
+
+/* ---------- Блок оплаты другим человеком ---------- */
+
+.payer {
+  margin-bottom: var(--msv-s24);
+  padding: var(--msv-s16);
+  background: var(--msv-lavender);
+  border-radius: var(--msv-r12);
+}
+
+.payer__title { margin: 0 0 var(--msv-s4); }
+.payer__text { margin: 0 0 var(--msv-s12); color: var(--msv-graphite); }
+
+.qr {
+  display: none;
+  width: 152px;
+  height: 152px;
+  margin: var(--msv-s16) 0 0;
+  padding: var(--msv-s8);
+  background: var(--msv-white);
+  border-radius: var(--msv-r11);
+}
+
+.qr--on { display: block; }
+
+/* ---------- Итог ---------- */
+
+.total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--msv-s12);
+  margin-bottom: var(--msv-s16);
+}
+
+.total b { font-size: var(--msv-sub-size); font-weight: 600; font-variant-numeric: tabular-nums; }

@@ -1,0 +1,167 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Сайт и его программное обеспечение охраняются ГК РФ (ст. 1259, 1261). Копирование без разрешения правообладателя запрещено. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#7EB2DD">
+<title>Настройки — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="cabinet.css">
+<link rel="stylesheet" href="form.css">
+<style>
+  .set { margin-bottom: var(--msv-s24); padding: var(--msv-s20); background: var(--msv-white); border-radius: var(--msv-r20); box-shadow: var(--msv-e1); }
+  .set__title { margin: 0 0 var(--msv-s8); }
+  .set__text { margin: 0 0 var(--msv-s16); color: var(--msv-n500); }
+  .set__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--msv-s12); }
+  .set .msv-field { margin-bottom: 0; }
+  .tog { display: flex; align-items: center; gap: var(--msv-s12); min-height: 44px; cursor: pointer; }
+  .tog input { width: 20px; height: 20px; accent-color: var(--msv-red); }
+</style>
+<style>
+  body { --role: var(--msv-sky); --role-ink: var(--msv-graphite); }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <aside class="side">
+    <img class="side__logo" src="msv-1200-white.png" width="1200" height="209"
+         alt="МСВ — Москва в студентов верит!">
+
+    <a class="side__who" href="staff-profile.html" title="Мои данные">
+      <span class="side__name">Сергей Ким</span>
+      <span class="side__role">Сотрудник · мастер</span>
+    </a>
+
+    <nav class="side__nav" aria-label="Разделы кабинета">
+      <a class="side__link" href="cabinet-staff.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M8 3v4"/><path d="M16 3v4"/><path d="M9 14l2 2 4-4"/></svg>
+        Мои задачи
+      </a>
+      <a class="side__link" href="staff-tickets.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h10"/></svg>
+        Все заявки
+      </a>
+      <a class="side__link" href="staff-shahmatka.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M9 10v9"/></svg>
+        Шахматка
+      </a>
+      <a class="side__link" href="staff-residents.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6.5a3 3 0 0 1 0 5.8"/><path d="M18 20a5.5 5.5 0 0 0-3-4.6"/></svg>
+        Резиденты
+      </a>
+      <a class="side__link" href="staff-salary.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M3 10h18"/><path d="M16 14.5h.01"/><path d="M6 7V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1"/></svg>
+        Мои зарплаты
+      </a>
+      <a class="side__link" href="staff-reputation.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l2.4 5 5.6.8-4 3.9 1 5.5-5-2.7-5 2.7 1-5.5-4-3.9 5.6-.8z"/></svg>
+        Репутация
+      </a>
+      <a class="side__link" href="staff-say.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 5H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3v4l5-4h8a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z"/></svg>
+        Хочу сказать
+      </a>
+      <a class="side__link" href="staff-repair.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4a5 5 0 0 0-6.6 6.2L4 14.6V20h5.4l4.4-4.4A5 5 0 0 0 20 9l-3 3-3-3 3-3a5 5 0 0 0-2-2z"/></svg>
+        Заявка технику
+      </a>
+      <a class="side__link" href="staff-mailings.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4h4l6 4V6l-6 4z"/><path d="M18 9a4 4 0 0 1 0 6"/></svg>
+        Рассылки
+      </a>
+      <a class="side__link" href="staff-documents.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
+        Мои документы
+      </a>
+      <a class="side__link" href="staff-profile.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
+        Мои данные
+      </a>
+      <a class="side__link" href="staff-exams.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-4 9 4-9 4z"/><path d="M7 11v5c0 1.4 2.2 2.5 5 2.5s5-1.1 5-2.5v-5"/></svg>
+        Экзамены
+      </a>
+      <a class="side__link" href="staff-settings.html" aria-current="page">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v2"/><path d="M12 19v2"/><path d="M4.5 7.5l1.7 1"/><path d="M17.8 15.5l1.7 1"/><path d="M4.5 16.5l1.7-1"/><path d="M17.8 8.5l1.7-1"/></svg>
+        Настройки
+      </a>
+    </nav>
+
+    <div class="side__out">
+      <a class="side__exit" href="index.html" data-logout>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/>
+        </svg>
+        Выйти
+      </a>
+    </div>
+  </aside>
+
+  <div class="work">
+    <header class="work__top">
+      <h1 class="msv-sub work__title">Настройки</h1>
+    </header>
+
+    <main class="work__body">
+      <section class="set">
+        <h2 class="msv-sub set__title">Уведомления мне</h2>
+        <p class="msv-body set__text">Куда сообщать о новых заявках и просрочках.</p>
+        <label class="tog"><input type="checkbox" checked> <span>Telegram</span></label>
+        <label class="tog"><input type="checkbox"> <span>Почта</span></label>
+        <label class="tog"><input type="checkbox" checked> <span>Только заявки, назначенные на меня</span></label>
+        <label class="tog"><input type="checkbox" checked> <span>Напоминать о сроке экзаменов за месяц</span></label>
+        <p class="msv-note" style="margin:var(--msv-s16) 0 var(--msv-s8)">Что присылать</p>
+        <label class="tog"><input type="radio" name="scope" value="all" checked> <span>Отправлять все уведомления</span></label>
+        <label class="tog"><input type="radio" name="scope" value="mine"> <span>Только касающиеся меня</span></label>
+        <label class="tog"><input type="radio" name="scope" value="none"> <span>Не отправлять совсем</span></label>
+        <p class="msv-note" id="noneWarn" hidden style="margin-top:var(--msv-s8);padding:var(--msv-s12) var(--msv-s16);background:var(--msv-n100);border:1px solid var(--msv-red);border-radius:var(--msv-r12)">Отказываясь от уведомлений, я полностью беру на себя ответственность за неинформированность: о сроках оплаты, изменениях в правилах и событиях мне не сообщат.</p>
+      </section>
+      <section class="set">
+        <h2 class="msv-sub set__title">Вход</h2>
+        <p class="msv-body set__text">Код входа — четыре цифры. Смени, если кто-то мог его увидеть.</p>
+        <a class="msv-btn msv-btn--m msv-btn--secondary" href="pin.html">Сменить код входа</a>
+      </section>
+      <section class="set">
+        <h2 class="msv-sub set__title">Telegram-бот</h2>
+        <p class="msv-body set__text">Чтобы уведомления приходили в Telegram, один раз напиши боту — нажми кнопку, откроется чат.</p>
+        <a class="msv-btn msv-btn--m msv-btn--tertiary" href="stub.html?t=Подключить Telegram" id="tgLink">Подключить Telegram</a>
+        <p class="msv-note" style="margin-top:var(--msv-s8)">Ссылка станет рабочей, когда администратор впишет имя бота в настройках сайта.</p>
+      </section>
+    </main>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var warn = document.getElementById('noneWarn');
+  document.querySelectorAll('input[name="scope"]').forEach(function (r) {
+    r.addEventListener('change', function () { warn.hidden = r.value !== 'none'; });
+  });
+})();
+</script>
+<script src="mark.js"></script>
+<script src="zoom.js"></script>
+<script src="edit.js"></script>
+<script src="protect.js"></script>
+</body>
+</html>
