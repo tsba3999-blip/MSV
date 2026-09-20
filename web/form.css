@@ -336,3 +336,8 @@
 @media (min-width: 1100px) {
   .form { max-width: 720px; }
 }
+
+/* Подпись раздела в шапке анкеты — ссылка «назад», как и стрелка рядом */
+.form__title-link { color: var(--msv-n500); text-decoration: none; }
+.form__title-link:hover { color: var(--msv-graphite); }
+.form__title-link:focus-visible { outline: 2px solid var(--msv-violet); outline-offset: 2px; border-radius: 4px; }
