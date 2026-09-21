@@ -21,6 +21,22 @@ module.exports = function register(route) {
 
   /* ---------- Главная резидента: бронь, баланс, заявки, уведомления ---------- */
 
+  /* Репутация резидента: баллы −30 … +50 (сумма событий), три жизни (каждое нарушение
+     модератора сжигает одну), история событий */
+  route('GET', '/api/me/reputation', async (req, res) => {
+    const s = auth.readSession(req);
+    if (!s) return fail(res, 401, 'Не выполнен вход');
+    const r = await query(`SELECT title, details, delta, is_negative, created_at FROM reputation_events
+      WHERE user_id = $1 ORDER BY created_at DESC`, [s.uid]);
+    let points = 0, burned = 0;
+    r.rows.forEach((e) => { points += Number(e.delta); if (e.is_negative) burned += 1; });
+    points = Math.max(-30, Math.min(50, Math.round(points)));
+    json(res, 200, {
+      points, lives: Math.max(0, 3 - burned),
+      events: r.rows.map((e) => ({ when: e.created_at, title: e.title, details: e.details || '', delta: Number(e.delta), negative: e.is_negative }))
+    });
+  });
+
   route('GET', '/api/me/home', async (req, res) => {
     const s = auth.readSession(req);
     if (!s) return fail(res, 401, 'Не выполнен вход');
