@@ -72,8 +72,8 @@
 MSV.ready(function (ctx) {
   'use strict';
 
-  /* Демо-резидент — тот же, что на главной: Логинов Артём */
-  var ME = ctx.me ? ctx.me.name : 'Логинов Артём Сергеевич';
+  // Имя — только с сервера; без входа заявки не показываем
+  var ME = ctx.me ? ctx.me.name : '';
   var RES = ctx.residences;
 
   function esc(s) {
