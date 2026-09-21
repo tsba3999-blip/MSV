@@ -1,0 +1,223 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#F5F1EA">
+<title>Репутация: по картинке — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="resident.css">
+<style>
+  /* ============================================================
+     Индикатор репутации — точное повторение картинки заказчика
+     (21.09.2026): пять секторов с объёмным градиентом, светло-серое
+     кольцо с надписями по дуге, белые прорези между секторами и в
+     кольце, большая пустая середина, мягкая тень, чёрная стрелка с
+     серой ступицей. Цвета в обратном порядке: от тёмно-красного слева
+     до тёмно-зелёного справа.
+     Ниже индикатора — балл, фраза состояния, жизни и путь к скидке.
+     ============================================================ */
+  .page { padding-bottom: var(--msv-s48); }
+  .gauge { display: block; width: 100%; margin: var(--msv-s8) 0 var(--msv-s16); }
+  .gauge svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .needle { transition: transform 1.5s cubic-bezier(.22, 1.2, .36, 1); }
+  .needle--reset { transition: none; }
+  .st { text-align: center; }
+  .st__score { margin: 0; font: 800 44px/1 var(--msv-font); letter-spacing: -.02em; color: var(--msv-graphite); }
+  .st__phrase { margin: var(--msv-s8) 0 0; font: 600 17px/22px var(--msv-font); color: var(--msv-graphite); }
+  .st__lives { display: flex; justify-content: center; align-items: center; gap: 6px; margin: var(--msv-s16) 0 0; }
+  .st__lives svg { width: 26px; height: 26px; }
+  .st__note { margin: var(--msv-s8) 0 0; color: var(--msv-n500); }
+  .ctl { margin: var(--msv-s32) 0 0; padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r20); }
+  .ctl__row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--msv-s8) var(--msv-s16); margin-bottom: var(--msv-s8); }
+  .ctl__row:last-child { margin-bottom: 0; }
+  .ctl__l { font-size: 12px; color: var(--msv-n500); min-width: 150px; }
+  .ctl input[type=range] { width: 160px; accent-color: var(--msv-red); }
+  .ctl .chip { height: 32px; padding: 0 12px; font-size: 13px; }
+  .ctl__val { display: inline-block; min-width: 26px; font-weight: 700; }
+  .again { display: inline-flex; align-items: center; height: var(--msv-btn-s); padding: 0 var(--msv-s16); font: 600 13px/1 var(--msv-font); color: var(--msv-graphite); background: var(--msv-beige); border: 0; border-radius: 999px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="head">
+    <a class="head__back" href="reputation.html" aria-label="Вернуться назад">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+    <span class="head__back-label">Вернуться</span></a>
+    <h1 class="msv-sub head__title">Моя репутация</h1>
+  </div>
+
+  <div class="gauge" id="gauge"></div>
+
+  <div class="st">
+    <p class="st__score" id="score">+1</p>
+    <p class="st__phrase" id="phrase">У тебя хорошее будущее</p>
+    <div class="st__lives" id="lives" aria-label="Жизни"></div>
+    <p class="msv-note st__note" id="livesNote"></p>
+    <p class="msv-note st__note" id="disc"></p>
+  </div>
+
+  <div class="ctl" aria-label="Проверка">
+    <div class="ctl__row">
+      <span class="ctl__l">Репутация <span class="ctl__val" id="vVal">+1</span></span>
+      <input type="range" id="v" min="-2" max="2" step="1" value="1" aria-label="Репутация">
+    </div>
+    <div class="ctl__row">
+      <span class="ctl__l">Жизни</span>
+      <span role="group" aria-label="Жизни">
+        <button class="chip" type="button" data-l="3" aria-pressed="true">3</button>
+        <button class="chip" type="button" data-l="2" aria-pressed="false">2</button>
+        <button class="chip" type="button" data-l="1" aria-pressed="false">1</button>
+      </span>
+    </div>
+    <div class="ctl__row">
+      <span class="ctl__l">Месяцев на максимуме <span class="ctl__val" id="mVal">2</span></span>
+      <input type="range" id="m" min="0" max="6" step="1" value="2" aria-label="Месяцев на максимуме">
+    </div>
+    <div class="ctl__row">
+      <span class="ctl__l">В кольце</span>
+      <span role="group" aria-label="Подписи в кольце">
+        <button class="chip" type="button" data-t="words" aria-pressed="true">Слова</button>
+        <button class="chip" type="button" data-t="nums" aria-pressed="false">Цифры</button>
+      </span>
+    </div>
+    <div class="ctl__row">
+      <span class="ctl__l">Секторов</span>
+      <span role="group" aria-label="Число секторов">
+        <button class="chip" type="button" data-n="5" aria-pressed="true">5 (как на картинке)</button>
+        <button class="chip" type="button" data-n="6" aria-pressed="false">6 (−2 … +3)</button>
+      </span>
+    </div>
+    <div class="ctl__row">
+      <button class="again" type="button" id="again">Показать анимацию ещё раз</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* Пять секторов, как на картинке; шестой — если нужна шкала до +3 */
+  var S5 = [
+    { v: -2, c: '#B0111B', word: 'ОПАСНОСТЬ',  w: 'Опасность расторжения договора' },
+    { v: -1, c: '#F0641A', word: 'ВНИМАНИЕ',   w: 'Нужно быть внимательным' },
+    { v:  0, c: '#FFDD00', word: 'СТАРАЙСЯ',   w: 'Нужно сделать что-то хорошее' },
+    { v:  1, c: '#8CD200', word: 'ХОРОШО',     w: 'У тебя хорошее будущее' },
+    { v:  2, c: '#158C2A', word: 'ОТЛИЧНО',    w: 'Ты на высоте — так держать!' }
+  ];
+  var S6 = [
+    { v: -2, c: '#B0111B', word: 'ОПАСНОСТЬ',  w: 'Опасность расторжения договора' },
+    { v: -1, c: '#F0641A', word: 'ВНИМАНИЕ',   w: 'Нужно быть внимательным' },
+    { v:  0, c: '#FFDD00', word: 'СТАРАЙСЯ',   w: 'Нужно сделать что-то хорошее' },
+    { v:  1, c: '#A6DC00', word: 'ХОРОШО',     w: 'У тебя хорошее будущее' },
+    { v:  2, c: '#4DB828', word: 'ОТЛИЧНО',    w: 'Ты на высоте' },
+    { v:  3, c: '#158C2A', word: 'ИДЕАЛЬНО', w: 'Так держать!' }
+  ];
+  var HEART = 'M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z';
+  var state = { v: 1, lives: 3, months: 2, ring: 'words', n: 5 };
+
+  /* ---------- геометрия: как на картинке 1024×685 ---------- */
+  var CX = 512, CY = 585;
+  var R_OUT = 500, R_RING = 428, R_BAND = 416, R_IN = 252;   // кольцо 428–500, прорезь 12, полоса 252–416
+  var GAP = 1.15;                                             // белая прорезь между секторами, градусов
+  function pt(r, a) { var k = a * Math.PI / 180; return [CX + r * Math.cos(k), CY - r * Math.sin(k)]; }
+  function f(n) { return Math.round(n * 100) / 100; }
+  function ring(r1, r2, a1, a2) {
+    var p1 = pt(r2, a1), p2 = pt(r2, a2), p3 = pt(r1, a2), p4 = pt(r1, a1);
+    return 'M' + f(p1[0]) + ' ' + f(p1[1]) + ' A' + r2 + ' ' + r2 + ' 0 0 1 ' + f(p2[0]) + ' ' + f(p2[1]) +
+      ' L' + f(p3[0]) + ' ' + f(p3[1]) + ' A' + r1 + ' ' + r1 + ' 0 0 0 ' + f(p4[0]) + ' ' + f(p4[1]) + ' Z';
+  }
+  function arc(r, a1, a2) { var p1 = pt(r, a1), p2 = pt(r, a2); return 'M' + f(p1[0]) + ' ' + f(p1[1]) + ' A' + r + ' ' + r + ' 0 0 1 ' + f(p2[0]) + ' ' + f(p2[1]); }
+  function hex(h) { var n = parseInt(h.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; }
+  function rgb(a) { return '#' + a.map(function (x) { return ('0' + Math.round(Math.max(0, Math.min(255, x))).toString(16)).slice(-2); }).join(''); }
+  function mix(h1, h2, k) { var a = hex(h1), b = hex(h2); return rgb([a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k]); }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  function plural(n) { return n === 1 ? 'месяц' : n < 5 ? 'месяца' : 'месяцев'; }
+
+  function build() {
+    var S = state.n === 6 ? S6 : S5, n = S.length;
+    var bounds = []; for (var i = 0; i <= n; i++) bounds.push(180 - 180 * i / n);
+    var idx = Math.min(n - 1, state.v + 2), cur = S[idx];
+    var ang = (bounds[idx] + bounds[idx + 1]) / 2, rot = 90 - ang;
+
+    var s = ['<svg viewBox="0 0 1024 640" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Репутация ' + state.v + '">', '<defs>'];
+    s.push('<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000" flood-opacity=".22"/></filter>');
+    s.push('<filter id="nshadow" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#000" flood-opacity=".35"/></filter>');
+    s.push('<linearGradient id="nfill" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4A4A4A"/><stop offset=".5" stop-color="#151515"/><stop offset="1" stop-color="#000"/></linearGradient>');
+    s.push('<radialGradient id="hub" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#9A9A9A"/><stop offset="1" stop-color="#5A5A5A"/></radialGradient>');
+    S.forEach(function (x, i) {
+      /* объём: у внутреннего края светлее, у внешнего — насыщенный и чуть темнее */
+      s.push('<radialGradient id="c' + i + '" cx="' + CX + '" cy="' + CY + '" r="' + R_BAND + '" gradientUnits="userSpaceOnUse"><stop offset="' + f(R_IN / R_BAND) + '" stop-color="' + mix(x.c, '#FFFFFF', .22) + '"/><stop offset=".72" stop-color="' + x.c + '"/><stop offset="1" stop-color="' + mix(x.c, '#000000', .12) + '"/></radialGradient>');
+      s.push('<path id="t' + i + '" d="' + arc((R_RING + R_OUT) / 2 + 2, bounds[i] - GAP, bounds[i + 1] + GAP) + '"/>');
+    });
+    s.push('</defs>');
+
+    s.push('<g filter="url(#shadow)">');
+    S.forEach(function (x, i) { s.push('<path d="' + ring(R_RING, R_OUT, bounds[i] - GAP, bounds[i + 1] + GAP) + '" fill="#E6E6E6"/>'); });
+    S.forEach(function (x, i) { s.push('<path d="' + ring(R_IN, R_BAND, bounds[i] - GAP, bounds[i + 1] + GAP) + '" fill="url(#c' + i + ')"/>'); });
+    s.push('</g>');
+
+    /* надписи в кольце — по дуге, капителью, как на картинке */
+    var fs = state.ring === 'nums' ? 52 : (n === 6 ? 31 : 38);
+    S.forEach(function (x, i) {
+      var label = state.ring === 'nums' ? (x.v > 0 ? '+' : '') + x.v : x.word;
+      s.push('<text font-size="' + fs + '" font-weight="700" letter-spacing="' + (state.ring === 'nums' ? 0 : 1.5) + '" fill="#4D4D4D" font-family="var(--msv-font)"><textPath href="#t' + i + '" startOffset="50%" text-anchor="middle" dominant-baseline="middle">' + esc(label) + '</textPath></text>');
+    });
+
+    /* стрелка: чёрная, с серой ступицей; при открытии выезжает слева */
+    var len = 332;
+    s.push('<g class="needle needle--reset" id="needle" data-rot="' + f(rot) + '" filter="url(#nshadow)" style="transform-origin:' + CX + 'px ' + CY + 'px;transform:rotate(-90deg)">' +
+      '<path d="M' + CX + ' ' + (CY - len) + ' C' + (CX + 6) + ' ' + (CY - len + 60) + ' ' + (CX + 20) + ' ' + (CY - 30) + ' ' + (CX + 22) + ' ' + (CY + 6) + ' A22 22 0 0 1 ' + (CX - 22) + ' ' + (CY + 6) + ' C' + (CX - 20) + ' ' + (CY - 30) + ' ' + (CX - 6) + ' ' + (CY - len + 60) + ' ' + CX + ' ' + (CY - len) + ' Z" fill="url(#nfill)"/>' +
+      '<circle cx="' + CX + '" cy="' + CY + '" r="46" fill="url(#hub)"/>' +
+      '<circle cx="' + CX + '" cy="' + CY + '" r="26" fill="#111"/>' +
+      '</g>');
+    s.push('</svg>');
+    document.getElementById('gauge').innerHTML = s.join('');
+
+    /* подписи под индикатором */
+    document.getElementById('score').textContent = (state.v > 0 ? '+' : '') + state.v;
+    document.getElementById('phrase').textContent = cur.w;
+    var hearts = '';
+    for (var h = 0; h < 3; h++) { var al = h < state.lives; hearts += '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + HEART + '" fill="' + (al ? '#FB344A' : 'none') + '" stroke="' + (al ? '#FB344A' : '#B8B1A5') + '" stroke-width="2" stroke-linejoin="round"/></svg>'; }
+    document.getElementById('lives').innerHTML = hearts;
+    document.getElementById('livesNote').textContent = state.lives === 3 ? 'Три жизни — все на месте' : state.lives === 2 ? 'Одна жизнь сгорела: нарушение отметил модератор' : 'Осталась последняя жизнь — следующее нарушение означает расторжение договора';
+    var mm = state.months;
+    document.getElementById('disc').textContent = mm >= 6 ? 'Скидка 5 % на проживание действует: полгода на максимуме' : 'До скидки 5 %: ещё ' + (6 - mm) + ' ' + plural(6 - mm) + ' на максимальной репутации';
+    animate();
+  }
+
+  function animate() {
+    var g = document.getElementById('needle');
+    g.classList.add('needle--reset'); g.style.transform = 'rotate(-90deg)';
+    void g.getBoundingClientRect();
+    setTimeout(function () { g.classList.remove('needle--reset'); g.style.transform = 'rotate(' + g.dataset.rot + 'deg)'; }, 300);
+  }
+
+  document.getElementById('v').addEventListener('input', function () { state.v = Number(this.value); document.getElementById('vVal').textContent = (state.v > 0 ? '+' : '') + state.v; build(); });
+  document.getElementById('m').addEventListener('input', function () { state.months = Number(this.value); document.getElementById('mVal').textContent = state.months; build(); });
+  function group(attr, key, cast) {
+    document.querySelectorAll('[' + attr + ']').forEach(function (b) {
+      b.addEventListener('click', function () {
+        document.querySelectorAll('[' + attr + ']').forEach(function (x) { x.setAttribute('aria-pressed', 'false'); });
+        b.setAttribute('aria-pressed', 'true'); state[key] = cast(b.getAttribute(attr));
+        if (key === 'n') { var v = document.getElementById('v'); v.max = state.n === 6 ? 3 : 2; if (state.v > Number(v.max)) { state.v = Number(v.max); v.value = state.v; document.getElementById('vVal').textContent = '+' + state.v; } }
+        build();
+      });
+    });
+  }
+  group('data-l', 'lives', Number); group('data-t', 'ring', String); group('data-n', 'n', Number);
+  document.getElementById('again').addEventListener('click', animate);
+  build();
+})();
+</script>
+<script src="mark.js"></script>
+<script src="protect.js"></script>
+
+</body>
+</html>
