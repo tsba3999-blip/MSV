@@ -22,14 +22,7 @@
     transition: background var(--msv-base) var(--msv-ease);
   }
 
-  /* Второй экран тёмный — чтобы разбить последовательность */
-  .onb[data-step="2"] { background: var(--msv-graphite); }
-  .onb[data-step="2"] .onb__title,
-  .onb[data-step="2"] .onb__text { color: var(--msv-n100); }
-  .onb[data-step="2"] .onb__skip { color: var(--msv-n300); }
-  .onb[data-step="2"] .onb__skip:hover { background: rgba(255, 255, 255, .12); }
-  .onb[data-step="2"] .dot { background: var(--msv-n500); }
-  .onb[data-step="2"] .dot--on { background: var(--msv-red); }
+  /* Все три экрана в одних цветах (решение заказчика 21.09.2026) */
 
   .onb__head {
     display: flex;
@@ -73,8 +66,8 @@
 
   /* Заголовки трёх экранов на одной высоте: картинка фиксированной
      высоты, заголовок — фиксированной, текст под ним. */
-  .onb__title { margin: 0 0 var(--msv-s12); }
-  .onb__text { margin: 0; color: var(--msv-graphite); flex: 1 1 auto; }
+  .onb__title { margin: 0 0 var(--msv-s12); text-align: center; }
+  .onb__text { margin: 0; color: var(--msv-graphite); flex: 1 1 auto; text-align: center; }
 
   .onb__foot { padding-top: var(--msv-s32); }
 
@@ -106,9 +99,10 @@
   <div class="screen screen--on" data-screen="1">
     <div class="onb__art">
       <svg viewBox="0 0 280 240" role="img" aria-label="Плоская композиция из фигур">
-        <circle cx="92" cy="96" r="72" fill="#FFD93D"/>
-        <path d="M150 40h96v96h-96z" transform="rotate(14 198 88)" fill="#FB344A"/>
-        <circle cx="180" cy="184" r="46" fill="#CBB6FF"/>
+        <circle cx="140" cy="118" r="80" fill="#FFD93D"/>
+        <path d="M96 172h88v40H96z" transform="rotate(-8 140 192)" fill="#FB344A"/>
+        <circle cx="200" cy="64" r="30" fill="#CBB6FF"/>
+        <circle cx="80" cy="64" r="30" fill="#C8F03C"/>
       </svg>
     </div>
     <h1 class="msv-h onb__title">Привет!</h1>
@@ -118,8 +112,9 @@
   <div class="screen" data-screen="2">
     <div class="onb__art">
       <svg viewBox="0 0 280 240" role="img" aria-label="Плоская композиция из фигур">
-        <path d="M46 50h150v140H46z" transform="rotate(-14 121 120)" fill="#C8F03C"/>
-        <circle cx="200" cy="72" r="48" fill="#56C3D0"/>
+        <path d="M60 60h160v120H60z" transform="rotate(-6 140 120)" fill="#C8F03C"/>
+        <circle cx="140" cy="120" r="52" fill="#56C3D0"/>
+        <path d="M120 120h40M140 100v40" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round"/>
       </svg>
     </div>
     <h1 class="msv-h onb__title">Правила</h1>
@@ -130,8 +125,9 @@
     <div class="onb__art">
       <svg viewBox="0 0 280 240" role="img" aria-label="Плоская композиция из фигур">
         <circle cx="140" cy="120" r="84" fill="#7EB2DD"/>
-        <path d="M132 62h16v62h-16z" fill="#FFFFFF"/>
-        <path d="M138 116h56v16h-56z" transform="rotate(14 166 124)" fill="#FFFFFF"/>
+        <path d="M140 120V70" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round"/>
+        <path d="M140 120l34 24" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round"/>
+        <circle cx="140" cy="120" r="9" fill="#34495E"/>
       </svg>
     </div>
     <h1 class="msv-h onb__title">Десять минут</h1>
@@ -171,7 +167,7 @@
     dots.forEach(function (d, i) { d.classList.toggle('dot--on', i === n - 1); });
     bar.setAttribute('aria-valuenow', String(n));
     next.textContent = LABEL[n];
-    if (theme) theme.setAttribute('content', n === 2 ? '#34495E' : '#F5F1EA');
+    if (theme) theme.setAttribute('content', '#F5F1EA');
     window.scrollTo(0, 0);
   }
 

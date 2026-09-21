@@ -36,29 +36,29 @@
     pointer-events: none;
   }
 
+  /* Сетка из трёх рядов: пустой ряд сверху, объект «лого + вход + строка»
+     в середине, снизу ряд той же высоты со служебными входами и копирайтом,
+     прижатыми к нижнему краю. Верхний и нижний ряды равны — объект стоит
+     ровно по центру экрана. */
   .start__inner {
     position: relative;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: 1fr auto 1fr;
     flex: 1 1 auto;
     width: 100%;
     max-width: 460px;
     margin: 0 auto;
-    /* Верхний отступ отсчитывается от полосы паттерна: знак встаёт
-       сразу под ней, а не по центру экрана. svh, а не vh — иначе на
-       телефоне панель браузера съедает часть высоты. */
-    padding: calc(22svh + var(--msv-s24)) var(--msv-s24) max(var(--msv-s24), env(safe-area-inset-bottom));
+    padding: var(--msv-s24) var(--msv-s24) max(var(--msv-s24), env(safe-area-inset-bottom));
   }
-
-  .start__brand { display: block; }
-
-  /* Вход подтянут к знаку, а не прижат к низу */
-  .start__entry { margin-top: var(--msv-s32); }
+  .start__hero { grid-row: 2; display: flex; flex-direction: column; align-items: center; }
+  .start__foot { grid-row: 3; align-self: end; }
+  .start__brand { display: block; width: 100%; max-width: 340px; }
+  .start__entry { width: 100%; max-width: 340px; margin-top: var(--msv-s24); }
 
   /* Логотип вставлен исходным файлом: воспроизводить знак вёрсткой
      или шрифтом брендбук запрещает. Горизонтальная версия не ставится
      уже 120 px — ниже этого берётся только знак. */
-  .start__logo-link { display: block; width: 100%; max-width: 360px; margin: 0 auto; border-radius: 8px; }
+  .start__logo-link { display: block; width: 100%; margin: 0 auto; border-radius: 8px; }
   .start__logo-link:focus-visible { outline: 2px solid var(--msv-white); outline-offset: 4px; }
   .start__logo-link:hover .start__logo { opacity: .92; }
 
@@ -158,34 +158,19 @@
   .start__legal a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
   .start__legal a:hover { opacity: 1; }
 
-  /* Широкий экран: две колонки — обещание слева, входы справа */
+  /* Широкий экран: тот же один объект по центру, лого крупнее */
   @media (min-width: 900px) {
-    .start__inner {
-      display: grid;
-      grid-template-columns: 1fr minmax(320px, 380px);
-      grid-template-rows: 1fr auto;
-      align-items: center;
-      gap: var(--msv-s64);
-      max-width: 1120px;
-      padding-top: var(--msv-s64);
-      padding-bottom: var(--msv-s64);
-    }
-    .start__brand { grid-column: 1; grid-row: 1; }
-    .start__entry { grid-column: 2; grid-row: 1; margin-top: 0; }
-    .start__staff { grid-column: 1; grid-row: 2; margin-top: 0; padding-top: 0; }
-    .start__pattern { height: 38%; opacity: .45; }
-    .start__logo { max-width: 480px; }
-    .start__staff { justify-content: flex-start; }
+    .start__brand, .start__entry { max-width: 420px; }
+    .start__logo { max-width: none; }
   }
 </style>
 </head>
 <body>
 
 <main class="start">
-  <div class="start__pattern msv-pattern" aria-hidden="true"></div>
-
   <div class="start__inner">
 
+    <div class="start__hero">
     <div class="start__brand">
       <a class="start__logo-link" href="login.html?role=resident" aria-label="Вход для резидентов"><img class="start__logo" src="msv-1200-white.png" width="1200" height="209"
            alt="МСВ — Москва в студентов верит!"></a>
@@ -203,12 +188,14 @@
         <a class="msv-link msv-link--on-red" href="signup.html">Как заселиться</a>
       </p>
     </div>
+    </div>
 
     <!-- Служебные входы. По просьбе заказчика — без подписей: эти две
          фигуры узнают только сотрудники и администрация. Подписи для
          экранного диктора оставлены: без них человек с нарушением зрения
          не сможет войти. Скрытость здесь не защита — доступ разграничивает
          роль в учётной записи, а не вид кнопки. -->
+    <div class="start__foot">
     <div class="start__staff">
       <a class="staff-mark" href="login.html?role=staff" aria-label="Вход для сотрудников" title="Сотрудники">
         <span class="staff-mark__letter" aria-hidden="true">С</span>
@@ -220,6 +207,7 @@
     </div>
 
     <p class="start__legal">© 2026 МСВ. Все права защищены. <a href="legal.html">Правовая информация</a></p>
+    </div>
 
   </div>
 </main>
