@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="icon" href="favicon4.png" type="image/png">
 <meta name="theme-color" content="#F5F1EA">
-<title>Знакомство — МСВ</title>
+<title>Знакомство: Рассвет — МСВ</title>
 <link rel="stylesheet" href="tokens.css">
 <style>
   html, body { height: 100%; }
@@ -22,7 +22,11 @@
     transition: background var(--msv-base) var(--msv-ease);
   }
 
-  /* Все три экрана в одних цветах (решение заказчика 21.09.2026) */
+  /* Градиентное решение «Рассвет»: Мягкий вертикальный градиент: бежевый сверху, к низу — лаванда, лёд и лайм по экранам. */
+  .onb[data-step="1"] { background: linear-gradient(180deg, #F5F1EA 0%, #E6DCFF 100%); }
+  .onb[data-step="2"] { background: linear-gradient(180deg, #F5F1EA 0%, #DDEBFF 100%); }
+  .onb[data-step="3"] { background: linear-gradient(180deg, #F5F1EA 0%, #EEF9C9 100%); }
+  body { background: #F5F1EA; }
 
   .onb__head {
     display: flex;

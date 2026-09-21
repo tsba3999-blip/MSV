@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="icon" href="favicon4.png" type="image/png">
 <meta name="theme-color" content="#F5F1EA">
-<title>Знакомство — МСВ</title>
+<title>Знакомство: Небо — МСВ</title>
 <link rel="stylesheet" href="tokens.css">
 <style>
   html, body { height: 100%; }
@@ -22,7 +22,11 @@
     transition: background var(--msv-base) var(--msv-ease);
   }
 
-  /* Все три экрана в одних цветах (решение заказчика 21.09.2026) */
+  /* Градиентное решение «Небо»: Диагональ голубого и льда с бежевой серединой — спокойный, «утренний». */
+  .onb[data-step="1"] { background: linear-gradient(160deg, #D6E8FF 0%, #F5F1EA 55%, #E3F5F7 100%); }
+  .onb[data-step="2"] { background: linear-gradient(160deg, #E3F5F7 0%, #F5F1EA 55%, #D6E8FF 100%); }
+  .onb[data-step="3"] { background: linear-gradient(160deg, #DDEBFF 0%, #F5F1EA 50%, #EEF9C9 100%); }
+  body { background: #F5F1EA; }
 
   .onb__head {
     display: flex;

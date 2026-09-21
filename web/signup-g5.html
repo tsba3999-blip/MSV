@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="icon" href="favicon4.png" type="image/png">
 <meta name="theme-color" content="#F5F1EA">
-<title>Знакомство — МСВ</title>
+<title>Знакомство: Пятна света — МСВ</title>
 <link rel="stylesheet" href="tokens.css">
 <style>
   html, body { height: 100%; }
@@ -22,7 +22,11 @@
     transition: background var(--msv-base) var(--msv-ease);
   }
 
-  /* Все три экрана в одних цветах (решение заказчика 21.09.2026) */
+  /* Градиентное решение «Пятна света»: Несколько мягких цветных пятен (лаванда, лайм, красный, лёд) на бежевом — на каждом экране они сдвигаются. */
+  .onb[data-step="1"] { background: radial-gradient(60% 40% at 15% 10%, #E4D8FF 0%, transparent 70%), radial-gradient(55% 40% at 90% 20%, #EAF7BD 0%, transparent 70%), radial-gradient(70% 45% at 50% 105%, #FFD3D8 0%, transparent 70%), #F5F1EA; }
+  .onb[data-step="2"] { background: radial-gradient(60% 40% at 85% 10%, #E4D8FF 0%, transparent 70%), radial-gradient(55% 40% at 10% 30%, #D6E8FF 0%, transparent 70%), radial-gradient(70% 45% at 50% 105%, #EAF7BD 0%, transparent 70%), #F5F1EA; }
+  .onb[data-step="3"] { background: radial-gradient(60% 40% at 50% 0%, #FFD3D8 0%, transparent 70%), radial-gradient(55% 40% at 5% 70%, #EAF7BD 0%, transparent 70%), radial-gradient(60% 40% at 95% 80%, #E4D8FF 0%, transparent 70%), #F5F1EA; }
+  body { background: #F5F1EA; }
 
   .onb__head {
     display: flex;

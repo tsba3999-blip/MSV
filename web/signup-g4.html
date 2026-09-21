@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="icon" href="favicon4.png" type="image/png">
 <meta name="theme-color" content="#F5F1EA">
-<title>Знакомство — МСВ</title>
+<title>Знакомство: Лайм и фиалка — МСВ</title>
 <link rel="stylesheet" href="tokens.css">
 <style>
   html, body { height: 100%; }
@@ -22,7 +22,11 @@
     transition: background var(--msv-base) var(--msv-ease);
   }
 
-  /* Все три экрана в одних цветах (решение заказчика 21.09.2026) */
+  /* Градиентное решение «Лайм и фиалка»: Диагональ от бледного лайма к лаванде через бежевый; линии рисунков — фиолетовые. */
+  .onb[data-step="1"] { background: linear-gradient(135deg, #EEF9C9 0%, #F5F1EA 50%, #E3D8FF 100%); }
+  .onb[data-step="2"] { background: linear-gradient(135deg, #E3D8FF 0%, #F5F1EA 50%, #EEF9C9 100%); }
+  .onb[data-step="3"] { background: linear-gradient(135deg, #EEF9C9 0%, #F5F1EA 45%, #FFD3D8 100%); }
+  body { background: #F5F1EA; }
 
   .onb__head {
     display: flex;
@@ -92,7 +96,7 @@
 </head>
 <body>
 
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="ink" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0.796 0 0 0 0.204  0 0.714 0 0 0.286  0 0 0.631 0 0.369  0 0 0 1 0"/></filter></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="ink" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0.569 0 0 0 0.431  0 0.769 0 0 0.231  0 0 0 0 1  0 0 0 1 0"/></filter></svg>
 
 <div class="onb" id="onb" data-step="1">
 
