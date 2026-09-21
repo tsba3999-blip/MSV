@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="icon" href="favicon4.png" type="image/png">
 <meta name="theme-color" content="#F5F1EA">
-<title>Очередь на место — МСВ</title>
+<title>Заявления на переселение — МСВ</title>
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="resident.css">
 <link rel="stylesheet" href="form.css">
@@ -22,24 +22,14 @@
         <path d="M15 6l-6 6 6 6"/>
       </svg>
     <span class="head__back-label form__back-label">Вернуться</span></a>
-    <h1 class="msv-sub head__title">Очередь на место</h1>
+    <h1 class="msv-sub head__title">Переселение</h1>
   </div>
 
-  <p class="msv-body" style="margin:0 0 var(--msv-s16);color:var(--msv-n500)">Хочешь переехать в другую комнату или резиденцию — встань в очередь. Как только подходящее место освободится, сообщим сразу всем, кто его ждёт. Место получит тот, кто первым оплатит.</p>
+  <p class="msv-body" style="margin:0 0 var(--msv-s16);color:var(--msv-n500)">Здесь твои заявления на переселение. Как только подходящее место освободится, сообщим сразу всем, кто его ждёт. Место получит тот, кто первым оплатит.</p>
 
-  <div class="rows" style="padding:var(--msv-s16)">
-    <label class="msv-field"><span class="msv-field__label">Резиденция</span>
-      <select class="msv-select" id="res"><option value="">Любая</option><option value="forma">FORMA</option><option value="uyut">Уют</option><option value="molod">Молодежка</option></select></label>
-    <label class="msv-field"><span class="msv-field__label">Комната</span>
-      <select class="msv-select" id="size"><option value="">Любая</option><option value="1">1-местная</option><option value="2">2-местная</option><option value="4">4-местная</option><option value="6">6-местная</option><option value="8">8-местная</option><option value="12">Капсулы</option></select></label>
-    <label class="msv-field"><span class="msv-field__label">Место</span>
-      <select class="msv-select" id="tier"><option value="">Любое</option><option value="нижнее">Нижнее</option><option value="верхнее">Верхнее</option></select></label>
-    <input class="msv-input" id="note" placeholder="Пожелание: к друзьям в №4, поближе к кухне" style="margin-top:var(--msv-s4)">
-    <div class="foot"><button class="msv-btn msv-btn--block msv-btn--primary" type="button" id="add">Встать в очередь</button></div>
-    <p class="msv-note" id="msg" hidden style="margin-top:var(--msv-s8);text-align:center"></p>
-  </div>
+  <div class="foot" style="padding-top:0;margin-bottom:var(--msv-s24)"><a class="msv-btn msv-btn--block msv-btn--primary" href="relocation.html">Подать заявление</a></div>
 
-  <h2 class="msv-sub group__title">Мои заявки</h2>
+  <h2 class="msv-sub group__title">Мои заявления</h2>
   <div id="list"></div>
 
 </div>
@@ -78,21 +68,13 @@
       return '<div class="row" style="cursor:default"><span class="row__text"><span class="row__name">' + (x.residence || 'Любая') + ' · ' + (x.roomSize ? x.roomSize + '-местная' : 'любая комната') + ' · ' + (x.tier || 'любое место') + '</span>' +
         '<span class="msv-note row__note">с ' + x.at + (x.note ? ' · ' + String(x.note).replace(/</g,'&lt;') : '') + (x.notifiedAt ? ' · сообщали о свободном месте' : '') + '</span></span>' +
         '<span class="row__end"><button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" data-del="' + x.id + '">Снять</button></span></div>';
-    }).join('') + '</div>' : '<p class="msv-note" style="text-align:center;padding:var(--msv-s24) 0">Заявок нет.</p>';
+    }).join('') + '</div>' : '<p class="msv-note" style="text-align:center;padding:var(--msv-s24) 0">Заявлений пока нет.</p>';
   }
   function load() {
     if (location.protocol === 'file:') { render(demo); return; }
     fetch('/api/waitlist', { credentials: 'same-origin' }).then(function (r) { return r.status === 200 ? r.json() : demo; })
       .then(function (a) { render(a.map(function (x) { x.at = x.at ? new Date(x.at).toLocaleDateString('ru-RU') : ''; return x; })); }).catch(function () { render(demo); });
   }
-  document.getElementById('add').addEventListener('click', function () {
-    var body = { residenceId: document.getElementById('res').value, roomSize: document.getElementById('size').value, tier: document.getElementById('tier').value, note: document.getElementById('note').value.trim() };
-    var m = document.getElementById('msg');
-    function ok() { m.textContent = 'Вы в очереди. Сообщим, как только место освободится.'; m.hidden = false; load(); }
-    if (location.protocol === 'file:') { demo.unshift({ id: 'd' + Date.now(), residence: RES[body.residenceId] || 'Любая', roomSize: body.roomSize, tier: body.tier, note: body.note, at: new Date().toLocaleDateString('ru-RU') }); ok(); return; }
-    fetch('/api/waitlist', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
-      .then(function (r) { if (r.status === 201) ok(); else { m.textContent = 'Не удалось'; m.hidden = false; } }).catch(function () { m.textContent = 'Сервер не отвечает'; m.hidden = false; });
-  });
   list.addEventListener('click', function (e) {
     var b = e.target.closest('[data-del]'); if (!b) return;
     if (location.protocol === 'file:') { demo = demo.filter(function (x) { return x.id !== b.dataset.del; }); render(demo); return; }
