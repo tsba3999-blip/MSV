@@ -91,7 +91,8 @@
     .onb__art svg, .onb__img { max-width: 420px; max-height: 420px; }
     .onb__title { grid-area: title; text-align: left; font-size: 40px; line-height: 46px; align-self: end; }
     .onb__text { grid-area: text; text-align: left; flex: none; font-size: 17px; line-height: 26px; }
-    .onb__foot { grid-area: foot; padding-top: var(--msv-s24); max-width: 360px; }
+    .onb__foot { grid-area: foot; padding-top: var(--msv-s24); width: 100%; max-width: 360px; justify-self: center; }   /* кнопка — по середине текстовой колонки */
+    .dots { justify-content: center; }
   }
 
   /* Заголовки трёх экранов на одной высоте: картинка фиксированной
@@ -138,35 +139,7 @@
 
   <div class="screen" data-screen="2">
     <div class="onb__art">
-      <!-- Рисунок тушью в манере двух других: человек читает лист с правилами, рядом галочка -->
-      <svg viewBox="0 0 280 240" role="img" aria-label="Рисунок: человек читает правила" fill="none" stroke="#34495E" stroke-linecap="round" stroke-linejoin="round">
-        <!-- голова и волосы -->
-        <path d="M98 74c-4-22 14-38 36-36 20 2 32 18 28 40-3 18-16 30-33 29-17 0-29-14-31-33z" stroke-width="6"/>
-        <path d="M96 62c10-16 30-24 52-18" stroke-width="7"/>
-        <path d="M104 52c6-9 15-14 26-15" stroke-width="5"/>
-        <path d="M150 52c6 4 10 10 12 18" stroke-width="5"/>
-        <!-- лицо: глаза вниз, к листу; улыбка -->
-        <path d="M116 84q5 4 10 0" stroke-width="4"/>
-        <path d="M138 84q5 4 10 0" stroke-width="4"/>
-        <path d="M124 100q8 7 18 1" stroke-width="4"/>
-        <!-- плечи, руки к листу -->
-        <path d="M74 176c8-36 34-56 62-58 22-1 44 8 60 26" stroke-width="7"/>
-        <path d="M92 150c12 6 26 6 40-2" stroke-width="5"/>
-        <path d="M190 138c-6 12-16 22-30 26" stroke-width="5"/>
-        <!-- лист с правилами -->
-        <path d="M148 128l60-16 14 54-60 16z" stroke-width="6"/>
-        <path d="M162 142l34-9" stroke-width="4"/>
-        <path d="M166 154l30-8" stroke-width="4"/>
-        <path d="M170 166l22-6" stroke-width="4"/>
-        <!-- кисти рук держат лист -->
-        <path d="M150 150c-6 2-10 8-6 14 4 4 10 2 12-4" stroke-width="5"/>
-        <path d="M212 174c6-2 8-8 4-12" stroke-width="5"/>
-        <!-- галочка-одобрение -->
-        <path d="M206 44c14-6 30 2 32 16 2 14-10 26-24 24-14-2-22-16-18-30" stroke-width="6"/>
-        <path d="M212 60l8 8 16-18" stroke-width="7"/>
-        <!-- стол -->
-        <path d="M36 206q104-12 208 2" stroke-width="7"/>
-      </svg>
+      <img class="onb__img" src="onb-2.jpg" width="803" height="1156" alt="Рисунок: девушка с телефоном и кофе">
     </div>
     <h1 class="msv-h onb__title">Правила</h1>
     <p class="msv-body onb__text">Настоятельно просим ознакомиться с <a class="msv-link" href="rules.html" style="color:inherit;text-decoration:underline;text-underline-offset:3px">Правилами проживания</a> и <a class="msv-link" href="memo.html" style="color:inherit;text-decoration:underline;text-underline-offset:3px">Памяткой</a> перед оплатой и заселением – так как это касается условий проживания, это касается ваших денег, вашего уровня жизни и вашей безопасности. Если не ознакомиться с Правилами, – то это полностью ваша ответственность.</p>
