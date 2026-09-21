@@ -245,9 +245,10 @@
   color: var(--msv-graphite);
 }
 
-.doc__icon--sky { background: var(--msv-sky); }
-.doc__icon--olive { background: var(--msv-olive); }
-.doc__icon--plain { background: var(--msv-n100); }
+/* Подложки нет, сам значок в полтора раза крупнее (решение заказчика 21.09.2026) */
+.doc__icon--sky, .doc__icon--olive, .doc__icon--plain { background: transparent; }
+.doc__icon { width: 52px; height: 52px; }
+.doc__icon svg { width: 36px; height: 36px; }
 
 .doc__text { flex: 1 1 auto; min-width: 0; }
 .doc__name { display: block; font-size: var(--msv-body-size); font-weight: 600; }
@@ -338,6 +339,10 @@
 }
 
 /* Подпись раздела в шапке анкеты — ссылка «назад», как и стрелка рядом */
-.form__title-link { color: var(--msv-graphite); text-decoration: none; }
+/* Шапка: стрелка с подписью «Вернуться» в первой строке, заголовок раздела — строкой ниже */
+.form__head { flex-wrap: wrap; height: auto; min-height: var(--msv-header); padding-top: var(--msv-s8); padding-bottom: var(--msv-s4); row-gap: 0; }
+.form__back:has(.form__back-label) { width: auto; height: var(--msv-tap); padding-right: var(--msv-s8); border-radius: 22px; gap: 2px; }
+.form__back-label { font-size: var(--msv-note-size); line-height: var(--msv-note-line); color: var(--msv-n500); }
+.form__title-link { flex: 1 1 100%; margin-top: var(--msv-s4); color: var(--msv-graphite); text-decoration: none; }
 .form__title-link:hover { color: var(--msv-n500); }
 .form__title-link:focus-visible { outline: 2px solid var(--msv-violet); outline-offset: 2px; border-radius: 4px; }

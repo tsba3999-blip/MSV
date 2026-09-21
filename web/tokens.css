@@ -312,6 +312,8 @@ body, h1, h2, h3, p, button, a, label { hyphens: none; }
    ============================================================ */
 
 .msv-field { display: block; margin-bottom: var(--msv-s12); }
+/* Атрибут hidden сильнее любого display — иначе поля с display:block «прячутся» только на словах */
+[hidden] { display: none !important; }
 
 .msv-field__label {
   display: block;

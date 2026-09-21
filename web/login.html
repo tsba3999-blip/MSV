@@ -43,6 +43,8 @@
     text-decoration: none;
   }
 
+  .head__back:has(.head__back-label) { width: auto; padding-right: var(--msv-s8); border-radius: 22px; gap: 2px; }
+  .head__back-label { font-size: var(--msv-note-size); line-height: var(--msv-note-line); color: var(--msv-n500); }
   .head__back:hover { background: var(--msv-n100); }
   .head__back:focus-visible { outline: 2px solid var(--msv-violet); outline-offset: 2px; }
 
@@ -151,7 +153,7 @@
            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M15 6l-6 6 6 6"/>
       </svg>
-    </a>
+    <span class="head__back-label form__back-label">Вернуться</span></a>
     <a class="msv-note head__title-link" id="headTitle" href="index.html" style="color:var(--msv-n500);text-decoration:none">Вход</a>
   </div>
 
