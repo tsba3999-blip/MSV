@@ -11,15 +11,16 @@
 <link rel="stylesheet" href="resident.css">
 <style>
   /* ============================================================
-     Индикатор репутации, восемь вариантов (номера сохранены из
-     прежних тридцати: 4, 5, 9, 10, 13, 14, 23, 24).
+     Индикатор репутации, восемь вариантов (номера из прежних
+     тридцати: 4, 5, 9, 10, 13, 14, 23, 24) и восемь рисунков жизней.
 
-     Правила шкалы (решение заказчика 21.09.2026):
-       · плюс — без потолка: шкала сама растёт (до 5, 10, 20, 50, 100…);
-       · минус — три «жизни»: −1 = сгорела одна жизнь; сгорели все три —
-         расторжение договора.
-     Слева — три ячейки жизней (красные), ноль — на границе, справа —
-     открытая шкала (лайм). Значение VALUE (сейчас 2,4).
+     Правила (решение заказчика 21.09.2026):
+       · репутация — число без потолка: шкала растёт сама (до 5, 10, 20, 50…);
+       · жизни — отдельный счётчик из трёх; нарушение сжигает жизнь,
+         сгорели все три — расторжение договора. Репутация может быть
+         положительной и при сгоревшей жизни.
+     Слева на шкале — зона трёх жизней (красная), ноль на границе,
+     справа — открытая шкала (лайм).
      ============================================================ */
   .page { padding-bottom: var(--msv-s48); }
   .grid { display: grid; grid-template-columns: 1fr; gap: var(--msv-s16); }
@@ -28,28 +29,31 @@
   .v__t { margin: 0 0 var(--msv-s4); font-size: 17px; line-height: 22px; }
   .v__d { margin: 0 0 var(--msv-s12); color: var(--msv-n500); }
   .v__num { display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 26px; padding: 0 6px; margin-right: var(--msv-s8); font-size: 13px; font-weight: 700; color: var(--msv-white); background: var(--msv-graphite); border-radius: 13px; vertical-align: middle; }
+  .v__num--l { background: var(--msv-red); }
   .g { display: block; width: 100%; max-width: 280px; margin: 0 auto; }
   .g svg { display: block; width: 100%; height: auto; overflow: visible; }
   .big { font: 700 32px/1 var(--msv-font); letter-spacing: -.02em; fill: var(--msv-graphite); }
-  .mid { font: 700 18px/1 var(--msv-font); fill: var(--msv-graphite); }
   .cap { font: 600 10px/1 var(--msv-font); letter-spacing: .08em; text-transform: uppercase; fill: var(--msv-n500); }
   .tick { font: 600 11px/1 var(--msv-font); fill: var(--msv-graphite); }
   .again { display: inline-flex; align-items: center; height: var(--msv-btn-s); padding: 0 var(--msv-s16); margin-top: var(--msv-s8); font: 600 13px/1 var(--msv-font); color: var(--msv-graphite); background: var(--msv-beige); border: 0; border-radius: 999px; cursor: pointer; }
-  .demo { display: flex; flex-wrap: wrap; gap: var(--msv-s8); margin: 0 0 var(--msv-s16); }
+  .ctl { margin: 0 0 var(--msv-s16); }
+  .ctl__l { margin: 0 0 var(--msv-s4); }
+  .demo { display: flex; flex-wrap: wrap; gap: var(--msv-s8); margin: 0 0 var(--msv-s12); }
   .demo button { height: var(--msv-chip); padding: 0 var(--msv-s12); font: 600 13px/1 var(--msv-font); color: var(--msv-graphite); background: var(--msv-white); border: 1px solid var(--msv-n100); border-radius: 999px; cursor: pointer; }
   .demo button[aria-pressed="true"] { color: var(--msv-white); background: var(--msv-graphite); border-color: var(--msv-graphite); }
+  h2.sect { margin: var(--msv-s32) 0 var(--msv-s8); }
 
-  /* анимация: .mv едет к --tf / --dash, .spring — с перелётом; .reset выключает переходы для сброса */
-  .mv { transition: all 1.3s cubic-bezier(.2,.9,.2,1); }
-  .g.run .mv { transform: var(--tf, none); stroke-dashoffset: var(--dash, 0); opacity: var(--op, 1); }
-  .spring { transition: all 1.5s cubic-bezier(.34,1.35,.64,1); }
+  /* Анимация. Начальное положение — из --from, конечное — из --tf: оба через
+     переменные, потому что transform в атрибуте style сильнее любого класса
+     (из-за этого стрелки раньше не двигались). */
+  .mv { transform: var(--from, none); transition: all 1.3s cubic-bezier(.2,.9,.2,1); }
+  .g.run .mv { transform: var(--tf, none); stroke-dashoffset: var(--dash, 0); }
+  .spring { transform: var(--from, none); transition: transform 1.5s cubic-bezier(.34,1.35,.64,1); }
   .g.run .spring { transform: var(--tf, none); }
-  .ln { opacity: .15; transition: opacity .3s ease, transform .4s cubic-bezier(.34,1.4,.64,1); }
-  .g.run .ln.on { opacity: 1; }
-  .g.reset .mv, .g.reset .spring, .g.reset .ln { transition: none !important; }
-  .life { transition: opacity .4s ease, transform .4s cubic-bezier(.34,1.4,.64,1); transform-box: fill-box; transform-origin: center; }
-  .life--lost { opacity: .18; }
-  @media (prefers-reduced-motion: reduce) { .mv, .spring, .ln, .life { transition: none; } }
+  .g.reset .mv, .g.reset .spring, .g.reset .life { transition: none !important; }
+  .life { transform-box: fill-box; transform-origin: center; transition: opacity .45s ease, transform .45s cubic-bezier(.34,1.4,.64,1); }
+  .life--lost { opacity: .22; transform: scale(.8); }
+  @media (prefers-reduced-motion: reduce) { .mv, .spring, .life { transition: none; } }
 </style>
 </head>
 <body>
@@ -66,94 +70,111 @@
     <h1 class="msv-sub head__title"><a class="head__title-link" href="reputation.html">Репутация: восемь вариантов</a></h1>
   </div>
 
-  <p class="msv-body" style="margin:0 0 var(--msv-s12);color:var(--msv-n500)">Слева — три жизни (сгорают при минусе; ноль жизней — расторжение договора), справа — открытая шкала: растёт вместе с репутацией. Посмотрите на разных значениях:</p>
-  <div class="demo" id="demo" role="group" aria-label="Значение для показа">
-    <button type="button" data-v="2.4" aria-pressed="true">+2,4</button>
-    <button type="button" data-v="7">+7</button>
-    <button type="button" data-v="23">+23</button>
-    <button type="button" data-v="-1.5">−1,5 (сгорела жизнь)</button>
-    <button type="button" data-v="-3">−3 (расторжение)</button>
+  <p class="msv-body" style="margin:0 0 var(--msv-s16);color:var(--msv-n500)">Репутация — число без потолка; жизни — три, отдельным счётчиком. Сейчас показано: +2,4 и одна сгоревшая жизнь. Переключатели ниже меняют все варианты сразу.</p>
+
+  <div class="ctl">
+    <p class="msv-note ctl__l">Репутация</p>
+    <div class="demo" id="demoV">
+      <button type="button" data-v="2.4" aria-pressed="true">+2,4</button>
+      <button type="button" data-v="0">0</button>
+      <button type="button" data-v="7">+7</button>
+      <button type="button" data-v="23">+23</button>
+      <button type="button" data-v="-1.5">−1,5</button>
+    </div>
+    <p class="msv-note ctl__l">Жизни</p>
+    <div class="demo" id="demoL">
+      <button type="button" data-l="3">три целы</button>
+      <button type="button" data-l="2" aria-pressed="true">одна сгорела</button>
+      <button type="button" data-l="1">две сгорели</button>
+      <button type="button" data-l="0">все сгорели — расторжение</button>
+    </div>
+    <p class="msv-note ctl__l">Рисунок жизней</p>
+    <div class="demo" id="demoS"></div>
   </div>
 
   <div class="grid" id="list"></div>
+
+  <h2 class="msv-sub sect">Варианты жизней</h2>
+  <p class="msv-note" style="margin:0 0 var(--msv-s12);color:var(--msv-n500)">Каждый — три жизни, одна сгорает. Выбранный рисунок подставляется во все спидометры выше.</p>
+  <div class="grid" id="lives"></div>
 
 </div>
 
 <script>
 (function () {
   'use strict';
-  var VALUE = 2.4;
-  var LIVES = 3;
-  var pos, posMax, lives, F, T, COL, LOST;
+  var VALUE = 2.4, LIVES = 3, left = 2, style = 'heart';
+  var pos, posMax, F, COL, LOST;
   var G = 'var(--msv-graphite)', N1 = 'var(--msv-n100)', N3 = 'var(--msv-n300)', RED = 'var(--msv-red)', LIME = 'var(--msv-lime)', W = '#fff';
 
-  /* Потолок положительной шкалы — «красивое» число не меньше значения */
   function niceMax(v) { var steps = [5, 10, 20, 50, 100, 200, 500, 1000]; for (var i = 0; i < steps.length; i++) if (v <= steps[i]) return steps[i]; return Math.ceil(v / 1000) * 1000; }
-  function recompute() {
-    pos = VALUE >= 0;
-    posMax = niceMax(Math.max(5, VALUE));
-    lives = pos ? LIVES : Math.max(0, LIVES + Math.floor(VALUE));   // −1,5 → 1 сгорела, 2 осталось
-    LOST = lives === 0;
-    COL = pos ? LIME : RED;
-    // T — положение на общей шкале: от −3 (0) до +posMax (1); ноль — на границе
-    var lo = -LIVES, hi = posMax, v = Math.max(lo, Math.min(hi, VALUE));
-    T = (v - lo) / (hi - lo);
-    F = pos ? VALUE / posMax : Math.min(1, -VALUE / LIVES);
-  }
+  function recompute() { pos = VALUE >= 0; posMax = niceMax(Math.max(5, VALUE)); LOST = left === 0; COL = pos ? LIME : RED; F = pos ? VALUE / posMax : Math.min(1, -VALUE / LIVES); }
   function fmt(v) { return (v > 0 ? '+' : '') + (Math.abs(v) >= 10 ? Math.round(v).toString() : v.toFixed(1).replace('.', ',')); }
   function P(cx, cy, r, deg) { var a = (deg - 90) * Math.PI / 180; return [(cx + Math.cos(a) * r).toFixed(1), (cy + Math.sin(a) * r).toFixed(1)]; }
   function arc(cx, cy, r, a0, a1) { var p0 = P(cx, cy, r, a0), p1 = P(cx, cy, r, a1); return 'M' + p0.join(' ') + ' A' + r + ' ' + r + ' 0 ' + (Math.abs(a1 - a0) > 180 ? 1 : 0) + ' ' + (a1 > a0 ? 1 : 0) + ' ' + p1.join(' '); }
-  // угол значения v на шкале с охватом span (ноль — на границе жизней и плюса)
   function ang(span, v) { var lo = -LIVES, hi = posMax; v = Math.max(lo, Math.min(hi, v)); return -span / 2 + (v - lo) / (hi - lo) * span; }
   function big(x, y, s) { return '<text class="big" x="' + x + '" y="' + y + '" text-anchor="middle"' + (s ? ' style="' + s + '"' : '') + ' data-count>0</text>'; }
   function cap(x, y, t, s) { return '<text class="cap" x="' + x + '" y="' + y + '" text-anchor="middle"' + (s ? ' style="' + s + '"' : '') + '>' + t + '</text>'; }
   function lbl(cx, cy, r, span, v, t, col) { var p = P(cx, cy, r, ang(span, v)); return '<text class="tick" x="' + p[0] + '" y="' + (+p[1] + 4) + '" text-anchor="middle"' + (col ? ' fill="' + col + '"' : '') + '>' + t + '</text>'; }
-  // заливка от нуля к значению
-  function fill(cx, cy, r, span, w, col, extra) { var a0 = ang(span, 0), a1 = ang(span, VALUE); if (Math.abs(a1 - a0) < .01) a1 = a0 + (pos ? .01 : -.01); return '<path class="mv" d="' + arc(cx, cy, r, a0, a1) + '" fill="none" stroke="' + col + '" stroke-width="' + w + '" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" style="--dash:0"' + (extra || '') + '/>'; }
-  // риски по всей шкале: на жизнях — по одной, на плюсе — по «шагу»
-  function ticks(cx, cy, r, span, len) { var s = '', step = posMax / 5; var vs = [-3, -2, -1, 0]; for (var v = step; v <= posMax + .001; v += step) vs.push(v); vs.forEach(function (v) { var a = ang(span, v), p0 = P(cx, cy, r, a), p1 = P(cx, cy, r - len, a); s += '<line x1="' + p0[0] + '" y1="' + p0[1] + '" x2="' + p1[0] + '" y2="' + p1[1] + '" stroke="' + (v < 0 ? RED : G) + '" stroke-width="2" stroke-linecap="round"/>'; }); return s; }
-  function needle(cx, cy, len, span) { return '<g class="spring" style="transform-origin:' + cx + 'px ' + cy + 'px;transform:rotate(' + ang(span, -LIVES) + 'deg);--tf:rotate(' + ang(span, VALUE) + 'deg)"><path d="M' + (cx - 4) + ' ' + cy + ' L' + cx + ' ' + (cy - len) + ' L' + (cx + 4) + ' ' + cy + ' Z" fill="' + G + '"/><circle cx="' + cx + '" cy="' + cy + '" r="7" fill="' + G + '"/><circle cx="' + cx + '" cy="' + cy + '" r="3" fill="' + W + '"/></g>'; }
-  // три жизни — сердечки; сгоревшие бледные
-  function heart(x, y, s, i) { return '<path class="life' + (i >= lives ? ' life--lost' : '') + '" data-life="' + i + '" transform="translate(' + x + ' ' + y + ') scale(' + s + ')" d="M0 3.2 C-1 1.4 -4.2 0.4 -4.2 -2 C-4.2 -3.6 -3 -4.6 -1.8 -4.6 C-0.9 -4.6 -0.3 -4.1 0 -3.4 C0.3 -4.1 0.9 -4.6 1.8 -4.6 C3 -4.6 4.2 -3.6 4.2 -2 C4.2 0.4 1 1.4 0 3.2 Z" fill="' + RED + '"/>'; }
-  function livesRow(x, y, s) { return heart(x - 14 * s, y, s, 0) + heart(x, y, s, 1) + heart(x + 14 * s, y, s, 2); }
-  function status(x, y) { return LOST ? '<text class="cap" x="' + x + '" y="' + y + '" text-anchor="middle" style="fill:var(--msv-red)">расторжение договора</text>' : cap(x, y, lives === 3 ? 'три жизни' : (lives === 2 ? 'осталось две жизни' : 'осталась одна жизнь')); }
+  function fill(cx, cy, r, span, w, col, extra) { var a0 = ang(span, 0), a1 = ang(span, VALUE); if (Math.abs(a1 - a0) < .01) a1 = a0 + .01; return '<path class="mv" d="' + arc(cx, cy, r, a0, a1) + '" fill="none" stroke="' + col + '" stroke-width="' + w + '" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" style="--dash:0"' + (extra || '') + '/>'; }
+  function ticks(cx, cy, r, span, len) { var s = '', step = posMax / 5, vs = [-3, -2, -1, 0]; for (var v = step; v <= posMax + .001; v += step) vs.push(v); vs.forEach(function (v) { var a = ang(span, v), p0 = P(cx, cy, r, a), p1 = P(cx, cy, r - len, a); s += '<line x1="' + p0[0] + '" y1="' + p0[1] + '" x2="' + p1[0] + '" y2="' + p1[1] + '" stroke="' + (v < 0 ? RED : G) + '" stroke-width="2" stroke-linecap="round"/>'; }); return s; }
+  // стрелка: начало — левый край шкалы, конец — значение; оба через переменные
+  function rot(cx, cy, span, cls) { return 'class="' + (cls || 'spring') + '" style="transform-origin:' + cx + 'px ' + cy + 'px;--from:rotate(' + ang(span, -LIVES) + 'deg);--tf:rotate(' + ang(span, VALUE) + 'deg)"'; }
+  function needle(cx, cy, len, span) { return '<g ' + rot(cx, cy, span) + '><path d="M' + (cx - 4) + ' ' + cy + ' L' + cx + ' ' + (cy - len) + ' L' + (cx + 4) + ' ' + cy + ' Z" fill="' + G + '"/><circle cx="' + cx + '" cy="' + cy + '" r="7" fill="' + G + '"/><circle cx="' + cx + '" cy="' + cy + '" r="3" fill="' + W + '"/></g>'; }
 
+  /* ---------- рисунки жизней: (x, y, масштаб, номер) → одна жизнь ---------- */
+  var STYLES = {
+    heart:  ['Сердечки', function (x, y, s, i) { return life(i, 'translate(' + x + ' ' + y + ') scale(' + s + ')', '<path d="M0 3.2 C-1 1.4 -4.2 0.4 -4.2 -2 C-4.2 -3.6 -3 -4.6 -1.8 -4.6 C-0.9 -4.6 -0.3 -4.1 0 -3.4 C0.3 -4.1 0.9 -4.6 1.8 -4.6 C3 -4.6 4.2 -3.6 4.2 -2 C4.2 0.4 1 1.4 0 3.2 Z" fill="' + RED + '"/>'); }],
+    dot:    ['Точки', function (x, y, s, i) { return life(i, 'translate(' + x + ' ' + y + ') scale(' + s + ')', '<circle r="4" fill="' + RED + '"/>'); }],
+    cell:   ['Ячейки батареи', function (x, y, s, i) { return life(i, 'translate(' + x + ' ' + y + ') scale(' + s + ')', '<rect x="-4.5" y="-3.5" width="9" height="7" rx="1.5" fill="' + RED + '"/>'); }],
+    shield: ['Щиты', function (x, y, s, i) { return life(i, 'translate(' + x + ' ' + y + ') scale(' + s + ')', '<path d="M0 -5 L4.5 -3.4 V0 C4.5 2.6 2.6 4.4 0 5.2 C-2.6 4.4 -4.5 2.6 -4.5 0 V-3.4 Z" fill="' + RED + '"/>'); }],
+    star:   ['Звёзды', function (x, y, s, i) { return life(i, 'translate(' + x + ' ' + y + ') scale(' + s + ')', '<path d="M0 -5 L1.4 -1.7 L5 -1.5 L2.2 0.8 L3.1 4.3 L0 2.4 L-3.1 4.3 L-2.2 0.8 L-5 -1.5 L-1.4 -1.7 Z" fill="' + RED + '"/>'); }],
+    bolt:   ['Молнии', function (x, y, s, i) { return life(i, 'translate(' + x + ' ' + y + ') scale(' + s + ')', '<path d="M1 -5.5 L-3.5 0.5 L-0.3 0.5 L-1 5.5 L3.5 -0.8 L0.3 -0.8 Z" fill="' + RED + '"/>'); }],
+    check:  ['Галочка / крест', function (x, y, s, i) { var lost = i >= left; return life(i, 'translate(' + x + ' ' + y + ') scale(' + s + ')', '<circle r="5" fill="' + (lost ? N1 : RED) + '"/>' + (lost ? '<path d="M-2 -2 L2 2 M2 -2 L-2 2" stroke="' + N3 + '" stroke-width="1.4" stroke-linecap="round"/>' : '<path d="M-2.4 0.2 L-0.8 1.8 L2.5 -1.8" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>'), true); }],
+    bar:    ['Полоски', function (x, y, s, i) { return life(i, 'translate(' + x + ' ' + y + ') scale(' + s + ')', '<rect x="-5" y="-1.5" width="10" height="3" rx="1.5" fill="' + RED + '"/>'); }]
+  };
+  // «крест» рисует потерю сам, остальным — бледность и уменьшение через .life--lost
+  function life(i, tf, inner, own) { return '<g class="life' + (!own && i >= left ? ' life--lost' : '') + '" data-life="' + i + '" transform="' + tf + '">' + inner + '</g>'; }
+  function livesRow(x, y, s) { var d = STYLES[style][1]; return d(x - 14 * s, y, s, 0) + d(x, y, s, 1) + d(x + 14 * s, y, s, 2); }
+  function status(x, y) { return LOST ? '<text class="cap" x="' + x + '" y="' + y + '" text-anchor="middle" style="fill:var(--msv-red)">расторжение договора</text>' : cap(x, y, left === 3 ? 'три жизни' : (left === 2 ? 'осталось две жизни' : 'осталась одна жизнь')); }
+
+  /* ---------- восемь спидометров ---------- */
   var V = [];
-  V.push([4, 'Полукруг с градиентом и треугольником', 'Дуга-градиент: красная зона жизней, ноль, дальше лайм до текущего потолка шкалы. Снаружи — треугольный указатель; под дугой — жизни и число.',
-    function () { var z = T0(); return '<svg viewBox="0 0 280 175"><defs><linearGradient id="gq4" x1="0" x2="1"><stop offset="0" stop-color="#FB344A"/><stop offset="' + z + '" stop-color="#FB344A"/><stop offset="' + (z + .04) + '" stop-color="#EAE4DA"/><stop offset="1" stop-color="#C8F03C"/></linearGradient></defs>' +
+  V.push([4, 'Полукруг с градиентом и треугольником', 'Дуга-градиент: красная зона жизней, ноль, дальше лайм до текущего потолка. Снаружи — треугольный указатель.',
+    function () { var z = LIVES / (LIVES + posMax); return '<svg viewBox="0 0 280 175"><defs><linearGradient id="gq4" x1="0" x2="1"><stop offset="0" stop-color="#FB344A"/><stop offset="' + z + '" stop-color="#FB344A"/><stop offset="' + (z + .04) + '" stop-color="#EAE4DA"/><stop offset="1" stop-color="#C8F03C"/></linearGradient></defs>' +
       '<path d="' + arc(140, 140, 110, -90, 90) + '" fill="none" stroke="url(#gq4)" stroke-width="16"/>' + lbl(140, 140, 88, 180, -3, '−3', RED) + lbl(140, 140, 88, 180, 0, '0') + lbl(140, 140, 88, 180, posMax, '+' + posMax) +
-      '<g class="spring" style="transform-origin:140px 140px;transform:rotate(-90deg);--tf:rotate(' + ang(180, VALUE) + 'deg)"><path d="M132 14 L140 26 L148 14 Z" fill="' + G + '"/></g>' + big(140, 118) + livesRow(140, 152, 1.6) + status(140, 172) + '</svg>'; }]);
+      '<g ' + rot(140, 140, 180) + '><path d="M132 14 L140 26 L148 14 Z" fill="' + G + '"/></g>' + big(140, 118) + livesRow(140, 152, 1.6) + status(140, 172) + '</svg>'; }]);
   V.push([5, 'Прибор 270° со стрелкой', 'Три четверти круга: красная дуга жизней слева, лаймовая — открытая шкала. Риски по делениям, стрелка с пружинящим ходом.',
     function () { return '<svg viewBox="0 0 280 250"><path d="' + arc(140, 130, 100, ang(270, -3), ang(270, 0)) + '" fill="none" stroke="' + RED + '" stroke-width="12" opacity=".75"/><path d="' + arc(140, 130, 100, ang(270, 0), ang(270, posMax)) + '" fill="none" stroke="' + LIME + '" stroke-width="12"/>' + ticks(140, 130, 88, 270, 10) +
-      lbl(140, 130, 64, 270, -3, '−3', RED) + lbl(140, 130, 64, 270, 0, '0') + lbl(140, 130, 64, 270, posMax, '+' + posMax) + needle(140, 130, 80, 270) + big(140, 214) + livesRow(140, 234, 1.6) + '</svg>'; }]);
-  V.push([9, 'Радуга', 'Три полосы: красная — жизни, серая — около нуля, лаймовая — рост. Стрелка показывает, в какой ты полосе; сердечки — сколько жизней осталось.',
+      lbl(140, 130, 64, 270, -3, '−3', RED) + lbl(140, 130, 64, 270, 0, '0') + lbl(140, 130, 64, 270, posMax, '+' + posMax) + needle(140, 130, 80, 270) + big(140, 214) + livesRow(140, 236, 1.6) + '</svg>'; }]);
+  V.push([9, 'Радуга', 'Три полосы: красная — жизни, серая — около нуля, лаймовая — рост. Стрелка показывает полосу; внизу — жизни.',
     function () { return '<svg viewBox="0 0 280 175"><path d="' + arc(140, 140, 110, ang(180, -3), ang(180, 0)) + '" fill="none" stroke="' + RED + '" stroke-width="20"/><path d="' + arc(140, 140, 110, ang(180, 0), ang(180, posMax * .2)) + '" fill="none" stroke="' + N3 + '" stroke-width="20"/><path d="' + arc(140, 140, 110, ang(180, posMax * .2), ang(180, posMax)) + '" fill="none" stroke="' + LIME + '" stroke-width="20"/>' +
       needle(140, 140, 90, 180) + big(140, 118) + livesRow(140, 152, 1.6) + status(140, 172) + '</svg>'; }]);
-  V.push([10, 'Кольцо с зазором', 'Кольцо на 300° с разрывом внизу. Ноль — не наверху, а на границе жизней и плюса; заливка идёт от него в сторону значения.',
-    function () { return '<svg viewBox="0 0 260 260"><path d="' + arc(130, 130, 104, -150, ang(300, 0)) + '" fill="none" stroke="#FEE7EA" stroke-width="14" stroke-linecap="round"/><path d="' + arc(130, 130, 104, ang(300, 0), 150) + '" fill="none" stroke="#EEF9D3" stroke-width="14" stroke-linecap="round"/>' + fill(130, 130, 104, 300, 14, COL) +
-      '<line x1="' + P(130, 130, 114, ang(300, 0))[0] + '" y1="' + P(130, 130, 114, ang(300, 0))[1] + '" x2="' + P(130, 130, 94, ang(300, 0))[0] + '" y2="' + P(130, 130, 94, ang(300, 0))[1] + '" stroke="' + G + '" stroke-width="3"/>' +
+  V.push([10, 'Кольцо с зазором', 'Кольцо на 300° с разрывом внизу. Ноль — на границе жизней и плюса; заливка идёт от него в сторону значения.',
+    function () { var z = ang(300, 0); return '<svg viewBox="0 0 260 260"><path d="' + arc(130, 130, 104, -150, z) + '" fill="none" stroke="#FEE7EA" stroke-width="14" stroke-linecap="round"/><path d="' + arc(130, 130, 104, z, 150) + '" fill="none" stroke="#EEF9D3" stroke-width="14" stroke-linecap="round"/>' + fill(130, 130, 104, 300, 14, COL) +
+      '<line x1="' + P(130, 130, 114, z)[0] + '" y1="' + P(130, 130, 114, z)[1] + '" x2="' + P(130, 130, 94, z)[0] + '" y2="' + P(130, 130, 94, z)[1] + '" stroke="' + G + '" stroke-width="3"/>' +
       lbl(130, 130, 80, 300, -3, '−3', RED) + lbl(130, 130, 80, 300, posMax, '+' + posMax) + big(130, 128) + livesRow(130, 156, 1.6) + status(130, 178) + '</svg>'; }]);
-  V.push([13, 'Шкала снаружи, заливка внутри', 'Тонкая шкала с рисками по внешнему краю и толстая заливка внутри. Заливка — от нуля: вправо лаймом, влево (по жизням) красным.',
+  V.push([13, 'Шкала снаружи, заливка внутри', 'Тонкая шкала с рисками по внешнему краю и толстая заливка внутри — от нуля в сторону значения.',
     function () { return '<svg viewBox="0 0 280 175"><path d="' + arc(140, 140, 122, -90, 90) + '" fill="none" stroke="' + N3 + '" stroke-width="2"/>' + ticks(140, 140, 122, 180, 8) + '<path d="' + arc(140, 140, 98, -90, 90) + '" fill="none" stroke="' + N1 + '" stroke-width="18"/>' + fill(140, 140, 98, 180, 18, COL) +
       lbl(140, 140, 138, 180, -3, '−3', RED) + lbl(140, 140, 138, 180, 0, '0') + lbl(140, 140, 138, 180, posMax, '+' + posMax) + big(140, 118) + livesRow(140, 152, 1.6) + status(140, 172) + '</svg>'; }]);
-  V.push([14, 'Автомобильный', 'Тёмный диск, светящаяся дуга и стрелка с шариком. Красный сектор жизней слева, шкала роста справа, число и жизни внизу.',
+  V.push([14, 'Автомобильный', 'Тёмный диск, светящаяся дуга и стрелка с шариком. Красный сектор жизней слева, шкала роста справа.',
     function () { return '<svg viewBox="0 0 280 250"><defs><filter id="gl14"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="140" cy="130" r="118" fill="' + G + '"/>' +
       '<path d="' + arc(140, 130, 96, ang(270, -3), ang(270, 0)) + '" fill="none" stroke="#7A3644" stroke-width="10"/><path d="' + arc(140, 130, 96, ang(270, 0), ang(270, posMax)) + '" fill="none" stroke="#4D6480" stroke-width="10"/>' + fill(140, 130, 96, 270, 10, COL, ' filter="url(#gl14)"') +
-      '<g class="spring" style="transform-origin:140px 130px;transform:rotate(' + ang(270, -3) + 'deg);--tf:rotate(' + ang(270, VALUE) + 'deg)"><line x1="140" y1="130" x2="140" y2="52" stroke="' + W + '" stroke-width="3"/><circle cx="140" cy="52" r="6" fill="' + COL + '"/></g><circle cx="140" cy="130" r="8" fill="' + W + '"/>' +
+      '<g ' + rot(140, 130, 270) + '><line x1="140" y1="130" x2="140" y2="52" stroke="' + W + '" stroke-width="3"/><circle cx="140" cy="52" r="6" fill="' + COL + '"/></g><circle cx="140" cy="130" r="8" fill="' + W + '"/>' +
       lbl(140, 130, 76, 270, -3, '−3', '#FF8A96') + lbl(140, 130, 76, 270, posMax, '+' + posMax, '#C8F03C') + big(140, 196, 'fill:#fff') + livesRow(140, 218, 1.6) + status(140, 240) + '</svg>'; }]);
-  V.push([23, 'Полукруг с числами', 'Подписано каждое деление: −3, −2, −1, 0 и шаги роста до потолка. Стрелка-луч из центра, число крупно, жизни под ним.',
+  V.push([23, 'Полукруг с числами', 'Подписано каждое деление: −3, −2, −1, 0 и шаги роста до потолка. Стрелка-луч из центра.',
     function () { var s = '<svg viewBox="0 0 280 175"><path d="' + arc(140, 140, 112, -90, 90) + '" fill="none" stroke="' + N1 + '" stroke-width="3"/>'; var step = posMax / 5; [-3, -2, -1, 0].forEach(function (v) { s += lbl(140, 140, 126, 180, v, v, v < 0 ? RED : null); }); for (var v = step; v <= posMax + .001; v += step) s += lbl(140, 140, 126, 180, v, '+' + Math.round(v));
-      return s + '<g class="spring" style="transform-origin:140px 140px;transform:rotate(-90deg);--tf:rotate(' + ang(180, VALUE) + 'deg)"><line x1="140" y1="140" x2="140" y2="44" stroke="' + COL + '" stroke-width="6" stroke-linecap="round"/></g><circle cx="140" cy="140" r="8" fill="' + G + '"/>' + big(140, 118) + livesRow(140, 152, 1.6) + status(140, 172) + '</svg>'; }]);
-  V.push([24, 'Три кольца', 'Как «кольца активности»: внешнее — репутация (доля от текущего потолка), среднее — платежи, внутреннее — участие. Жизни — сердечки в центре.',
-    function () { return '<svg viewBox="0 0 260 260"><circle cx="130" cy="130" r="112" fill="none" stroke="' + N1 + '" stroke-width="12"/><path class="mv" d="' + arc(130, 130, 112, 0, pos ? 359.9 : -359.9) + '" fill="none" stroke="' + COL + '" stroke-width="12" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" style="--dash:' + (100 - F * 100) + '"/>' +
+      return s + '<g ' + rot(140, 140, 180) + '><line x1="140" y1="140" x2="140" y2="44" stroke="' + COL + '" stroke-width="6" stroke-linecap="round"/></g><circle cx="140" cy="140" r="8" fill="' + G + '"/>' + big(140, 118) + livesRow(140, 152, 1.6) + status(140, 172) + '</svg>'; }]);
+  V.push([24, 'Три кольца', 'Как «кольца активности»: внешнее — репутация (доля от текущего потолка), среднее — платежи, внутреннее — участие. Жизни — в центре.',
+    function () { return '<svg viewBox="0 0 260 260"><circle cx="130" cy="130" r="112" fill="none" stroke="' + N1 + '" stroke-width="12"/><path class="mv" d="' + arc(130, 130, 112, 0, 359.9) + '" fill="none" stroke="' + COL + '" stroke-width="12" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" style="--dash:' + (100 - F * 100) + '"/>' +
       '<circle cx="130" cy="130" r="90" fill="none" stroke="' + N1 + '" stroke-width="12"/><path class="mv" d="' + arc(130, 130, 90, 0, 359.9) + '" fill="none" stroke="var(--msv-sky)" stroke-width="12" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" style="--dash:10"/>' +
       '<circle cx="130" cy="130" r="68" fill="none" stroke="' + N1 + '" stroke-width="12"/><path class="mv" d="' + arc(130, 130, 68, 0, 359.9) + '" fill="none" stroke="var(--msv-lavender)" stroke-width="12" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" style="--dash:55"/>' +
       big(130, 128) + livesRow(130, 150, 1.4) + cap(130, 170, 'до +' + posMax) + '</svg>'; }]);
 
-  function T0() { return LIVES / (LIVES + posMax); }   // доля шкалы, занятая жизнями (для градиента)
+  /* ---------- сборка ---------- */
+  var list = document.getElementById('list'), lives = document.getElementById('lives'), demoS = document.getElementById('demoS');
+  Object.keys(STYLES).forEach(function (k, i) { var b = document.createElement('button'); b.type = 'button'; b.dataset.s = k; b.textContent = STYLES[k][0]; b.setAttribute('aria-pressed', k === style ? 'true' : 'false'); demoS.appendChild(b); });
 
-  /* ---------- сборка / перерисовка ---------- */
-  var list = document.getElementById('list');
   function build() {
     recompute();
     list.innerHTML = '';
@@ -165,6 +186,17 @@
       sec.querySelector('.again').addEventListener('click', function () { run(g); });
       setTimeout(function () { run(g); }, 150 + i * 90);
     });
+    lives.innerHTML = '';
+    Object.keys(STYLES).forEach(function (k, i) {
+      var save = style; style = k;
+      var sec = document.createElement('section'); sec.className = 'v';
+      sec.innerHTML = '<h2 class="msv-sub v__t"><span class="v__num v__num--l">' + String.fromCharCode(1040 + i) + '</span>' + STYLES[k][0] + '</h2><div class="g" id="l' + k + '" style="max-width:200px"><svg viewBox="0 0 200 60">' + livesRow(100, 24, 2.6) + status(100, 54) + '</svg></div><button class="again" type="button">Ещё раз</button>';
+      style = save;
+      lives.appendChild(sec);
+      var g = sec.querySelector('.g');
+      sec.querySelector('.again').addEventListener('click', function () { run(g); });
+      setTimeout(function () { run(g); }, 900 + i * 90);
+    });
   }
   function count(root, ms) {
     root.querySelectorAll('[data-count]').forEach(function (el) {
@@ -172,8 +204,8 @@
       (function step() { var p = Math.min(1, (Date.now() - t0) / ms), e = 1 - Math.pow(1 - p, 3); el.textContent = fmt(VALUE * e); if (p < 1) setTimeout(step, 16); })();
     });
   }
-  /* Сброс без переходов (класс .reset), затем запуск — так «Ещё раз» всегда
-     начинается с нуля, а не «докручивает» с середины */
+  /* Сброс без переходов, затем запуск: «Ещё раз» всегда начинается с нуля.
+     Сгоревшие жизни гаснут по одной после того, как стрелка доехала. */
   function run(g) {
     g.classList.add('reset'); g.classList.remove('run');
     g.querySelectorAll('[data-count]').forEach(function (el) { el.textContent = fmt(0); });
@@ -183,15 +215,13 @@
     void g.offsetWidth;
     setTimeout(function () {
       g.classList.add('run'); count(g, 1300);
-      // сгоревшие жизни гаснут по одной после того, как стрелка доехала
-      g.querySelectorAll('.life').forEach(function (h) { var i = +h.dataset.life; if (i >= lives) setTimeout(function () { h.classList.add('life--lost'); }, 900 + (LIVES - 1 - i) * 220); });
+      g.querySelectorAll('.life').forEach(function (h) { var i = +h.dataset.life; if (i >= left) setTimeout(function () { h.classList.add('life--lost'); }, 1000 + (LIVES - 1 - i) * 240); });
     }, 40);
   }
-  document.getElementById('demo').addEventListener('click', function (e) {
-    var b = e.target.closest('button[data-v]'); if (!b) return;
-    document.querySelectorAll('#demo button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
-    VALUE = parseFloat(b.dataset.v); build();
-  });
+  function press(box, btn) { box.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', x === btn ? 'true' : 'false'); }); }
+  document.getElementById('demoV').addEventListener('click', function (e) { var b = e.target.closest('button[data-v]'); if (!b) return; press(this, b); VALUE = parseFloat(b.dataset.v); build(); });
+  document.getElementById('demoL').addEventListener('click', function (e) { var b = e.target.closest('button[data-l]'); if (!b) return; press(this, b); left = +b.dataset.l; build(); });
+  demoS.addEventListener('click', function (e) { var b = e.target.closest('button[data-s]'); if (!b) return; press(this, b); style = b.dataset.s; build(); });
   build();
 })();
 </script>
