@@ -32,6 +32,11 @@
   .needle { transition: transform 1.6s cubic-bezier(.25, .8, .25, 1); }
   .needle--gas { transition: transform .8s cubic-bezier(.45, 0, .55, 1); }
   .needle--reset { transition: none !important; }
+  @keyframes smoke { 0% { transform: translateY(0) scale(1); opacity: .7; } 100% { transform: translateY(-9px) scale(1.2); opacity: 0; } }
+  .smoke path { animation: smoke 2.4s ease-out infinite; transform-origin: 12px 4px; }
+  .smoke path:nth-child(2) { animation-delay: .8s; }
+  .smoke path:nth-child(3) { animation-delay: 1.6s; }
+  .cracks__h { width: 100%; margin: var(--msv-s8) 0 0; padding-left: var(--msv-s8); font-size: 13px; font-weight: 600; color: var(--msv-graphite); }
   .st { text-align: center; }
   .lcd { display: block; width: 168px; height: auto; margin: 0 auto; }
   .st__phrase { margin: var(--msv-s12) 0 0; font: 600 17px/22px var(--msv-font); color: var(--msv-graphite); }
@@ -87,7 +92,7 @@
     <button class="again" type="button" id="again">Показать анимацию ещё раз</button>
   </div>
 
-  <p class="msv-note" style="margin:var(--msv-s24) 0 0;padding-left:var(--msv-s16);color:var(--msv-n500)">Трещина на сгоревшем сердце — выбери:</p>
+  <p class="msv-note" style="margin:var(--msv-s24) 0 0;padding-left:var(--msv-s16);color:var(--msv-n500)">Сгоревшая жизнь — выбери рисунок:</p>
   <div class="cracks" id="cracks"></div>
 
 </div>
@@ -126,16 +131,49 @@
     line: { t: 'Ломаная',            d: 'M12 6.5l-2.2 4 3.2 3-2.6 3.6 1.6 3.9' },
     bolt: { t: 'Молния',             d: 'M13.2 6l-3.6 5.2 3 1.4-3.2 5.6' },
     chip: { t: 'С отколотым кусочком', d: 'M12 6.5l-1.6 3.2 2.6 2.4-2 3.2', chip: 'M14.2 8.6l3.6-1.2-.6 3.6z' },
-    split: { t: 'Две половинки',      split: true }
+    split: { t: 'Две половинки',      split: true },
+    /* разбитые — ещё шесть */
+    fork:   { t: 'Раздвоенная',        d: 'M12 6.5l-1.5 3.5 2.5 2.5-2 4 M13 12.5l2.5 2.5-1.5 3.5' },
+    web:    { t: 'С ответвлениями',    d: 'M12 6.5l-2 4 3 3-2.5 4 1.5 3 M10 10.5l-2.5 1 M13 13.5l2.5-1.5 M10.5 17.5l-2 .5' },
+    gap:    { t: 'Расколото пополам',  gap: true },
+    shards: { t: 'Осколки',            d: 'M12 12l-1.5-5 M12 12l4-3.5 M12 12l-4 2.5 M12 12l1 6', chip: 'M15.5 8.2l3.2-1.3-.4 3.4z' },
+    stitch: { t: 'Зашитое',            d: 'M12 6.5l-1.5 4 2.5 3-2 4 1 2.5', stitch: 'M9 9.5l3.5 1.2 M10.5 12.8l3.5-1 M9.5 15.6l3.5.8 M10 18.3l3.2-.4' },
+    tip:    { t: 'Без кончика',        d: 'M12 6.5l-1.5 3.5 2.5 2.5-1.5 3', chip: 'M8.6 17.4L12 21.2l3.4-3.8-3.4 1.4z' },
+    /* сгоревшие — шесть */
+    ember:  { t: 'Уголь с искрами',    burnt: 'ember' },
+    edge:   { t: 'Обгоревший край',    burnt: 'edge' },
+    ash:    { t: 'Пепел',              burnt: 'ash' },
+    smoke:  { t: 'С дымком',           burnt: 'smoke' },
+    glow:   { t: 'Тлеющее',            burnt: 'glow' },
+    lava:   { t: 'С огненными трещинами', burnt: 'lava' }
   };
+  var DARK = '#3A3A3A', EMBER = '#FF7A00';
+  var LOWER = 'M2.6 12.3q2.35 1.5 4.7 0t4.7 0 4.7 0 4.7 0L21.5 12C20 16 17 19 12 21 7 19 4 16 2.5 12z';   // нижняя половина сердца с волнистым краем
+  function burntHeart(kind) {
+    var base = '<path d="' + HEART + '" fill="' + DARK + '" stroke="' + DARK + '" stroke-width="1.6" stroke-linejoin="round"/>';
+    switch (kind) {
+      case 'ember': return base + '<circle cx="9" cy="14" r=".9" fill="' + EMBER + '"/><circle cx="13.5" cy="11" r=".7" fill="' + EMBER + '"/><circle cx="12" cy="16.5" r=".6" fill="' + EMBER + '"/><circle cx="15.5" cy="14.5" r=".5" fill="' + EMBER + '"/>';
+      case 'edge':  return '<path d="' + HEART + '" fill="' + RED + '" stroke="' + RED + '" stroke-width="1.6" stroke-linejoin="round"/><path d="' + LOWER + '" fill="' + DARK + '"/><circle cx="8" cy="12.6" r=".55" fill="' + EMBER + '"/><circle cx="16.5" cy="12.4" r=".55" fill="' + EMBER + '"/>';
+      case 'ash':   return '<path d="' + HEART + '" fill="#CFCAC0" stroke="#B8B1A5" stroke-width="1.4" stroke-dasharray="1.6 1.2" stroke-linejoin="round"/><circle cx="7" cy="22.5" r=".7" fill="#B8B1A5"/><circle cx="10.5" cy="23.2" r=".5" fill="#B8B1A5"/><circle cx="15" cy="22.8" r=".6" fill="#B8B1A5"/><circle cx="18" cy="21.6" r=".45" fill="#B8B1A5"/>';
+      case 'smoke': return base + '<g class="smoke" fill="none" stroke="#9A958C" stroke-width="1.1" stroke-linecap="round"><path d="M9 5c-1.5-1.5 1.5-2.5 0-4"/><path d="M12.5 4c-1.5-1.5 1.5-2.5 0-4"/><path d="M16 5.5c-1.5-1.5 1.5-2.5 0-4"/></g>';
+      case 'glow':  return base + '<path d="' + LOWER + '" fill="' + EMBER + '" opacity=".55"/><path d="M12 21c-2.4-1.2-4.2-2.6-5.6-4.2 1.9 1 3.7 1.5 5.6 1.5s3.7-.5 5.6-1.5c-1.4 1.6-3.2 3-5.6 4.2z" fill="#FFD93D" opacity=".7"/>';
+      default:      return base + '<path d="M12 6.5l-2 4 3 3-2.5 4 1.5 3 M15 9l-1.5 3 2 2" fill="none" stroke="' + EMBER + '" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>';
+    }
+  }
   function lostHeart(kind, sc) {
     var c = CRACK[kind] || CRACK.bolt;
+    if (c.burnt) return burntHeart(c.burnt);
+    if (c.gap) {
+      return '<g transform="translate(-1 0)"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6l-1.2 3.4 2 2.4-1.6 3 1.4 2.6-.6 3.6z" fill="' + N300 + '" stroke="' + N300 + '" stroke-width="1.4" stroke-linejoin="round"/></g>' +
+             '<g transform="translate(1 0)"><path d="M12 21c2.5-1.6 7-4.5 9.5-9A5.5 5.5 0 0 0 12 6l-1.2 3.4 2 2.4-1.6 3 1.4 2.6-.6 3.6z" fill="' + N300 + '" stroke="' + N300 + '" stroke-width="1.4" stroke-linejoin="round"/></g>';
+    }
     if (c.split) {
       return '<g transform="rotate(-6 6 14)"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6z" fill="' + N300 + '" stroke="' + N300 + '" stroke-width="1.6" stroke-linejoin="round"/></g>' +
              '<g transform="translate(1.6 0) rotate(6 18 14)"><path d="M12 21c2.5-1.6 7-4.5 9.5-9A5.5 5.5 0 0 0 12 6z" fill="' + N300 + '" stroke="' + N300 + '" stroke-width="1.6" stroke-linejoin="round"/></g>';
     }
     return '<path d="' + HEART + '" fill="' + N300 + '" stroke="' + N300 + '" stroke-width="2" stroke-linejoin="round"/>' +
       (c.chip ? '<path d="' + c.chip + '" fill="' + BG + '" stroke="none"/>' : '') +
+      (c.stitch ? '<path d="' + c.stitch + '" fill="none" stroke="' + INK + '" stroke-width="1" stroke-linecap="round"/>' : '') +
       '<path d="' + c.d + '" fill="none" stroke="' + BG + '" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>';
   }
 
@@ -240,8 +278,10 @@
     document.getElementById('phrase').textContent = cur.w;
     document.getElementById('livesNote').textContent = state.lives === 3 ? 'Три жизни — все на месте' : state.lives === 2 ? 'Одна жизнь сгорела: нарушение отметил модератор' : 'Осталась последняя жизнь — следующее нарушение означает расторжение договора';
     document.getElementById('disc').textContent = mm >= 6 ? 'Скидка 5 % на проживание действует: полгода на максимуме' : 'До скидки 5 %: ещё ' + (6 - mm) + ' ' + plural(6 - mm) + ' на максимальной репутации';
-    document.getElementById('cracks').innerHTML = Object.keys(CRACK).map(function (k) {
-      return '<button class="crack" type="button" data-crack="' + k + '" aria-pressed="' + (state.crack === k) + '"><svg viewBox="0 0 24 24">' + lostHeart(k) + '</svg>' + esc(CRACK[k].t) + '</button>';
+    var keys = Object.keys(CRACK);
+    document.getElementById('cracks').innerHTML = keys.map(function (k, i) {
+      var head = i === 0 ? '<p class="cracks__h">Разбитые — первые четыре</p>' : i === 4 ? '<p class="cracks__h">Разбитые — ещё шесть</p>' : i === 10 ? '<p class="cracks__h">Сгоревшие — шесть</p>' : '';
+      return head + '<button class="crack" type="button" data-crack="' + k + '" aria-pressed="' + (state.crack === k) + '"><svg viewBox="0 0 24 24">' + lostHeart(k) + '</svg>' + esc(CRACK[k].t) + '</button>';
     }).join('');
     animate();
   }
