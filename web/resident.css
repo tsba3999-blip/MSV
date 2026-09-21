@@ -423,7 +423,7 @@
 /* Заголовок раздела в шапке — тоже ссылка «назад», как и стрелка рядом.
    Выглядит как обычный заголовок; при наведении чуть светлеет. */
 /* Шапка: стрелка с подписью «Вернуться» в первой строке, заголовок раздела — строкой ниже */
-.head { flex-wrap: wrap; height: auto; min-height: var(--msv-header); padding-top: var(--msv-s8); padding-bottom: var(--msv-s4); }
+.head { flex-wrap: wrap; height: auto; min-height: var(--msv-header); padding-top: var(--msv-s8); padding-bottom: var(--msv-s12); }   /* под заголовком раздела — 12 px, как под подзаголовками (.group__title) */
 .head__back:has(.head__back-label) { width: auto; padding-right: var(--msv-s8); border-radius: 22px; gap: 2px; }
 .head__back-label { font-size: var(--msv-note-size); line-height: var(--msv-note-line); color: var(--msv-n500); }
 .head__title { flex: 1 1 100%; order: 3; margin-top: var(--msv-s4); }
