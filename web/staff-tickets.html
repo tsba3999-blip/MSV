@@ -164,6 +164,12 @@ MSV.ready(function (ctx) {
     return d + ' ' + plural(d, 'день', 'дня', 'дней') + ' назад';
   }
 
+  var MONTHS = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+  function when(ms) {
+    var d = new Date(ms); if (isNaN(d)) return '';
+    var hh = ('0' + d.getHours()).slice(-2), mm = ('0' + d.getMinutes()).slice(-2);
+    return d.getDate() + ' ' + MONTHS[d.getMonth()] + (d.getFullYear() !== new Date().getFullYear() ? ' ' + d.getFullYear() : '') + ', ' + hh + ':' + mm;
+  }
   var PRIO_TAG = { critical: 'tag--bad', urgent: 'tag--warn', normal: 'tag--info', consult: 'tag--mute' };
   var STATUS_TAG = { 'Принята': 'tag--info', 'В работе': 'tag--warn', 'Выполнена': 'tag--ok', 'Отклонена': 'tag--bad' };
 
@@ -177,7 +183,8 @@ MSV.ready(function (ctx) {
       ? ' <span class="tag tag--bad">просрочена</span>' : '';
     return '<tr data-id="' + esc(t.id) + '">' +
       '<td><span class="who-cell__name">' + esc(t.category) + late + '</span>' +
-        '<span class="msv-note sub">' + esc(t.text) + '</span></td>' +
+        '<span class="msv-note sub">' + esc(t.text) + '</span>' +
+        '<span class="msv-note sub" style="color:var(--msv-n300)">№' + esc(String(t.id).replace(/^.*-t/, '')) + ' · ' + esc(when(t.created)) + '</span></td>' +
       '<td>' + esc(t.resident) +
         '<span class="msv-note sub">' + esc(t.bed) + ' · ' + esc(t.room) + ' · ' + esc(t.residence) + '</span></td>' +
       '<td><span class="tag ' + PRIO_TAG[t.priority] + '">' + esc(t.priorityName) + '</span>' +

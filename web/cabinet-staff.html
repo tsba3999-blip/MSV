@@ -10,6 +10,11 @@
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="cabinet.css">
 <style>
+  .bar__sel { height: var(--msv-btn-m); padding: 0 var(--msv-s12); font: 600 13px/1 var(--msv-font); color: var(--msv-graphite); background: var(--msv-white); border: 1px solid var(--msv-n100); border-radius: calc(var(--msv-btn-m) / 2); cursor: pointer; }
+  .bar__sel:focus { outline: none; border-color: var(--msv-graphite); }
+  .bar__sel--on { border-color: var(--msv-graphite); }
+</style>
+<style>
   body { --role: var(--msv-sky); --role-ink: var(--msv-graphite); }
 </style>
 </head>
@@ -111,11 +116,43 @@
     </header>
 
     <main class="work__body">
-      <p class="msv-note notice">Заявки вымышленные. Кнопки меняют состояние до обновления страницы: сервер ещё не подключён.</p>
-
       <div class="stats" id="stats"></div>
 
-      <h2 class="msv-sub" style="margin:0 0 var(--msv-s12)">Назначены на меня</h2>
+      <h2 class="msv-sub" style="margin:0 0 var(--msv-s12)" id="title">Назначены на меня</h2>
+
+      <!-- Фильтры: поиск, статус, срочность, исполнитель, резиденция, порядок -->
+      <div class="bar" id="filters">
+        <input class="bar__search" id="q" type="search" placeholder="Поиск: текст, фамилия, комната, номер" aria-label="Поиск">
+        <select class="bar__sel" id="fStatus" aria-label="Статус">
+          <option value="">Все статусы</option>
+          <option value="open">Открытые</option>
+          <option value="overdue">Просроченные</option>
+          <option value="Принята">Принята</option>
+          <option value="В работе">В работе</option>
+          <option value="Выполнена">Выполнена</option>
+          <option value="Отклонена">Отклонена</option>
+        </select>
+        <select class="bar__sel" id="fPrio" aria-label="Срочность">
+          <option value="">Любая срочность</option>
+          <option value="critical">Критическая авария</option>
+          <option value="urgent">Срочная поломка</option>
+          <option value="normal">Текущая неисправность</option>
+          <option value="consult">Консультация</option>
+        </select>
+        <select class="bar__sel" id="fWho" aria-label="Исполнитель"></select>
+        <select class="bar__sel" id="fRes" aria-label="Резиденция"><option value="">Все резиденции</option></select>
+        <select class="bar__sel" id="fSort" aria-label="Порядок">
+          <option value="smart">Сначала важные</option>
+          <option value="new">Сначала новые</option>
+          <option value="old">Сначала старые</option>
+          <option value="prio">По срочности</option>
+          <option value="status">По статусу</option>
+          <option value="who">По исполнителю</option>
+          <option value="res">По резиденции</option>
+        </select>
+        <button class="bar__chip" type="button" id="fReset" hidden>Сбросить</button>
+        <span class="msv-note bar__count" id="count"></span>
+      </div>
       <table class="grid">
         <thead><tr><th>Заявка</th><th>Кто и где</th><th>Срочность</th><th>Исполнитель</th><th>Статус</th><th></th></tr></thead>
         <tbody id="rows"></tbody>
@@ -158,7 +195,16 @@ MSV.ready(function (ctx) {
     return d + ' ' + plural(d, 'день', 'дня', 'дней') + ' назад';
   }
 
+  var MONTHS = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+  function when(ms) {
+    var d = new Date(ms); if (isNaN(d)) return '';
+    var hh = ('0' + d.getHours()).slice(-2), mm = ('0' + d.getMinutes()).slice(-2);
+    return d.getDate() + ' ' + MONTHS[d.getMonth()] + (d.getFullYear() !== new Date().getFullYear() ? ' ' + d.getFullYear() : '') + ', ' + hh + ':' + mm;
+  }
+
   var PRIO_TAG = { critical: 'tag--bad', urgent: 'tag--warn', normal: 'tag--info', consult: 'tag--mute' };
+  var PRIO_RANK = { critical: 0, urgent: 1, normal: 2, consult: 3 };
+  var STATUS_RANK = { 'Принята': 0, 'В работе': 1, 'Выполнена': 2, 'Отклонена': 3 };
   var STATUS_TAG = { 'Принята': 'tag--info', 'В работе': 'tag--warn', 'Выполнена': 'tag--ok', 'Отклонена': 'tag--bad' };
 
   /* Заявки всей сети. Изменения (взял в работу, выполнил) живут
@@ -171,7 +217,8 @@ MSV.ready(function (ctx) {
       ? ' <span class="tag tag--bad">просрочена</span>' : '';
     return '<tr data-id="' + esc(t.id) + '">' +
       '<td><span class="who-cell__name">' + esc(t.category) + late + '</span>' +
-        '<span class="msv-note sub">' + esc(t.text) + '</span></td>' +
+        '<span class="msv-note sub">' + esc(t.text) + '</span>' +
+        '<span class="msv-note sub" style="color:var(--msv-n300)">№' + esc(String(t.id).replace(/^.*-t/, '')) + ' · ' + esc(when(t.created)) + '</span></td>' +
       '<td>' + esc(t.resident) +
         '<span class="msv-note sub">' + esc(t.bed) + ' · ' + esc(t.room) + ' · ' + esc(t.residence) + '</span></td>' +
       '<td><span class="tag ' + PRIO_TAG[t.priority] + '">' + esc(t.priorityName) + '</span>' +
@@ -187,24 +234,79 @@ MSV.ready(function (ctx) {
     '</tr>';
   }
 
-  function mine() {
-    return ALL.filter(function (t) { return t.master === ME; })
-      .sort(function (a, b) {
-        var rank = function (t) {
-          if (t.status === 'Выполнена' || t.status === 'Отклонена') return 3;
-          if (t.overdue) return 0;
-          return t.status === 'В работе' ? 1 : 2;
-        };
-        var d = rank(a) - rank(b);
-        return d !== 0 ? d : b.created - a.created;
-      });
+  /* Фильтры. По умолчанию — «назначены на меня»; исполнителя можно сменить на любого или «все». */
+  var F = { q: '', status: '', prio: '', who: 'me', res: '', sort: 'smart' };
+  var isClosed = function (t) { return t.status === 'Выполнена' || t.status === 'Отклонена'; };
+
+  function fillWho() {
+    var names = {};
+    ALL.forEach(function (t) { if (t.master && t.master !== ME) names[t.master] = true; });
+    var sel = document.getElementById('fWho');
+    sel.innerHTML = '<option value="me">Я — ' + esc(ME) + '</option><option value="">Все исполнители</option><option value="none">Без исполнителя</option>' +
+      Object.keys(names).sort().map(function (n) { return '<option value="' + esc(n) + '">' + esc(n) + '</option>'; }).join('');
+    var rs = document.getElementById('fRes');
+    rs.innerHTML = '<option value="">Все резиденции</option>' + RES.map(function (r) { return '<option value="' + esc(r.name) + '">' + esc(r.name) + '</option>'; }).join('');
   }
+
+  function mine() {
+    var q = F.q.toLowerCase();
+    var list = ALL.filter(function (t) {
+      if (F.who === 'me' && t.master !== ME) return false;
+      if (F.who === 'none' && t.master) return false;
+      if (F.who && F.who !== 'me' && F.who !== 'none' && t.master !== F.who) return false;
+      if (F.status === 'open' && isClosed(t)) return false;
+      if (F.status === 'overdue' && !(t.overdue && !isClosed(t))) return false;
+      if (F.status && F.status !== 'open' && F.status !== 'overdue' && t.status !== F.status) return false;
+      if (F.prio && t.priority !== F.prio) return false;
+      if (F.res && t.residence !== F.res) return false;
+      if (q) {
+        var hay = [t.category, t.text, t.resident, t.room, t.bed, t.residence, t.master, String(t.id)].join(' ').toLowerCase();
+        if (hay.indexOf(q) < 0) return false;
+      }
+      return true;
+    });
+    var smart = function (t) { if (isClosed(t)) return 3; if (t.overdue) return 0; return t.status === 'В работе' ? 1 : 2; };
+    var cmp = {
+      smart: function (a, b) { return smart(a) - smart(b) || b.created - a.created; },
+      new: function (a, b) { return b.created - a.created; },
+      old: function (a, b) { return a.created - b.created; },
+      prio: function (a, b) { return PRIO_RANK[a.priority] - PRIO_RANK[b.priority] || b.created - a.created; },
+      status: function (a, b) { return STATUS_RANK[a.status] - STATUS_RANK[b.status] || b.created - a.created; },
+      who: function (a, b) { return String(a.master || 'я').localeCompare(String(b.master || 'я'), 'ru') || b.created - a.created; },
+      res: function (a, b) { return String(a.residence).localeCompare(String(b.residence), 'ru') || b.created - a.created; }
+    };
+    return list.sort(cmp[F.sort] || cmp.smart);
+  }
+
+  function readFilters() {
+    F.q = document.getElementById('q').value.trim();
+    F.status = document.getElementById('fStatus').value;
+    F.prio = document.getElementById('fPrio').value;
+    F.who = document.getElementById('fWho').value;
+    F.res = document.getElementById('fRes').value;
+    F.sort = document.getElementById('fSort').value;
+    ['fStatus', 'fPrio', 'fRes'].forEach(function (id) { var el = document.getElementById(id); el.classList.toggle('bar__sel--on', !!el.value); });
+    document.getElementById('fWho').classList.toggle('bar__sel--on', F.who !== 'me');
+    document.getElementById('fSort').classList.toggle('bar__sel--on', F.sort !== 'smart');
+    var changed = F.q || F.status || F.prio || F.who !== 'me' || F.res || F.sort !== 'smart';
+    document.getElementById('fReset').hidden = !changed;
+    document.getElementById('title').textContent = F.who === 'me' ? 'Назначены на меня' : F.who === 'none' ? 'Без исполнителя' : F.who ? 'Заявки: ' + F.who : 'Все заявки';
+  }
+  document.getElementById('filters').addEventListener('input', function () { readFilters(); render(); });
+  document.getElementById('filters').addEventListener('change', function () { readFilters(); render(); });
+  document.getElementById('fReset').addEventListener('click', function () {
+    document.getElementById('q').value = ''; document.getElementById('fStatus').value = ''; document.getElementById('fPrio').value = '';
+    document.getElementById('fWho').value = 'me'; document.getElementById('fRes').value = ''; document.getElementById('fSort').value = 'smart';
+    readFilters(); render();
+  });
 
   function render() {
     var list = mine();
-    var open = list.filter(function (t) { return t.status === 'Принята' || t.status === 'В работе'; });
+    var my = ALL.filter(function (t) { return t.master === ME; });
+    var open = my.filter(function (t) { return t.status === 'Принята' || t.status === 'В работе'; });
     var late = open.filter(function (t) { return t.overdue; });
-    var done = list.filter(function (t) { return t.status === 'Выполнена'; });
+    var done = my.filter(function (t) { return t.status === 'Выполнена'; });
+    document.getElementById('count').textContent = list.length + ' ' + plural(list.length, 'заявка', 'заявки', 'заявок');
 
     document.getElementById('stats').innerHTML = [
       ['В работе и принятых', String(open.length), 'на мне сейчас', ''],
@@ -218,7 +320,7 @@ MSV.ready(function (ctx) {
 
     var box = document.getElementById('rows');
     if (!list.length) {
-      box.innerHTML = '<tr><td colspan="5" class="grid__empty">На вас пока ничего не назначено. Загляните в общую очередь.</td></tr>';
+      box.innerHTML = '<tr><td colspan="6" class="grid__empty">' + (F.q || F.status || F.prio || F.res || F.who !== 'me' ? 'По этим условиям заявок нет.' : 'На вас пока ничего не назначено. Загляните в общую очередь.') + '</td></tr>';
       return;
     }
     box.innerHTML = list.map(row).join('');
@@ -238,6 +340,7 @@ MSV.ready(function (ctx) {
       .catch(function () { alert('Сервер не отвечает'); });
   });
 
+  fillWho(); readFilters();
   render();
 });
 </script>
