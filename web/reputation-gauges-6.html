@@ -1,0 +1,361 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#F5F1EA">
+<title>Репутация: двадцать на бежевом — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="resident.css">
+<style>
+  /* ============================================================
+     Индикатор репутации, третья серия (замечания 21.09.2026):
+     за основу взят вариант «Всё сразу» (цифры в кольце, фразы в
+     секторах, сердца, дуга до скидки), без белой карточки — прямо
+     на бежевом фоне. Двадцать разных рисунков, стрелок и анимаций.
+     Правила прежние: шкала −2 … +3 (бордовый, красный, жёлтый, лайм,
+     зелёный, тёмно-зелёный), три жизни, скидка 5 % за полгода на максимуме.
+     ============================================================ */
+  .page { padding-bottom: var(--msv-s48); }
+  .v { padding: var(--msv-s16) 0 var(--msv-s24); border-bottom: 1px solid var(--msv-n100); }
+  .v:last-child { border-bottom: 0; }
+  .v__t { margin: 0 0 var(--msv-s4); font-size: 17px; line-height: 22px; padding-left: var(--msv-s16); }
+  .v__d { margin: 0 0 var(--msv-s12); color: var(--msv-n500); padding-left: var(--msv-s16); }
+  .v__num { display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 26px; padding: 0 6px; margin-right: var(--msv-s8); font-size: 13px; font-weight: 700; color: var(--msv-white); background: var(--msv-red); border-radius: 13px; vertical-align: middle; }
+  .g { display: block; width: 100%; }
+  .g svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .g--dark { padding: var(--msv-s16); background: var(--msv-graphite); border-radius: var(--msv-r20); }
+  .g--row { display: flex; align-items: center; gap: var(--msv-s16); }
+  .g--row svg { width: 46%; flex: 0 0 auto; }
+  .g--row p { margin: 0 0 var(--msv-s4); }
+  .needle { transition: transform 1.4s cubic-bezier(.22, 1.25, .36, 1); }
+  .needle--ease { transition: transform 1.2s cubic-bezier(.2, .8, .2, 1); }
+  .needle--bounce { transition: transform 1.6s cubic-bezier(.5, 1.9, .4, .9); }
+  .needle--fast { transition: transform .9s cubic-bezier(.3, 0, .2, 1); }
+  .needle--grow { transition: transform 1.1s cubic-bezier(.22, 1.25, .36, 1); }
+  .needle--reset { transition: none !important; }
+  .lit { transition: opacity .5s ease; }
+  .draw { transition: stroke-dashoffset 1.6s cubic-bezier(.2, .8, .2, 1); }
+  .again { display: inline-flex; align-items: center; height: var(--msv-btn-s); padding: 0 var(--msv-s16); margin: var(--msv-s12) 0 0 var(--msv-s16); font: 600 13px/1 var(--msv-font); color: var(--msv-graphite); background: var(--msv-white); border: 1px solid var(--msv-n100); border-radius: 999px; cursor: pointer; }
+  .again:hover { border-color: var(--msv-n300); }
+  .ctl { position: sticky; top: 0; z-index: 2; margin: 0 calc(var(--msv-s24) * -1) var(--msv-s8); padding: var(--msv-s12) var(--msv-s24); background: color-mix(in srgb, var(--msv-beige) 92%, transparent); backdrop-filter: blur(6px); }
+  .ctl__row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--msv-s8) var(--msv-s16); }
+  .ctl__l { font-size: 12px; color: var(--msv-n500); }
+  .ctl input[type=range] { width: 160px; accent-color: var(--msv-red); }
+  .ctl .chip { height: 32px; padding: 0 12px; font-size: 13px; }
+  .ctl__val { display: inline-block; min-width: 26px; font-weight: 700; }
+  @keyframes shiver { 0%, 100% { transform: rotate(var(--r)); } 30% { transform: rotate(calc(var(--r) + 3deg)); } 60% { transform: rotate(calc(var(--r) - 2deg)); } }
+  .needle--shiver { animation: shiver .6s ease-in-out 1.4s 1; }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="head">
+    <a class="head__back" href="reputation-gauges-5.html" aria-label="Вернуться назад">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+    <span class="head__back-label">Вернуться</span></a>
+    <h1 class="msv-sub head__title">Репутация: двадцать на бежевом</h1>
+  </div>
+
+  <p class="msv-body" style="margin:0 0 var(--msv-s8);color:var(--msv-n500)">За основу взят «Всё сразу». Без белых карточек. У каждого — свой рисунок, стрелка и анимация: кнопка «ещё раз» под индикатором.</p>
+
+  <div class="ctl">
+    <div class="ctl__row">
+      <span class="ctl__l">Репутация <span class="ctl__val" id="vVal">+1</span></span>
+      <input type="range" id="v" min="-2" max="3" step="1" value="1" aria-label="Репутация">
+      <span class="ctl__l">Жизни</span>
+      <span role="group" aria-label="Жизни">
+        <button class="chip" type="button" data-l="3" aria-pressed="false">3</button>
+        <button class="chip" type="button" data-l="2" aria-pressed="true">2</button>
+        <button class="chip" type="button" data-l="1" aria-pressed="false">1</button>
+      </span>
+      <span class="ctl__l">Месяцев на максимуме <span class="ctl__val" id="mVal">2</span></span>
+      <input type="range" id="m" min="0" max="6" step="1" value="2" aria-label="Месяцев на максимуме">
+    </div>
+  </div>
+
+  <div id="grid"></div>
+
+  <div class="foot">
+    <a class="msv-btn msv-btn--block msv-btn--secondary" href="reputation-gauges-5.html">Предыдущие восемь</a>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var C = { bordo: '#7A1F2E', red: '#FB344A', yellow: '#FFD93D', lime: '#C8F03C', green: '#35B265', emerald: '#1E7F4B', ink: '#34495E', white: '#FFFFFF', n100: '#EAE4DA', n300: '#B8B1A5', n500: '#6B665E' };
+  var ORDER = ['bordo', 'red', 'yellow', 'lime', 'green', 'emerald'];
+  var S = [
+    { v: -2, c: 'bordo',   ink: '#fff', t: ['Опасность', 'расторжения', 'договора'], w: 'Опасность расторжения договора', s: 'Опасность' },
+    { v: -1, c: 'red',     ink: '#fff', t: ['Нужно быть', 'внимательным'],           w: 'Нужно быть внимательным', s: 'Внимание' },
+    { v:  0, c: 'yellow',  ink: C.ink,  t: ['Сделай', 'что-то', 'хорошее'],          w: 'Нужно сделать что-то хорошее', s: 'Доброе дело' },
+    { v:  1, c: 'lime',    ink: C.ink,  t: ['У тебя', 'хорошее', 'будущее'],         w: 'У тебя хорошее будущее', s: 'Будущее' },
+    { v:  2, c: 'green',   ink: '#fff', t: ['Ты на', 'высоте'],                      w: 'Ты на высоте', s: 'На высоте' },
+    { v:  3, c: 'emerald', ink: '#fff', t: ['Так', 'держать!'],                      w: 'Так держать!', s: 'Так держать!' }
+  ];
+  var ICON = { bordo: 'M12 3l10 18H2z M12 10v5 M12 18v.5', red: 'M12 4v10 M12 18v.5', yellow: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z M9 13a3 3 0 0 0 6 0', lime: 'M5 12l5 5 9-10', green: 'M12 3l2.6 5.6 6.1.8-4.5 4.2 1.2 6.1L12 16.8 6.6 19.7l1.2-6.1L3.3 9.4l6.1-.8z', emerald: 'M6 4h12v4a6 6 0 0 1-12 0z M9 20h6 M12 14v6 M6 6H3v2a3 3 0 0 0 3 3 M18 6h3v2a3 3 0 0 1-3 3' };
+  var HEART = 'M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z';
+  var state = { v: 1, lives: 2, months: 2 };
+
+  /* ---------- геометрия ---------- */
+  var CX = 200, CY = 200;
+  function pt(r, a) { var k = a * Math.PI / 180; return [CX + r * Math.cos(k), CY - r * Math.sin(k)]; }
+  function f(n) { return Math.round(n * 100) / 100; }
+  function ring(r1, r2, a1, a2) {   // a1 > a2 (по часовой), дуга < 180°
+    var big = a1 - a2 > 180 ? 1 : 0;
+    var p1 = pt(r2, a1), p2 = pt(r2, a2), p3 = pt(r1, a2), p4 = pt(r1, a1);
+    return 'M' + f(p1[0]) + ' ' + f(p1[1]) + ' A' + r2 + ' ' + r2 + ' 0 ' + big + ' 1 ' + f(p2[0]) + ' ' + f(p2[1]) +
+      ' L' + f(p3[0]) + ' ' + f(p3[1]) + ' A' + r1 + ' ' + r1 + ' 0 ' + big + ' 0 ' + f(p4[0]) + ' ' + f(p4[1]) + ' Z';
+  }
+  function arc(r, a1, a2) { var big = a1 - a2 > 180 ? 1 : 0; var p1 = pt(r, a1), p2 = pt(r, a2); return 'M' + f(p1[0]) + ' ' + f(p1[1]) + ' A' + r + ' ' + r + ' 0 ' + big + ' 1 ' + f(p2[0]) + ' ' + f(p2[1]); }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  function hex(h) { var n = parseInt(h.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; }
+  function rgb(a) { return '#' + a.map(function (x) { return ('0' + Math.round(Math.max(0, Math.min(255, x))).toString(16)).slice(-2); }).join(''); }
+  function mix(h1, h2, k) { var a = hex(h1), b = hex(h2); return rgb([a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k]); }
+  function light(h, k) { return mix(h, '#FFFFFF', k); }
+  function plural(n) { return n === 1 ? 'месяц' : n < 5 ? 'месяца' : 'месяцев'; }
+  var uid = 0;
+
+  /* ---------- индикатор ----------
+     o.sweep    — 180 (полукруг) или 270 (три четверти)
+     o.band     — [r1, r2] цветная полоса; o.ring — [k1, k2] кольцо цифр или null
+     o.flat     — без градиента; o.cont — сплошной градиент без секторов; o.gap — зазор, град.
+     o.inside   — 'phrases' | 'icons' | 'none'; o.nums — 'ring' | 'out' | 'none'; o.ticks — штрихи
+     o.needle   — 'graphite' | 'red' | 'white' | 'slim' | 'drop' | 'tail' | 'outer' | 'knob' | 'none'
+     o.mode     — 'normal' | 'fill' (сектора до значения) | 'led' (деления) | 'only' (только текущий) | 'draw' (дуга-прогресс)
+     o.center   — 'hearts' | 'score' | 'phrase' | 'initials' | 'livesArc' | 'none'; o.discount; o.dark
+     o.anim     — 'spring' | 'ease' | 'bounce' | 'sweep' | 'tick' | 'grow' | 'shiver' | 'count' | 'fill' | 'led' | 'draw' | 'fade' */
+  function gauge(o) {
+    var id = 'g' + (++uid);
+    var sweep = o.sweep || 180, A1 = 90 + sweep / 2, A2 = 90 - sweep / 2;
+    var R1 = o.band[0], R2 = o.band[1];
+    var gap = o.gap === undefined ? 1.4 : o.gap;
+    var n = S.length, bounds = []; for (var i = 0; i <= n; i++) bounds.push(A1 - sweep * i / n);
+    var v = state.v, idx = v + 2, cur = S[idx];
+    var ang = (bounds[idx] + bounds[idx + 1]) / 2;
+    var rot = 90 - ang, rot0 = 90 - A1;
+    var dark = o.dark, ink = dark ? '#fff' : C.ink, sub = dark ? '#B7C3D0' : C.n500;
+    var H = sweep > 180 ? 400 : (o.center === 'below' ? 262 : 224);
+    var s = ['<svg viewBox="0 0 400 ' + H + '"' + (o.mode ? ' data-seq="1"' : '') + ' xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Репутация ' + v + '">', '<defs>'];
+    s.push('<filter id="' + id + 'sh" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#34495E" flood-opacity=".18"/></filter>');
+    s.push('<filter id="' + id + 'ns" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity=".3"/></filter>');
+    ORDER.forEach(function (k) {
+      s.push('<radialGradient id="' + id + k + '" cx="' + CX + '" cy="' + CY + '" r="' + R2 + '" gradientUnits="userSpaceOnUse"><stop offset="' + f(R1 / R2) + '" stop-color="' + light(C[k], .28) + '"/><stop offset=".8" stop-color="' + C[k] + '"/><stop offset="1" stop-color="' + C[k] + '" stop-opacity=".92"/></radialGradient>');
+    });
+    var rm = (R1 + R2) / 2, rl = [R2 - 14, R2 - 31, R2 - 48], tg = gap * 0.7;   // строки текста прижаты к внешнему краю, зазор для текста уже
+    S.forEach(function (x, i) {
+      rl.forEach(function (r, j) { s.push('<path id="' + id + i + 'abc'[j] + '" d="' + arc(r, bounds[i] - tg, bounds[i + 1] + tg) + '"/>'); });
+      if (o.ring) s.push('<path id="' + id + i + 'k" d="' + arc((o.ring[0] + o.ring[1]) / 2, bounds[i] - gap, bounds[i + 1] + gap) + '"/>');
+    });
+    s.push('</defs>');
+
+    /* кольцо + сектора */
+    s.push('<g filter="url(#' + id + 'sh)">');
+    if (o.ring) S.forEach(function (x, i) { s.push('<path d="' + ring(o.ring[0], o.ring[1], bounds[i] - gap, bounds[i + 1] + gap) + '" fill="' + (dark ? '#4A5B70' : (o.ringColor || C.white)) + '"/>'); });
+    if (o.cont) {
+      var N = 60;
+      for (var q = 0; q < N; q++) {
+        var t0 = q / N * (n - 1), i0 = Math.min(n - 2, Math.floor(t0)), col = mix(C[ORDER[i0]], C[ORDER[i0 + 1]], t0 - i0);
+        var b1 = A1 - sweep * q / N, b2 = A1 - sweep * (q + 1) / N - 0.3;
+        var on = o.mode === 'draw' ? (b2 >= ang - 0.01) : true;
+        s.push('<path class="lit" data-i="' + q + '" d="' + ring(R1, R2, b1, b2) + '" fill="' + col + '" opacity="' + (o.mode === 'draw' ? (on ? 1 : .18) : 1) + '" data-on="' + (on ? 1 : .18) + '"/>');
+      }
+    } else if (o.mode === 'led') {
+      S.forEach(function (x, i) {
+        var k = 5, step = (bounds[i] - gap - (bounds[i + 1] + gap)) / k;
+        for (var j = 0; j < k; j++) {
+          var b1 = bounds[i] - gap - step * j, b2 = b1 - step + 0.9, on = b2 >= ang - 0.01;
+          s.push('<path class="lit" data-i="' + (i * k + j) + '" d="' + ring(R1, R2, b1, b2) + '" fill="' + C[x.c] + '" opacity="' + (on ? 1 : .15) + '" data-on="' + (on ? 1 : .15) + '"/>');
+        }
+      });
+    } else {
+      S.forEach(function (x, i) {
+        var op = 1;
+        if (o.mode === 'fill') op = i <= idx ? 1 : .18;
+        if (o.mode === 'only') op = i === idx ? 1 : .22;
+        s.push('<path class="lit" data-i="' + i + '" d="' + ring(R1, R2, bounds[i] - gap, bounds[i + 1] + gap) + '" fill="' + (o.flat ? C[x.c] : 'url(#' + id + x.c + ')') + '" opacity="' + op + '" data-on="' + op + '"' + (o.stroke ? ' stroke="' + (dark ? C.ink : '#F5F1EA') + '" stroke-width="' + o.stroke + '" stroke-linejoin="round"' : '') + '/>');
+      });
+    }
+    s.push('</g>');
+
+    /* штрихи */
+    if (o.ticks) {
+      for (var tk = 0; tk <= 30; tk++) {
+        var ta = A1 - sweep * tk / 30, major = tk % 5 === 0, ra = R2 + 4, rb = R2 + (major ? 14 : 8);
+        s.push('<line x1="' + f(pt(ra, ta)[0]) + '" y1="' + f(pt(ra, ta)[1]) + '" x2="' + f(pt(rb, ta)[0]) + '" y2="' + f(pt(rb, ta)[1]) + '" stroke="' + (major ? ink : C.n300) + '" stroke-width="' + (major ? 2 : 1) + '"/>');
+      }
+    }
+    /* цифры */
+    if (o.nums === 'ring' && o.ring) S.forEach(function (x, i) {
+      var on = x.v === v;
+      s.push('<text font-size="' + (on ? 17 : 15) + '" font-weight="800" fill="' + (on ? ink : sub) + '" font-family="var(--msv-font)"><textPath href="#' + id + i + 'k" startOffset="50%" text-anchor="middle" dominant-baseline="middle">' + (x.v > 0 ? '+' : '') + x.v + '</textPath></text>');
+    });
+    if (o.nums === 'out') S.forEach(function (x, i) {
+      var p = pt(R2 + (o.ticks ? 26 : 16), (bounds[i] + bounds[i + 1]) / 2), on = x.v === v;
+      s.push('<text x="' + f(p[0]) + '" y="' + f(p[1]) + '" font-size="' + (on ? 17 : 14) + '" font-weight="800" fill="' + (on ? ink : sub) + '" text-anchor="middle" dominant-baseline="middle" font-family="var(--msv-font)">' + (x.v > 0 ? '+' : '') + x.v + '</text>');
+    });
+    /* подписи в секторах */
+    if (o.inside === 'phrases') S.forEach(function (x, i) {
+      var keys = x.t.length === 3 ? ['a', 'b', 'c'] : ['a', 'b'];
+      x.t.forEach(function (ln, li) { s.push('<text font-size="' + (o.font || 7.5) + '" font-weight="600" fill="' + x.ink + '" font-family="var(--msv-font)"><textPath href="#' + id + i + keys[li] + '" startOffset="50%" text-anchor="middle" dominant-baseline="middle">' + esc(ln) + '</textPath></text>'); });
+    });
+    if (o.inside === 'icons') S.forEach(function (x, i) {
+      var p = pt(rm, (bounds[i] + bounds[i + 1]) / 2);
+      s.push('<g transform="translate(' + f(p[0] - 12) + ' ' + f(p[1] - 12) + ')"><path d="' + ICON[x.c] + '" fill="none" stroke="' + x.ink + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>');
+    });
+    if (o.inside === 'short') S.forEach(function (x, i) {
+      s.push('<text font-size="9" font-weight="700" fill="' + x.ink + '" font-family="var(--msv-font)"><textPath href="#' + id + i + 'b" startOffset="50%" text-anchor="middle" dominant-baseline="middle">' + esc(x.s) + '</textPath></text>');
+    });
+
+    /* стрелка */
+    var len = o.len || (R1 + (R2 - R1) * .45), body = '', hub = dark ? '#fff' : C.ink;
+    var N_ = { graphite: '<path d="M' + CX + ' ' + (CY - len) + ' L' + (CX - 6) + ' ' + (CY - 10) + ' L' + (CX + 6) + ' ' + (CY - 10) + ' Z" fill="' + hub + '"/><circle cx="' + CX + '" cy="' + CY + '" r="14" fill="' + (dark ? C.ink : '#fff') + '"/><circle cx="' + CX + '" cy="' + CY + '" r="6" fill="' + hub + '"/>',
+      red: '<path d="M' + CX + ' ' + (CY - len) + ' L' + (CX - 5) + ' ' + (CY - 8) + ' L' + (CX + 5) + ' ' + (CY - 8) + ' Z" fill="' + C.red + '"/><circle cx="' + CX + '" cy="' + CY + '" r="13" fill="' + C.red + '"/><circle cx="' + CX + '" cy="' + CY + '" r="5" fill="#fff"/>',
+      white: '<path d="M' + CX + ' ' + (CY - len) + ' L' + (CX - 7) + ' ' + (CY - 10) + ' L' + (CX + 7) + ' ' + (CY - 10) + ' Z" fill="#fff" stroke="' + C.ink + '" stroke-width="2" stroke-linejoin="round"/><circle cx="' + CX + '" cy="' + CY + '" r="14" fill="#fff" stroke="' + C.ink + '" stroke-width="2"/><circle cx="' + CX + '" cy="' + CY + '" r="5" fill="' + C.red + '"/>',
+      slim: '<line x1="' + CX + '" y1="' + (CY - 4) + '" x2="' + CX + '" y2="' + (CY - len) + '" stroke="' + hub + '" stroke-width="3.5" stroke-linecap="round"/><circle cx="' + CX + '" cy="' + (CY - len) + '" r="6" fill="' + C.red + '" stroke="#fff" stroke-width="2"/><circle cx="' + CX + '" cy="' + CY + '" r="11" fill="' + (dark ? C.ink : '#fff') + '" stroke="' + hub + '" stroke-width="3"/>',
+      drop: '<path d="M' + CX + ' ' + (CY - len) + ' C' + (CX + 9) + ' ' + (CY - len * .5) + ' ' + (CX + 9) + ' ' + (CY - 18) + ' ' + CX + ' ' + (CY + 2) + ' C' + (CX - 9) + ' ' + (CY - 18) + ' ' + (CX - 9) + ' ' + (CY - len * .5) + ' ' + CX + ' ' + (CY - len) + ' Z" fill="' + hub + '"/><circle cx="' + CX + '" cy="' + (CY - 12) + '" r="4" fill="' + C.red + '"/>',
+      tail: '<path d="M' + CX + ' ' + (CY - len) + ' L' + (CX - 4) + ' ' + CY + ' L' + (CX - 5) + ' ' + (CY + 24) + ' L' + (CX + 5) + ' ' + (CY + 24) + ' L' + (CX + 4) + ' ' + CY + ' Z" fill="' + C.red + '"/><circle cx="' + CX + '" cy="' + CY + '" r="10" fill="' + hub + '"/><circle cx="' + CX + '" cy="' + CY + '" r="4" fill="#fff"/>',
+      outer: '<path d="M' + CX + ' ' + (CY - R2 - 4) + ' L' + (CX - 10) + ' ' + (CY - R2 - 22) + ' L' + (CX + 10) + ' ' + (CY - R2 - 22) + ' Z" fill="' + C.red + '"/>',
+      knob: '<circle cx="' + CX + '" cy="' + (CY - rm) + '" r="17" fill="#fff" stroke="' + C[cur.c] + '" stroke-width="4"/><g class="needle-inv" style="transform-origin:' + CX + 'px ' + (CY - rm) + 'px;transform:rotate(' + f(-rot) + 'deg)"><text x="' + CX + '" y="' + (CY - rm) + '" font-size="14" font-weight="800" fill="' + C.ink + '" text-anchor="middle" dominant-baseline="middle" font-family="var(--msv-font)">' + (v > 0 ? '+' : '') + v + '</text></g>',
+      none: '' };
+    body = N_[o.needle || 'graphite'];
+    if (body) s.push('<g class="needle needle--reset" data-rot="' + f(rot) + '" data-rot0="' + f(rot0) + '" data-anim="' + (o.anim || 'spring') + '" filter="url(#' + id + 'ns)" style="--r:' + f(rot) + 'deg;transform-origin:' + CX + 'px ' + CY + 'px;transform:rotate(' + f(rot0) + 'deg)' + (o.anim === 'grow' ? ' scale(0)' : '') + '">' + body + '</g>');
+
+    /* центр */
+    var cyc = CY - (sweep > 180 ? 60 : 40);
+    if (o.center === 'score' || o.center === 'count') s.push('<text class="' + (o.center === 'count' ? 'cnt' : '') + '" data-v="' + v + '" x="' + CX + '" y="' + (cyc - 22) + '" font-size="34" font-weight="800" letter-spacing="-.02em" fill="' + ink + '" text-anchor="middle" dominant-baseline="middle" font-family="var(--msv-font)">' + (v > 0 ? '+' : '') + v + '</text>');
+    if (o.center === 'phrase' || o.center === 'score' || o.center === 'count') s.push('<text x="' + CX + '" y="' + (cyc + (o.center === 'phrase' ? -6 : 4)) + '" font-size="12" font-weight="700" fill="' + ink + '" text-anchor="middle" dominant-baseline="middle" font-family="var(--msv-font)">' + esc(cur.w) + '</text>');
+    if (o.center === 'initials') s.push('<circle cx="' + CX + '" cy="' + (cyc - 16) + '" r="22" fill="' + C.red + '"/><text x="' + CX + '" y="' + (cyc - 16) + '" font-size="15" font-weight="700" fill="#fff" text-anchor="middle" dominant-baseline="middle" font-family="var(--msv-font)">АЛ</text>');
+    var hearts = o.center === 'hearts' || o.center === 'initials' || o.center === 'score' || o.center === 'count' || o.center === 'phrase' || o.center === 'below';
+    if (hearts) {
+      var hy = o.center === 'below' ? CY + 30 : (o.center === 'hearts' ? cyc - 6 : cyc + 26), sc = o.center === 'below' ? 1 : .7, st = o.center === 'below' ? 34 : 22;
+      for (var h = 0; h < 3; h++) {
+        var hx = CX - st + h * st, al = h < state.lives;
+        s.push('<g transform="translate(' + f(hx - 12 * sc) + ' ' + f(hy - 12 * sc) + ') scale(' + sc + ')"><path d="' + HEART + '" fill="' + (al ? C.red : 'none') + '" stroke="' + (al ? C.red : C.n300) + '" stroke-width="2" stroke-linejoin="round"/></g>');
+      }
+      if (o.center === 'below') s.push('<text x="' + CX + '" y="' + (CY + 56) + '" font-size="11" fill="' + sub + '" text-anchor="middle" font-family="var(--msv-font)">' + (state.lives === 3 ? 'Три жизни — все на месте' : state.lives === 2 ? 'Одна жизнь сгорела' : 'Осталась последняя жизнь') + '</text>');
+    }
+    if (o.center === 'livesArc') {   // жизни — три сегмента внутренней дуги
+      var lr = R1 - 14;
+      for (var L = 0; L < 3; L++) {
+        var la1 = A1 - sweep * L / 3 - 1, la2 = A1 - sweep * (L + 1) / 3 + 1, al2 = L < state.lives;
+        s.push('<path d="' + arc(lr, la1, la2) + '" fill="none" stroke="' + (al2 ? C.red : C.n100) + '" stroke-width="8" stroke-linecap="butt"/>');
+      }
+      s.push('<text x="' + CX + '" y="' + (CY - 8) + '" font-size="10" font-weight="600" fill="' + sub + '" text-anchor="middle" font-family="var(--msv-font)">жизни: ' + state.lives + ' из 3</text>');
+    }
+    if (o.discount) {
+      var mr = R1 - (o.center === 'livesArc' ? 30 : 12), mm = state.months, ma = A1 - sweep * mm / 6;
+      s.push('<path d="' + arc(mr, A1, A2 + 0.001) + '" fill="none" stroke="' + (dark ? '#4A5B70' : C.white) + '" stroke-width="6" stroke-linecap="round"/>');
+      if (mm > 0) s.push('<path class="draw" d="' + arc(mr, A1, ma + 0.001) + '" fill="none" stroke="' + C.green + '" stroke-width="6" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="' + (o.anim === 'draw' ? 1 : 0) + '"/>');
+      s.push('<text x="' + CX + '" y="' + (CY + (sweep > 180 ? 60 : 14)) + '" font-size="10" font-weight="600" fill="' + sub + '" text-anchor="middle" font-family="var(--msv-font)">' + (mm >= 6 ? 'Скидка 5 % действует' : 'До скидки 5 %: ' + (6 - mm) + ' ' + plural(6 - mm)) + '</text>');
+    }
+    s.push('</svg>');
+    return s.join('');
+  }
+
+  var V = [
+    { t: 'Основа на бежевом', d: '«Всё сразу» без карточки: кольцо стало белым, чтобы читалось на бежевом. Графитовая стрелка, выезд слева с перелётом.', o: { band: [82, 150], ring: [156, 192], nums: 'ring', inside: 'phrases', center: 'hearts', discount: true, anim: 'spring' } },
+    { t: 'Без кольца, цифры снаружи', d: 'Цветная полоса шире, цифры стоят прямо над дугой. Красная стрелка, мягкий плавный выезд без перелёта.', o: { band: [92, 176], nums: 'out', inside: 'phrases', font: 8.5, needle: 'red', center: 'hearts', discount: true, anim: 'ease' } },
+    { t: 'Три четверти круга', d: 'Дуга 270°, как на приборной панели: сектора длиннее, фразы просторнее. Стрелка-игла с противовесом, «разгон до максимума и назад».', o: { sweep: 270, band: [96, 156], ring: [162, 194], nums: 'ring', inside: 'phrases', font: 9, needle: 'tail', center: 'score', discount: true, anim: 'sweep' } },
+    { t: 'Тонкая дуга и крупный балл', d: 'Узкая полоса без подписей, цифры снаружи; в центре крупный балл, который «накручивается» от −2 до значения, и фраза.', o: { band: [138, 168], nums: 'out', inside: 'none', needle: 'slim', len: 150, center: 'count', discount: true, anim: 'count' } },
+    { t: 'Плоские сектора, широкие зазоры', d: 'Без объёма, цвета ровные, между секторами бежевые просветы. Белая стрелка с красной точкой, пружинистый выезд с подскоком.', o: { band: [86, 152], ring: [158, 190], gap: 2.6, flat: true, nums: 'ring', inside: 'phrases', needle: 'white', center: 'hearts', discount: true, anim: 'bounce' } },
+    { t: 'Светящиеся деления', d: 'Тридцать делений загораются по очереди слева направо до текущего. Стрелки нет — метка на конце.', o: { band: [96, 160], ring: [166, 194], mode: 'led', nums: 'ring', inside: 'none', needle: 'none', center: 'score', discount: true, anim: 'led' } },
+    { t: 'Заливка до значения', d: 'Сектора справа от значения бледные; при открытии закрашиваются по одному. Тонкая стрелка, сердца ниже.', o: { band: [90, 156], ring: [162, 192], mode: 'fill', nums: 'ring', inside: 'short', needle: 'slim', center: 'below', discount: true, anim: 'fill' } },
+    { t: 'Только текущий сектор', d: 'Горит один сектор, остальные приглушены — сразу видно, где ты. Стрелка-капля, короткая дрожь в конце.', o: { band: [84, 150], ring: [156, 192], mode: 'only', nums: 'ring', inside: 'phrases', needle: 'drop', center: 'hearts', discount: true, anim: 'shiver' } },
+    { t: 'Сплошной градиент', d: 'Без секторов: цвет плавно переходит от бордового к зелёному, цифры снаружи со штрихами. Стрелка-игла.', o: { band: [104, 160], cont: true, ticks: true, nums: 'out', inside: 'none', needle: 'tail', center: 'score', discount: true, anim: 'spring' } },
+    { t: 'Дуга-прогресс', d: 'Градиентная дуга «рисуется» слева до значения, как загрузка. Указателя нет — конец дуги и есть значение.', o: { band: [120, 164], cont: true, mode: 'draw', nums: 'out', inside: 'none', needle: 'none', center: 'count', discount: true, anim: 'draw' } },
+    { t: 'Указатель снаружи', d: 'Красный треугольник над кольцом показывает на сектор, центр свободен для балла и сердец. Быстрый уверенный ход.', o: { band: [88, 150], ring: [156, 190], nums: 'ring', inside: 'phrases', needle: 'outer', center: 'score', discount: true, anim: 'fast' } },
+    { t: 'Бегунок с баллом', d: 'Кружок с числом едет по самой полосе, обводка — в цвет сектора. Внутри фраза и сердца.', o: { band: [96, 156], ring: [162, 192], nums: 'ring', inside: 'none', needle: 'knob', center: 'phrase', discount: true, anim: 'ease' } },
+    { t: 'Значки в секторах', d: 'Вместо слов — знаки: предупреждение, восклицание, нейтрально, галочка, звезда, кубок. Фраза — в центре под стрелкой.', o: { band: [88, 150], ring: [156, 192], nums: 'ring', inside: 'icons', needle: 'graphite', center: 'phrase', discount: true, anim: 'spring' } },
+    { t: 'Жизни — внутренней дугой', d: 'Вместо сердец три красных сегмента под шкалой: сгоревшая — серая. Ещё глубже — дуга до скидки.', o: { band: [100, 156], ring: [162, 192], nums: 'ring', inside: 'short', needle: 'graphite', center: 'livesArc', discount: true, anim: 'spring' } },
+    { t: 'С аватаром', d: 'В центре кружок с инициалами резидента и сердца под ним — индикатор становится личной карточкой.', o: { band: [92, 152], ring: [158, 192], nums: 'ring', inside: 'phrases', needle: 'outer', center: 'initials', discount: true, anim: 'ease' } },
+    { t: 'Тёмный циферблат', d: 'Графитовая плашка, белая стрелка, цвета горят ярче. Для тёмного оформления или ночного режима.', o: { dark: true, band: [86, 150], ring: [156, 192], nums: 'ring', inside: 'phrases', needle: 'white', center: 'hearts', discount: true, anim: 'spring' } },
+    { t: 'Со штрихами и рамкой', d: 'Секторы обведены бежевыми линиями, снаружи шкала со штрихами и цифрами — строже, как у прибора. Красная игла.', o: { band: [96, 160], stroke: 3, ticks: true, nums: 'out', inside: 'short', needle: 'tail', center: 'hearts', discount: true, anim: 'sweep' } },
+    { t: 'Три четверти, плоский', d: '270° без объёма и без кольца: цифры снаружи, широкие зазоры, красная стрелка. Ход с подскоком.', o: { sweep: 270, band: [98, 160], gap: 2.4, flat: true, nums: 'out', inside: 'phrases', font: 9, needle: 'red', center: 'hearts', discount: true, anim: 'bounce' } },
+    { t: 'Появление из центра', d: 'Стрелка «вырастает» из ступицы уже в нужном направлении — без пробега по шкале. Спокойный вариант для частых открытий.', o: { band: [86, 150], ring: [156, 192], nums: 'ring', inside: 'phrases', needle: 'graphite', center: 'hearts', discount: true, anim: 'grow' } },
+    { t: 'Компактный, в строку', d: 'Индикатор слева, справа балл, фраза, жизни и скидка. Для главной страницы кабинета, где место дорого.', o: { band: [96, 160], nums: 'out', inside: 'none', needle: 'red', center: 'none', anim: 'spring' }, row: true }
+  ];
+
+  var grid = document.getElementById('grid');
+  function hearts() { var r = ''; for (var i = 0; i < 3; i++) r += '<span style="color:' + (i < state.lives ? C.red : C.n300) + ';font-size:18px">' + (i < state.lives ? '♥' : '♡') + '</span> '; return r; }
+  function draw() {
+    uid = 0;
+    grid.innerHTML = V.map(function (x, i) {
+      var cur = S[state.v + 2];
+      var g = gauge(x.o);
+      var body = x.row
+        ? '<div class="g g--row">' + g + '<div><p class="msv-sub" style="margin:0">' + (state.v > 0 ? '+' : '') + state.v + ' · ' + esc(cur.s) + '</p><p class="msv-note" style="color:var(--msv-n500)">' + esc(cur.w) + '</p><p>' + hearts() + '</p><p class="msv-note" style="color:var(--msv-n500)">' + (state.months >= 6 ? 'Скидка 5 % действует' : 'До скидки 5 %: ' + (6 - state.months) + ' ' + plural(6 - state.months)) + '</p></div></div>'
+        : '<div class="g' + (x.o.dark ? ' g--dark' : '') + '">' + g + '</div>';
+      return '<section class="v"><h2 class="msv-body v__t"><span class="v__num">' + (i + 1) + '</span>' + esc(x.t) + '</h2><p class="msv-note v__d">' + esc(x.d) + '</p>' + body + '<button class="again" type="button" data-again>Показать анимацию ещё раз</button></section>';
+    }).join('');
+    animate();
+  }
+
+  /* ---------- анимации ---------- */
+  function animate(scope) {
+    var root = scope || document;
+    root.querySelectorAll('.needle').forEach(function (g) {
+      var anim = g.dataset.anim, rot = g.dataset.rot, rot0 = g.dataset.rot0;
+      g.className.baseVal = 'needle needle--reset';
+      g.style.animation = 'none';
+      g.style.transform = anim === 'grow' ? 'rotate(' + rot + 'deg) scale(0)' : 'rotate(' + rot0 + 'deg)';
+      var inv = g.querySelector('.needle-inv'); if (inv) { inv.style.transition = 'none'; inv.style.transform = 'rotate(' + (-rot0) + 'deg)'; }
+      void g.getBoundingClientRect();
+      setTimeout(function () {
+        var cls = { ease: 'needle--ease', bounce: 'needle--bounce', fast: 'needle--fast', grow: 'needle--grow' }[anim] || '';
+        g.className.baseVal = 'needle ' + cls;
+        if (inv) inv.style.transition = 'transform 1.2s cubic-bezier(.2,.8,.2,1)';
+        if (anim === 'sweep') {
+          var max = Number(rot0) + (90 - Number(rot0)) * 2;   // правый край
+          g.className.baseVal = 'needle needle--fast';
+          g.style.transform = 'rotate(' + max + 'deg)';
+          setTimeout(function () { g.className.baseVal = 'needle needle--ease'; g.style.transform = 'rotate(' + rot + 'deg)'; }, 950);
+          return;
+        }
+        if (anim === 'tick') {
+          var steps = 6, k = 0, from = Number(rot0), to = Number(rot);
+          g.className.baseVal = 'needle needle--fast';
+          var iv = setInterval(function () { k++; g.style.transform = 'rotate(' + (from + (to - from) * k / steps) + 'deg)'; if (k >= steps) clearInterval(iv); }, 180);
+          return;
+        }
+        g.style.transform = 'rotate(' + rot + 'deg)' + (anim === 'grow' ? ' scale(1)' : '');
+        if (inv) inv.style.transform = 'rotate(' + (-rot) + 'deg)';
+        if (anim === 'shiver') { g.style.animation = ''; g.className.baseVal = 'needle needle--shiver'; }
+      }, 250);
+    });
+    /* сектора и деления — загораются по очереди */
+    root.querySelectorAll('svg[data-seq]').forEach(function (svg) {
+      var lits = svg.querySelectorAll('.lit[data-i]'), seq = lits.length > 6, dim = seq ? .15 : .18;
+      lits.forEach(function (p) { p.style.transition = 'none'; p.style.opacity = dim; });
+      void svg.getBoundingClientRect();
+      lits.forEach(function (p) { p.style.transition = ''; setTimeout(function () { p.style.opacity = p.dataset.on; }, 250 + Number(p.dataset.i) * (seq ? 35 : 150)); });
+    });
+    /* дуга-прогресс и дуга скидки */
+    root.querySelectorAll('.draw').forEach(function (p) { p.style.transition = 'none'; p.setAttribute('stroke-dashoffset', '1'); void p.getBoundingClientRect(); p.style.transition = ''; setTimeout(function () { p.setAttribute('stroke-dashoffset', '0'); }, 300); });
+    /* счётчик в центре */
+    root.querySelectorAll('.cnt').forEach(function (tx) {
+      var to = Number(tx.dataset.v), from = -2, steps = Math.max(1, to - from), k = 0;
+      tx.textContent = '−2';
+      var iv = setInterval(function () { k++; var val = from + k; tx.textContent = (val > 0 ? '+' : val < 0 ? '−' : '') + Math.abs(val); if (k >= steps) clearInterval(iv); }, 1400 / steps);
+    });
+  }
+  grid.addEventListener('click', function (e) { var b = e.target.closest('[data-again]'); if (b) animate(b.closest('.v')); });
+
+  document.getElementById('v').addEventListener('input', function () { state.v = Number(this.value); document.getElementById('vVal').textContent = (state.v > 0 ? '+' : '') + state.v; draw(); });
+  document.getElementById('m').addEventListener('input', function () { state.months = Number(this.value); document.getElementById('mVal').textContent = state.months; draw(); });
+  document.querySelectorAll('[data-l]').forEach(function (b) { b.addEventListener('click', function () { document.querySelectorAll('[data-l]').forEach(function (x) { x.setAttribute('aria-pressed', 'false'); }); b.setAttribute('aria-pressed', 'true'); state.lives = Number(b.dataset.l); draw(); }); });
+  draw();
+})();
+</script>
+<script src="mark.js"></script>
+<script src="protect.js"></script>
+
+</body>
+</html>
