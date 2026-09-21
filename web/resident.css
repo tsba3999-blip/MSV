@@ -380,6 +380,8 @@
 }
 
 .tab[aria-current="page"] .tab__cap { display: block; }
+/* Узкие экраны (360): подпись «Заявка на техника» длинная — ужимаем зазоры, чтобы полоса не переполнялась */
+@media (max-width: 374px) { .tabbar { gap: 2px; } .tab[aria-current="page"] { padding: 0 12px; } }
 
 /* Внесённый депозит — отдельный неброский тон */
 .pay-row--deposit { background: color-mix(in srgb, var(--msv-ice) 12%, var(--msv-white)); }   /* едва заметный голубой (в восемь раз светлее подложки) */

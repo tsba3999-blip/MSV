@@ -32,14 +32,13 @@
      ============================================================ */
   .page { padding-bottom: var(--msv-s48); }
   .grid { display: grid; grid-template-columns: 1fr; gap: var(--msv-s16); }
-  @media (min-width: 768px) { .grid { grid-template-columns: 1fr 1fr; } }
   .v { padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r20); box-shadow: var(--msv-e1); }
   .v--dark { background: var(--msv-graphite); color: var(--msv-white); }
   .v--dark .v__d { color: #B7C3D0; }
   .v__t { margin: 0 0 var(--msv-s4); font-size: 17px; line-height: 22px; }
   .v__d { margin: 0 0 var(--msv-s12); color: var(--msv-n500); }
   .v__num { display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 26px; padding: 0 6px; margin-right: var(--msv-s8); font-size: 13px; font-weight: 700; color: var(--msv-white); background: var(--msv-red); border-radius: 13px; vertical-align: middle; }
-  .g { display: block; width: 100%; max-width: 320px; margin: 0 auto; }
+  .g { display: block; width: 100%; margin: 0 auto; }   /* на всю ширину колонки — по просьбе заказчика, чтобы разглядеть */
   .g svg { display: block; width: 100%; height: auto; overflow: visible; }
   .g--compact { display: flex; align-items: center; gap: var(--msv-s16); max-width: none; }
   .g--compact svg { width: 150px; flex: 0 0 auto; }
