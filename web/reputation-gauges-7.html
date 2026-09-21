@@ -92,8 +92,6 @@
     <button class="again" type="button" id="again">Показать анимацию ещё раз</button>
   </div>
 
-  <p class="msv-note" style="margin:var(--msv-s24) 0 0;padding-left:var(--msv-s16);color:var(--msv-n500)">Сгоревшая жизнь — выбери рисунок:</p>
-  <div class="cracks" id="cracks"></div>
 
 </div>
 
@@ -126,6 +124,11 @@
   };
   var ICONS = ['warn', 'stop', 'sprout', 'star', 'cup'];
 
+  /* Сгоревшая жизнь — утверждено 22.09.2026: чёрное сердце, расколотое зигзагом сверху донизу */
+  function brokenBlack() {
+    return '<path d="' + HEART + '" fill="#111" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/>' +
+      '<path d="M12.6 5.4L10.2 9.4l3.4 1.6-3 3.6 2.8 1.8-2.6 3.6 1.2 2.2" fill="none" stroke="' + BG + '" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>';
+  }
   /* трещины — четыре рисунка */
   var CRACK = {
     line: { t: 'Ломаная',            d: 'M12 6.5l-2.2 4 3.2 3-2.6 3.6 1.6 3.9' },
@@ -250,7 +253,7 @@
     for (var h = 0; h < 3; h++) {
       var x = CX - 90 + h * 90, y = CY + 136, al = h < state.lives, k2 = 3;
       s.push('<g transform="translate(' + f(x - 12 * k2) + ' ' + f(y - 12 * k2) + ') scale(' + k2 + ')">');
-      s.push(al ? '<path d="' + HEART + '" fill="' + RED + '" stroke="' + RED + '" stroke-width="2" stroke-linejoin="round"/>' : lostHeart(state.crack));
+      s.push(al ? '<path d="' + HEART + '" fill="' + RED + '" stroke="' + RED + '" stroke-width="2" stroke-linejoin="round"/>' : brokenBlack());
       s.push('</g>');
     }
     s.push('</svg>');
@@ -278,11 +281,6 @@
     document.getElementById('phrase').textContent = cur.w;
     document.getElementById('livesNote').textContent = state.lives === 3 ? 'Три жизни — все на месте' : state.lives === 2 ? 'Одна жизнь сгорела: нарушение отметил модератор' : 'Осталась последняя жизнь — следующее нарушение означает расторжение договора';
     document.getElementById('disc').textContent = mm >= 6 ? 'Скидка 5 % на проживание действует: полгода на максимуме' : 'До скидки 5 %: ещё ' + (6 - mm) + ' ' + plural(6 - mm) + ' на максимальной репутации';
-    var keys = Object.keys(CRACK);
-    document.getElementById('cracks').innerHTML = keys.map(function (k, i) {
-      var head = i === 0 ? '<p class="cracks__h">Разбитые — первые четыре</p>' : i === 4 ? '<p class="cracks__h">Разбитые — ещё шесть</p>' : i === 10 ? '<p class="cracks__h">Сгоревшие — шесть</p>' : '';
-      return head + '<button class="crack" type="button" data-crack="' + k + '" aria-pressed="' + (state.crack === k) + '"><svg viewBox="0 0 24 24">' + lostHeart(k) + '</svg>' + esc(CRACK[k].t) + '</button>';
-    }).join('');
     animate();
   }
 
@@ -308,7 +306,6 @@
   document.getElementById('v').addEventListener('input', function () { state.v = Number(this.value); document.getElementById('vVal').textContent = sign(state.v) + Math.abs(state.v); build(); });
   document.getElementById('m').addEventListener('input', function () { state.months = Number(this.value); document.getElementById('mVal').textContent = state.months; build(); });
   document.querySelectorAll('[data-l]').forEach(function (b) { b.addEventListener('click', function () { document.querySelectorAll('[data-l]').forEach(function (x) { x.setAttribute('aria-pressed', 'false'); }); b.setAttribute('aria-pressed', 'true'); state.lives = Number(b.dataset.l); build(); }); });
-  document.getElementById('cracks').addEventListener('click', function (e) { var b = e.target.closest('[data-crack]'); if (b) { state.crack = b.dataset.crack; build(); } });
   document.getElementById('again').addEventListener('click', animate);
   build();
 })();
