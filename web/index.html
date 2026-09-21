@@ -13,15 +13,18 @@
   /* Первая страница — красное полотно с паттерном.
      Экран 04 прототипа, растянутый на любую ширину. */
 
-  html, body { height: 100%; }
+  /* Первая страница целиком красная: страница не скроллится, красное поле — ровно окно
+     (иначе на некоторых экранах появлялась полоса прокрутки и бежевая кромка справа) */
+  html, body { height: 100%; overflow: hidden; background: var(--msv-red); }
 
   .start {
     position: relative;
     display: flex;
     flex-direction: column;
-    min-height: 100svh;
+    height: 100%;
+    min-height: 0;
     background: var(--msv-red);
-    overflow: hidden;
+    overflow: auto;
   }
 
   /* Паттерн — полосой поверху, не заходя под знак и не мешая кнопкам.
