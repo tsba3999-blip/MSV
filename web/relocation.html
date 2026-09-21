@@ -1,0 +1,163 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#F5F1EA">
+<title>Заявление на переселение — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="resident.css">
+<link rel="stylesheet" href="form.css">
+<style>
+  /* Заявление на переселение: пожелания уходят в очередь на место
+     (/api/waitlist). Когда подходящее место освободится, резиденту
+     придёт уведомление. */
+  .page { padding-bottom: var(--msv-s32); }
+  .q { margin: 0 0 var(--msv-s8); font-weight: 600; }
+  .sect { margin-bottom: var(--msv-s24); }
+  .opt { display: flex; align-items: flex-start; gap: var(--msv-s12); padding: var(--msv-s12) var(--msv-s16); background: var(--msv-white); border-bottom: 1px solid var(--msv-n100); cursor: pointer; }
+  .opt:first-child { border-radius: var(--msv-r12) var(--msv-r12) 0 0; }
+  .opt:last-child { border-bottom: 0; border-radius: 0 0 var(--msv-r12) var(--msv-r12); }
+  .opt:only-child { border-radius: var(--msv-r12); }
+  .opt input { width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--msv-red); flex: 0 0 auto; }
+  .opt span { flex: 1 1 auto; }
+  .box { background: var(--msv-white); border-radius: var(--msv-r12); box-shadow: var(--msv-e1); overflow: hidden; }
+  .chips { display: flex; flex-wrap: wrap; gap: var(--msv-s8); }
+  .other { margin-top: var(--msv-s12); }
+  .ok { padding: var(--msv-s16); background: var(--msv-lime); border-radius: var(--msv-r12); }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="head">
+    <a class="head__back" href="documents.html" aria-label="Вернуться назад">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 6l-6 6 6 6"/>
+      </svg>
+    <span class="head__back-label form__back-label">Вернуться</span></a>
+    <h1 class="msv-sub head__title"><a class="head__title-link" href="documents.html">Заявление на переселение</a></h1>
+  </div>
+
+  <p class="msv-body" style="margin:0 0 var(--msv-s24);color:var(--msv-n500)">Опиши, куда хочешь переехать. Когда подходящее место освободится, тебе придёт уведомление — и куратор свяжется.</p>
+
+  <div id="form">
+    <div class="sect">
+      <p class="msv-body q">В какую резиденцию хочешь переехать?</p>
+      <select class="msv-select" id="res" style="width:100%">
+        <option value="">Любая — где раньше освободится</option>
+        <option value="forma">Forma · м. Шаболовская</option>
+        <option value="uyut">Уют на Варшавке · м. Нагатинская</option>
+        <option value="molod">Молодежка · м. Молодежная</option>
+      </select>
+    </div>
+
+    <div class="sect">
+      <p class="msv-body q">Количество человек в комнате</p>
+      <div class="chips" role="group" aria-label="Количество человек в комнате" id="sizes">
+        <button class="chip" type="button" data-size="1" aria-pressed="false">1</button>
+        <button class="chip" type="button" data-size="2" aria-pressed="false">2</button>
+        <button class="chip" type="button" data-size="4" aria-pressed="false">4</button>
+        <button class="chip" type="button" data-size="6" aria-pressed="false">6</button>
+        <button class="chip" type="button" data-size="8" aria-pressed="false">8</button>
+        <button class="chip" type="button" data-size="caps" aria-pressed="false">Капсулы</button>
+      </div>
+    </div>
+
+    <div class="sect">
+      <p class="msv-body q">Насколько строго?</p>
+      <div class="box">
+        <label class="opt"><input type="radio" name="strict" value="strict"><span class="msv-body">Только так — жду именно такой вариант</span></label>
+        <label class="opt"><input type="radio" name="strict" value="flex" checked><span class="msv-body">Рассмотрю варианты — предлагайте похожие</span></label>
+      </div>
+    </div>
+
+    <div class="sect">
+      <p class="msv-body q">Выберите, пожалуйста, причину переезда</p>
+      <div class="box" id="reasons">
+        <label class="opt"><input type="checkbox" value="далеко добираться до вуза"><span class="msv-body">Далеко добираться до вуза</span></label>
+        <label class="opt"><input type="checkbox" value="хочу место подешевле"><span class="msv-body">Хочу место подешевле</span></label>
+        <label class="opt"><input type="checkbox" value="хочу место получше и подороже"><span class="msv-body">Хочу место получше и подороже</span></label>
+        <label class="opt"><input type="checkbox" value="не нравятся соседи"><span class="msv-body">Не нравятся соседи</span></label>
+        <label class="opt"><input type="checkbox" value="другая причина" id="otherCb"><span class="msv-body">Другая причина</span></label>
+      </div>
+      <label class="msv-field other" id="otherField" hidden>
+        <span class="msv-field__label">Расскажи, что за причина</span>
+        <textarea class="msv-area" id="otherText" maxlength="200" rows="3" placeholder="Например: сменился вуз"></textarea>
+      </label>
+    </div>
+
+    <p class="msv-note" id="err" hidden style="color:var(--msv-red);margin:0 0 var(--msv-s12)"></p>
+    <div class="foot">
+      <button class="msv-btn msv-btn--block msv-btn--primary" type="button" id="send">Подать заявление</button>
+    </div>
+  </div>
+
+  <div id="done" hidden>
+    <div class="ok">
+      <p class="msv-body" style="margin:0 0 var(--msv-s4);font-weight:600">Заявление принято</p>
+      <p class="msv-body" style="margin:0">Ты в очереди на место. Как только подходящее освободится, придёт уведомление, и куратор свяжется с тобой.</p>
+    </div>
+    <div class="foot">
+      <a class="msv-btn msv-btn--block msv-btn--secondary" href="waitlist.html">Посмотреть свою очередь</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var size = null;
+  document.getElementById('sizes').addEventListener('click', function (e) {
+    var c = e.target.closest('.chip'); if (!c) return;
+    var on = c.getAttribute('aria-pressed') === 'true';
+    this.querySelectorAll('.chip').forEach(function (x) { x.setAttribute('aria-pressed', 'false'); });
+    size = on ? null : c.dataset.size;
+    if (!on) c.setAttribute('aria-pressed', 'true');
+  });
+  document.getElementById('otherCb').addEventListener('change', function () {
+    document.getElementById('otherField').hidden = !this.checked;
+    if (this.checked) document.getElementById('otherText').focus();
+  });
+
+  document.getElementById('send').addEventListener('click', function () {
+    var btn = this, err = document.getElementById('err');
+    var reasons = Array.prototype.map.call(document.querySelectorAll('#reasons input:checked'), function (i) { return i.value; });
+    var other = document.getElementById('otherText').value.trim();
+    if (!reasons.length) { err.textContent = 'Отметь хотя бы одну причину.'; err.hidden = false; return; }
+    if (reasons.indexOf('другая причина') >= 0 && !other) { err.textContent = 'Напиши, что за причина.'; err.hidden = false; return; }
+    err.hidden = true;
+
+    var strict = document.querySelector('input[name="strict"]:checked').value === 'strict' ? 'только так' : 'рассмотрю варианты';
+    var note = ['Переселение', strict, size === 'caps' ? 'капсулы' : null, reasons.join(', ').replace('другая причина', 'другая причина: ' + other)]
+      .filter(Boolean).join(' · ').slice(0, 300);
+    var body = {
+      residenceId: document.getElementById('res').value || null,
+      roomSize: size && size !== 'caps' ? Number(size) : null,
+      note: note
+    };
+    if (location.protocol === 'file:') { show(); return; }
+    btn.disabled = true;
+    fetch('/api/waitlist', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j || {} }; }, function () { return { s: r.status, j: {} }; }); })
+      .then(function (r) {
+        if (r.s === 200 || r.s === 201) { show(); return; }
+        btn.disabled = false;
+        err.textContent = r.s === 401 ? 'Сессия истекла — войди ещё раз.' : (r.j.error || 'Не удалось отправить.'); err.hidden = false;
+      })
+      .catch(function () { btn.disabled = false; err.textContent = 'Сервер не отвечает. Попробуй ещё раз.'; err.hidden = false; });
+  });
+  function show() { document.getElementById('form').hidden = true; document.getElementById('done').hidden = false; window.scrollTo(0, 0); }
+})();
+</script>
+<script src="mark.js"></script>
+<script src="edit.js"></script>
+<script src="protect.js"></script>
+
+</body>
+</html>

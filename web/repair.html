@@ -217,9 +217,30 @@
 
   /* ---------- Отправка ---------- */
 
+  /* Отправка на сервер: заявка попадает в «Мои заявки» резидента и в раздел
+     «Заявки» у сотрудников и администратора; в Telegram администрации — уведомление.
+     Файлы пока не передаются — сервер их не принимает. */
+  var PRIO = { '0': 'critical', '1': 'urgent', '2': 'normal', '3': 'consult' };
   send.addEventListener('click', function () {
-    // ЗДЕСЬ БУДЕТ ЗАПРОС К СЕРВЕРУ: POST /api/tickets
-    location.href = 'my-tickets.html';
+    var prio = document.querySelector('input[name="prio"]:checked');
+    var placeEl = document.getElementById('place');
+    var body = {
+      text: document.getElementById('what').value.trim(),
+      priority: PRIO[prio ? prio.value : '2'] || 'normal',
+      category: placeEl ? placeEl.options[placeEl.selectedIndex].text : 'Другое',
+      place: placeEl ? placeEl.value : null,
+      room: (document.getElementById('room') || {}).value || null
+    };
+    if (location.protocol === 'file:') { location.href = 'my-tickets.html'; return; }
+    send.disabled = true;
+    fetch('/api/tickets', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j || {} }; }, function () { return { s: r.status, j: {} }; }); })
+      .then(function (r) {
+        if (r.s === 201 || r.s === 200) { location.href = 'my-tickets.html'; return; }
+        send.disabled = false;
+        alert(r.s === 401 ? 'Сессия истекла — войди ещё раз.' : (r.j.error || 'Не удалось отправить заявку.'));
+      })
+      .catch(function () { send.disabled = false; alert('Сервер не отвечает. Попробуй ещё раз.'); });
   });
 })();
 </script>
