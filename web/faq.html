@@ -15,10 +15,12 @@
   .qa__q { display: flex; align-items: center; justify-content: space-between; gap: var(--msv-s12); min-height: 56px; padding: var(--msv-s12) var(--msv-s16); font-weight: 600; cursor: pointer; list-style: none; }
   .qa__q::-webkit-details-marker { display: none; }
   .qa__q svg { flex: 0 0 auto; color: var(--msv-n300); transition: transform .32s var(--msv-ease); }
-  /* Ответ раскрывается плавно: высота анимируется скриптом ниже, .32s — как модальное окно в брендбуке */
-  .qa__a { overflow: hidden; transition: height .32s var(--msv-ease), opacity .32s var(--msv-ease); }
-  .qa__a.is-closing, .qa__a.is-opening { opacity: 0; }
-  .qa__a.is-opening.is-shown { opacity: 1; }
+  /* Ответ раскрывается и схлопывается плавно: скрипт оборачивает его в .qa__wrap и анимирует
+     высоту обёртки (вместе с полями абзаца — поэтому в конце ничего не дёргается), текст
+     проявляется и гаснет чуть быстрее высоты */
+  .qa__wrap { overflow: hidden; transition: height .38s cubic-bezier(.22, .61, .36, 1); }
+  .qa__a { transition: opacity .26s ease; }
+  .qa__a.is-hidden { opacity: 0; }
   .qa[open] .qa__q svg { transform: rotate(180deg); }
   .qa__a { margin: 0; padding: 0 var(--msv-s16) var(--msv-s16); color: var(--msv-n500); }
 </style>
@@ -182,24 +184,27 @@
 /* Плавное раскрытие ответов. <details> сам открывается рывком, поэтому
    перехватываем нажатие и анимируем высоту ответа: 0 → его высота → auto. */
 (function () {
-  var D = 320;
+  var D = 380;
   document.querySelectorAll('.qa').forEach(function (qa) {
     var q = qa.querySelector('.qa__q'), a = qa.querySelector('.qa__a');
     if (!q || !a) return;
+    var w = document.createElement('div'); w.className = 'qa__wrap';
+    a.parentNode.insertBefore(w, a); w.appendChild(a);
     q.addEventListener('click', function (e) {
       e.preventDefault();
       if (qa.dataset.busy) return;
       qa.dataset.busy = '1';
       if (!qa.open) {
+        a.classList.add('is-hidden');
         qa.open = true;
-        var h = a.scrollHeight;
-        a.classList.add('is-opening'); a.style.height = '0px';
-        requestAnimationFrame(function () { requestAnimationFrame(function () { a.style.height = h + 'px'; a.classList.add('is-shown'); }); });
-        setTimeout(function () { a.style.height = ''; a.classList.remove('is-opening', 'is-shown'); delete qa.dataset.busy; }, D + 20);
+        var h = w.scrollHeight;
+        w.style.height = '0px';
+        requestAnimationFrame(function () { requestAnimationFrame(function () { w.style.height = h + 'px'; a.classList.remove('is-hidden'); }); });
+        setTimeout(function () { w.style.height = ''; delete qa.dataset.busy; }, D + 20);
       } else {
-        a.style.height = a.scrollHeight + 'px';
-        requestAnimationFrame(function () { requestAnimationFrame(function () { a.classList.add('is-closing'); a.style.height = '0px'; }); });
-        setTimeout(function () { qa.open = false; a.style.height = ''; a.classList.remove('is-closing'); delete qa.dataset.busy; }, D + 20);
+        w.style.height = w.scrollHeight + 'px';
+        requestAnimationFrame(function () { requestAnimationFrame(function () { w.style.height = '0px'; a.classList.add('is-hidden'); }); });
+        setTimeout(function () { qa.open = false; w.style.height = ''; a.classList.remove('is-hidden'); delete qa.dataset.busy; }, D + 20);
       }
     });
   });
