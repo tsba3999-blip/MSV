@@ -1,0 +1,215 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#F5F1EA">
+<title>Резиденции: три одинаковых блока — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="resident.css">
+<style>
+  /* Страница выбора резиденции — двадцать вариантов по правилу заказчика (22.09.2026):
+     три одинаковых блока, одна и та же иерархия шрифтов, на компьютере — в ряд,
+     на телефоне — друг под другом. В основе — баннеры-логотипы 415×116.
+     Фон баннеров: Forma #ECECEC, Уют #C51919, Молодежка градиент #5397D8 → #E12AB6. */
+  .page { padding-bottom: var(--msv-s48); }
+  .v { padding: var(--msv-s16) 0 var(--msv-s32); border-bottom: 1px solid var(--msv-n100); }
+  .v:last-child { border-bottom: 0; }
+  .v__t { margin: 0 0 var(--msv-s4); font-size: 17px; line-height: 22px; padding-left: var(--msv-s16); }
+  .v__d { margin: 0 0 var(--msv-s16); color: var(--msv-n500); padding-left: var(--msv-s16); }
+  .v__num { display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 26px; padding: 0 6px; margin-right: var(--msv-s8); font-size: 13px; font-weight: 700; color: var(--msv-white); background: var(--msv-red); border-radius: 13px; vertical-align: middle; }
+
+  /* общая сетка: телефон — столбик, компьютер — три в ряд */
+  .g { display: grid; grid-template-columns: 1fr; gap: var(--msv-s12); }
+  @media (min-width: 768px) { .g { grid-template-columns: repeat(3, 1fr); gap: var(--msv-s16); } }
+  /* общий блок: одинаковая иерархия — баннер, тип, имя, метро/адрес, описание, цена */
+  .b { display: flex; flex-direction: column; gap: 4px; color: inherit; text-decoration: none; }
+  .b__ban { display: block; width: 100%; aspect-ratio: 415 / 116; object-fit: cover; }
+  .b__kind { font-size: 10px; line-height: 16px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--msv-n500); }
+  .b__name { font: 600 var(--msv-sub-size)/var(--msv-sub-line) var(--msv-font); letter-spacing: var(--msv-sub-track); }
+  .b__meta { font-size: var(--msv-body-size); line-height: var(--msv-body-line); }
+  .b__note { font-size: var(--msv-note-size); line-height: var(--msv-note-line); color: var(--msv-n500); }
+  .b__price { margin-top: var(--msv-s4); font-weight: 700; }
+  .b__btn { margin-top: var(--msv-s12); }
+  .b__ava { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
+
+  /* 1 белая карточка, баннер сверху */
+  .s1 .b { padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r20); box-shadow: var(--msv-e1); }
+  .s1 .b__ban { border-radius: var(--msv-r11); margin-bottom: var(--msv-s8); }
+  /* 2 баннер навылет */
+  .s2 .b { background: var(--msv-white); border-radius: var(--msv-r20); overflow: hidden; box-shadow: var(--msv-e1); }
+  .s2 .b__ban { border-radius: 0; }
+  .s2 .b__kind { margin-top: var(--msv-s12); }
+  .s2 .b__kind, .s2 .b__name, .s2 .b__meta, .s2 .b__note, .s2 .b__price { padding: 0 var(--msv-s16); }
+  .s2 .b__price { padding-bottom: var(--msv-s16); }
+  /* 3 карточка в цвете баннера — баннер продолжается вниз */
+  .s3 .b { background: var(--bg); color: var(--ink); border-radius: var(--msv-r20); overflow: hidden; }
+  .s3 .b__ban { border-radius: 0; }
+  .s3 .b__kind, .s3 .b__note { color: inherit; opacity: .78; }
+  .s3 .b__kind { margin-top: var(--msv-s8); }
+  .s3 .b__kind, .s3 .b__name, .s3 .b__meta, .s3 .b__note, .s3 .b__price { padding: 0 var(--msv-s16); }
+  .s3 .b__price { padding-bottom: var(--msv-s16); }
+  /* 4 баннер-табличка, текст на бежевом */
+  .s4 .b__ban { border-radius: var(--msv-r12); box-shadow: var(--msv-e1); margin-bottom: var(--msv-s8); }
+  .s4 .b__kind, .s4 .b__name, .s4 .b__meta, .s4 .b__note, .s4 .b__price { padding: 0 var(--msv-s16); }
+  /* 5 минимум: баннер и одна строка */
+  .s5 .b__ban { border-radius: var(--msv-r12); }
+  .s5 .b__line { display: flex; justify-content: space-between; gap: var(--msv-s12); padding: var(--msv-s8) var(--msv-s8) 0; }
+  /* 6 с кнопкой */
+  .s6 .b { padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r20); }
+  .s6 .b__ban { border-radius: var(--msv-r11); margin-bottom: var(--msv-s8); }
+  /* 7 цветная рамка */
+  .s7 .b { padding: var(--msv-s16); background: var(--msv-white); border: 2px solid var(--acc); border-radius: var(--msv-r20); }
+  .s7 .b__ban { border-radius: var(--msv-r11); margin-bottom: var(--msv-s8); }
+  /* 8 цена крупно */
+  .s8 .b { padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r20); }
+  .s8 .b__ban { border-radius: var(--msv-r11); margin-bottom: var(--msv-s8); }
+  .s8 .b__price { font: 700 var(--msv-h-size)/var(--msv-h-line) var(--msv-font); letter-spacing: var(--msv-h-track); margin-top: var(--msv-s8); }
+  .s8 .b__price small { display: block; font: 500 var(--msv-note-size)/var(--msv-note-line) var(--msv-font); color: var(--msv-n500); letter-spacing: 0; }
+  /* 9 тёмная */
+  .s9 .b { padding: var(--msv-s16); color: #fff; background: var(--msv-graphite); border-radius: var(--msv-r20); }
+  .s9 .b__ban { border-radius: var(--msv-r11); margin-bottom: var(--msv-s8); }
+  .s9 .b__kind, .s9 .b__note { color: #B7C3D0; }
+  /* 10 факты чипами */
+  .s10 .b { padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r20); }
+  .s10 .b__ban { border-radius: var(--msv-r11); margin-bottom: var(--msv-s8); }
+  .s10 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: var(--msv-s8); }
+  .s10 .chip { height: 28px; padding: 0 10px; font-size: 12px; line-height: 28px; background: var(--msv-beige); border-radius: 14px; }
+  /* 11 лента типа */
+  .s11 .b { position: relative; padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r20); overflow: hidden; }
+  .s11 .b__kind { order: -1; align-self: flex-start; margin: -16px 0 var(--msv-s12) -16px; padding: 6px 14px; color: var(--ink); background: var(--acc); border-radius: 0 0 var(--msv-r12) 0; opacity: 1; }
+  .s11 .b__ban { border-radius: var(--msv-r11); margin-bottom: var(--msv-s8); }
+  /* 12 текст сверху, баннер снизу */
+  .s12 .b { padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r20); }
+  .s12 .b__ban { order: 10; margin-top: var(--msv-s12); border-radius: var(--msv-r11); }
+  /* 13 по центру */
+  .s13 .b { align-items: center; text-align: center; padding: var(--msv-s20) var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r20); }
+  .s13 .b__ban { max-width: 280px; border-radius: var(--msv-r11); margin-bottom: var(--msv-s8); }
+  /* 14 линия-разделитель и цена справа */
+  .s14 .b { padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r20); }
+  .s14 .b__ban { border-radius: var(--msv-r11); margin-bottom: var(--msv-s12); }
+  .s14 .b__name { padding-bottom: var(--msv-s8); border-bottom: 1px solid var(--msv-n100); margin-bottom: var(--msv-s4); }
+  .s14 .b__price { margin-left: auto; }
+  /* 15 конверт: баннер с полем цвета карточки внутри цветной рамки-фона */
+  .s15 .b { padding: 8px; background: var(--bg); color: var(--ink); border-radius: var(--msv-r20); }
+  .s15 .b__ban { border-radius: var(--msv-r12); }
+  .s15 .b__kind, .s15 .b__note { color: inherit; opacity: .78; }
+  .s15 .b__kind { margin-top: var(--msv-s8); }
+  .s15 .b__kind, .s15 .b__name, .s15 .b__meta, .s15 .b__note, .s15 .b__price { padding: 0 var(--msv-s8); }
+  .s15 .b__price { padding-bottom: var(--msv-s8); }
+  /* 16 без карточек, разделители */
+  .s16 .b { padding: var(--msv-s16) var(--msv-s16) var(--msv-s20); border-bottom: 1px solid var(--msv-n300); }
+  .s16 .b:last-child { border-bottom: 0; }
+  .s16 .b__ban { border-radius: var(--msv-r11); margin-bottom: var(--msv-s8); }
+  @media (min-width: 768px) { .s16 .b { border-bottom: 0; border-right: 1px solid var(--msv-n300); } .s16 .b:last-child { border-right: 0; } }
+  /* 17 цветная полоса под баннером */
+  .s17 .b { padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r20); }
+  .s17 .b__ban { border-radius: var(--msv-r11) var(--msv-r11) 0 0; }
+  .s17 .bar { height: 6px; margin: 0 0 var(--msv-s8); background: var(--acc); border-radius: 0 0 6px 6px; }
+  /* 18 знак поверх баннера */
+  .s18 .b { padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r20); }
+  .s18 .b__ban { border-radius: var(--msv-r11); }
+  .s18 .b__ava { margin: -22px 0 0 var(--msv-s12); border: 3px solid var(--msv-white); box-shadow: var(--msv-e1); }
+  /* 19 баннер крупнее, скруглённая карточка светло-серая */
+  .s19 .b { padding: var(--msv-s12); background: var(--msv-n100); border-radius: var(--msv-r20); }
+  .s19 .b__ban { border-radius: var(--msv-r12); aspect-ratio: 415 / 150; margin-bottom: var(--msv-s8); }
+  .s19 .b__kind, .s19 .b__name, .s19 .b__meta, .s19 .b__note, .s19 .b__price { padding: 0 var(--msv-s8); }
+  .s19 .b__price { padding-bottom: var(--msv-s4); }
+  /* 20 карточка-кнопка: вся карточка в цвете, баннер-табличка внутри, кнопка снизу */
+  .s20 .b { padding: var(--msv-s16); background: color-mix(in srgb, var(--acc) 22%, var(--msv-white)); border-radius: var(--msv-r20); }
+  .s20 .b__ban { border-radius: var(--msv-r11); box-shadow: var(--msv-e1); margin-bottom: var(--msv-s8); }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="head">
+    <a class="head__back" href="residences.html" aria-label="Вернуться назад">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+    <span class="head__back-label">Вернуться</span></a>
+    <h1 class="msv-sub head__title">Резиденции: три одинаковых блока</h1>
+  </div>
+
+  <p class="msv-body" style="margin:0 0 var(--msv-s8);color:var(--msv-n500)">В каждом варианте три блока устроены одинаково: баннер, тип, имя, метро и адрес, описание, цена. На телефоне — столбиком, на компьютере — в ряд.</p>
+
+  <div id="grid"></div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var R = [
+    { id: 'forma', name: 'Forma', kind: 'Комфорт-резиденция', metro: 'Шаболовская', addr: 'Конный пер., 12', note: '16 комнат · 57 мест · свои санузлы в части комнат', rooms: 16, beds: 57, acc: '#FB344A', bg: '#ECECEC', ink: '#34495E', ban: 'logo-forma.jpg', ava: 'forma.png' },
+    { id: 'uyut', name: 'Уют на Варшавке', kind: 'Эконом-резиденция', metro: 'Нагатинская', addr: 'Варшавское шоссе, 18к2', note: '16 комнат · 78 мест', rooms: 16, beds: 78, acc: '#C51919', bg: '#C51919', ink: '#fff', ban: 'logo-uyut.jpg', ava: 'uyt.gif' },
+    { id: 'molod', name: 'Молодежка', kind: 'Квартира для девушек', metro: 'Молодежная', addr: 'ул. Партизанская, 40', note: '3 комнаты · 6 мест · по двое', rooms: 3, beds: 6, acc: '#9668CA', bg: '#E12AB6', ink: '#fff', ban: 'logo-molod.jpg', ava: 'molodejka.png' }
+  ];
+  var PRICE = { forma: null, uyut: null, molod: null };
+  function money(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ₽'; }
+  function from(r) { return PRICE[r.id] ? 'от ' + money(PRICE[r.id]) + ' в месяц' : 'цена уточняется'; }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  function st(r) { return ' style="--acc:' + r.acc + ';--bg:' + r.bg + ';--ink:' + r.ink + '"'; }
+
+  /* один и тот же блок для всех вариантов; o — что добавить */
+  function block(r, o) {
+    o = o || {};
+    var s = '<a class="b" href="rooms.html?res=' + r.id + '"' + st(r) + '>';
+    s += '<img class="b__ban" src="' + r.ban + '" alt="' + esc(r.name) + '">';
+    if (o.bar) s += '<span class="bar"></span>';
+    if (o.ava) s += '<img class="b__ava" src="' + r.ava + '" alt="">';
+    if (o.line) { s += '<span class="b__line"><span class="b__meta">м. ' + esc(r.metro) + '</span><span class="b__price" style="margin:0">' + esc(from(r)) + '</span></span></a>'; return s; }
+    s += '<span class="b__kind">' + esc(r.kind) + '</span>';
+    s += '<span class="b__name">' + esc(r.name) + '</span>';
+    s += '<span class="b__meta">м. ' + esc(r.metro) + ' · ' + esc(r.addr) + '</span>';
+    if (o.chips) s += '<span class="chips"><span class="chip">' + r.rooms + ' комнат</span><span class="chip">' + r.beds + ' мест</span><span class="chip">м. ' + esc(r.metro) + '</span></span>';
+    else s += '<span class="b__note">' + esc(r.note) + '</span>';
+    s += o.bigPrice ? '<span class="b__price">' + esc(from(r).replace(' в месяц', '')) + '<small>в месяц</small></span>' : '<span class="b__price">' + esc(from(r)) + '</span>';
+    if (o.btn) s += '<span class="msv-btn msv-btn--m ' + (o.btnKind || 'msv-btn--secondary') + ' b__btn">Смотреть места</span>';
+    return s + '</a>';
+  }
+
+  var V = [
+    { t: 'Белая карточка, баннер сверху', d: 'Классика: баннер-логотип с полями, под ним текст.', c: 's1' },
+    { t: 'Баннер навылет', d: 'Баннер до краёв карточки, текст под ним с полями.', c: 's2' },
+    { t: 'Карточка в цвете баннера', d: 'Фон карточки такой же, как у баннера, — логотип продолжается вниз; текст белым или графитом.', c: 's3' },
+    { t: 'Баннер-табличка на бежевом', d: 'Без карточки: баннер с тенью, текст прямо на фоне страницы.', c: 's4' },
+    { t: 'Минимум', d: 'Только баннер и одна строка: метро слева, цена справа.', c: 's5', o: { line: true } },
+    { t: 'С кнопкой', d: 'Как №1, снизу кнопка «Смотреть места».', c: 's6', o: { btn: true } },
+    { t: 'Цветная рамка', d: 'Белая карточка с рамкой в цвете резиденции.', c: 's7' },
+    { t: 'Цена крупно', d: 'Цена — главным числом карточки.', c: 's8', o: { bigPrice: true } },
+    { t: 'Тёмная карточка', d: 'Графитовый фон, белый текст, баннер как есть.', c: 's9' },
+    { t: 'Факты чипами', d: 'Комнаты, места и метро — отдельными чипами вместо строки описания.', c: 's10', o: { chips: true } },
+    { t: 'Лента с типом', d: 'Тип резиденции — цветной язычок в углу карточки, баннер под ним.', c: 's11' },
+    { t: 'Текст сверху, баннер снизу', d: 'Сначала имя и адрес, баннер завершает карточку.', c: 's12' },
+    { t: 'По центру', d: 'Всё выровнено по центру, баннер уже карточки.', c: 's13' },
+    { t: 'С разделителем', d: 'Имя отделено линией, цена прижата вправо.', c: 's14' },
+    { t: 'Конверт', d: 'Узкая цветная рамка вокруг баннера в цвете самого баннера.', c: 's15' },
+    { t: 'Без карточек, с разделителями', d: 'Блоки разделены линиями: на телефоне горизонтальными, на компьютере вертикальными.', c: 's16' },
+    { t: 'Цветная полоса', d: 'Под баннером тонкая полоса в цвете резиденции.', c: 's17', o: { bar: true } },
+    { t: 'Знак поверх баннера', d: 'Круглый знак резиденции наезжает на нижний край баннера, как аватар.', c: 's18', o: { ava: true } },
+    { t: 'Баннер крупнее', d: 'Баннер выше и крупнее, карточка светло-серая, поля уже.', c: 's19' },
+    { t: 'В оттенке цвета, с кнопкой', d: 'Карточка в светлом оттенке цвета резиденции, баннер-табличка, красная кнопка.', c: 's20', o: { btn: true, btnKind: 'msv-btn--primary' } }
+  ];
+
+  var grid = document.getElementById('grid');
+  function draw() {
+    grid.innerHTML = V.map(function (x, i) {
+      return '<section class="v"><h2 class="msv-body v__t"><span class="v__num">' + (i + 1) + '</span>' + esc(x.t) + '</h2><p class="msv-note v__d">' + esc(x.d) + '</p><div class="g ' + x.c + '">' + R.map(function (r) { return block(r, x.o); }).join('') + '</div></section>';
+    }).join('');
+  }
+  draw();
+  if (location.protocol !== 'file:') fetch('/api/residences', { credentials: 'same-origin' }).then(function (r) { return r.status === 200 ? r.json() : null; }).then(function (list) {
+    if (!list) return;
+    list.forEach(function (res) { var m = null; (res.beds || []).forEach(function (b) { if (b.price > 0 && (m === null || b.price < m)) m = b.price; }); if (res.id in PRICE) PRICE[res.id] = m; });
+    draw();
+  }).catch(function () {});
+})();
+</script>
+<script src="mark.js"></script>
+<script src="protect.js"></script>
+
+</body>
+</html>
