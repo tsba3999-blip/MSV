@@ -101,3 +101,5 @@ hr { background: #EAE4DA; }
 .no-auth-wrapper .logo img { max-height: 48px; border-radius: 12px; }
 /* «Vikunja загружается…» — просто точка бренда без надписи */
 #loader-container, .loader-container { color: transparent; }
+.noauth-container .image::before { background: none !important; }
+.api-config { display: none !important; }   /* «Используется Vikunja на …» — лишнее для пользователей */
