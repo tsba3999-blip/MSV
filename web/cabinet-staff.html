@@ -117,7 +117,7 @@
 
       <h2 class="msv-sub" style="margin:0 0 var(--msv-s12)">Назначены на меня</h2>
       <table class="grid">
-        <thead><tr><th>Заявка</th><th>Кто и где</th><th>Срочность</th><th>Статус</th><th></th></tr></thead>
+        <thead><tr><th>Заявка</th><th>Кто и где</th><th>Срочность</th><th>Исполнитель</th><th>Статус</th><th></th></tr></thead>
         <tbody id="rows"></tbody>
       </table>
     </main>
@@ -176,8 +176,8 @@ MSV.ready(function (ctx) {
         '<span class="msv-note sub">' + esc(t.bed) + ' · ' + esc(t.room) + ' · ' + esc(t.residence) + '</span></td>' +
       '<td><span class="tag ' + PRIO_TAG[t.priority] + '">' + esc(t.priorityName) + '</span>' +
         '<span class="msv-note sub">срок ' + t.deadlineHours + ' ч · ' + esc(ago(t.ageHours)) + '</span></td>' +
-      '<td><span class="tag ' + STATUS_TAG[t.status] + '">' + esc(t.status) + '</span>' +
-        (t.master ? '<span class="msv-note sub">' + esc(t.master) + '</span>' : '') + '</td>' +
+      '<td>' + (t.master ? esc(t.master) : '<span class="msv-note">не назначен</span>') + '</td>' +
+      '<td><span class="tag ' + STATUS_TAG[t.status] + '">' + esc(t.status) + '</span></td>' +
       '<td class="num">' + (
         t.status === 'Принята'
           ? '<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-act="start">В работу</button>'
