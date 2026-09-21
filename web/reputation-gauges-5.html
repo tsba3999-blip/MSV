@@ -1,0 +1,264 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#F5F1EA">
+<title>Репутация: по образцу — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="resident.css">
+<style>
+  /* ============================================================
+     Индикатор репутации, вторая серия — по образцу заказчика
+     (замечания 21.09.2026):
+       · рисунок как на картинке: широкая цветная полоса с объёмным
+         градиентом, светло-серое кольцо с подписями, белые зазоры,
+         большая пустая середина, мягкая тень;
+       · стрелка не чёрная — тонкая графитовая, красная или белая,
+         с круглой ступицей;
+       · цвета слева направо: бордовый, красный, жёлтый, лайм, зелёный
+         (в шести секторах +3 — тёмно-зелёный);
+       · при открытии стрелка выезжает слева с лёгким перелётом —
+         кнопка «Показать анимацию ещё раз» у каждого варианта.
+     ============================================================ */
+  .page { padding-bottom: var(--msv-s48); }
+  .grid { display: grid; grid-template-columns: 1fr; gap: var(--msv-s16); }
+  .v { padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r20); box-shadow: var(--msv-e1); }
+  .v__t { margin: 0 0 var(--msv-s4); font-size: 17px; line-height: 22px; }
+  .v__d { margin: 0 0 var(--msv-s12); color: var(--msv-n500); }
+  .v__num { display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 26px; padding: 0 6px; margin-right: var(--msv-s8); font-size: 13px; font-weight: 700; color: var(--msv-white); background: var(--msv-red); border-radius: 13px; vertical-align: middle; }
+  .g { display: block; width: 100%; margin: 0 auto; }
+  .g svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .needle { transition: transform 1.4s cubic-bezier(.22, 1.25, .36, 1); }
+  .needle--reset { transition: none; }
+  .again { display: inline-flex; align-items: center; height: var(--msv-btn-s); padding: 0 var(--msv-s16); margin-top: var(--msv-s12); font: 600 13px/1 var(--msv-font); color: var(--msv-graphite); background: var(--msv-beige); border: 0; border-radius: 999px; cursor: pointer; }
+  .again:hover { background: var(--msv-n100); }
+  .ctl { position: sticky; top: 0; z-index: 2; margin: 0 calc(var(--msv-s24) * -1) var(--msv-s16); padding: var(--msv-s12) var(--msv-s24); background: color-mix(in srgb, var(--msv-beige) 92%, transparent); backdrop-filter: blur(6px); }
+  .ctl__row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--msv-s8) var(--msv-s16); }
+  .ctl__l { font-size: 12px; color: var(--msv-n500); }
+  .ctl input[type=range] { width: 160px; accent-color: var(--msv-red); }
+  .ctl .chip { height: 32px; padding: 0 12px; font-size: 13px; }
+  .ctl__val { display: inline-block; min-width: 26px; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="head">
+    <a class="head__back" href="reputation-gauges-4.html" aria-label="Вернуться назад">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+    <span class="head__back-label">Вернуться</span></a>
+    <h1 class="msv-sub head__title">Репутация: по образцу</h1>
+  </div>
+
+  <p class="msv-body" style="margin:0 0 var(--msv-s16);color:var(--msv-n500)">Рисунок повторяет присланный спидометр. Стрелка при открытии выезжает слева — у каждого варианта есть кнопка «ещё раз». Ползунок меняет значение у всех сразу.</p>
+
+  <div class="ctl">
+    <div class="ctl__row">
+      <span class="ctl__l">Репутация <span class="ctl__val" id="vVal">0</span></span>
+      <input type="range" id="v" min="-2" max="3" step="1" value="0" aria-label="Репутация">
+      <span class="ctl__l">Жизни</span>
+      <span role="group" aria-label="Жизни">
+        <button class="chip" type="button" data-l="3" aria-pressed="true">3</button>
+        <button class="chip" type="button" data-l="2" aria-pressed="false">2</button>
+        <button class="chip" type="button" data-l="1" aria-pressed="false">1</button>
+      </span>
+      <span class="ctl__l">Месяцев на максимуме <span class="ctl__val" id="mVal">2</span></span>
+      <input type="range" id="m" min="0" max="6" step="1" value="2" aria-label="Месяцев на максимуме">
+    </div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="foot">
+    <a class="msv-btn msv-btn--block msv-btn--secondary" href="reputation-gauges-4.html">Предыдущие двадцать</a>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var C = { bordo: '#7A1F2E', red: '#FB344A', yellow: '#FFD93D', lime: '#C8F03C', green: '#35B265', emerald: '#1E7F4B', ink: '#34495E', ring: '#E9E6E1', ringText: '#5C6670', white: '#FFFFFF' };
+
+  /* Шесть секторов — по одному на значение −2 … +3 */
+  var S6 = [
+    { v: -2, c: 'bordo',   ink: '#fff', t: ['Опасность', 'расторжения', 'договора'], s: 'ОПАСНОСТЬ', w: 'Опасность расторжения договора' },
+    { v: -1, c: 'red',     ink: '#fff', t: ['Нужно быть', 'внимательным'],           s: 'ВНИМАНИЕ',  w: 'Нужно быть внимательным' },
+    { v:  0, c: 'yellow',  ink: C.ink,  t: ['Сделай', 'что-то', 'хорошее'],          s: 'ДОБРОЕ ДЕЛО', w: 'Нужно сделать что-то хорошее' },
+    { v:  1, c: 'lime',    ink: C.ink,  t: ['У тебя', 'хорошее', 'будущее'],         s: 'БУДУЩЕЕ',   w: 'У тебя хорошее будущее' },
+    { v:  2, c: 'green',   ink: '#fff', t: ['Ты на', 'высоте'],                      s: 'НА ВЫСОТЕ', w: 'Ты на высоте' },
+    { v:  3, c: 'emerald', ink: '#fff', t: ['Так', 'держать!'],                      s: 'ТАК ДЕРЖАТЬ', w: 'Так держать!' }
+  ];
+  /* Пять секторов — цифры на границах */
+  var S5 = [
+    { c: 'bordo',  ink: '#fff', t: ['Опасность', 'расторжения', 'договора'], s: 'ОПАСНОСТЬ',     w: 'Опасность расторжения договора' },
+    { c: 'red',    ink: '#fff', t: ['Нужно быть', 'внимательным'],           s: 'ВНИМАНИЕ',      w: 'Нужно быть внимательным' },
+    { c: 'yellow', ink: C.ink,  t: ['Нужно сделать', 'что-то', 'хорошее'],   s: 'ДОБРОЕ ДЕЛО', w: 'Нужно сделать что-то хорошее' },
+    { c: 'lime',   ink: C.ink,  t: ['У тебя', 'хорошее', 'будущее'],         s: 'БУДУЩЕЕ',       w: 'У тебя хорошее будущее' },
+    { c: 'green',  ink: '#fff', t: ['Ты на высоте —', 'так', 'держать!'],    s: 'ТАК ДЕРЖАТЬ',   w: 'Ты на высоте — так держать!' }
+  ];
+  var HEART = 'M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z';
+  var state = { v: 0, lives: 3, months: 2 };
+
+  /* ---------- геометрия ---------- */
+  var CX = 200, CY = 200;
+  function pt(r, a) { var k = a * Math.PI / 180; return [CX + r * Math.cos(k), CY - r * Math.sin(k)]; }
+  function f(n) { return Math.round(n * 100) / 100; }
+  function ring(r1, r2, a1, a2) {
+    var p1 = pt(r2, a1), p2 = pt(r2, a2), p3 = pt(r1, a2), p4 = pt(r1, a1);
+    return 'M' + f(p1[0]) + ' ' + f(p1[1]) + ' A' + r2 + ' ' + r2 + ' 0 0 1 ' + f(p2[0]) + ' ' + f(p2[1]) +
+      ' L' + f(p3[0]) + ' ' + f(p3[1]) + ' A' + r1 + ' ' + r1 + ' 0 0 0 ' + f(p4[0]) + ' ' + f(p4[1]) + ' Z';
+  }
+  function arc(r, a1, a2) { var p1 = pt(r, a1), p2 = pt(r, a2); return 'M' + f(p1[0]) + ' ' + f(p1[1]) + ' A' + r + ' ' + r + ' 0 0 1 ' + f(p2[0]) + ' ' + f(p2[1]); }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  function light(hex, k) {   // смешать с белым: k = доля белого
+    var n = parseInt(hex.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+    r = Math.round(r + (255 - r) * k); g = Math.round(g + (255 - g) * k); b = Math.round(b + (255 - b) * k);
+    return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+  }
+  function plural(n) { return n === 1 ? 'месяц' : n < 5 ? 'месяца' : 'месяцев'; }
+
+  var uid = 0;
+
+  /* ---------- один индикатор ----------
+     o: { sectors: 6|5, inside: 'phrases'|'numbers'|'none', ringText: 'numbers'|'phrases',
+          needle: 'graphite'|'red'|'white'|'slim', center: 'phrase'|'score'|'none',
+          lives: 'center'|'below'|'none', discount: bool } */
+  function gauge(o) {
+    var id = 'g' + (++uid);
+    var six = o.sectors === 6, S = six ? S6 : S5, n = S.length;
+    var R2 = 150, R1 = 82;             // цветная полоса
+    var K1 = 156, K2 = 192;            // серое кольцо
+    var GAP = 1.4;                     // белый зазор между секторами, градусов
+    var bounds = [180]; for (var i = 1; i <= n; i++) bounds.push(180 - 180 * i / n);
+
+    var v = state.v, ang;
+    if (six) ang = (bounds[v + 2] + bounds[v + 3]) / 2;
+    else { var pos = (v + 2) / 5; ang = Math.max(0.001, 180 - 180 * pos); }
+    var cur = six ? S[v + 2] : S[Math.min(4, Math.max(0, v + 2))];
+
+    var extraH = o.lives === 'below' ? 60 : 24;
+    var svg = ['<svg viewBox="0 0 400 ' + (CY + extraH) + '" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Репутация ' + v + '">'];
+    svg.push('<defs>');
+    svg.push('<filter id="' + id + 'sh" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#34495E" flood-opacity=".22"/></filter>');
+    svg.push('<filter id="' + id + 'ns" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity=".3"/></filter>');
+    Object.keys(C).forEach(function (k) {
+      svg.push('<radialGradient id="' + id + k + '" cx="' + CX + '" cy="' + CY + '" r="' + R2 + '" gradientUnits="userSpaceOnUse"><stop offset="' + f(R1 / R2) + '" stop-color="' + light(C[k], 0.28) + '"/><stop offset=".78" stop-color="' + C[k] + '"/><stop offset="1" stop-color="' + light(C[k], -0.0) + '" stop-opacity=".92"/></radialGradient>');
+    });
+    S.forEach(function (s, i) {
+      ['a', 'b', 'c', 'm', 'k'].forEach(function (key, j) {
+        var r = [140, 126, 112, 116, (K1 + K2) / 2][j];
+        svg.push('<path id="' + id + i + key + '" d="' + arc(r, bounds[i] - GAP, bounds[i + 1] + GAP) + '"/>');
+      });
+    });
+    svg.push('</defs>');
+
+    /* тень под всем индикатором */
+    svg.push('<g filter="url(#' + id + 'sh)">');
+    /* серое кольцо — сегментами, с белыми зазорами как у цветных секторов */
+    S.forEach(function (s, i) { svg.push('<path d="' + ring(K1, K2, bounds[i] - GAP, bounds[i + 1] + GAP) + '" fill="' + C.ring + '"/>'); });
+    /* цветные сектора */
+    S.forEach(function (s, i) { svg.push('<path d="' + ring(R1, R2, bounds[i] - GAP, bounds[i + 1] + GAP) + '" fill="url(#' + id + s.c + ')"/>'); });
+    svg.push('</g>');
+
+    /* подписи в кольце */
+    S.forEach(function (s, i) {
+      if (o.ringText === 'phrases') {
+        svg.push('<text font-size="9.5" font-weight="700" letter-spacing=".04em" fill="' + C.ringText + '" font-family="var(--msv-font)"><textPath href="#' + id + i + 'k" startOffset="50%" text-anchor="middle" dominant-baseline="middle">' + esc(s.s) + '</textPath></text>');
+      } else if (six) {
+        var on = s.v === v;
+        svg.push('<text font-size="' + (on ? 17 : 15) + '" font-weight="800" fill="' + (on ? C.ink : C.ringText) + '" font-family="var(--msv-font)"><textPath href="#' + id + i + 'k" startOffset="50%" text-anchor="middle" dominant-baseline="middle">' + (s.v > 0 ? '+' : '') + s.v + '</textPath></text>');
+      }
+    });
+    if (o.ringText === 'numbers' && !six) {
+      bounds.forEach(function (a, i) {
+        var val = i - 2, p = pt((K1 + K2) / 2, Math.min(176, Math.max(4, a)));
+        svg.push('<text x="' + f(p[0]) + '" y="' + f(p[1]) + '" font-size="15" font-weight="800" fill="' + C.ringText + '" text-anchor="middle" dominant-baseline="middle" font-family="var(--msv-font)">' + (val > 0 ? '+' : '') + val + '</text>');
+      });
+    }
+    /* подписи внутри секторов */
+    S.forEach(function (s, i) {
+      if (o.inside === 'phrases') {
+        var lines = s.t, keys = lines.length === 3 ? ['a', 'b', 'c'] : ['a', 'b'];
+        lines.forEach(function (ln, li) {
+          svg.push('<text font-size="' + (six ? 8 : 9.5) + '" font-weight="600" fill="' + s.ink + '" font-family="var(--msv-font)"><textPath href="#' + id + i + keys[li] + '" startOffset="50%" text-anchor="middle" dominant-baseline="middle">' + esc(ln) + '</textPath></text>');
+        });
+      } else if (o.inside === 'numbers' && six) {
+        svg.push('<text font-size="22" font-weight="800" fill="' + s.ink + '" font-family="var(--msv-font)"><textPath href="#' + id + i + 'm" startOffset="50%" text-anchor="middle" dominant-baseline="middle">' + (s.v > 0 ? '+' : '') + s.v + '</textPath></text>');
+      }
+    });
+
+    /* стрелка: рисуется вертикально вверх, поворачивается; при открытии стартует слева */
+    var rot = 90 - ang, len = R1 + 34;
+    var body;
+    if (o.needle === 'graphite') body = '<path d="M' + CX + ' ' + (CY - len) + ' L' + (CX - 6) + ' ' + (CY - 10) + ' L' + (CX + 6) + ' ' + (CY - 10) + ' Z" fill="' + C.ink + '"/><circle cx="' + CX + '" cy="' + CY + '" r="14" fill="#fff"/><circle cx="' + CX + '" cy="' + CY + '" r="6" fill="' + C.ink + '"/>';
+    else if (o.needle === 'red') body = '<path d="M' + CX + ' ' + (CY - len) + ' L' + (CX - 5) + ' ' + (CY - 8) + ' L' + (CX + 5) + ' ' + (CY - 8) + ' Z" fill="' + C.red + '"/><circle cx="' + CX + '" cy="' + CY + '" r="13" fill="' + C.red + '"/><circle cx="' + CX + '" cy="' + CY + '" r="5" fill="#fff"/>';
+    else if (o.needle === 'white') body = '<path d="M' + CX + ' ' + (CY - len) + ' L' + (CX - 7) + ' ' + (CY - 10) + ' L' + (CX + 7) + ' ' + (CY - 10) + ' Z" fill="#fff" stroke="' + C.ink + '" stroke-width="2" stroke-linejoin="round"/><circle cx="' + CX + '" cy="' + CY + '" r="14" fill="#fff" stroke="' + C.ink + '" stroke-width="2"/><circle cx="' + CX + '" cy="' + CY + '" r="5" fill="' + C.red + '"/>';
+    else body = '<line x1="' + CX + '" y1="' + (CY - 4) + '" x2="' + CX + '" y2="' + (CY - len) + '" stroke="' + C.ink + '" stroke-width="3.5" stroke-linecap="round"/><circle cx="' + CX + '" cy="' + (CY - len) + '" r="6" fill="' + C.red + '" stroke="#fff" stroke-width="2"/><circle cx="' + CX + '" cy="' + CY + '" r="11" fill="#fff" stroke="' + C.ink + '" stroke-width="3"/>';
+    svg.push('<g class="needle needle--reset" data-rot="' + f(rot) + '" filter="url(#' + id + 'ns)" style="transform-origin:' + CX + 'px ' + CY + 'px;transform:rotate(-90deg)">' + body + '</g>');
+
+    /* центр */
+    if (o.center === 'phrase') svg.push('<text x="' + CX + '" y="' + (CY - 40) + '" font-size="12" font-weight="700" fill="' + C.ink + '" text-anchor="middle" dominant-baseline="middle" font-family="var(--msv-font)">' + esc(cur.w) + '</text>');
+    if (o.center === 'score') svg.push('<text x="' + CX + '" y="' + (CY - 44) + '" font-size="30" font-weight="800" letter-spacing="-.02em" fill="' + C.ink + '" text-anchor="middle" dominant-baseline="middle" font-family="var(--msv-font)">' + (v > 0 ? '+' : '') + v + '</text>');
+    if (o.lives === 'center' || o.lives === 'below') {
+      var hy = o.lives === 'center' ? CY - 24 : CY + 30, step = o.lives === 'center' ? 22 : 34, sc = o.lives === 'center' ? 0.7 : 1;
+      for (var h = 0; h < 3; h++) {
+        var hx = CX - step + h * step, alive = h < state.lives;
+        svg.push('<g transform="translate(' + f(hx - 12 * sc) + ' ' + f(hy - 12 * sc) + ') scale(' + sc + ')"><path d="' + HEART + '" fill="' + (alive ? C.red : 'none') + '" stroke="' + (alive ? C.red : '#B8B1A5') + '" stroke-width="2" stroke-linejoin="round"/></g>');
+      }
+      if (o.lives === 'below') svg.push('<text x="' + CX + '" y="' + (CY + 56) + '" font-size="11" fill="#6B665E" text-anchor="middle" font-family="var(--msv-font)">' + (state.lives === 3 ? 'Три жизни — все на месте' : state.lives === 2 ? 'Одна жизнь сгорела' : 'Осталась последняя жизнь') + '</text>');
+    }
+    if (o.discount) {
+      var mr = R1 - 12, mm = state.months, ma = 180 - 180 * mm / 6;
+      svg.push('<path d="' + arc(mr, 180, 0.001) + '" fill="none" stroke="' + C.ring + '" stroke-width="6" stroke-linecap="round"/>');
+      if (mm > 0) svg.push('<path d="' + arc(mr, 180, Math.max(0.001, ma)) + '" fill="none" stroke="' + C.green + '" stroke-width="6" stroke-linecap="round"/>');
+      svg.push('<text x="' + CX + '" y="' + (CY + 14) + '" font-size="10" font-weight="600" fill="#6B665E" text-anchor="middle" font-family="var(--msv-font)">' + (mm >= 6 ? 'Скидка 5 % действует' : 'До скидки 5 %: ' + (6 - mm) + ' ' + plural(6 - mm)) + '</text>');
+    }
+    svg.push('</svg>');
+    return svg.join('');
+  }
+
+  var V = [
+    { t: 'Как на картинке', d: 'Серое кольцо с цифрами −2 … +3, шесть объёмных секторов, фразы дугой внутри, тонкая графитовая стрелка с белой ступицей.', o: { sectors: 6, inside: 'phrases', ringText: 'numbers', needle: 'graphite', center: 'none' } },
+    { t: 'Фразы в кольце, цифры в секторах', d: 'Как в образце — подписи капителью идут по серому кольцу, а в цветных секторах крупные цифры.', o: { sectors: 6, inside: 'numbers', ringText: 'phrases', needle: 'graphite', center: 'none' } },
+    { t: 'Красная стрелка, фраза в центре', d: 'Сектора чистые, цифры в кольце; фраза текущего состояния — под стрелкой. Стрелка в фирменном красном.', o: { sectors: 6, inside: 'none', ringText: 'numbers', needle: 'red', center: 'phrase' } },
+    { t: 'Белая стрелка и сердца', d: 'Белая стрелка с графитовой обводкой, три жизни в центре, фразы в секторах.', o: { sectors: 6, inside: 'phrases', ringText: 'numbers', needle: 'white', center: 'none', lives: 'center' } },
+    { t: 'Тонкая стрелка с точкой', d: 'Линия с красной точкой на конце — как указатель. Балл крупно в центре, сердца под индикатором.', o: { sectors: 6, inside: 'phrases', ringText: 'numbers', needle: 'slim', center: 'score', lives: 'below' } },
+    { t: 'Пять секторов, цифры на границах', d: 'Ровно пять цветов по заданию: бордовый, красный, жёлтый, лайм, зелёный. Цифры на стыках, стрелка может стоять между ними (баллы).', o: { sectors: 5, inside: 'phrases', ringText: 'numbers', needle: 'graphite', center: 'none' } },
+    { t: 'Пять секторов, фразы в кольце', d: 'Те же пять цветов, подписи капителью в кольце, в секторах чисто; фраза в центре, красная стрелка.', o: { sectors: 5, inside: 'none', ringText: 'phrases', needle: 'red', center: 'phrase' } },
+    { t: 'Всё сразу', d: 'Цифры в кольце, фразы в секторах, сердца в центре и дуга «до скидки 5 %». Для страницы «Репутация».', o: { sectors: 6, inside: 'phrases', ringText: 'numbers', needle: 'graphite', center: 'none', lives: 'center', discount: true } }
+  ];
+
+  var grid = document.getElementById('grid');
+  function draw() {
+    uid = 0;
+    grid.innerHTML = V.map(function (x, i) {
+      return '<section class="v"><h2 class="msv-body v__t"><span class="v__num">' + (i + 1) + '</span>' + esc(x.t) + '</h2><p class="msv-note v__d">' + esc(x.d) + '</p><div class="g">' + gauge(x.o) + '</div><button class="again" type="button" data-again>Показать анимацию ещё раз</button></section>';
+    }).join('');
+    animate();
+  }
+  /* стрелка стартует слева (−90°) и через мгновение едет к значению с перелётом */
+  function animate(scope) {
+    var list = (scope || document).querySelectorAll('.needle');
+    list.forEach(function (g) { g.classList.add('needle--reset'); g.style.transform = 'rotate(-90deg)'; });
+    void document.body.offsetWidth;   // зафиксировать стартовое положение
+    setTimeout(function () { list.forEach(function (g) { g.classList.remove('needle--reset'); g.style.transform = 'rotate(' + g.dataset.rot + 'deg)'; }); }, 250);
+  }
+  grid.addEventListener('click', function (e) { var b = e.target.closest('[data-again]'); if (b) animate(b.closest('.v')); });
+
+  document.getElementById('v').addEventListener('input', function () { state.v = Number(this.value); document.getElementById('vVal').textContent = (state.v > 0 ? '+' : '') + state.v; draw(); });
+  document.getElementById('m').addEventListener('input', function () { state.months = Number(this.value); document.getElementById('mVal').textContent = state.months; draw(); });
+  document.querySelectorAll('[data-l]').forEach(function (b) { b.addEventListener('click', function () { document.querySelectorAll('[data-l]').forEach(function (x) { x.setAttribute('aria-pressed', 'false'); }); b.setAttribute('aria-pressed', 'true'); state.lives = Number(b.dataset.l); draw(); }); });
+  draw();
+})();
+</script>
+<script src="mark.js"></script>
+<script src="protect.js"></script>
+
+</body>
+</html>
