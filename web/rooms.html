@@ -195,19 +195,21 @@ MSV.ready(function (ctx) {
           btn = '<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-pick="' + esc(r.id) + '" data-tier="' + ti + '">Выбрать</button>';
         }
         return '<div class="room__price' + (out ? ' room__price--out' : '') + '">' +
-          '<span>' + esc(b.kind) + (out ? '' : ' · ' + b.left + ' ' + plural(b.left, 'место', 'места', 'мест')) + '</span>' +
+          '<span>' + esc(b.kind) + '</span>' +
           '<b>' + money(b.price) + '</b>' + btn + '</div>';
       }).join('');
 
+      // Порядок в карточке (решение заказчика 21.09.2026): тип + пол в одной строке,
+      // резиденция, имя, описание (санузел и т.п.) сразу под именем, фото, цены.
       return '<article class="room">' +
-        '<span class="msv-note room__kind">' + r.size + '-местная комната</span>' +
-        '<span class="msv-note room__res">' + esc(r.residenceTitle) + '</span>' +
-        '<div class="room__head">' +
-          '<h2 class="msv-sub room__name">' + esc(r.name) + '</h2>' +
+        '<div class="room__top">' +
+          '<span class="msv-note room__kind">' + r.size + '-местная комната</span>' +
           '<span class="sex-tag sex-tag--' + (r.sex === 'ж' ? 'f' : 'm') + '">' + (r.sex === 'ж' ? 'Женская' : 'Мужская') + '</span>' +
         '</div>' +
+        '<span class="msv-note room__res">' + esc(r.residenceTitle) + '</span>' +
+        '<h2 class="msv-sub room__name">' + esc(r.name) + '</h2>' +
+        '<p class="msv-body room__text">' + esc(r.text) + '</p>' +
         '<div class="room__shots">' + shots(r) + '</div>' +
-        (r.text ? '<p class="msv-body room__text">' + esc(r.text) + '</p>' : '') +
         '<div class="room__prices">' + prices + '</div>' +
         '<p class="msv-note" style="margin:0">Цены при условии заключения «годового контракта» (проживание минимум до конца августа).</p>' +
       '</article>';
