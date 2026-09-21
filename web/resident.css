@@ -150,8 +150,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   color: var(--msv-graphite);
 }
@@ -160,6 +160,8 @@
 .note-card__mark--info { background: var(--msv-lavender); }
 .note-card__mark--ok { background: var(--msv-lime); }
 .note-card__mark--alarm { background: transparent; color: var(--msv-red); }
+.note-card__mark svg { width: 24px; height: 24px; }
+.note-card__mark--alarm svg { width: 30px; height: 30px; }
 
 .note-card__body { flex: 1 1 auto; min-width: 0; }
 .note-card__text { margin: 0; }
@@ -279,7 +281,7 @@
 .pay-row__extra { display: block; margin-top: 2px; }
 
 .good {
-  margin: var(--msv-s24) 0 0;
+  margin: 0 0 var(--msv-s16);
   padding: var(--msv-s12) var(--msv-s16);
   background: var(--msv-lime);
   border-radius: var(--msv-r12);
@@ -326,7 +328,8 @@
 
 /* ---------- Подвал с главной кнопкой ---------- */
 
-.foot { margin-top: auto; padding-top: var(--msv-s32); }
+/* Кнопка действия — сразу за содержимым, на 24 px (правило для всех страниц, 21.09.2026) */
+.foot { margin-top: 0; padding-top: var(--msv-s24); }
 
 /* ---------- Плавающий таббар ---------- */
 
@@ -375,7 +378,7 @@
 .tab[aria-current="page"] .tab__cap { display: block; }
 
 /* Внесённый депозит — отдельный неброский тон */
-.pay-row--deposit { background: color-mix(in srgb, var(--msv-ice) 25%, var(--msv-white)); }   /* в четыре раза светлее подложки сообщений */
+.pay-row--deposit { background: color-mix(in srgb, var(--msv-ice) 12%, var(--msv-white)); }   /* едва заметный голубой (в восемь раз светлее подложки) */
 .pay-row--deposit .msv-num { color: var(--msv-graphite); }
 
 /* Скидка — отдельный столбик со стрелкой; текст раскрывается под строкой */

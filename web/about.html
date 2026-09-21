@@ -9,6 +9,15 @@
 <title>О проекте МСВ — МСВ</title>
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="resident.css">
+<style>
+  .res-about > summary { list-style: none; cursor: pointer; }
+  .res-about > summary::-webkit-details-marker { display: none; }
+  .res-about .row__end svg { transition: transform .32s var(--msv-ease); color: var(--msv-n300); }
+  .res-about[open] .row__end svg { transform: rotate(180deg); }
+  .res-about__body { padding: 0 var(--msv-s16) var(--msv-s16) 64px; color: var(--msv-n500); }
+  .res-about__body p { margin: 0 0 var(--msv-s8); }
+  [data-map] { cursor: pointer; }
+</style>
 </head>
 <body>
 
@@ -24,9 +33,9 @@
     <h1 class="msv-sub head__title"><a class="head__title-link" href="menu.html">О проекте МСВ</a></h1>
   </div>
 
-  <div style="margin:0 0 var(--msv-s24);padding:var(--msv-s20);background:var(--msv-red);border-radius:var(--msv-r20);color:var(--msv-white)">
-    <span class="msv-note" style="color:rgba(255,255,255,.8);letter-spacing:.08em;text-transform:uppercase;font-size:11px">Обещание</span>
-    <p class="msv-h" style="margin:var(--msv-s8) 0 0">Москва в студентов верит!</p>
+  <!-- Логотип из брендбука на графитовой полосе (подпись у него белая) -->
+  <div style="margin:0 0 var(--msv-s24);padding:var(--msv-s20);background:var(--msv-graphite);border-radius:var(--msv-r20)">
+    <img src="msv-1200-white.png" alt="МСВ — Москва в студентов верит!" style="display:block;width:100%;max-width:360px;height:auto;margin:0 auto">
   </div>
 
   <h2 class="msv-sub" style="margin:0 0 var(--msv-s8)">Что это</h2>
@@ -44,10 +53,32 @@
   </div>
 
   <h2 class="msv-sub" style="margin:0 0 var(--msv-s12)">Резиденции</h2>
+  <!-- Каждая резиденция раскрывается; тексты пока черновые, заменим на ваши -->
   <div class="rows" style="margin-bottom:var(--msv-s24)">
-    <div class="row" style="cursor:default"><img src="forma.png" alt="" width="36" height="36" style="border-radius:50%"><span class="row__text"><span class="row__name">FORMA</span><span class="msv-note row__note">16 комнат, свои санузлы в части комнат</span></span></div>
-    <div class="row" style="cursor:default"><img src="uyt.gif" alt="" width="36" height="36" style="border-radius:50%"><span class="row__text"><span class="row__name">Уют на Варшавке</span><span class="msv-note row__note">16 комнат, от двух до восьми мест</span></span></div>
-    <div class="row" style="cursor:default"><img src="molodejka.png" alt="" width="36" height="36" style="border-radius:50%"><span class="row__text"><span class="row__name">Молодежка</span><span class="msv-note row__note">Квартира для девушек, три двухместные комнаты</span></span></div>
+    <details class="res-about">
+      <summary class="row"><img src="forma.png" alt="" width="36" height="36" style="border-radius:50%"><span class="row__text"><span class="row__name">FORMA</span><span class="msv-note row__note">16 комнат, свои санузлы в части комнат</span></span><span class="row__end"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span></summary>
+      <div class="res-about__body msv-body">
+        <p>Комфорт-резиденция у метро Шаболовская. Шестнадцать комнат на два, четыре и восемь мест; в части комнат — свой санузел и душ. Общая кухня на этаже, коворкинг, прачечная.</p>
+        <p>Комнаты названы именами людей, задававших форму русской культуре: Рерих, Шостакович, Цветаева, Королёв.</p>
+        <p class="msv-note">Москва, Конный пер., 12 · <span class="msv-link" role="link" tabindex="0" data-map="https://yandex.ru/maps/-/CTtSY62w">на карте</span></p>
+      </div>
+    </details>
+    <details class="res-about">
+      <summary class="row"><img src="uyt.gif" alt="" width="36" height="36" style="border-radius:50%"><span class="row__text"><span class="row__name">Уют на Варшавке</span><span class="msv-note row__note">16 комнат, от двух до восьми мест</span></span><span class="row__end"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span></summary>
+      <div class="res-about__body msv-body">
+        <p>Эконом-резиденция у метро Нагатинская. Шестнадцать комнат от двух до восьми мест, есть капсулы. Самые доступные цены в сети — при тех же правилах, кураторе и репутации.</p>
+        <p>Комнаты названы именами городов, откуда приезжают студенты: Иваново, Казань, Ярославль, Сочи. Рядом парк и набережная.</p>
+        <p class="msv-note">Москва, Варшавское шоссе, 18к2 · <span class="msv-link" role="link" tabindex="0" data-map="https://yandex.ru/maps/-/CTtSYE5l">на карте</span></p>
+      </div>
+    </details>
+    <details class="res-about">
+      <summary class="row"><img src="molodejka.png" alt="" width="36" height="36" style="border-radius:50%"><span class="row__text"><span class="row__name">Молодежка</span><span class="msv-note row__note">Квартира для девушек, три двухместные комнаты</span></span><span class="row__end"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span></summary>
+      <div class="res-about__body msv-body">
+        <p>Квартира только для девушек-студенток у метро Молодежная: три двухместные комнаты, общая кухня и гостиная. Тихий район, до центра двадцать минут.</p>
+        <p>Формат для тех, кому камерность важнее большой компании: шесть соседок, свой ключ, домашняя обстановка.</p>
+        <p class="msv-note">Москва, ул. Партизанская, 40 · <span class="msv-link" role="link" tabindex="0" data-map="https://yandex.ru/maps/-/CTtSaI6E">на карте</span></p>
+      </div>
+    </details>
   </div>
 
   <p class="msv-note" style="text-align:center">Служба бренда МСВ · <a class="msv-link" href="legal.html">Правовая информация</a></p>
@@ -76,6 +107,9 @@
     <span class="tab__cap">Профиль</span>
   </a>
 </nav>
+<script>
+document.addEventListener('click', function (e) { var m = e.target.closest('[data-map]'); if (!m) return; e.preventDefault(); e.stopPropagation(); window.open(m.getAttribute('data-map'), '_blank', 'noopener'); });
+</script>
 <script src="mark.js"></script>
 <script src="zoom.js"></script>
 <script src="edit.js"></script>
