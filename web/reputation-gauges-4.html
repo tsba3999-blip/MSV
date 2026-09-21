@@ -1,0 +1,339 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#F5F1EA">
+<title>Репутация: двадцать вариантов — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="resident.css">
+<style>
+  /* ============================================================
+     Индикатор репутации по образцу заказчика (спидометр с пятью
+     цветными секторами и серым кольцом), двадцать вариантов.
+
+     Смысл (решение заказчика 21.09.2026):
+       · шкала −2 … +3, по умолчанию 0;
+       · цвета слева направо: чёрный, серый, жёлтый, светло-зелёный, зелёный;
+       · подписи в секторах: «Опасность расторжения договора»,
+         «Нужно быть внимательным», «Нужно сделать что-то хорошее»,
+         «У тебя хорошее будущее», «Ты на высоте — так держать!»;
+       · три «жизни»: нарушение от модератора сжигает одну, третье —
+         расторжение договора;
+       · полгода на максимуме — скидка 5 % на проживание.
+
+     Две раскладки шкалы:
+       6 секторов — по одному на каждое значение −2 −1 0 +1 +2 +3
+                    (цифра в кольце над своим сектором, стрелка в центре сектора);
+       5 секторов — цифры стоят на границах секторов, стрелка может
+                    показывать промежуточное значение (баллы).
+     ============================================================ */
+  .page { padding-bottom: var(--msv-s48); }
+  .grid { display: grid; grid-template-columns: 1fr; gap: var(--msv-s16); }
+  @media (min-width: 768px) { .grid { grid-template-columns: 1fr 1fr; } }
+  .v { padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r20); box-shadow: var(--msv-e1); }
+  .v--dark { background: var(--msv-graphite); color: var(--msv-white); }
+  .v--dark .v__d { color: #B7C3D0; }
+  .v__t { margin: 0 0 var(--msv-s4); font-size: 17px; line-height: 22px; }
+  .v__d { margin: 0 0 var(--msv-s12); color: var(--msv-n500); }
+  .v__num { display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 26px; padding: 0 6px; margin-right: var(--msv-s8); font-size: 13px; font-weight: 700; color: var(--msv-white); background: var(--msv-red); border-radius: 13px; vertical-align: middle; }
+  .g { display: block; width: 100%; max-width: 320px; margin: 0 auto; }
+  .g svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .g--compact { display: flex; align-items: center; gap: var(--msv-s16); max-width: none; }
+  .g--compact svg { width: 150px; flex: 0 0 auto; }
+  .g__side p { margin: 0 0 var(--msv-s4); }
+  .needle { transition: transform .9s cubic-bezier(.2,.8,.2,1); }
+  .legend { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; margin: var(--msv-s12) 0 0; font-size: 12px; line-height: 16px; color: var(--msv-n500); }
+  .legend b { display: inline-block; min-width: 26px; text-align: center; padding: 1px 6px; border-radius: 6px; font-weight: 700; }
+  .legend .on { color: var(--msv-graphite); font-weight: 600; }
+  .v--dark .legend .on { color: #fff; }
+  .ctl { position: sticky; top: 0; z-index: 2; margin: 0 calc(var(--msv-s24) * -1) var(--msv-s16); padding: var(--msv-s12) var(--msv-s24); background: color-mix(in srgb, var(--msv-beige) 92%, transparent); backdrop-filter: blur(6px); }
+  .ctl__row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--msv-s8) var(--msv-s16); }
+  .ctl__l { font-size: 12px; color: var(--msv-n500); }
+  .ctl input[type=range] { width: 160px; accent-color: var(--msv-red); }
+  .ctl .chip { height: 32px; padding: 0 12px; font-size: 13px; }
+  .ctl__val { display: inline-block; min-width: 26px; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="head">
+    <a class="head__back" href="reputation-gauges-3.html" aria-label="Вернуться назад">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+    <span class="head__back-label">Вернуться</span></a>
+    <h1 class="msv-sub head__title">Репутация: двадцать вариантов</h1>
+  </div>
+
+  <p class="msv-body" style="margin:0 0 var(--msv-s16);color:var(--msv-n500)">Шкала −2 … +3, три жизни, скидка 5 % за полгода на максимуме. Крутите ползунки — все двадцать вариантов покажут одно и то же состояние.</p>
+
+  <div class="ctl">
+    <div class="ctl__row">
+      <span class="ctl__l">Репутация <span class="ctl__val" id="vVal">0</span></span>
+      <input type="range" id="v" min="-2" max="3" step="1" value="0" aria-label="Репутация">
+      <span class="ctl__l">Жизни</span>
+      <span role="group" aria-label="Жизни">
+        <button class="chip" type="button" data-l="3" aria-pressed="true">3</button>
+        <button class="chip" type="button" data-l="2" aria-pressed="false">2</button>
+        <button class="chip" type="button" data-l="1" aria-pressed="false">1</button>
+      </span>
+      <span class="ctl__l">Месяцев на максимуме <span class="ctl__val" id="mVal">2</span></span>
+      <input type="range" id="m" min="0" max="6" step="1" value="2" aria-label="Месяцев на максимуме">
+    </div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="foot">
+    <a class="msv-btn msv-btn--block msv-btn--secondary" href="reputation-gauges-3.html">Предыдущие восемь</a>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var C = { black: '#1B1B1B', dgrey: '#6B665E', grey: '#B8B1A5', yellow: '#FFD93D', lime: '#C8F03C', green: '#35B265', ink: '#34495E', ring: '#EAE4DA', ringDark: '#4A5B70', red: '#FB344A' };
+
+  /* Шесть секторов — по одному на значение */
+  var S6 = [
+    { v: -2, c: 'black',  ink: '#fff',  t: ['Опасность', 'расторжения', 'договора'], s: 'Риск', w: 'Опасность расторжения договора' },
+    { v: -1, c: 'dgrey',  ink: '#fff',  t: ['Нужно быть', 'внимательным'],           s: 'Внимание', w: 'Нужно быть внимательным' },
+    { v:  0, c: 'grey',   ink: C.ink,   t: ['Сделай', 'что-то', 'хорошее'],          s: 'Доброе дело', w: 'Нужно сделать что-то хорошее' },
+    { v:  1, c: 'yellow', ink: C.ink,   t: ['У тебя', 'хорошее', 'будущее'],         s: 'Будущее', w: 'У тебя хорошее будущее' },
+    { v:  2, c: 'lime',   ink: C.ink,   t: ['Ты на', 'высоте'],                      s: 'На высоте', w: 'Ты на высоте' },
+    { v:  3, c: 'green',  ink: '#fff',  t: ['Так', 'держать!'],                      s: 'Так держать!', w: 'Так держать!' }
+  ];
+  /* Пять секторов — цифры на границах (−2 −1 0 +1 +2 +3), фразы в секторах */
+  var S5 = [
+    { c: 'black',  ink: '#fff', t: ['Опасность', 'расторжения', 'договора'], s: 'Риск',            w: 'Опасность расторжения договора' },
+    { c: 'grey',   ink: C.ink,  t: ['Нужно быть', 'внимательным'],           s: 'Внимание',        w: 'Нужно быть внимательным' },
+    { c: 'yellow', ink: C.ink,  t: ['Нужно сделать', 'что-то', 'хорошее'],   s: 'Сделай доброе',   w: 'Нужно сделать что-то хорошее' },
+    { c: 'lime',   ink: C.ink,  t: ['У тебя', 'хорошее', 'будущее'],         s: 'Хорошее будущее', w: 'У тебя хорошее будущее' },
+    { c: 'green',  ink: '#fff', t: ['Ты на высоте —', 'так', 'держать!'],    s: 'Так держать!',    w: 'Ты на высоте — так держать!' }
+  ];
+  var ICONS = { black: 'M12 3l10 18H2z M12 10v5 M12 18v.5', dgrey: 'M12 4v10 M12 18v.5', grey: 'M12 4v10 M12 18v.5', yellow: 'M5 12l5 5 9-10', lime: 'M12 3l2.6 5.6 6.1.8-4.5 4.2 1.2 6.1L12 16.8 6.6 19.7l1.2-6.1L3.3 9.4l6.1-.8z', green: 'M6 4h12v4a6 6 0 0 1-12 0z M9 20h6 M12 14v6 M6 6H3v2a3 3 0 0 0 3 3 M18 6h3v2a3 3 0 0 1-3 3' };
+
+  var HEART = 'M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z';
+
+  var state = { v: 0, lives: 3, months: 2 };
+
+  /* ---------- геометрия ---------- */
+  var CX = 200, CY = 205;
+  function pt(r, a) { var k = a * Math.PI / 180; return [CX + r * Math.cos(k), CY - r * Math.sin(k)]; }
+  function f(n) { return Math.round(n * 100) / 100; }
+  /* кольцевой сектор от угла a1 (левее) до a2 (правее); углы: 180 — слева, 0 — справа */
+  function ring(r1, r2, a1, a2) {
+    var p1 = pt(r2, a1), p2 = pt(r2, a2), p3 = pt(r1, a2), p4 = pt(r1, a1);
+    return 'M' + f(p1[0]) + ' ' + f(p1[1]) + ' A' + r2 + ' ' + r2 + ' 0 0 1 ' + f(p2[0]) + ' ' + f(p2[1]) +
+      ' L' + f(p3[0]) + ' ' + f(p3[1]) + ' A' + r1 + ' ' + r1 + ' 0 0 0 ' + f(p4[0]) + ' ' + f(p4[1]) + ' Z';
+  }
+  function arc(r, a1, a2) { var p1 = pt(r, a1), p2 = pt(r, a2); return 'M' + f(p1[0]) + ' ' + f(p1[1]) + ' A' + r + ' ' + r + ' 0 0 1 ' + f(p2[0]) + ' ' + f(p2[1]); }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+
+  var uid = 0;
+
+  /* ---------- один индикатор ----------
+     o: { sectors:6|5, text:'curve'|'curve1'|'radial'|'center'|'outside'|'legend'|'none',
+          nums:'ring'|'inside'|'bottom'|'none', needle:'classic'|'thin'|'dot'|'bubble'|'fill'|'led',
+          lives:'hearts'|'center'|'mini'|'none', discount:bool, dark:bool, gradient:bool,
+          gap:deg, unequal:bool, icons:bool, thin:bool, score:bool, noring:bool } */
+  function gauge(o) {
+    var id = 'g' + (++uid);
+    var six = o.sectors === 6;
+    var S = six ? S6 : S5;
+    var n = S.length;
+    var thin = o.thin;
+    var R2 = thin ? 172 : 165, R1 = thin ? 132 : 100;     // цветная полоса
+    var K1 = 170, K2 = 196;                               // серое кольцо цифр
+    if (o.noring) { R2 = 190; R1 = thin ? 150 : 118; }
+    var gap = o.gap === undefined ? 1.2 : o.gap;
+    var dark = o.dark;
+
+    /* границы секторов (равные или неравные) */
+    var bounds = [180];
+    if (o.unequal) { var wts = six ? [0.6, 0.8, 1, 1.1, 1.2, 1.3] : [0.7, 0.9, 1, 1.15, 1.25]; var sum = wts.reduce(function (a, b) { return a + b; }, 0); var acc = 180; wts.forEach(function (w) { acc -= 180 * w / sum; bounds.push(acc); }); bounds[n] = 0; }
+    else for (var i = 1; i <= n; i++) bounds.push(180 - 180 * i / n);
+
+    /* угол стрелки */
+    var v = state.v;
+    var ang;
+    if (six) { var idx = v + 2; ang = (bounds[idx] + bounds[idx + 1]) / 2; }
+    else { var pos = (v + 2) / 5; var seg = Math.min(4, Math.floor(pos * 5)); var t = pos * 5 - seg; ang = v >= 3 ? 0.001 : bounds[seg] - (bounds[seg] - bounds[seg + 1]) * t; }
+    var cur = six ? S[v + 2] : S[Math.min(4, Math.max(0, v + 2))];
+    if (!six && v >= 3) cur = S[4];
+
+    var svg = [];
+    svg.push('<svg viewBox="0 0 400 ' + (o.lives === 'hearts' || o.nums === 'bottom' || o.text === 'outside' ? 262 : 226) + '" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Репутация ' + v + '">');
+    svg.push('<defs>');
+    Object.keys(C).forEach(function (k) {
+      svg.push('<radialGradient id="' + id + k + '" cx="' + CX + '" cy="' + CY + '" r="' + R2 + '" gradientUnits="userSpaceOnUse"><stop offset="' + (R1 / R2) + '" stop-color="' + C[k] + '"/><stop offset="1" stop-color="' + C[k] + '" stop-opacity=".78"/></radialGradient>');
+    });
+    S.forEach(function (s, i) { svg.push('<path id="' + id + 'p' + i + 'a" d="' + arc(six ? 152 : 150, bounds[i] - gap, bounds[i + 1] + gap) + '"/><path id="' + id + 'p' + i + 'b" d="' + arc(six ? 138 : 134, bounds[i] - gap, bounds[i + 1] + gap) + '"/><path id="' + id + 'p' + i + 'c" d="' + arc(six ? 124 : 118, bounds[i] - gap, bounds[i + 1] + gap) + '"/><path id="' + id + 'p' + i + 'm" d="' + arc((R1 + R2) / 2, bounds[i] - gap, bounds[i + 1] + gap) + '"/>'); });
+    svg.push('<path id="' + id + 'ring" d="' + arc((K1 + K2) / 2, 180, 0) + '"/>');
+    svg.push('</defs>');
+
+    /* серое кольцо */
+    if (!o.noring) svg.push('<path d="' + ring(K1, K2, 180, 0.001) + '" fill="' + (dark ? C.ringDark : C.ring) + '"/>');
+
+    /* сектора */
+    S.forEach(function (s, i) {
+      var a1 = bounds[i] - gap, a2 = bounds[i + 1] + gap;
+      var fill = o.gradient ? 'url(#' + id + s.c + ')' : C[s.c];
+      var lit = true;
+      if (o.needle === 'fill') lit = six ? i <= v + 2 : bounds[i + 1] >= ang - 0.01 || i === 0;
+      if (o.needle === 'led') {
+        var k = 5, step = (a1 - a2) / k;
+        for (var j = 0; j < k; j++) {
+          var b1 = a1 - step * j, b2 = b1 - step + 0.8;
+          var on = b2 >= ang - 0.01;
+          svg.push('<path d="' + ring(R1, R2, b1, b2) + '" fill="' + C[s.c] + '" opacity="' + (on ? 1 : 0.18) + '"/>');
+        }
+      } else {
+        svg.push('<path d="' + ring(R1, R2, a1, a2) + '" fill="' + fill + '" opacity="' + (lit ? 1 : 0.22) + '"' + (o.rounded ? ' stroke="' + (dark ? C.ink : '#fff') + '" stroke-width="3" stroke-linejoin="round"' : '') + '/>');
+      }
+      var mid = (a1 + a2) / 2;
+      /* подписи внутри сектора */
+      if (o.text === 'curve') {
+        var lines = s.t, rs = lines.length === 3 ? ['a', 'b', 'c'] : lines.length === 2 ? ['a', 'b'] : ['b'];
+        lines.forEach(function (ln, li) {
+          svg.push('<text font-size="' + (six ? 8.5 : 10) + '" font-weight="600" fill="' + s.ink + '" font-family="var(--msv-font)"><textPath href="#' + id + 'p' + i + rs[li] + '" startOffset="50%" text-anchor="middle" dominant-baseline="middle">' + esc(ln) + '</textPath></text>');
+        });
+      } else if (o.text === 'curve1') {
+        svg.push('<text font-size="' + (six ? 9 : 11) + '" font-weight="700" fill="' + s.ink + '" font-family="var(--msv-font)"><textPath href="#' + id + 'p' + i + 'm" startOffset="50%" text-anchor="middle" dominant-baseline="middle">' + esc(s.s) + '</textPath></text>');
+      } else if (o.text === 'radial') {
+        var p = pt((R1 + R2) / 2, mid), rot = 90 - mid;
+        svg.push('<text transform="translate(' + f(p[0]) + ' ' + f(p[1]) + ') rotate(' + f(rot) + ')" font-size="' + (six ? 8.5 : 9.5) + '" font-weight="600" fill="' + s.ink + '" text-anchor="middle" font-family="var(--msv-font)">' +
+          s.s.split(' ').map(function (ln, li, all) { return '<tspan x="0" y="' + ((li - (all.length - 1) / 2) * 11) + '" dominant-baseline="middle">' + esc(ln) + '</tspan>'; }).join('') + '</text>');
+      }
+      if (o.icons) {
+        var ip = pt((R1 + R2) / 2, mid);
+        svg.push('<g transform="translate(' + f(ip[0] - 12) + ' ' + f(ip[1] - 12) + ')"><path d="' + ICONS[s.c] + '" fill="none" stroke="' + s.ink + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>');
+      }
+      /* цифры внутри секторов */
+      if (o.nums === 'inside' && six) {
+        var np = pt(R2 - 14, mid);
+        svg.push('<text x="' + f(np[0]) + '" y="' + f(np[1]) + '" font-size="14" font-weight="800" fill="' + s.ink + '" text-anchor="middle" dominant-baseline="middle" font-family="var(--msv-font)">' + (s.v > 0 ? '+' : '') + s.v + '</text>');
+      }
+    });
+
+    /* цифры в кольце */
+    var numInk = dark ? '#fff' : C.ink;
+    if (o.nums === 'ring' || o.nums === 'bottom') {
+      var rr = o.nums === 'bottom' ? R2 + 14 : (K1 + K2) / 2;
+      if (six) S.forEach(function (s, i) { var p = pt(rr, (bounds[i] + bounds[i + 1]) / 2); svg.push('<text x="' + f(p[0]) + '" y="' + f(p[1]) + '" font-size="15" font-weight="800" fill="' + (s.v === v ? (dark ? '#fff' : C.ink) : (dark ? '#B7C3D0' : '#8E877B')) + '" text-anchor="middle" dominant-baseline="middle" font-family="var(--msv-font)">' + (s.v > 0 ? '+' : '') + s.v + '</text>'); });
+      else bounds.forEach(function (a, i) { var val = i - 2, p = pt(rr, Math.min(179, Math.max(1, a))); svg.push('<text x="' + f(p[0]) + '" y="' + f(p[1]) + '" font-size="14" font-weight="800" fill="' + numInk + '" text-anchor="middle" dominant-baseline="middle" font-family="var(--msv-font)">' + (val > 0 ? '+' : '') + val + '</text>'); if (!o.noring) svg.push('<line x1="' + f(pt(K1, a)[0]) + '" y1="' + f(pt(K1, a)[1]) + '" x2="' + f(pt(K1 + 6, a)[0]) + '" y2="' + f(pt(K1 + 6, a)[1]) + '" stroke="' + numInk + '" stroke-width="2"/>'); });
+    }
+    /* фразы снаружи, в кольце */
+    if (o.text === 'outside') {
+      S.forEach(function (s, i) {
+        svg.push('<text font-size="9" font-weight="700" letter-spacing=".04em" fill="' + numInk + '" font-family="var(--msv-font)"><textPath href="#' + id + 'ring" startOffset="' + f((180 - (bounds[i] + bounds[i + 1]) / 2) / 180 * 100) + '%" text-anchor="middle" dominant-baseline="middle">' + esc(s.s.toUpperCase()) + '</textPath></text>');
+      });
+    }
+
+    /* стрелка */
+    var rot = 90 - ang;   // группа рисуется вертикально вверх, поворот по часовой
+    var needleLen = R2 - 6;
+    if (o.needle === 'classic') {
+      svg.push('<g class="needle" style="transform-origin:' + CX + 'px ' + CY + 'px;transform:rotate(' + f(rot) + 'deg)"><path d="M' + CX + ' ' + (CY - needleLen) + ' L' + (CX - 9) + ' ' + (CY + 8) + ' L' + (CX + 9) + ' ' + (CY + 8) + ' Z" fill="' + (dark ? '#fff' : '#1B1B1B') + '"/><circle cx="' + CX + '" cy="' + CY + '" r="13" fill="' + (dark ? '#fff' : '#1B1B1B') + '"/><circle cx="' + CX + '" cy="' + CY + '" r="5" fill="' + (dark ? C.ink : '#6B665E') + '"/></g>');
+    } else if (o.needle === 'thin') {
+      svg.push('<g class="needle" style="transform-origin:' + CX + 'px ' + CY + 'px;transform:rotate(' + f(rot) + 'deg)"><line x1="' + CX + '" y1="' + CY + '" x2="' + CX + '" y2="' + (CY - needleLen) + '" stroke="' + C.red + '" stroke-width="3" stroke-linecap="round"/><circle cx="' + CX + '" cy="' + CY + '" r="8" fill="' + C.red + '"/><circle cx="' + CX + '" cy="' + CY + '" r="3" fill="#fff"/></g>');
+    } else if (o.needle === 'dot') {
+      var dp = pt((R1 + R2) / 2, ang);
+      svg.push('<circle cx="' + f(dp[0]) + '" cy="' + f(dp[1]) + '" r="12" fill="#fff" stroke="' + (dark ? C.ink : '#1B1B1B') + '" stroke-width="4"/>');
+    } else if (o.needle === 'bubble') {
+      var bp = pt(R2 + 22, ang);
+      svg.push('<g class="needle" style="transform-origin:' + CX + 'px ' + CY + 'px;transform:rotate(' + f(rot) + 'deg)"><line x1="' + CX + '" y1="' + CY + '" x2="' + CX + '" y2="' + (CY - R1 + 6) + '" stroke="' + (dark ? '#fff' : '#1B1B1B') + '" stroke-width="4" stroke-linecap="round"/><circle cx="' + CX + '" cy="' + CY + '" r="9" fill="' + (dark ? '#fff' : '#1B1B1B') + '"/></g>');
+      svg.push('<g><circle cx="' + f(bp[0]) + '" cy="' + f(bp[1]) + '" r="17" fill="' + C[cur.c] + '" stroke="' + (dark ? C.ink : '#fff') + '" stroke-width="3"/><text x="' + f(bp[0]) + '" y="' + f(bp[1]) + '" font-size="14" font-weight="800" fill="' + cur.ink + '" text-anchor="middle" dominant-baseline="middle" font-family="var(--msv-font)">' + (v > 0 ? '+' : '') + v + '</text></g>');
+    } else if (o.needle === 'fill' || o.needle === 'led') {
+      var ep = pt((R1 + R2) / 2, ang);
+      svg.push('<circle cx="' + f(ep[0]) + '" cy="' + f(ep[1]) + '" r="' + (thin ? 9 : 7) + '" fill="' + (dark ? C.ink : '#fff') + '" stroke="' + C[cur.c] + '" stroke-width="4"/>');
+    }
+
+    /* центр: балл, фраза, жизни, скидка */
+    var cy0 = o.needle === 'classic' || o.needle === 'thin' || o.needle === 'bubble' ? CY - 30 : CY - 4;
+    if (o.score) svg.push('<text x="' + CX + '" y="' + (cy0 - 26) + '" font-size="34" font-weight="800" letter-spacing="-.02em" fill="' + numInk + '" text-anchor="middle" dominant-baseline="middle" font-family="var(--msv-font)">' + (v > 0 ? '+' : '') + v + '</text>');
+    if (o.text === 'center' || o.text === 'legend' && false) {
+      var line1 = cur.w;
+      svg.push('<text x="' + CX + '" y="' + (o.score ? cy0 - 2 : cy0 - 16) + '" font-size="12" font-weight="700" fill="' + numInk + '" text-anchor="middle" dominant-baseline="middle" font-family="var(--msv-font)">' + esc(line1) + '</text>');
+    }
+    if (o.lives === 'center' || o.lives === 'mini') {
+      var hy = o.lives === 'mini' ? CY - 8 : (o.score || o.text === 'center' ? cy0 + 16 : cy0);
+      for (var h = 0; h < 3; h++) {
+        var hx = CX - 26 + h * 26, alive = h < state.lives;
+        svg.push('<g transform="translate(' + (hx - 9) + ' ' + (hy - 9) + ') scale(.75)"><path d="' + HEART + '" fill="' + (alive ? C.red : 'none') + '" stroke="' + (alive ? C.red : (dark ? '#8FA0B3' : C.grey)) + '" stroke-width="2" stroke-linejoin="round"/></g>');
+      }
+    }
+    if (o.lives === 'hearts') {
+      for (var h2 = 0; h2 < 3; h2++) {
+        var hx2 = CX - 34 + h2 * 34, alive2 = h2 < state.lives;
+        svg.push('<g transform="translate(' + (hx2 - 12) + ' ' + (CY + 22) + ')"><path d="' + HEART + '" fill="' + (alive2 ? C.red : 'none') + '" stroke="' + (alive2 ? C.red : (dark ? '#8FA0B3' : C.grey)) + '" stroke-width="2" stroke-linejoin="round"/></g>');
+      }
+      svg.push('<text x="' + CX + '" y="' + (CY + 56) + '" font-size="11" fill="' + (dark ? '#B7C3D0' : '#6B665E') + '" text-anchor="middle" font-family="var(--msv-font)">' + (state.lives === 3 ? 'Три жизни — все на месте' : state.lives === 2 ? 'Одна жизнь сгорела' : 'Осталась последняя жизнь') + '</text>');
+    }
+    if (o.discount) {
+      /* тонкая дуга внутри: месяцы на максимуме, 0…6 */
+      var mr = R1 - 12, mm = state.months, ma = 180 - 180 * mm / 6;
+      svg.push('<path d="' + arc(mr, 180, 0.001) + '" fill="none" stroke="' + (dark ? C.ringDark : C.ring) + '" stroke-width="6" stroke-linecap="round"/>');
+      if (mm > 0) svg.push('<path d="' + arc(mr, 180, Math.max(0.001, ma)) + '" fill="none" stroke="' + C.green + '" stroke-width="6" stroke-linecap="round"/>');
+      svg.push('<text x="' + CX + '" y="' + (CY - 6) + '" font-size="10" font-weight="600" fill="' + (dark ? '#B7C3D0' : '#6B665E') + '" text-anchor="middle" font-family="var(--msv-font)">' + (mm >= 6 ? 'Скидка 5 % действует' : 'До скидки 5 %: ' + (6 - mm) + ' ' + plural(6 - mm)) + '</text>');
+    }
+    svg.push('</svg>');
+    return { svg: svg.join(''), cur: cur, S: S, six: six };
+  }
+  function plural(n) { return n === 1 ? 'месяц' : n < 5 ? 'месяца' : 'месяцев'; }
+
+  /* ---------- двадцать вариантов ---------- */
+  var V = [
+    { t: 'По образцу', d: 'Как на картинке: серое кольцо с цифрами −2 … +3, шесть секторов, фразы дугой в три строки, чёрная стрелка.', o: { sectors: 6, text: 'curve', nums: 'ring', needle: 'classic', gradient: true } },
+    { t: 'Пять секторов, цифры на границах', d: 'Ровно пять цветов по заданию; цифры стоят на стыках, стрелка может показывать промежуточные баллы.', o: { sectors: 5, text: 'curve', nums: 'ring', needle: 'classic', gradient: true } },
+    { t: 'Короткие подписи', d: 'Одна строка дугой в каждом секторе: Риск · Внимание · Сделай доброе · Хорошее будущее · На высоте · Так держать!', o: { sectors: 6, text: 'curve1', nums: 'ring', needle: 'classic' } },
+    { t: 'Фраза в центре', d: 'Сектора чистые, цифры в кольце; фраза текущего состояния — одна, крупно под стрелкой.', o: { sectors: 6, text: 'center', nums: 'ring', needle: 'classic', score: true } },
+    { t: 'Плоский, без кольца', d: 'Без серого кольца и градиентов, цифры под дугой, тонкая красная стрелка. Самый спокойный.', o: { sectors: 6, text: 'curve1', nums: 'bottom', needle: 'thin', noring: true } },
+    { t: 'Метка на дуге + балл', d: 'Вместо стрелки — белая метка на самой полосе, в центре крупный балл и фраза.', o: { sectors: 6, text: 'center', nums: 'ring', needle: 'dot', score: true } },
+    { t: 'Три сердца снизу', d: 'Классическая стрелка; жизни — три сердца под индикатором с подписью.', o: { sectors: 6, text: 'curve', nums: 'ring', needle: 'classic', gradient: true, lives: 'hearts' } },
+    { t: 'Сердца в центре', d: 'Жизни внутри полукруга, рядом со стрелкой, — всё в одном пятне внимания.', o: { sectors: 6, text: 'curve1', nums: 'ring', needle: 'classic', lives: 'center' } },
+    { t: 'Путь к скидке', d: 'Внутри — тонкая зелёная дуга: сколько месяцев из шести продержался максимум. Стрелка и жизни на месте.', o: { sectors: 6, text: 'curve1', nums: 'ring', needle: 'classic', discount: true, lives: 'center' } },
+    { t: 'Тёмная карточка', d: 'На графитовом фоне сектора светятся ярче; для главной страницы кабинета.', o: { sectors: 6, text: 'curve1', nums: 'ring', needle: 'classic', dark: true, lives: 'center' } },
+    { t: 'Компактный, в строку', d: 'Маленький индикатор слева, справа — балл, фраза, жизни и скидка. Для плитки в меню.', o: { sectors: 6, text: 'none', nums: 'none', needle: 'thin', noring: true, thin: true }, compact: true },
+    { t: 'Цифры внутри, фразы снаружи', d: 'Наоборот: цифры крупно в цветных секторах, короткие фразы капителью в сером кольце.', o: { sectors: 6, text: 'outside', nums: 'inside', needle: 'classic' } },
+    { t: 'Светящиеся деления', d: 'Каждый сектор из пяти сегментов; горят до текущего значения, остальные притушены. Без стрелки.', o: { sectors: 6, text: 'none', nums: 'ring', needle: 'led', score: true, lives: 'center' } },
+    { t: 'Заливка до значения', d: 'Сектора справа от значения бледные, слева — цветные; метка на конце. Читается как прогресс.', o: { sectors: 6, text: 'curve1', nums: 'ring', needle: 'fill', score: true } },
+    { t: 'Значки в секторах', d: 'Вместо слов — знаки: предупреждение, восклицание, галочка, звезда, кубок; фраза — в центре.', o: { sectors: 6, text: 'center', nums: 'ring', needle: 'classic', icons: true, score: true } },
+    { t: 'Пузырёк на конце стрелки', d: 'Короткая стрелка, а балл — в цветном кружке над дугой, цвет кружка = цвет сектора.', o: { sectors: 6, text: 'curve1', nums: 'none', needle: 'bubble', lives: 'center' } },
+    { t: 'Тонкая дуга', d: 'Узкая полоса без подписей внутри, цифры под дугой, легенда со всеми фразами под индикатором — текущая выделена.', o: { sectors: 6, text: 'legend', nums: 'bottom', needle: 'dot', noring: true, thin: true, score: true }, legend: true },
+    { t: 'Неравные сектора', d: 'Чёрный узкий (опасность — короткая), зелёный широкий (есть куда расти). Подписи лучами от центра.', o: { sectors: 6, text: 'radial', nums: 'ring', needle: 'classic', unequal: true } },
+    { t: 'Скруглённые дольки', d: 'Сектора с белой обводкой и мягкими стыками, как дольки; фразы дугой, три сердца снизу.', o: { sectors: 5, text: 'curve', nums: 'ring', needle: 'thin', rounded: true, gap: 0, lives: 'hearts' } },
+    { t: 'Всё сразу', d: 'Полный набор: фразы дугой, цифры в кольце, балл, жизни и путь к скидке. Для страницы «Репутация».', o: { sectors: 6, text: 'curve', nums: 'ring', needle: 'classic', gradient: true, lives: 'center', discount: true } }
+  ];
+
+  var grid = document.getElementById('grid');
+  function draw() {
+    uid = 0;
+    grid.innerHTML = V.map(function (x, i) {
+      var g = gauge(x.o);
+      var body;
+      if (x.compact) {
+        body = '<div class="g g--compact">' + g.svg + '<div class="g__side"><p class="msv-sub" style="margin:0">' + (state.v > 0 ? '+' : '') + state.v + ' · ' + esc(g.cur.s) + '</p><p class="msv-note" style="color:var(--msv-n500)">' + esc(g.cur.w) + '</p><p class="msv-note">' + hearts() + '</p><p class="msv-note" style="color:var(--msv-n500)">' + (state.months >= 6 ? 'Скидка 5 % действует' : 'До скидки 5 %: ' + (6 - state.months) + ' ' + plural(6 - state.months)) + '</p></div></div>';
+      } else body = '<div class="g">' + g.svg + '</div>';
+      if (x.legend) body += '<div class="legend">' + g.S.map(function (s) { var on = s === g.cur; return '<b style="background:' + C[s.c] + ';color:' + s.ink + '">' + (s.v > 0 ? '+' : '') + s.v + '</b><span' + (on ? ' class="on"' : '') + '>' + esc(s.w) + '</span>'; }).join('') + '</div>';
+      return '<section class="v' + (x.o.dark ? ' v--dark' : '') + '"><h2 class="msv-body v__t"><span class="v__num">' + (i + 1) + '</span>' + esc(x.t) + '</h2><p class="msv-note v__d">' + esc(x.d) + '</p>' + body + '</section>';
+    }).join('');
+  }
+  function hearts() { var s = ''; for (var i = 0; i < 3; i++) s += '<span style="color:' + (i < state.lives ? C.red : C.grey) + ';font-size:16px">' + (i < state.lives ? '♥' : '♡') + '</span> '; return s + '<span style="color:var(--msv-n500)">жизни</span>'; }
+
+  document.getElementById('v').addEventListener('input', function () { state.v = Number(this.value); document.getElementById('vVal').textContent = (state.v > 0 ? '+' : '') + state.v; draw(); });
+  document.getElementById('m').addEventListener('input', function () { state.months = Number(this.value); document.getElementById('mVal').textContent = state.months; draw(); });
+  document.querySelectorAll('[data-l]').forEach(function (b) { b.addEventListener('click', function () { document.querySelectorAll('[data-l]').forEach(function (x) { x.setAttribute('aria-pressed', 'false'); }); b.setAttribute('aria-pressed', 'true'); state.lives = Number(b.dataset.l); draw(); }); });
+  draw();
+})();
+</script>
+<script src="mark.js"></script>
+<script src="protect.js"></script>
+
+</body>
+</html>
