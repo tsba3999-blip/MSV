@@ -15,6 +15,7 @@
   .invite[hidden] { display: none; }
   .invite__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--msv-s12); }
   .invite .msv-field { margin-bottom: 0; }
+  .invite .msv-error { margin-top: var(--msv-s12); }
 </style>
 <style>
   body { --role: var(--msv-graphite); --role-ink: var(--msv-graphite); }
@@ -25,8 +26,8 @@
 <div class="shell">
 
   <aside class="side">
-    <img class="side__logo" src="msv-1200-white.png" width="1200" height="209"
-         alt="МСВ — Москва в студентов верит!">
+    <a class="side__logo-link" href="index.html" title="На главную"><img class="side__logo" src="msv-1200-white.png" width="1200" height="209"
+         alt="МСВ — Москва в студентов верит!"></a>
 
     <a class="side__who" href="admin-profile.html" title="Мой профиль и настройки">
       <span class="side__name">Ирина Соколова</span>
@@ -38,6 +39,11 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>
         Обзор
+      </a>
+      <a class="side__link" href="admin-staff.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6.5a3 3 0 0 1 0 5.8"/><path d="M18 20a5.5 5.5 0 0 0-3-4.6"/></svg>
+        Сотрудники
       </a>
       <a class="side__link" href="admin-residences.html">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -63,11 +69,6 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 12h5a3.5 3.5 0 0 0 0-7H9v14"/><path d="M7 15h7"/></svg>
         Начисления
-      </a>
-      <a class="side__link" href="admin-staff.html">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6.5a3 3 0 0 1 0 5.8"/><path d="M18 20a5.5 5.5 0 0 0-3-4.6"/></svg>
-        Сотрудники
       </a>
       <a class="side__link" href="admin-reputation.html">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -125,7 +126,7 @@
                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2.5 15 14H1z"/><path d="M8 6.5v3.2"/><path d="M8 12h.01"/></svg>
           <span id="invErrText"></span>
         </div>
-        <div style="display:flex;gap:var(--msv-s8)">
+        <div style="display:flex;flex-wrap:wrap;gap:var(--msv-s8);margin-top:var(--msv-s16);padding-top:var(--msv-s16);border-top:1px solid var(--msv-n100)">
           <button class="msv-btn msv-btn--m msv-btn--primary" type="button" id="invSend">Создать и выдать код</button>
           <button class="msv-btn msv-btn--m msv-btn--tertiary" type="button" id="invRand">Случайный код</button>
           <button class="msv-btn msv-btn--m msv-btn--tertiary" type="button" id="invCancel">Отмена</button>

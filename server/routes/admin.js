@@ -13,6 +13,7 @@
    POST   /api/rooms/:id/photos     { url }
    DELETE /api/photos/:id
    GET    /api/rooms/:id/photos     → [{ id, url }]
+   PUT    /api/rooms/:id/photos/order { ids }  — порядок показа (перетаскивание в кабинете)
    ============================================================ */
 
 const fs = require('fs');
@@ -204,6 +205,19 @@ module.exports = function register(route) {
       VALUES ($1, $2, $3, (SELECT COALESCE(max(sort), 0) + 1 FROM room_photos WHERE room_id = $1)) RETURNING id`,
       [req.params.id, b.url, s.uid]);
     json(res, 201, { id: String(r.rows[0].id) });
+  });
+
+  route('PUT', '/api/rooms/:id/photos/order', async (req, res) => {
+    const s = mod(req, res); if (!s) return;
+    const b = await readJson(req);
+    const ids = Array.isArray(b.ids) ? b.ids.map(Number).filter(Number.isInteger) : [];
+    if (!ids.length) return fail(res, 400, 'Нужен список фото');
+    // порядок — позиция в списке; чужие id (не этой комнаты) молча пропускаем
+    for (let i = 0; i < ids.length; i++) {
+      await query(`UPDATE room_photos SET sort = $1 WHERE id = $2 AND room_id = $3`, [i + 1, ids[i], req.params.id]);
+    }
+    await audit(s.uid, 'photo.order', 'room:' + req.params.id, { ids });
+    json(res, 200, { ok: true });
   });
 
   route('DELETE', '/api/photos/:id', async (req, res) => {

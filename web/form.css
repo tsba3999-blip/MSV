@@ -20,8 +20,8 @@
   align-items: center;
   gap: var(--msv-s12);
   height: var(--msv-header);
-  margin: 0 calc(var(--msv-s24) * -1);
-  padding: 0 var(--msv-s16);
+  margin: 0 calc(var(--msv-s24) * -1) 0 0;
+  padding: 0 var(--msv-s16);   /* кнопка «Вернуться» начинается со значка — он встаёт на линию 16, как текст в карточках */
 }
 
 .form__back {
@@ -332,7 +332,7 @@
    длинные поля ввода читаются хуже. */
 @media (min-width: 768px) {
   .form { max-width: 640px; padding-left: var(--msv-s32); padding-right: var(--msv-s32); }
-  .form__head { margin-left: calc(var(--msv-s32) * -1); margin-right: calc(var(--msv-s32) * -1); }
+  .form__head { margin-left: 0; margin-right: calc(var(--msv-s32) * -1); }
 }
 @media (min-width: 1100px) {
   .form { max-width: 720px; }
@@ -344,5 +344,6 @@
 .form__back:has(.form__back-label) { width: auto; height: var(--msv-tap); padding-right: var(--msv-s8); border-radius: 22px; gap: 2px; }
 .form__back-label { font-size: var(--msv-note-size); line-height: var(--msv-note-line); color: var(--msv-n500); }
 .form__title-link { flex: 1 1 100%; margin-top: var(--msv-s4); color: var(--msv-graphite); text-decoration: none; }
+.form > p, .form > .msv-body, .form > .msv-note, .sect__title, .filters__label, .form .msv-field__label { padding-left: var(--msv-s16); }
 .form__title-link:hover { color: var(--msv-n500); }
 .form__title-link:focus-visible { outline: 2px solid var(--msv-violet); outline-offset: 2px; border-radius: 4px; }

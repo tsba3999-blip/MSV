@@ -224,10 +224,11 @@
   send.addEventListener('click', function () {
     var prio = document.querySelector('input[name="prio"]:checked');
     var placeEl = document.getElementById('place');
+    var catEl = document.querySelector('.chip[data-group="cat"][aria-pressed="true"]');   // категория — нажатый чип
     var body = {
       text: document.getElementById('what').value.trim(),
       priority: PRIO[prio ? prio.value : '2'] || 'normal',
-      category: placeEl ? placeEl.options[placeEl.selectedIndex].text : 'Другое',
+      category: catEl ? catEl.textContent.trim() : 'Другое',
       place: placeEl ? placeEl.value : null,
       room: (document.getElementById('room') || {}).value || null
     };

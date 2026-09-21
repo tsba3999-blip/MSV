@@ -24,7 +24,7 @@
   else home = 'menu.html';
 
   var a = document.createElement('a');
-  a.className = 'msv-mark-btn';
+  a.className = 'msv-mark-btn' + (home === 'cabinet-staff.html' ? ' msv-mark-btn--staff' : (home === 'cabinet-admin.html' ? ' msv-mark-btn--admin' : ''));
   a.href = home;
   a.setAttribute('aria-label', 'Меню');
   a.title = 'Меню';
@@ -45,6 +45,7 @@
     '.msv-mark-btn{position:fixed;top:14px;right:14px;z-index:10040;display:flex;align-items:center;justify-content:center;' +
       'width:44px;height:44px;border-radius:12px;background:#fff;box-shadow:0 3px 9px rgba(52,73,94,.18);text-decoration:none;' +
       'transition:transform .09s cubic-bezier(.2,0,0,1)}' +
+    '.msv-mark-btn--staff{background:#7EB2DD}.msv-mark-btn--admin{background:#34495E}' +
     '.msv-mark-btn:hover{transform:translateY(-1px)}' +
     '.msv-mark-btn:active{transform:scale(.97)}' +
     '.msv-mark-btn:focus-visible{outline:2px solid #6E3BFF;outline-offset:2px}' +
@@ -70,13 +71,17 @@
     btn.type = 'button'; btn.className = 'side__fold'; btn.setAttribute('aria-label', 'Свернуть меню'); btn.title = 'Свернуть меню';
     btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 6l-6 6 6 6"/><path d="M18 6l-6 6 6 6"/></svg>';
     side.appendChild(btn);
+    // Стрелка стоит напротив имени сотрудника (в свёрнутом меню — сверху)
+    function place() { if (!who || shell.classList.contains('shell--folded')) { btn.style.top = ''; return; } btn.style.top = (who.offsetTop + who.offsetHeight / 2 - 14) + 'px'; }
     function apply(folded) {
       shell.classList.toggle('shell--folded', folded);
+      place();
       btn.setAttribute('aria-label', folded ? 'Развернуть меню' : 'Свернуть меню'); btn.title = btn.getAttribute('aria-label');
       side.querySelectorAll('.side__link').forEach(function (l) { if (folded) l.title = l.textContent.trim(); else l.removeAttribute('title'); });
     }
     var saved = false; try { saved = localStorage.getItem('msv.sideFolded') === '1'; } catch (e) {}
     apply(saved);
+    window.addEventListener('resize', place);
     btn.addEventListener('click', function () {
       var f = !shell.classList.contains('shell--folded'); apply(f);
       try { localStorage.setItem('msv.sideFolded', f ? '1' : '0'); } catch (e) {}

@@ -28,8 +28,8 @@
 <div class="shell">
 
   <aside class="side">
-    <img class="side__logo" src="msv-1200-white.png" width="1200" height="209"
-         alt="МСВ — Москва в студентов верит!">
+    <a class="side__logo-link" href="index.html" title="На главную"><img class="side__logo" src="msv-1200-white.png" width="1200" height="209"
+         alt="МСВ — Москва в студентов верит!"></a>
 
     <a class="side__who" href="staff-profile.html" title="Мои данные">
       <span class="side__name">Сергей Ким</span>
@@ -126,10 +126,11 @@
       <div class="set" style="max-width:680px">
         <div class="set__grid">
           <label class="msv-field"><span class="msv-field__label">Кому</span>
-            <select class="msv-select" id="to"><option value="all">Всем резидентам</option><option value="forma">FORMA</option><option value="uyut">Уют</option><option value="molod">Молодежка</option></select></label>
+            <select class="msv-select" id="to"><option value="all">Всем резидентам</option><option value="one">Одному резиденту…</option><option value="forma">FORMA</option><option value="uyut">Уют</option><option value="molod">Молодежка</option></select></label>
           <label class="msv-field"><span class="msv-field__label">Вид</span>
             <select class="msv-select" id="kind"><option value="news">Новость или событие</option><option value="alarm">Предупреждение</option><option value="pay">Напоминание об оплате</option></select></label>
         </div>
+        <label class="msv-field" id="oneField" hidden style="margin-top:var(--msv-s12)"><span class="msv-field__label">Кому именно</span><input class="msv-input" id="oneWho" list="oneList" placeholder="Начни вводить фамилию" autocomplete="off"><datalist id="oneList"></datalist></label>
         <input class="msv-input" id="title" placeholder="Заголовок: Вечер настолок в четверг" style="margin-top:var(--msv-s12)">
         <textarea class="msv-area" id="text" maxlength="1000" style="min-height:120px;margin-top:var(--msv-s12)" placeholder="Текст сообщения. Короткий, на «ты», без восклицательных знаков."></textarea>
         <span class="msv-note" style="display:block;margin-top:var(--msv-s4);text-align:right" id="count">0 из 1000</span>
@@ -153,11 +154,28 @@
 <script>
 (function () {
   'use strict';
+  // «Одному резиденту»: подсказка по фамилии (значение — id пользователя); список — с сервера
+  var ONE = {};
+  (function () {
+    var sel = document.getElementById('to'), f = document.getElementById('oneField'), dl = document.getElementById('oneList');
+    sel.addEventListener('change', function () { f.hidden = sel.value !== 'one'; if (!f.hidden) document.getElementById('oneWho').focus(); });
+    if (location.protocol === 'file:') return;
+    fetch('/api/residences', { credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (list) {
+      (list || []).forEach(function (res) {
+        fetch('/api/shahmatka?res=' + encodeURIComponent(res.id), { credentials: 'same-origin' }).then(function (r) { return r.status === 200 ? r.json() : null; }).then(function (d) {
+          if (!d) return;
+          (d.residents || []).forEach(function (p) { var key = p.name + ' — ' + res.name; ONE[key] = p.id; var o = document.createElement('option'); o.value = key; dl.appendChild(o); });
+        }).catch(function () {});
+      });
+    }).catch(function () {});
+  })();
   var text = document.getElementById('text'), count = document.getElementById('count');
   text.addEventListener('input', function () { count.textContent = text.value.length + ' из 1000'; });
   document.getElementById('send').addEventListener('click', function () {
     var m = document.getElementById('msg');
-    var body = { to: document.getElementById('to').value, kind: document.getElementById('kind').value,
+    var toSel = document.getElementById('to').value, toVal = toSel;
+    if (toSel === 'one') { var picked = ONE[document.getElementById('oneWho').value.trim()]; if (!picked) { alert('Выбери резидента из списка'); return; } toVal = 'user:' + picked; }
+    var body = { to: toVal, kind: document.getElementById('kind').value,
                  title: document.getElementById('title').value.trim(), text: text.value.trim() };
     if (!body.title || !body.text) { m.textContent = 'Нужны заголовок и текст'; m.hidden = false; return; }
     function ok() {

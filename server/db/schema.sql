@@ -473,6 +473,8 @@ CREATE TABLE IF NOT EXISTS mailings (
   created_at   timestamptz NOT NULL DEFAULT now(),
   sent_at      timestamptz
 );
+-- Рассылка одному резиденту (сотрудник выбирает конкретного человека)
+ALTER TABLE mailings ADD COLUMN IF NOT EXISTS user_id bigint REFERENCES users(id) ON DELETE SET NULL;
 
 -- ------------------------------------------------------------
 --  Очередь на свободное место

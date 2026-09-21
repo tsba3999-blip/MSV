@@ -28,8 +28,8 @@
 <div class="shell">
 
   <aside class="side">
-    <img class="side__logo" src="msv-1200-white.png" width="1200" height="209"
-         alt="МСВ — Москва в студентов верит!">
+    <a class="side__logo-link" href="index.html" title="На главную"><img class="side__logo" src="msv-1200-white.png" width="1200" height="209"
+         alt="МСВ — Москва в студентов верит!"></a>
 
     <a class="side__who" href="staff-profile.html" title="Мои данные">
       <span class="side__name">Сергей Ким</span>
@@ -135,7 +135,8 @@
           <label class="msv-field"><span class="msv-field__label">Контакт на экстренный случай</span><input class="msv-input" value="Ким Ольга Петровна, +7 916 200-30-41" readonly></label>
         </div>
         <p class="msv-note" style="margin:var(--msv-s16) 0 var(--msv-s8)">Мессенджеры</p>
-        <div class="chips"><button class="chip" type="button" aria-pressed="true">Telegram</button><button class="chip" type="button" aria-pressed="false">Макс</button></div>
+        <div class="chips"><button class="chip" type="button" data-mess="tg" aria-pressed="false">Telegram</button><button class="chip" type="button" data-mess="max" aria-pressed="false">Макс</button></div>
+        <label class="msv-field" id="tgField" hidden style="margin-top:var(--msv-s12);max-width:320px"><span class="msv-field__label">Ник в Telegram</span><input class="msv-input" id="tgNick" placeholder="@nick" autocomplete="off"></label>
       </section>
     </main>
   </div>
@@ -144,10 +145,32 @@
 <script>
 (function () {
   'use strict';
+  // Мессенджеры: при выборе Telegram появляется поле для ника
   document.querySelector('.chips').addEventListener('click', function (e) {
     var c = e.target.closest('.chip'); if (!c) return;
-    c.setAttribute('aria-pressed', c.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+    var on = c.getAttribute('aria-pressed') === 'true';
+    c.setAttribute('aria-pressed', on ? 'false' : 'true');
+    if (c.dataset.mess === 'tg') { var f = document.getElementById('tgField'); f.hidden = on; if (!on) document.getElementById('tgNick').focus(); }
   });
+  // Данные — с сервера (имя, телефон, почта, резиденции); поля не редактируются
+  if (location.protocol !== 'file:') {
+    var inputs = document.querySelectorAll('.set__grid .msv-input');
+    var byLabel = {};
+    inputs.forEach(function (i) { var l = i.parentNode.querySelector('.msv-field__label'); if (l) byLabel[l.textContent.trim()] = i; });
+    fetch('/api/auth/me', { credentials: 'same-origin' }).then(function (r) { return r.status === 200 ? r.json() : null; }).then(function (me) {
+      if (!me) return;
+      if (byLabel['Фамилия Имя Отчество']) byLabel['Фамилия Имя Отчество'].value = me.name || '';
+      var NAMES = { forma: 'FORMA', uyut: 'Уют', molod: 'Молодежка' };
+      if (byLabel['Резиденции']) byLabel['Резиденции'].value = (me.residences || []).map(function (r) { return NAMES[r] || r; }).join(', ');
+      var who = document.querySelector('.side__name'); if (who && me.name) who.textContent = me.name;
+    }).catch(function () {});
+    fetch('/api/me/home', { credentials: 'same-origin' }).then(function (r) { return r.status === 200 ? r.json() : null; }).then(function (d) {
+      if (!d || !d.me) return;
+      if (byLabel['Телефон']) byLabel['Телефон'].value = d.me.phone || '—';
+      if (byLabel['Рабочая почта']) byLabel['Рабочая почта'].value = d.me.email || '—';
+      ['Дата рождения', 'Должность', 'В команде с', 'Контакт на экстренный случай'].forEach(function (k) { if (byLabel[k]) byLabel[k].value = byLabel[k].value; });
+    }).catch(function () {});
+  }
 })();
 </script>
 <script src="mark.js"></script>

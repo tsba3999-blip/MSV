@@ -76,12 +76,14 @@ module.exports = function register(route) {
     const title = String(b.title || '').trim(), text = String(b.text || '').trim();
     if (!title || !text) return fail(res, 400, 'Нужны заголовок и текст');
     if (!['news', 'alarm', 'pay'].includes(b.kind)) return fail(res, 400, 'Неверный вид');
-    const resId = b.to && b.to !== 'all' ? String(b.to) : null;
+    // to: 'all' | id резиденции | 'user:<id>' — одному резиденту
+    const oneUser = /^user:(\d+)$/.test(String(b.to || '')) ? Number(String(b.to).slice(5)) : null;
+    const resId = !oneUser && b.to && b.to !== 'all' ? String(b.to) : null;
     // модератор и выше отправляет сразу, сотрудник — на согласование
     const status = auth.atLeast(s, 'moderator') ? 'approved' : 'draft';
-    const r = await query(`INSERT INTO mailings (author_id, residence_id, kind, title, text, status, approved_by)
-      VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
-      [s.uid, resId, b.kind, title.slice(0, 200), text.slice(0, 1000), status, status === 'approved' ? s.uid : null]);
+    const r = await query(`INSERT INTO mailings (author_id, residence_id, user_id, kind, title, text, status, approved_by)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
+      [s.uid, resId, oneUser, b.kind, title.slice(0, 200), text.slice(0, 1000), status, status === 'approved' ? s.uid : null]);
     json(res, 201, { id: String(r.rows[0].id), status });
     if (status === 'approved') sendMailing(r.rows[0].id).catch((e) => console.error('[mailing]', e.message));
     else notify.notifyAdmin('tickets', `<b>Рассылка на согласование</b>\n${title}`).catch(() => {});
@@ -101,7 +103,8 @@ module.exports = function register(route) {
   async function sendMailing(id) {
     const m = (await query(`SELECT * FROM mailings WHERE id = $1`, [id])).rows[0];
     if (!m) return;
-    const who = await query(`
+    // одному человеку — только ему; иначе всем живущим в резиденции (или везде)
+    const who = m.user_id ? { rows: [{ user_id: m.user_id }] } : await query(`
       SELECT DISTINCT b.user_id FROM bookings b
       JOIN beds bd ON bd.id = b.bed_id JOIN rooms r ON r.id = bd.room_id
       WHERE b.date_from <= CURRENT_DATE AND b.date_to >= CURRENT_DATE

@@ -61,7 +61,8 @@ module.exports = function register(route) {
   /* ---------- Шахматка одной резиденции ---------- */
 
   route('GET', '/api/shahmatka', async (req, res) => {
-    if (!requireRole(req, res, 'moderator')) return;
+    // чтение — с роли staff (список резидентов в кабинете сотрудника); менять брони — moderator+
+    if (!requireRole(req, res, 'staff')) return;
     const resId = String(req.query.res || '');
     if (!resId) return fail(res, 400, 'Укажи резиденцию: ?res=forma');
 

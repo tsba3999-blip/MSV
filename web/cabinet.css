@@ -25,6 +25,8 @@
   color: var(--msv-white);
 }
 
+.side__logo-link { display: block; border-radius: 6px; }
+.side__logo-link:focus-visible { outline: 2px solid var(--msv-white); outline-offset: 2px; }
 .side__logo { display: block; width: 100%; max-width: 180px; height: auto; margin-bottom: var(--msv-s32); }
 
 .side__who {

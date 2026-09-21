@@ -21,6 +21,11 @@
   .rm__photos { display: flex; flex-wrap: wrap; gap: var(--msv-s8); margin-bottom: var(--msv-s12); }
   .rm__photo { position: relative; width: 96px; height: 72px; border-radius: var(--msv-r11); overflow: hidden; }
   .rm__photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .rm__photo { cursor: grab; touch-action: none; user-select: none; }
+  .rm__photo--drag { opacity: .5; outline: 2px solid var(--msv-red); cursor: grabbing; }
+  .rm__photo-first { position: absolute; left: 0; bottom: 0; padding: 2px 6px; font: 500 10px var(--msv-font); color: #fff; background: rgba(16,22,31,.7); border-radius: 0 6px 0 0; }
+  .rm__foot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--msv-s8); }
+  .rm__foot-gap { flex: 1 1 auto; }
   .rm__photo-del { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; font-size: 16px; line-height: 1; color: #fff; background: rgba(16,22,31,.7); border: 0; border-radius: 50%; cursor: pointer; }
   .rm__photo-add { width: 96px; height: 72px; font-size: 24px; color: var(--msv-red); background: transparent; border: 2px dashed var(--msv-n300); border-radius: var(--msv-r11); cursor: pointer; }
   .rm__photo-add:hover { border-color: var(--msv-red); }
@@ -43,8 +48,8 @@
 <div class="shell">
 
   <aside class="side">
-    <img class="side__logo" src="msv-1200-white.png" width="1200" height="209"
-         alt="МСВ — Москва в студентов верит!">
+    <a class="side__logo-link" href="index.html" title="На главную"><img class="side__logo" src="msv-1200-white.png" width="1200" height="209"
+         alt="МСВ — Москва в студентов верит!"></a>
 
     <a class="side__who" href="admin-profile.html" title="Мой профиль и настройки">
       <span class="side__name">Ирина Соколова</span>
@@ -56,6 +61,11 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>
         Обзор
+      </a>
+      <a class="side__link" href="admin-staff.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6.5a3 3 0 0 1 0 5.8"/><path d="M18 20a5.5 5.5 0 0 0-3-4.6"/></svg>
+        Сотрудники
       </a>
       <a class="side__link" href="admin-residences.html" aria-current="page">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -81,11 +91,6 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 12h5a3.5 3.5 0 0 0 0-7H9v14"/><path d="M7 15h7"/></svg>
         Начисления
-      </a>
-      <a class="side__link" href="admin-staff.html">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6.5a3 3 0 0 1 0 5.8"/><path d="M18 20a5.5 5.5 0 0 0-3-4.6"/></svg>
-        Сотрудники
       </a>
       <a class="side__link" href="admin-reputation.html">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -121,7 +126,7 @@
     </header>
 
     <main class="work__body">
-      <p class="msv-note notice"><b>Как править:</b> щёлкните название, примечание, обозначение места или цену — они редактируются на месте. <b>Фото:</b> кнопка «+» под названием комнаты; любое фото открывается крупно по щелчку, крестик удаляет. Без сервера правки живут до обновления страницы.</p>
+      <p class="msv-note notice"><b>Как править:</b> щёлкните название, примечание, обозначение места или цену — они редактируются на месте; затем нажмите «Сохранить» у комнаты. <b>Фото:</b> кнопка «+» под названием комнаты — загружаются сразу; порядок меняется перетаскиванием (первое — главное, оно показывается резидентам); щелчок открывает крупно, крестик удаляет.</p>
 
       <div class="bar">
         <button class="bar__chip" type="button" data-res="forma" aria-pressed="true">FORMA</button>
@@ -143,12 +148,41 @@
 MSV.ready(function (ctx) {
   'use strict';
 
+  /* Резиденции в кабинете администратора.
+     Правки (название, пол, примечание, места, порядок фото) копятся в памяти
+     и уходят на сервер по кнопке «Сохранить» у комнаты. Фото загружаются сразу
+     (POST /api/upload → POST /api/rooms/:id/photos), удаляются тоже сразу;
+     порядок фото — перетаскиванием, сохраняется вместе с комнатой.
+     Без сервера (file:) всё живёт до обновления страницы. */
+
   var RES = ctx.residences;
+  var LIVE = !!ctx.live;
   var cur = RES[0];
-  var photos = {};        // roomId -> [ {url, name} ] — до сервера живёт в памяти страницы
+  var photos = {};        // roomId -> [ {id, url} ]
+  var flags = {};         // roomId -> { room, beds:{bedId:true}, photos, delBeds:[ids], isNew }
 
   function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-  function money(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '\u2009'); }
+  function api(method, url, body, raw) {
+    var opt = { method: method, credentials: 'same-origin', headers: {} };
+    if (raw) { opt.body = raw.file; opt.headers['Content-Type'] = raw.file.type || 'application/octet-stream'; opt.headers['X-File-Name'] = encodeURIComponent(raw.file.name || 'photo'); }
+    else if (body) { opt.body = JSON.stringify(body); opt.headers['Content-Type'] = 'application/json'; }
+    return fetch(url, opt).then(function (r) {
+      return r.text().then(function (t) { var j = {}; try { j = t ? JSON.parse(t) : {}; } catch (e) {} return { s: r.status, j: j }; });
+    });
+  }
+  function fl(roomId) { return flags[roomId] = flags[roomId] || { room: false, beds: {}, photos: false, delBeds: [], isNew: false }; }
+  function dirty(roomId) {
+    var f = flags[roomId]; if (!f) return false;
+    return f.room || f.photos || f.isNew || f.delBeds.length > 0 || Object.keys(f.beds).length > 0;
+  }
+  function refreshSave(roomId) {
+    var sec = document.querySelector('[data-room="' + roomId + '"]'); if (!sec) return;
+    var btn = sec.querySelector('[data-act="save"]'); if (!btn) return;
+    btn.disabled = !dirty(roomId);
+    btn.textContent = 'Сохранить';
+  }
+
+  /* ---------- фото: загрузка ---------- */
 
   var picker = document.createElement('input');
   picker.type = 'file'; picker.accept = 'image/*'; picker.multiple = true; picker.style.display = 'none';
@@ -157,15 +191,86 @@ MSV.ready(function (ctx) {
 
   picker.addEventListener('change', function () {
     if (!pickFor) return;
-    var list = photos[pickFor] = photos[pickFor] || [];
-    Array.prototype.forEach.call(picker.files || [], function (file) {
-      if (file.type.indexOf('image/') !== 0) return;
-      // ЗДЕСЬ БУДЕТ ЗАПРОС К СЕРВЕРУ: POST /api/upload → url; затем POST /api/rooms/:id/photos { url }
-      list.push({ url: URL.createObjectURL(file), name: file.name });
+    var roomId = pickFor; pickFor = null;
+    var list = photos[roomId] = photos[roomId] || [];
+    var files = Array.prototype.filter.call(picker.files || [], function (f) { return f.type.indexOf('image/') === 0; });
+    picker.value = '';
+    if (!LIVE || /^new-/.test(roomId)) {
+      files.forEach(function (file) { list.push({ id: 'local-' + Date.now() + Math.random(), url: URL.createObjectURL(file), file: file }); });
+      if (LIVE) fl(roomId).photos = true;   // новая комната: фото уйдут после её создания
+      render(); return;
+    }
+    var chain = Promise.resolve();
+    files.forEach(function (file) {
+      chain = chain.then(function () { return uploadTo(roomId, file); }).then(function (p) { if (p) list.push(p); }, function (e) { alert(e.message || 'Не удалось загрузить фото'); });
     });
-    picker.value = ''; pickFor = null;
-    render();
+    chain.then(render);
   });
+
+  function uploadTo(roomId, file) {
+    return api('POST', '/api/upload', null, { file: file }).then(function (r) {
+      if (r.s !== 201) throw new Error(r.j.error || 'Не удалось загрузить ' + file.name);
+      return api('POST', '/api/rooms/' + encodeURIComponent(roomId) + '/photos', { url: r.j.url }).then(function (p) {
+        if (p.s !== 201) throw new Error(p.j.error || 'Не удалось привязать фото');
+        return { id: p.j.id, url: r.j.url };
+      });
+    });
+  }
+
+  function loadPhotos() {
+    if (!LIVE) return Promise.resolve();
+    var jobs = [];
+    RES.forEach(function (res) {
+      res.rooms.forEach(function (r) {
+        jobs.push(api('GET', '/api/rooms/' + encodeURIComponent(r.id) + '/photos').then(function (x) { if (x.s === 200 && Array.isArray(x.j)) photos[r.id] = x.j; }).catch(function () {}));
+      });
+    });
+    return Promise.all(jobs);
+  }
+
+  /* ---------- фото: перетаскивание (мышь и палец) ---------- */
+
+  var drag = null;   // { roomId, el, from, ghost }
+  document.getElementById('rooms').addEventListener('pointerdown', function (e) {
+    var ph = e.target.closest('.rm__photo'); if (!ph || e.target.closest('button')) return;
+    var wrap = ph.closest('.rm__photos'); if (!wrap) return;
+    var roomId = ph.closest('[data-room]').dataset.room;
+    drag = { roomId: roomId, el: ph, wrap: wrap, moved: false, x: e.clientX, y: e.clientY };
+    ph.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+  document.getElementById('rooms').addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    if (!drag.moved && Math.abs(e.clientX - drag.x) + Math.abs(e.clientY - drag.y) < 6) return;
+    drag.moved = true;
+    drag.el.classList.add('rm__photo--drag');
+    var under = document.elementFromPoint(e.clientX, e.clientY);
+    var over = under && under.closest('.rm__photo');
+    if (!over || over === drag.el || over.closest('.rm__photos') !== drag.wrap) return;
+    var r = over.getBoundingClientRect();
+    var before = e.clientX < r.left + r.width / 2;
+    drag.wrap.insertBefore(drag.el, before ? over : over.nextSibling);
+  });
+  function dragEnd(e) {
+    if (!drag) return;
+    var d = drag; drag = null;
+    d.el.classList.remove('rm__photo--drag');
+    if (!d.moved) { var img = d.el.querySelector('img'); if (img && e.type === 'pointerup') img.click(); return; }   // без движения — просто открыть крупно
+    // новый порядок — по DOM
+    var ids = Array.prototype.map.call(d.wrap.querySelectorAll('.rm__photo'), function (el) { return el.dataset.id; });
+    var list = photos[d.roomId] || [];
+    var byId = {}; list.forEach(function (p) { byId[p.id] = p; });
+    var next = ids.map(function (id) { return byId[id]; }).filter(Boolean);
+    var same = next.length === list.length && next.every(function (p, i) { return p === list[i]; });
+    if (same) return;
+    photos[d.roomId] = next;
+    fl(d.roomId).photos = true;
+    refreshSave(d.roomId);
+  }
+  document.getElementById('rooms').addEventListener('pointerup', dragEnd);
+  document.getElementById('rooms').addEventListener('pointercancel', dragEnd);
+
+  /* ---------- вывод ---------- */
 
   function render() {
     var beds = cur.beds;
@@ -186,13 +291,13 @@ MSV.ready(function (ctx) {
             '<option value="м"' + (r.gender === 'м' ? ' selected' : '') + '>мужская</option>' +
           '</select>' +
           '<input class="rm__note" data-f="note" value="' + esc(r.note || '') + '" placeholder="Примечание: свой санузел, окно в коридор…" aria-label="Примечание">' +
-          '<button class="msv-btn msv-btn--s msv-btn--destructive" type="button" data-act="delRoom" title="Удалить комнату">Удалить</button>' +
         '</div>' +
 
         '<div class="rm__photos zoomable">' +
           ph.map(function (p, i) {
-            return '<span class="rm__photo"><img src="' + esc(p.url) + '" alt="' + esc(r.name) + ' — фото ' + (i + 1) + '" data-zoom>' +
-              '<button type="button" class="rm__photo-del" data-act="delPhoto" data-i="' + i + '" aria-label="Удалить фото">&times;</button></span>';
+            return '<span class="rm__photo" data-id="' + esc(p.id) + '" title="Перетащите, чтобы поменять порядок"><img src="' + esc(p.url) + '" alt="' + esc(r.name) + ' — фото ' + (i + 1) + '" draggable="false" data-zoom>' +
+              (i === 0 ? '<span class="rm__photo-first">Главное</span>' : '') +
+              '<button type="button" class="rm__photo-del" data-act="delPhoto" data-id="' + esc(p.id) + '" aria-label="Удалить фото">&times;</button></span>';
           }).join('') +
           '<button type="button" class="rm__photo-add" data-act="addPhoto" aria-label="Добавить фото">+</button>' +
         '</div>' +
@@ -211,28 +316,35 @@ MSV.ready(function (ctx) {
             '</tr>';
           }).join('') +
         '</tbody></table>' +
-        '<button type="button" class="msv-btn msv-btn--s msv-btn--tertiary" data-act="addBed">+ место</button>' +
+        '<div class="rm__foot">' +
+          '<button type="button" class="msv-btn msv-btn--s msv-btn--tertiary" data-act="addBed">+ место</button>' +
+          '<span class="rm__foot-gap"></span>' +
+          '<button class="msv-btn msv-btn--s msv-btn--destructive" type="button" data-act="delRoom" title="Удалить комнату">Удалить комнату</button>' +
+          '<button class="msv-btn msv-btn--s msv-btn--primary" type="button" data-act="save"' + (dirty(r.id) ? '' : ' disabled') + '>Сохранить</button>' +
+        '</div>' +
       '</section>';
     }).join('');
   }
 
-  /* ---------- Правки — сразу в данные ---------- */
+  /* ---------- правки — в данные, флаг «есть изменения» ---------- */
 
   document.getElementById('rooms').addEventListener('change', function (e) {
     var f = e.target.dataset.f; if (!f) return;
     var roomEl = e.target.closest('[data-room]'), bedEl = e.target.closest('[data-bed]');
+    var roomId = roomEl && roomEl.dataset.room;
     if (bedEl) {
       var bed = cur.beds.filter(function (b) { return b.id === bedEl.dataset.bed; })[0];
       if (!bed) return;
       if (f === 'price') { var v = Number(String(e.target.value).replace(/\D/g, '')); bed.price = isFinite(v) ? v : bed.price; e.target.value = bed.price; }
       else bed[f] = e.target.value;
-      // ЗДЕСЬ БУДЕТ ЗАПРОС К СЕРВЕРУ: PATCH /api/beds/:id
+      fl(roomId).beds[bed.id] = true;
     } else if (roomEl) {
-      var room = cur.rooms.filter(function (r) { return r.id === roomEl.dataset.room; })[0];
+      var room = cur.rooms.filter(function (r) { return r.id === roomId; })[0];
       if (!room) return;
       room[f] = e.target.value;
-      // ЗДЕСЬ БУДЕТ ЗАПРОС К СЕРВЕРУ: PATCH /api/rooms/:id
+      fl(roomId).room = true;
     }
+    refreshSave(roomId);
   });
 
   document.getElementById('rooms').addEventListener('click', function (e) {
@@ -241,32 +353,128 @@ MSV.ready(function (ctx) {
     var act = btn.dataset.act;
 
     if (act === 'addPhoto') { pickFor = roomId; picker.click(); return; }
-    if (act === 'delPhoto') { (photos[roomId] || []).splice(Number(btn.dataset.i), 1); render(); return; }
+    if (act === 'delPhoto') {
+      var pid = btn.dataset.id;
+      var list = photos[roomId] || [];
+      var p = list.filter(function (x) { return String(x.id) === pid; })[0]; if (!p) return;
+      if (!confirm('Удалить фото?')) return;
+      var done = function () { photos[roomId] = list.filter(function (x) { return x !== p; }); render(); };
+      if (LIVE && !/^local-/.test(String(p.id))) {
+        api('DELETE', '/api/photos/' + encodeURIComponent(p.id)).then(function (r) { if (r.s === 200) done(); else alert(r.j.error || 'Не удалось удалить'); });
+      } else done();
+      return;
+    }
 
     if (act === 'delBed') {
       var bedId = btn.closest('[data-bed]').dataset.bed;
-      if (!confirm('Удалить место? Если на нём есть брони, сервер откажет.')) return;
-      cur.beds = cur.beds.filter(function (b) { return b.id !== bedId; }); render(); return;
-      // ЗДЕСЬ БУДЕТ ЗАПРОС К СЕРВЕРУ: DELETE /api/beds/:id
+      if (!confirm('Удалить место? Если на нём есть брони, сервер откажет при сохранении.')) return;
+      cur.beds = cur.beds.filter(function (b) { return b.id !== bedId; });
+      var f = fl(roomId);
+      if (/-new-/.test(bedId)) delete f.beds[bedId]; else { delete f.beds[bedId]; f.delBeds.push(bedId); }
+      render(); return;
     }
     if (act === 'addBed') {
       var n = cur.beds.filter(function (b) { return b.roomId === roomId; }).length + 1;
       var room = cur.rooms.filter(function (r) { return r.id === roomId; })[0];
-      cur.beds.push({ id: roomId + '-new-' + Date.now(), roomId: roomId, label: (room ? room.number : '?') + '.' + n, tier: '', price: 0 });
+      var nid = roomId + '-new-' + Date.now();
+      cur.beds.push({ id: nid, roomId: roomId, label: (room ? room.number : '?') + '.' + n, tier: '', price: 0 });
+      fl(roomId).beds[nid] = true;
       render(); return;
     }
     if (act === 'delRoom') {
-      if (!confirm('Удалить комнату со всеми местами?')) return;
-      cur.rooms = cur.rooms.filter(function (r) { return r.id !== roomId; });
-      cur.beds = cur.beds.filter(function (b) { return b.roomId !== roomId; });
-      render(); return;
+      if (!confirm('Удалить комнату со всеми местами? Если в комнате кто-то живёт, сервер откажет.')) return;
+      var drop = function () {
+        cur.rooms = cur.rooms.filter(function (r) { return r.id !== roomId; });
+        cur.beds = cur.beds.filter(function (b) { return b.roomId !== roomId; });
+        delete flags[roomId]; delete photos[roomId]; render();
+      };
+      if (LIVE && !/^new-/.test(roomId)) {
+        api('DELETE', '/api/rooms/' + encodeURIComponent(roomId)).then(function (r) { if (r.s === 200) drop(); else alert(r.j.error || 'Не удалось удалить комнату'); });
+      } else drop();
+      return;
     }
+    if (act === 'save') { saveRoom(roomId, btn); return; }
   });
 
+  /* ---------- сохранение комнаты ---------- */
+
+  function saveRoom(roomId, btn) {
+    var f = fl(roomId);
+    var room = cur.rooms.filter(function (r) { return r.id === roomId; })[0]; if (!room) return;
+    if (!LIVE) { flags[roomId] = null; btn.disabled = true; btn.textContent = 'Сохранено'; return; }
+    btn.disabled = true; btn.textContent = 'Сохраняю…';
+    var chain = Promise.resolve();
+    var oldId = roomId;
+
+    if (f.isNew) {
+      chain = chain.then(function () {
+        return api('POST', '/api/rooms', { residenceId: cur.id, number: room.number, name: room.name, gender: room.gender, size: cur.beds.filter(function (b) { return b.roomId === oldId; }).length || 1, note: room.note });
+      }).then(function (r) {
+        if (r.s !== 201) throw new Error(r.j.error || 'Не удалось создать комнату');
+        room.id = r.j.id;
+        cur.beds.forEach(function (b) { if (b.roomId === oldId) b.roomId = room.id; });
+        photos[room.id] = photos[oldId] || []; delete photos[oldId];
+        flags[room.id] = f; delete flags[oldId]; f.isNew = false; f.room = false;
+      });
+    } else if (f.room) {
+      chain = chain.then(function () { return api('PATCH', '/api/rooms/' + encodeURIComponent(roomId), { name: room.name, gender: room.gender, note: room.note }); })
+        .then(function (r) { if (r.s !== 200) throw new Error(r.j.error || 'Не удалось сохранить комнату'); f.room = false; });
+    }
+
+    f.delBeds.slice().forEach(function (bedId) {
+      chain = chain.then(function () { return api('DELETE', '/api/beds/' + encodeURIComponent(bedId)); })
+        .then(function (r) { if (r.s !== 200) throw new Error(r.j.error || 'Не удалось удалить место ' + bedId); f.delBeds = f.delBeds.filter(function (x) { return x !== bedId; }); });
+    });
+
+    Object.keys(f.beds).forEach(function (bedId) {
+      chain = chain.then(function () {
+        var bed = cur.beds.filter(function (b) { return b.id === bedId; })[0];
+        if (!bed) { delete f.beds[bedId]; return; }
+        if (/-new-/.test(bedId)) {
+          return api('POST', '/api/beds', { roomId: room.id, label: bed.label, tier: bed.tier, price: bed.price }).then(function (r) {
+            if (r.s !== 201) throw new Error(r.j.error || 'Не удалось добавить место ' + bed.label);
+            bed.id = r.j.id; delete f.beds[bedId];
+          });
+        }
+        return api('PATCH', '/api/beds/' + encodeURIComponent(bedId), { label: bed.label, tier: bed.tier, price: bed.price }).then(function (r) {
+          if (r.s !== 200) throw new Error(r.j.error || 'Не удалось сохранить место ' + bed.label);
+          delete f.beds[bedId];
+        });
+      });
+    });
+
+    if (f.photos) {
+      chain = chain.then(function () {
+        var list = photos[room.id] || [];
+        // фото, добавленные до создания комнаты, — сначала загрузить
+        var up = Promise.resolve();
+        list.forEach(function (p, i) {
+          if (!p.file) return;
+          up = up.then(function () { return uploadTo(room.id, p.file); }).then(function (np) { list[i] = np; });
+        });
+        return up.then(function () {
+          var ids = list.map(function (p) { return p.id; }).filter(function (id) { return !/^local-/.test(String(id)); });
+          if (!ids.length) return;
+          return api('PUT', '/api/rooms/' + encodeURIComponent(room.id) + '/photos/order', { ids: ids }).then(function (r) { if (r.s !== 200) throw new Error(r.j.error || 'Не удалось сохранить порядок фото'); });
+        }).then(function () { f.photos = false; });
+      });
+    }
+
+    chain.then(function () {
+      render();
+      var b = document.querySelector('[data-room="' + room.id + '"] [data-act="save"]');
+      if (b) { b.textContent = 'Сохранено'; b.disabled = true; setTimeout(function () { if (b.textContent === 'Сохранено') b.textContent = 'Сохранить'; }, 2000); }
+    }).catch(function (e) {
+      render();
+      alert(e.message || 'Не удалось сохранить');
+    });
+  }
+
   document.getElementById('addRoom').addEventListener('click', function () {
-    var no = cur.rooms.length + 1;
-    var id = cur.id + '-new-' + Date.now();
+    var no = cur.rooms.reduce(function (m, r) { return Math.max(m, Number(r.number) || 0); }, 0) + 1;
+    var id = 'new-' + Date.now();
     cur.rooms.push({ id: id, buildingId: cur.id, number: String(no), name: '№' + no + ' Новая', gender: '', size: 0, note: '' });
+    fl(id).isNew = true;
     render();
     var el = document.querySelector('[data-room="' + id + '"] .rm__name');
     if (el) { el.focus(); el.select(); }
@@ -274,13 +482,20 @@ MSV.ready(function (ctx) {
 
   document.querySelector('.bar').addEventListener('click', function (e) {
     var chip = e.target.closest('.bar__chip'); if (!chip) return;
+    var unsaved = Object.keys(flags).some(function (id) { return dirty(id); });
+    if (unsaved && !confirm('Есть несохранённые изменения — переключить резиденцию без сохранения?')) return;
     document.querySelectorAll('.bar__chip').forEach(function (c) { c.setAttribute('aria-pressed', 'false'); });
     chip.setAttribute('aria-pressed', 'true');
     cur = RES.filter(function (r) { return r.id === chip.dataset.res; })[0] || RES[0];
     render();
   });
 
+  window.addEventListener('beforeunload', function (e) {
+    if (Object.keys(flags).some(function (id) { return dirty(id); })) { e.preventDefault(); e.returnValue = ''; }
+  });
+
   render();
+  loadPhotos().then(render);
 });
 </script>
 <script src="mark.js"></script>

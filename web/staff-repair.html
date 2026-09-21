@@ -9,6 +9,7 @@
 <title>Заявка технику — МСВ</title>
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="cabinet.css">
+<link rel="stylesheet" href="resident.css">
 <link rel="stylesheet" href="form.css">
 <style>
   .set { margin-bottom: var(--msv-s24); padding: var(--msv-s20); background: var(--msv-white); border-radius: var(--msv-r20); box-shadow: var(--msv-e1); }
@@ -28,8 +29,8 @@
 <div class="shell">
 
   <aside class="side">
-    <img class="side__logo" src="msv-1200-white.png" width="1200" height="209"
-         alt="МСВ — Москва в студентов верит!">
+    <a class="side__logo-link" href="index.html" title="На главную"><img class="side__logo" src="msv-1200-white.png" width="1200" height="209"
+         alt="МСВ — Москва в студентов верит!"></a>
 
     <a class="side__who" href="staff-profile.html" title="Мои данные">
       <span class="side__name">Сергей Ким</span>
@@ -121,22 +122,85 @@
     </header>
 
     <main class="work__body">
-      <p class="msv-body" style="margin:0 0 var(--msv-s16);color:var(--msv-n500)">Сотрудник тоже может завести заявку: увидел поломку на обходе — записал, чтобы не забыть. Попадёт в общую очередь.</p>
-      <div class="set" style="max-width:640px">
-        <div class="set__grid">
-          <label class="msv-field"><span class="msv-field__label">Резиденция</span>
-            <select class="msv-select" id="res"><option>FORMA</option><option>Уют</option><option>Молодежка</option></select></label>
-          <label class="msv-field"><span class="msv-field__label">Комната или место</span>
-            <input class="msv-input" id="room" placeholder="№4 Чуковский, кухня 2 этаж"></label>
-          <label class="msv-field"><span class="msv-field__label">Категория</span>
-            <select class="msv-select" id="cat"><option>Сантехника</option><option>Электрика</option><option>Бытовая техника</option><option>Мебель</option><option>Вентиляция</option><option>Улучшения</option></select></label>
-          <label class="msv-field"><span class="msv-field__label">Срочность</span>
-            <select class="msv-select" id="prio"><option value="normal">Текущая неисправность</option><option value="urgent">Срочная поломка</option><option value="critical">Критическая авария</option><option value="consult">Проверка</option></select></label>
-        </div>
-        <textarea class="msv-area" id="text" maxlength="1000" style="min-height:96px;margin-top:var(--msv-s12)" placeholder="Что случилось"></textarea>
-        <label class="tog" style="margin-top:var(--msv-s12)"><input type="checkbox" id="mine" checked> <span>Сразу взять в работу себе</span></label>
-        <button class="msv-btn msv-btn--m msv-btn--primary" type="button" id="send" style="margin-top:var(--msv-s12)">Создать заявку</button>
-        <span class="msv-note" id="msg" hidden style="margin-left:var(--msv-s12)"></span>
+      <div class="page" style="max-width:640px;margin:0;padding:0;min-height:0">
+  <section style="margin-bottom:var(--msv-s24)">
+    <p class="msv-note" style="margin-bottom:var(--msv-s8)">Категория</p>
+    <div class="chips" role="group" aria-label="Категория">
+      <button class="chip" type="button" data-group="cat" aria-pressed="true">Сантехника</button>
+      <button class="chip" type="button" data-group="cat" aria-pressed="false">Электрика</button>
+      <button class="chip" type="button" data-group="cat" aria-pressed="false">Бытовая техника</button>
+      <button class="chip" type="button" data-group="cat" aria-pressed="false">Мебель</button>
+      <button class="chip" type="button" data-group="cat" aria-pressed="false">Вентиляция</button>
+      <button class="chip" type="button" data-group="cat" aria-pressed="false">Улучшения</button>
+    </div>
+  </section>
+
+  <label class="msv-field">
+    <span class="msv-field__label">Место</span>
+    <select class="msv-select" id="place">
+      <option>В комнате</option>
+      <option>В блоке</option>
+      <option>В общем коридоре</option>
+      <option>На кухне</option>
+      <option>В душевой</option>
+      <option>В лаундже</option>
+    </select>
+  </label>
+
+  <label class="msv-field">
+    <span class="msv-field__label">Номер комнаты</span>
+    <input class="msv-input" id="room" placeholder="Если поломка в комнате">
+  </label>
+
+  <section style="margin-bottom:var(--msv-s24)">
+    <p class="msv-note" style="margin-bottom:var(--msv-s8)">Что случилось</p>
+    <textarea class="msv-area" id="what" maxlength="1000"
+              placeholder="Не закрывается окно в комнате, ручка проворачивается"></textarea>
+    <span class="msv-note" style="display:block;margin-top:var(--msv-s4);text-align:right" id="count">0 из 1000</span>
+  </section>
+
+  <section style="margin-bottom:var(--msv-s24)">
+    <p class="msv-note" style="margin-bottom:var(--msv-s8)">Выберите, насколько срочно</p>
+    <div class="pick">
+      <label class="pick__opt">
+        <input class="pick__radio" type="radio" name="prio" value="0" data-note="Течёт вода, нет электричества, дым или запах газа. Мастер выезжает сразу.">
+        <span><span class="pick__name">Критическая авария</span></span>
+      </label>
+      <label class="pick__opt">
+        <input class="pick__radio" type="radio" name="prio" value="1" data-note="Не работает то, без чего трудно жить: душ, холодильник, замок. До конца дня.">
+        <span><span class="pick__name">Срочная поломка</span></span>
+      </label>
+      <label class="pick__opt">
+        <input class="pick__radio" type="radio" name="prio" value="2" data-note="Скрипит, подтекает, плохо закрывается. До трёх рабочих дней." checked>
+        <span><span class="pick__name">Текущая неисправность</span></span>
+      </label>
+      <label class="pick__opt">
+        <input class="pick__radio" type="radio" name="prio" value="3" data-note="Не уверен, что сломалось, или нужен совет. До пяти рабочих дней.">
+        <span><span class="pick__name">Консультация или проверка</span></span>
+      </label>
+    </div>
+    <p class="msv-note hint" id="hint"></p>
+  </section>
+
+  <section style="margin-bottom:var(--msv-s24)">
+    <p class="msv-note" style="margin-bottom:var(--msv-s8)">Фото и видео</p>
+    <div class="photos" id="files">
+      <button class="photo__add" type="button" id="addFile" aria-label="Прикрепить файл">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <path d="M12 5v14"/><path d="M5 12h14"/>
+        </svg>
+      </button>
+    </div>
+    <span class="msv-note" style="display:block;margin-top:var(--msv-s4);text-align:right" id="fileCount">0 из 5</span>
+  </section>
+
+  <label class="tog" style="display:flex;align-items:center;gap:var(--msv-s12);margin:0 0 var(--msv-s4)"><input type="checkbox" id="mine" checked> <span class="msv-body">Сразу взять в работу себе</span></label>
+  <div class="foot">
+    <button class="msv-btn msv-btn--block msv-btn--primary" id="send" type="button" disabled>Отправить заявку</button>
+    <p class="msv-note" style="margin-top:var(--msv-s8);text-align:center" id="why">Опиши, что случилось — тогда кнопка станет активной</p>
+  </div>
+
       </div>
     </main>
   </div>
@@ -145,22 +209,121 @@
 <script>
 (function () {
   'use strict';
-  document.getElementById('send').addEventListener('click', function () {
-    var t = document.getElementById('text').value.trim(), m = document.getElementById('msg');
-    if (!t) { m.textContent = 'Опиши, что случилось'; m.hidden = false; return; }
-    var body = { category: document.getElementById('cat').value, priority: document.getElementById('prio').value,
-                 room: document.getElementById('room').value.trim(), place: document.getElementById('res').value, text: t };
-    function ok() { m.textContent = 'Заявка создана.'; m.hidden = false; document.getElementById('text').value = ''; }
-    if (location.protocol === 'file:') { ok(); return; }
+
+  /* ---------- Категория ---------- */
+
+  document.querySelector('.chips').addEventListener('click', function (e) {
+    var chip = e.target.closest('.chip');
+    if (!chip) return;
+    document.querySelectorAll('.chip[data-group="cat"]').forEach(function (c) {
+      c.setAttribute('aria-pressed', 'false');
+    });
+    chip.setAttribute('aria-pressed', 'true');
+  });
+
+  /* ---------- Описание ---------- */
+
+  var what = document.getElementById('what');
+  var count = document.getElementById('count');
+  var send = document.getElementById('send');
+  var why = document.getElementById('why');
+
+  function sync() {
+    var n = what.value.trim().length;
+    count.textContent = what.value.length + ' из 1000';
+    send.disabled = n === 0;
+    why.hidden = n > 0;
+  }
+
+  what.addEventListener('input', sync);
+  sync();
+
+  /* ---------- Приоритет: пояснение выбранного ---------- */
+
+  var hint = document.getElementById('hint');
+  var radios = Array.prototype.slice.call(document.querySelectorAll('.pick__radio'));
+
+  function syncHint() {
+    var on = radios.filter(function (r) { return r.checked; })[0];
+    if (!on) { hint.hidden = true; return; }
+    hint.textContent = on.dataset.note;
+    hint.hidden = false;
+  }
+
+  radios.forEach(function (r) { r.addEventListener('change', syncHint); });
+  syncHint();
+
+  /* ---------- Вложения ---------- */
+
+  var MAX = 5;
+  var files = document.getElementById('files');
+  var addFile = document.getElementById('addFile');
+  var fileCount = document.getElementById('fileCount');
+
+  var picker = document.createElement('input');
+  picker.type = 'file';
+  picker.accept = 'image/*,video/*';
+  picker.multiple = true;
+  picker.style.display = 'none';
+  document.body.appendChild(picker);
+
+  addFile.addEventListener('click', function () { picker.click(); });
+
+  picker.addEventListener('change', function () {
+    Array.prototype.slice.call(picker.files || []).forEach(function (file) {
+      if (files.querySelectorAll('.photo').length >= MAX) return;
+      var box = document.createElement('div');
+      box.className = 'photo';
+      if (file.type.indexOf('image/') === 0) {
+        var img = document.createElement('img');
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block';
+        img.alt = '';
+        var url = URL.createObjectURL(file);
+        img.src = url;
+        img.addEventListener('load', function () { URL.revokeObjectURL(url); });
+        box.appendChild(img);
+      } else {
+        box.style.cssText += ';display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--msv-n500)';
+        box.textContent = 'видео';
+      }
+      files.insertBefore(box, addFile);
+    });
+    picker.value = '';
+    var n = files.querySelectorAll('.photo').length;
+    fileCount.textContent = n + ' из ' + MAX;
+    addFile.disabled = n >= MAX;
+  });
+
+  /* ---------- Отправка ---------- */
+
+  /* Отправка на сервер: заявка попадает в «Мои заявки» резидента и в раздел
+     «Заявки» у сотрудников и администратора; в Telegram администрации — уведомление.
+     Файлы пока не передаются — сервер их не принимает. */
+  var PRIO = { '0': 'critical', '1': 'urgent', '2': 'normal', '3': 'consult' };
+  send.addEventListener('click', function () {
+    var prio = document.querySelector('input[name="prio"]:checked');
+    var placeEl = document.getElementById('place');
+    var catEl = document.querySelector('.chip[data-group="cat"][aria-pressed="true"]');   // категория — нажатый чип
+    var body = {
+      text: document.getElementById('what').value.trim(),
+      priority: PRIO[prio ? prio.value : '2'] || 'normal',
+      category: catEl ? catEl.textContent.trim() : 'Другое',
+      place: placeEl ? placeEl.value : null,
+      room: (document.getElementById('room') || {}).value || null
+    };
+    if (location.protocol === 'file:') { location.href = 'staff-tickets.html'; return; }
+    send.disabled = true;
     fetch('/api/tickets', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
-      .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j }; }); })
+      .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j || {} }; }, function () { return { s: r.status, j: {} }; }); })
       .then(function (r) {
-        if (r.s !== 201) { m.textContent = r.j.error || 'Не удалось'; m.hidden = false; return; }
-        if (document.getElementById('mine').checked) {
-          return fetch('/api/tickets/' + r.j.id, { method: 'PATCH', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ take: true, status: 'В работе' }) }).then(ok);
-        }
-        ok();
-      }).catch(function () { m.textContent = 'Сервер не отвечает'; m.hidden = false; });
+        if (r.s === 201 || r.s === 200) {
+        var mine = document.getElementById('mine');
+        if (mine && mine.checked && r.j.id) { return fetch('/api/tickets/' + r.j.id, { method: 'PATCH', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ take: true, status: 'В работе' }) }).then(function () { location.href = 'staff-tickets.html'; }); }
+        location.href = 'staff-tickets.html'; return; }
+        send.disabled = false;
+        alert(r.s === 401 ? 'Сессия истекла — войди ещё раз.' : (r.j.error || 'Не удалось отправить заявку.'));
+      })
+      .catch(function () { send.disabled = false; alert('Сервер не отвечает. Попробуй ещё раз.'); });
   });
 })();
 </script>
