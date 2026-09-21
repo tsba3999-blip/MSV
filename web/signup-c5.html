@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="icon" href="favicon4.png" type="image/png">
 <meta name="theme-color" content="#F5F1EA">
-<title>Знакомство: Пятна света — МСВ</title>
+<title>Знакомство: Круг за рисунком — МСВ</title>
 <link rel="stylesheet" href="tokens.css">
 <style>
   html, body { height: 100%; }
@@ -22,11 +22,10 @@
     transition: background var(--msv-base) var(--msv-ease);
   }
 
-  /* Градиентное решение «Пятна света»: Несколько мягких цветных пятен (лаванда, лайм, красный, лёд) на бежевом — на каждом экране они сдвигаются. */
-  .onb[data-step="1"] { background: radial-gradient(60% 40% at 15% 10%, #E4D8FF 0%, transparent 70%), radial-gradient(55% 40% at 90% 20%, #EAF7BD 0%, transparent 70%), radial-gradient(70% 45% at 50% 105%, #FFD3D8 0%, transparent 70%), #F5F1EA; }
-  .onb[data-step="2"] { background: radial-gradient(60% 40% at 85% 10%, #E4D8FF 0%, transparent 70%), radial-gradient(55% 40% at 10% 30%, #D6E8FF 0%, transparent 70%), radial-gradient(70% 45% at 50% 105%, #EAF7BD 0%, transparent 70%), #F5F1EA; }
-  .onb[data-step="3"] { background: radial-gradient(60% 40% at 50% 0%, #FFD3D8 0%, transparent 70%), radial-gradient(55% 40% at 5% 70%, #EAF7BD 0%, transparent 70%), radial-gradient(60% 40% at 95% 80%, #E4D8FF 0%, transparent 70%), #F5F1EA; }
-  body { background: #F5F1EA; }
+  /* Цветовое решение «Круг за рисунком»: Бежевый фон, за рисунком большой цветной круг: лаванда → лайм → красный. Линии графитовые. */
+  body { background: radial-gradient(circle at 50% 168px, #CBB6FF 0 132px, transparent 133px) #F5F1EA; } body[data-step="2"] { background: radial-gradient(circle at 50% 168px, #C8F03C 0 132px, transparent 133px) #F5F1EA; } body[data-step="3"] { background: radial-gradient(circle at 50% 168px, #FFB3BC 0 132px, transparent 133px) #F5F1EA; }
+  @media (min-width: 768px) { body { background: radial-gradient(circle at 27% 50%, #CBB6FF 0 240px, transparent 241px) #F5F1EA; } body[data-step="2"] { background: radial-gradient(circle at 27% 50%, #C8F03C 0 240px, transparent 241px) #F5F1EA; } body[data-step="3"] { background: radial-gradient(circle at 27% 50%, #FFB3BC 0 240px, transparent 241px) #F5F1EA; } }
+  .onb { background: transparent; }
 
   .onb__head {
     display: flex;
@@ -69,7 +68,31 @@
   .onb__art svg { width: 100%; max-width: 260px; height: auto; }
   /* Рисунки тушью (файлы заказчика): чёрные линии перекрашены в графит фильтром,
      белый фон убран режимом умножения — на любом фоне остаются только линии */
-  .onb__img { display: block; width: 100%; max-width: 250px; height: auto; max-height: 200px; object-fit: contain; mix-blend-mode: multiply; filter: url(#ink); }
+  .onb__img { display: block; width: 100%; max-width: 250px; height: auto; max-height: 200px; object-fit: contain; mix-blend-mode: var(--ink-blend, multiply); filter: var(--ink-filter, url(#ink)); }
+  .onb__art svg { stroke: var(--ink, #34495E); }
+  .onb__title, .onb__text { color: var(--ink, var(--msv-graphite)); }
+  .onb__skip { color: var(--ink-soft, var(--msv-n500)); }
+  .dot { background: var(--dot, var(--msv-n300)); }
+  .dot--on { background: var(--dot-on, var(--msv-red)); }
+
+  /* Компьютер: экран во всю ширину, рисунок слева, текст справа — не «телефон посреди монитора» */
+  @media (min-width: 768px) {
+    .onb {
+      max-width: 1040px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto 1fr auto auto auto 1fr;
+      grid-template-areas: "head head" "art ." "art title" "art text" "art foot" "art .";
+      column-gap: var(--msv-s48);
+      padding: 0 var(--msv-s48) var(--msv-s32);
+    }
+    .onb__head { grid-area: head; margin: 0; padding-right: 80px; }
+    .onb__art { grid-area: art; height: auto; align-self: center; padding: 0; }
+    .onb__art svg, .onb__img { max-width: 420px; max-height: 420px; }
+    .onb__title { grid-area: title; text-align: left; font-size: 40px; line-height: 46px; align-self: end; }
+    .onb__text { grid-area: text; text-align: left; flex: none; font-size: 17px; line-height: 26px; }
+    .onb__foot { grid-area: foot; padding-top: var(--msv-s24); max-width: 360px; }
+  }
 
   /* Заголовки трёх экранов на одной высоте: картинка фиксированной
      высоты, заголовок — фиксированной, текст под ним. */
@@ -94,7 +117,7 @@
   .screen--on { display: contents; }
 </style>
 </head>
-<body>
+<body data-step="1">
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="ink" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0.796 0 0 0 0.204  0 0.714 0 0 0.286  0 0 0.631 0 0.369  0 0 0 1 0"/></filter></svg>
 
@@ -184,6 +207,7 @@
   function show(n) {
     step = n;
     onb.dataset.step = String(n);
+    document.body.dataset.step = String(n);
     screens.forEach(function (s) {
       s.classList.toggle('screen--on', Number(s.dataset.screen) === n);
     });

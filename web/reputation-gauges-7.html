@@ -14,26 +14,19 @@
      Индикатор репутации — утверждённый рисунок (21.09.2026).
      Картинка заказчика (reputation-gauge.png) как есть, поверх —
      своя графитовая стрелка:
-       · без белого: картинка обрезана по кругу r 500, середина, зазор
-         между кольцом и полосой и скруглённые уголки закрыты;
-       · белые прорези между цветами закрыты кусочками соседних секторов
-         (градиент радиальный — шва нет), цвета сомкнуты;
-       · в сером кольце прорези закрыты серым, между делениями — тонкие
-         тёмные перегородки; надписи — шрифт сайта, строчными, по середине;
-       · шкала баллов −30 … 0 … +50: слева 90° на 30 баллов, справа 90°
-         на 50 — риски по нижнему краю цвета, числа под ними;
-       · под ступицей «У вас осталось жизней:» и три сердца;
+       · без белого: обрезка по кругу r 500, середина и уголки закрыты;
+       · прорези между цветами и между кольцом и цветом закрыты,
+         в кольце — тонкие тёмные перегородки;
+       · надписи в кольце — шрифт сайта, строчными, по середине;
+       · еле заметные значки в полях: треугольник «!», STOP, росток,
+         звезда, кубок;
+       · шкала баллов −30 … 0 … +50: риски по нижнему краю цвета,
+         числа тем же кеглем, что слова в кольце;
+       · «У вас осталось жизней:» и три сердца; сгоревшая — разбитое;
        · табло — два семисегментных разряда со знаком, следует за стрелкой;
        · стрелка: «нажали на газ» — до упора, «отпустили» — плавно к значению.
-     Геометрия картинки 1024×683: центр (512, 576), кольцо r 430–500,
-     цветная полоса r 217–426, прорези на 36°, 72°, 108°, 144°.
      ============================================================ */
   .page { padding-bottom: var(--msv-s48); }
-  .v { padding: var(--msv-s16) 0 var(--msv-s24); border-bottom: 1px solid var(--msv-n100); }
-  .v:last-child { border-bottom: 0; }
-  .v__t { margin: 0 0 var(--msv-s4); font-size: 17px; line-height: 22px; padding-left: var(--msv-s16); }
-  .v__d { margin: 0 0 var(--msv-s8); color: var(--msv-n500); padding-left: var(--msv-s16); }
-  .v__num { display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 26px; padding: 0 6px; margin-right: var(--msv-s8); font-size: 13px; font-weight: 700; color: var(--msv-white); background: var(--msv-red); border-radius: 13px; vertical-align: middle; }
   .gauge { display: block; width: 100%; }
   .gauge svg { display: block; width: 100%; height: auto; overflow: visible; }
   .needle { transition: transform 1.6s cubic-bezier(.25, .8, .25, 1); }
@@ -50,6 +43,12 @@
   .ctl input[type=range] { width: 200px; accent-color: var(--msv-red); }
   .ctl .chip { height: 32px; padding: 0 12px; font-size: 13px; }
   .ctl__val { display: inline-block; min-width: 32px; font-weight: 700; }
+  /* варианты трещины */
+  .cracks { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--msv-s16); margin-top: var(--msv-s24); padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r20); }
+  .crack { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 120px; font-size: 12px; color: var(--msv-n500); text-align: center; cursor: pointer; border: 0; background: none; font-family: var(--msv-font); }
+  .crack svg { width: 72px; height: 72px; }
+  .crack[aria-pressed="true"] { color: var(--msv-graphite); font-weight: 600; }
+  .crack[aria-pressed="true"] svg { outline: 2px solid var(--msv-red); outline-offset: 4px; border-radius: 8px; }
 </style>
 </head>
 <body>
@@ -78,7 +77,18 @@
     </div>
   </div>
 
-  <div id="grid"></div>
+  <div class="gauge" id="gauge"></div>
+
+  <div class="st">
+    <div class="lcdbox" id="lcdbox"></div>
+    <p class="st__phrase" id="phrase"></p>
+    <p class="msv-note st__note" id="livesNote"></p>
+    <p class="msv-note st__note" id="disc"></p>
+    <button class="again" type="button" id="again">Показать анимацию ещё раз</button>
+  </div>
+
+  <p class="msv-note" style="margin:var(--msv-s24) 0 0;padding-left:var(--msv-s16);color:var(--msv-n500)">Трещина на сгоревшем сердце — выбери:</p>
+  <div class="cracks" id="cracks"></div>
 
 </div>
 
@@ -89,33 +99,45 @@
   var S = [
     { word: 'Опасность', w: 'Опасность расторжения договора' },
     { word: 'Внимание',  w: 'Нужно быть внимательным' },
-    { word: 'Старайся',  w: 'Нужно сделать что-то хорошее' },
+    { word: 'Начало',    w: 'Нужно сделать что-то хорошее' },
     { word: 'Хорошо',    w: 'У тебя хорошее будущее' },
     { word: 'Отлично',   w: 'Ты на высоте — так держать!' }
   ];
   var HEART = 'M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z';
   var BG = '#F5F1EA', INK = '#34495E', RED = '#FB344A', GREY = '#E4E4E4', TXT = '#6B6B6B', DIV = '#1B1B1B', N500 = '#6B665E', N300 = '#B8B1A5';
-  var state = { v: 12, lives: 2, months: 2 };
+  var state = { v: 12, lives: 2, months: 2, crack: 'bolt' };
 
-  /* шкала: −30 … 0 — левая половина, 0 … +50 — правая */
   function angOf(v) { return v < 0 ? 90 + 90 * (-v / 30) : 90 - 90 * (v / 50); }
   function valOf(a) { return a > 90 ? -Math.round((a - 90) / 90 * 30) : Math.round((90 - a) / 90 * 50); }
   function sectorOf(v) { return Math.min(4, Math.max(0, Math.floor((180 - angOf(v)) / 36))); }
 
-  /* ---------- значки (сетка 24×24). Три манеры: line — контур, fill — силуэт, bold — крупный силуэт ---------- */
+  /* значки-силуэты (сетка 24×24), еле заметные */
   var IC = {
-    warn:  { line: '<path d="M12 3l10 18H2z"/><path d="M12 10v5"/><path d="M12 18v.5"/>',
-             fill: '<path d="M12 2.5L23 21.5H1z" class="f"/><path d="M12 9.5v6" class="cut" stroke-width="2.4"/><circle cx="12" cy="18.3" r="1.3" class="cutf"/>' },
-    stop:  { line: '<path d="M8 3h8l5 5v8l-5 5H8l-5-5V8z"/><text x="12" y="14.1" font-size="5.2" font-weight="800" text-anchor="middle" stroke="none" class="txt" font-family="var(--msv-font)">STOP</text>',
-             fill: '<path d="M8 2.5h8l5.5 5.5v8L16 21.5H8L2.5 16V8z" class="f"/><text x="12" y="14.1" font-size="5.4" font-weight="800" text-anchor="middle" stroke="none" class="cutt" font-family="var(--msv-font)">STOP</text>' },
-    eye:   { line: '<path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
-             fill: '<path d="M1.5 12s4-6.5 10.5-6.5S22.5 12 22.5 12 18.5 18.5 12 18.5 1.5 12 1.5 12z" class="f"/><circle cx="12" cy="12" r="3.4" class="cutf"/><circle cx="12" cy="12" r="1.6" class="f"/>' },
-    star:  { line: '<path d="M12 3l2.6 5.6 6.1.8-4.5 4.2 1.2 6.1L12 16.8 6.6 19.7l1.2-6.1L3.3 9.4l6.1-.8z"/>',
-             fill: '<path d="M12 2.5l2.9 6.1 6.7.9-4.9 4.6 1.3 6.7L12 17.6l-6 3.2 1.3-6.7L2.4 9.5l6.7-.9z" class="f"/>' },
-    cup:   { line: '<path d="M6 4h12v4a6 6 0 0 1-12 0z"/><path d="M9 20h6"/><path d="M12 14v6"/><path d="M6 6H3v2a3 3 0 0 0 3 3"/><path d="M18 6h3v2a3 3 0 0 1-3 3"/>',
-             fill: '<path d="M5.5 3h13v5.5a6.5 6.5 0 0 1-13 0z" class="f"/><path d="M10.5 13.5h3V19h-3z" class="f"/><path d="M7.5 19h9v2.5h-9z" class="f"/><path d="M5.5 5.5H2.5v2.8a3.7 3.7 0 0 0 3.7 3.7" class="ln"/><path d="M18.5 5.5h3v2.8a3.7 3.7 0 0 1-3.7 3.7" class="ln"/>' }
+    warn:   '<path d="M12 2.5L23 21.5H1z" class="f"/><path d="M12 9.5v6" class="cut" stroke-width="2.4"/><circle cx="12" cy="18.3" r="1.3" class="cutf"/>',
+    stop:   '<path d="M8 2.5h8l5.5 5.5v8L16 21.5H8L2.5 16V8z" class="f"/><text x="12" y="14.1" font-size="5.4" font-weight="800" text-anchor="middle" stroke="none" class="cutt" font-family="var(--msv-font)">STOP</text>',
+    sprout: '<path d="M12 21.5V11" class="ln" stroke-width="2.6"/><path d="M12 13.5c0-4.5-3.2-7.5-8-7.5 0 4.8 3 8 8 7.5z" class="f"/><path d="M12 11c0-4.5 3.2-7.5 8-7.5 0 4.8-3 8-8 7.5z" class="f"/><path d="M6 21.5h12" class="ln" stroke-width="2.6"/>',
+    star:   '<path d="M12 2.5l2.9 6.1 6.7.9-4.9 4.6 1.3 6.7L12 17.6l-6 3.2 1.3-6.7L2.4 9.5l6.7-.9z" class="f"/>',
+    cup:    '<path d="M5.5 3h13v5.5a6.5 6.5 0 0 1-13 0z" class="f"/><path d="M10.5 13.5h3V19h-3z" class="f"/><path d="M7.5 19h9v2.5h-9z" class="f"/><path d="M5.5 5.5H2.5v2.8a3.7 3.7 0 0 0 3.7 3.7" class="ln"/><path d="M18.5 5.5h3v2.8a3.7 3.7 0 0 1-3.7 3.7" class="ln"/>'
   };
-  var ICONS = ['warn', 'stop', 'eye', 'star', 'cup'];
+  var ICONS = ['warn', 'stop', 'sprout', 'star', 'cup'];
+
+  /* трещины — четыре рисунка */
+  var CRACK = {
+    line: { t: 'Ломаная',            d: 'M12 6.5l-2.2 4 3.2 3-2.6 3.6 1.6 3.9' },
+    bolt: { t: 'Молния',             d: 'M13.2 6l-3.6 5.2 3 1.4-3.2 5.6' },
+    chip: { t: 'С отколотым кусочком', d: 'M12 6.5l-1.6 3.2 2.6 2.4-2 3.2', chip: 'M14.2 8.6l3.6-1.2-.6 3.6z' },
+    split: { t: 'Две половинки',      split: true }
+  };
+  function lostHeart(kind, sc) {
+    var c = CRACK[kind] || CRACK.bolt;
+    if (c.split) {
+      return '<g transform="rotate(-6 6 14)"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6z" fill="' + N300 + '" stroke="' + N300 + '" stroke-width="1.6" stroke-linejoin="round"/></g>' +
+             '<g transform="translate(1.6 0) rotate(6 18 14)"><path d="M12 21c2.5-1.6 7-4.5 9.5-9A5.5 5.5 0 0 0 12 6z" fill="' + N300 + '" stroke="' + N300 + '" stroke-width="1.6" stroke-linejoin="round"/></g>';
+    }
+    return '<path d="' + HEART + '" fill="' + N300 + '" stroke="' + N300 + '" stroke-width="2" stroke-linejoin="round"/>' +
+      (c.chip ? '<path d="' + c.chip + '" fill="' + BG + '" stroke="none"/>' : '') +
+      '<path d="' + c.d + '" fill="none" stroke="' + BG + '" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>';
+  }
 
   var CX = 512, CY = 576;
   function pt(r, a) { var k = a * Math.PI / 180; return [CX + r * Math.cos(k), CY - r * Math.sin(k)]; }
@@ -131,66 +153,58 @@
   function img(rot) { return '<image href="reputation-gauge.png" x="0" y="0" width="1024" height="683"' + (rot ? ' transform="rotate(' + rot + ' ' + CX + ' ' + CY + ')"' : '') + '/>'; }
   function sign(v) { return v < 0 ? '−' : v > 0 ? '+' : ''; }
 
-  var uid = 0;
-
-  /* o: ticks — риски и числа; icons — 'line'|'fill'|'bold'|null; lost — вид сгоревшей жизни;
-        shadow — тень у стрелки; digits — цифры 1 2 3 в сердцах */
-  function gauge(o) {
-    var id = 'g' + (++uid);
+  function gauge() {
     var ang = angOf(state.v), rot = 90 - ang;
     var s = ['<svg viewBox="0 0 1024 760" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Репутация ' + state.v + '">', '<defs>'];
-    s.push('<clipPath id="' + id + 'half"><path d="M' + (CX - 500.5) + ' ' + (CY - 0.5) + ' A500.5 500.5 0 0 1 ' + (CX + 500.5) + ' ' + (CY - 0.5) + ' Z"/></clipPath>');
+    s.push('<clipPath id="half"><path d="M' + (CX - 500.5) + ' ' + (CY - 0.5) + ' A500.5 500.5 0 0 1 ' + (CX + 500.5) + ' ' + (CY - 0.5) + ' Z"/></clipPath>');
     var P = [[214, 228.5, 13.5, 9.2, -4], [214, 228.5, 23.7, 13.2, 10.8], [225.5, 340, 15.8, 8.8, -5.5], [225.5, 340, 24.7, 15.4, 9.8]];
     [36, 72, 108, 144].forEach(function (b) { P.push([216, 427.5, b + 0.05, b - 1.4, -3]); P.push([216, 427.5, b + 1.4, b - 0.05, 3]); });
     [[3.3, 5.6, 3], [1.0, 3.4, 5.3], [-1, 1.1, 7.3]].forEach(function (q) { P.push([214, 252, q[1], q[0], q[2]]); P.push([214, 252, 180 - q[0], 180 - q[1], -q[2]]); });
-    P.forEach(function (p, i) { s.push('<clipPath id="' + id + 'c' + i + '"><path d="' + ring(p[0], p[1], p[2], p[3]) + '"/></clipPath>'); });
-    if (o.shadow) s.push('<filter id="' + id + 'ns" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="7" stdDeviation="7" flood-color="#000" flood-opacity=".3"/></filter>');
+    P.forEach(function (p, i) { s.push('<clipPath id="c' + i + '"><path d="' + ring(p[0], p[1], p[2], p[3]) + '"/></clipPath>'); });
+    s.push('<style>.ic .f{fill:rgba(0,0,0,.055);stroke:none}.ic .cut{stroke:rgba(255,255,255,.16)}.ic .cutf{fill:rgba(255,255,255,.16);stroke:none}.ic .cutt{fill:rgba(255,255,255,.2)}.ic .ln{fill:none;stroke:rgba(0,0,0,.055);stroke-width:2;stroke-linecap:round}</style>');
     s.push('</defs>');
 
-    s.push('<g clip-path="url(#' + id + 'half)">');
+    s.push('<g clip-path="url(#half)">');
     s.push('<g transform="matrix(-1 0 0 1 1024 0)">');
     s.push(img(0));
-    P.forEach(function (p, i) { s.push('<g clip-path="url(#' + id + 'c' + i + ')">' + img(p[4]) + '</g>'); });
+    P.forEach(function (p, i) { s.push('<g clip-path="url(#c' + i + ')">' + img(p[4]) + '</g>'); });
     s.push('</g>');
+    /* зазор между кольцом и цветом — закрыт серым: кольцо доходит до цвета */
+    s.push('<path d="' + ring(425, 431, 180.5, -0.5) + '" fill="' + GREY + '"/>');
     [36, 72, 108, 144].forEach(function (b) {
-      s.push('<path d="' + ring(430.5, 500, b + 1.3, b - 1.3) + '" fill="' + GREY + '"/>');
-      s.push('<line x1="' + f(pt(430.5, b)[0]) + '" y1="' + f(pt(430.5, b)[1]) + '" x2="' + f(pt(500, b)[0]) + '" y2="' + f(pt(500, b)[1]) + '" stroke="' + DIV + '" stroke-width="2.5"/>');
+      s.push('<path d="' + ring(425, 500, b + 1.3, b - 1.3) + '" fill="' + GREY + '"/>');
+      s.push('<line x1="' + f(pt(425.5, b)[0]) + '" y1="' + f(pt(425.5, b)[1]) + '" x2="' + f(pt(500, b)[0]) + '" y2="' + f(pt(500, b)[1]) + '" stroke="' + DIV + '" stroke-width="2.5"/>');
     });
     s.push('<path d="' + ring(478, 500, 1.4, -0.5) + '" fill="' + GREY + '"/><path d="' + ring(478, 500, 180.5, 178.6) + '" fill="' + GREY + '"/>');
     s.push('</g>');
     s.push('<circle cx="' + CX + '" cy="' + CY + '" r="218" fill="' + BG + '"/>');
-    s.push('<path d="' + ring(425.5, 430.5, 180.5, -0.5) + '" fill="' + BG + '"/>');
     s.push('<rect x="0" y="' + (CY + 0.5) + '" width="1024" height="8" fill="' + BG + '"/>');
 
     /* надписи в кольце */
     S.forEach(function (x, i) {
       var a1 = 180 - 36 * i - 1.6, a2 = 144 - 36 * i + 1.6;
       s.push('<path d="' + ring(434, 499, a1, a2) + '" fill="' + GREY + '"/>');
-      s.push('<path id="' + id + 't' + i + '" d="' + arc(465, a1, a2) + '" fill="none"/>');
-      s.push('<text font-size="28" fill="' + TXT + '" font-family="var(--msv-font)"><textPath href="#' + id + 't' + i + '" startOffset="50%" text-anchor="middle" dominant-baseline="central">' + esc(x.word) + '</textPath></text>');
+      s.push('<path id="t' + i + '" d="' + arc(465, a1, a2) + '" fill="none"/>');
+      s.push('<text font-size="28" fill="' + TXT + '" font-family="var(--msv-font)"><textPath href="#t' + i + '" startOffset="50%" text-anchor="middle" dominant-baseline="central">' + esc(x.word) + '</textPath></text>');
     });
 
-    /* еле видные значки — чуть темнее цвета поля */
-    if (o.icons) ICONS.forEach(function (k, i) {
-      var p = pt(322, 162 - 36 * i), sc = o.icons === 'bold' ? 4.6 : 3.6, st = o.icons === 'line' ? 'line' : 'fill';
-      var css = '<style>.' + id + 'i .f{fill:rgba(0,0,0,.16);stroke:none}.' + id + 'i .cut{stroke:rgba(255,255,255,.42)}.' + id + 'i .cutf{fill:rgba(255,255,255,.42);stroke:none}.' + id + 'i .cutt{fill:rgba(255,255,255,.5)}.' + id + 'i .ln{fill:none;stroke:rgba(0,0,0,.16);stroke-width:2}.' + id + 'i .txt{fill:rgba(0,0,0,.2)}</style>';
-      if (i === 0) s.push(css);
-      s.push('<g class="' + id + 'i" transform="translate(' + f(p[0] - 12 * sc) + ' ' + f(p[1] - 12 * sc) + ') scale(' + sc + ')" fill="none" stroke="rgba(0,0,0,.2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + IC[k][st] + '</g>');
+    /* значки */
+    ICONS.forEach(function (k, i) {
+      var p = pt(322, 162 - 36 * i), sc = 3.6;
+      s.push('<g class="ic" transform="translate(' + f(p[0] - 12 * sc) + ' ' + f(p[1] - 12 * sc) + ') scale(' + sc + ')" fill="none" stroke="none">' + IC[k] + '</g>');
     });
 
-    /* риски по нижнему краю цвета и числа под ними */
-    if (o.ticks) {
-      for (var u = -30; u <= 50; u++) {
-        var a = angOf(u), big = u % 10 === 0, mid = u % 5 === 0;
-        var r1 = big ? 198 : mid ? 204 : 209, p1 = pt(r1, a), p2 = pt(215, a);
-        s.push('<line x1="' + f(p1[0]) + '" y1="' + f(p1[1]) + '" x2="' + f(p2[0]) + '" y2="' + f(p2[1]) + '" stroke="' + INK + '" stroke-width="' + (big ? 2 : 1.1) + '" opacity="' + (big ? .75 : .45) + '"/>');
-        if (big) { var q = pt(180, a); s.push('<text x="' + f(q[0]) + '" y="' + f(q[1]) + '" font-size="19" font-weight="600" fill="' + N500 + '" text-anchor="middle" dominant-baseline="central" font-family="var(--msv-font)">' + (u > 0 ? '+' : '') + u + '</text>'); }
-      }
+    /* риски и числа — тем же кеглем, что слова в кольце */
+    for (var u = -30; u <= 50; u++) {
+      var a = angOf(u), big = u % 10 === 0, mid = u % 5 === 0;
+      var r1 = big ? 198 : mid ? 204 : 209, p1 = pt(r1, a), p2 = pt(215, a);
+      s.push('<line x1="' + f(p1[0]) + '" y1="' + f(p1[1]) + '" x2="' + f(p2[0]) + '" y2="' + f(p2[1]) + '" stroke="' + INK + '" stroke-width="' + (big ? 2 : 1.1) + '" opacity="' + (big ? .75 : .45) + '"/>');
+      if (big) { var q = pt(176, a); s.push('<text x="' + f(q[0]) + '" y="' + f(q[1]) + '" font-size="28" fill="' + TXT + '" text-anchor="middle" dominant-baseline="central" font-family="var(--msv-font)">' + (u > 0 ? '+' : '') + u + '</text>'); }
     }
 
     /* стрелка и ступица */
     var len = 318;
-    s.push('<g class="needle needle--reset" data-rot="' + f(rot) + '"' + (o.shadow ? ' filter="url(#' + id + 'ns)"' : '') + ' style="transform-origin:' + CX + 'px ' + CY + 'px;transform:rotate(-90deg)"><path d="M' + CX + ' ' + (CY - len) + ' L' + (CX - 12) + ' ' + (CY - 14) + ' L' + (CX + 12) + ' ' + (CY - 14) + ' Z" fill="' + INK + '"/></g>');
+    s.push('<g class="needle needle--reset" id="needle" data-rot="' + f(rot) + '" style="transform-origin:' + CX + 'px ' + CY + 'px;transform:rotate(-90deg)"><path d="M' + CX + ' ' + (CY - len) + ' L' + (CX - 12) + ' ' + (CY - 14) + ' L' + (CX + 12) + ' ' + (CY - 14) + ' Z" fill="' + INK + '"/></g>');
     s.push('<circle cx="' + CX + '" cy="' + CY + '" r="30" fill="' + BG + '" stroke="' + INK + '" stroke-width="4"/><circle cx="' + CX + '" cy="' + CY + '" r="10" fill="' + INK + '"/>');
 
     /* жизни */
@@ -198,32 +212,15 @@
     for (var h = 0; h < 3; h++) {
       var x = CX - 90 + h * 90, y = CY + 136, al = h < state.lives, k2 = 3;
       s.push('<g transform="translate(' + f(x - 12 * k2) + ' ' + f(y - 12 * k2) + ') scale(' + k2 + ')">');
-      if (al) s.push('<path d="' + HEART + '" fill="' + RED + '" stroke="' + RED + '" stroke-width="2" stroke-linejoin="round"/>');
-      else s.push(lost(o.lost));
-      if (o.digits) s.push('<text x="12" y="13.2" font-size="9" font-weight="800" fill="' + (al ? '#fff' : N300) + '" text-anchor="middle" dominant-baseline="central" font-family="var(--msv-font)">' + (h + 1) + '</text>');
+      s.push(al ? '<path d="' + HEART + '" fill="' + RED + '" stroke="' + RED + '" stroke-width="2" stroke-linejoin="round"/>' : lostHeart(state.crack));
       s.push('</g>');
     }
     s.push('</svg>');
     return s.join('');
   }
 
-  /* сгоревшая жизнь — шесть манер */
-  function lost(kind) {
-    switch (kind) {
-      case 'broken':  return '<path d="' + HEART + '" fill="' + N300 + '" stroke="' + N300 + '" stroke-width="2" stroke-linejoin="round"/><path d="M12 6.5l-2.2 4 3.2 3-2.6 3.6 1.6 3.9" fill="none" stroke="' + BG + '" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>';
-      case 'plaster': return '<path d="' + HEART + '" fill="' + N300 + '" stroke="' + N300 + '" stroke-width="2" stroke-linejoin="round"/><g transform="rotate(-35 12 12.5)"><rect x="4.5" y="10" width="15" height="5" rx="2.5" fill="' + BG + '" stroke="' + N500 + '" stroke-width=".9"/><circle cx="10.5" cy="12.5" r=".6" fill="' + N500 + '"/><circle cx="13.5" cy="12.5" r=".6" fill="' + N500 + '"/><circle cx="12" cy="11.2" r=".6" fill="' + N500 + '"/><circle cx="12" cy="13.8" r=".6" fill="' + N500 + '"/></g>';
-      case 'cross':   return '<path d="' + HEART + '" fill="' + RED + '" opacity=".22" stroke="none"/><path d="M8.5 8.5l7 7M15.5 8.5l-7 7" fill="none" stroke="' + N500 + '" stroke-width="2" stroke-linecap="round"/>';
-      case 'dashed':  return '<path d="' + HEART + '" fill="none" stroke="' + RED + '" stroke-width="1.6" stroke-dasharray="2.2 1.8" stroke-linejoin="round" opacity=".8"/>';
-      case 'dark':    return '<path d="' + HEART + '" fill="' + INK + '" stroke="' + INK + '" stroke-width="2" stroke-linejoin="round" opacity=".55"/>';
-      default:        return '<path d="' + HEART + '" fill="none" stroke="' + N300 + '" stroke-width="2" stroke-linejoin="round"/>';
-    }
-  }
-
-  /* ---------- табло: знак и два семисегментных разряда ---------- */
-  var SEG = {
-    a: '4,2 36,2 32,8 8,8', b: '38,4 38,34 32,30 32,10', c: '38,38 38,68 32,62 32,42',
-    d: '4,70 36,70 32,64 8,64', e: '2,38 8,42 8,62 2,68', f: '2,4 8,10 8,30 2,34', g: '5,36 9,32 31,32 35,36 31,40 9,40'
-  };
+  /* табло: знак и два разряда */
+  var SEG = { a: '4,2 36,2 32,8 8,8', b: '38,4 38,34 32,30 32,10', c: '38,38 38,68 32,62 32,42', d: '4,70 36,70 32,64 8,64', e: '2,38 8,42 8,62 2,68', f: '2,4 8,10 8,30 2,34', g: '5,36 9,32 31,32 35,36 31,40 9,40' };
   var DIG = { 0: 'abcdef', 1: 'bc', 2: 'abged', 3: 'abgcd', 4: 'fgbc', 5: 'afgcd', 6: 'afgedc', 7: 'abc', 8: 'abcdefg', 9: 'abcdfg' };
   var OFF = 'rgba(52,73,94,.08)';
   function cellSvg(dx, on) { return Object.keys(SEG).map(function (k) { return '<polygon transform="translate(' + dx + ' 0)" points="' + SEG[k] + '" fill="' + (on.indexOf(k) >= 0 ? INK : OFF) + '"/>'; }).join(''); }
@@ -237,57 +234,43 @@
     return s + '</g></svg>';
   }
 
-  var V = [
-    { t: 'Утверждённый + шкала баллов', d: 'Риски по нижнему краю цвета: слева −30 … 0 (реже), справа 0 … +50. Табло двухзначное, следует за стрелкой. Сгоревшая жизнь — пустой контур.', o: { ticks: true, lost: 'outline' } },
-    { t: 'Значки-силуэты', d: 'Еле видные значки чуть темнее поля: треугольник «!», STOP, глаз, звезда, кубок. Сгоревшая жизнь — разбитое сердце.', o: { ticks: true, icons: 'fill', lost: 'broken' } },
-    { t: 'Значки-контуры', d: 'Те же значки тонкой линией. Сгоревшая жизнь — сердце с пластырем.', o: { ticks: true, icons: 'line', lost: 'plaster' } },
-    { t: 'Крупные значки + тень у стрелки', d: 'Силуэты крупнее, стрелка с мягкой тенью. Сгоревшая жизнь — бледное сердце с крестиком.', o: { ticks: true, icons: 'bold', lost: 'cross', shadow: true } },
-    { t: 'Цифры в сердцах', d: 'Внутри сердец 1, 2, 3. Сгоревшая жизнь — пунктирный контур.', o: { ticks: true, lost: 'dashed', digits: true } },
-    { t: 'Без шкалы', d: 'Как утверждено, без рисок; значки-силуэты. Сгоревшая жизнь — тёмное сердце без дыма.', o: { icons: 'fill', lost: 'dark' } }
-  ];
-
-  var grid = document.getElementById('grid');
-  function draw() {
-    uid = 0;
+  function build() {
     var cur = S[sectorOf(state.v)], mm = state.months;
-    grid.innerHTML = V.map(function (x, i) {
-      return '<section class="v"><h2 class="msv-body v__t"><span class="v__num">' + (i + 1) + '</span>' + esc(x.t) + '</h2><p class="msv-note v__d">' + esc(x.d) + '</p>' +
-        '<div class="gauge">' + gauge(x.o) + '</div>' +
-        '<div class="st"><div class="lcdbox" data-v="' + state.v + '">' + lcd(-30) + '</div>' +
-        '<p class="st__phrase">' + esc(cur.w) + '</p>' +
-        '<p class="msv-note st__note">' + (state.lives === 3 ? 'Три жизни — все на месте' : state.lives === 2 ? 'Одна жизнь сгорела: нарушение отметил модератор' : 'Осталась последняя жизнь — следующее нарушение означает расторжение договора') + '</p>' +
-        '<p class="msv-note st__note">' + (mm >= 6 ? 'Скидка 5 % на проживание действует: полгода на максимуме' : 'До скидки 5 %: ещё ' + (6 - mm) + ' ' + plural(6 - mm) + ' на максимальной репутации') + '</p>' +
-        '<button class="again" type="button" data-again>Показать анимацию ещё раз</button></div></section>';
+    document.getElementById('gauge').innerHTML = gauge();
+    document.getElementById('phrase').textContent = cur.w;
+    document.getElementById('livesNote').textContent = state.lives === 3 ? 'Три жизни — все на месте' : state.lives === 2 ? 'Одна жизнь сгорела: нарушение отметил модератор' : 'Осталась последняя жизнь — следующее нарушение означает расторжение договора';
+    document.getElementById('disc').textContent = mm >= 6 ? 'Скидка 5 % на проживание действует: полгода на максимуме' : 'До скидки 5 %: ещё ' + (6 - mm) + ' ' + plural(6 - mm) + ' на максимальной репутации';
+    document.getElementById('cracks').innerHTML = Object.keys(CRACK).map(function (k) {
+      return '<button class="crack" type="button" data-crack="' + k + '" aria-pressed="' + (state.crack === k) + '"><svg viewBox="0 0 24 24">' + lostHeart(k) + '</svg>' + esc(CRACK[k].t) + '</button>';
     }).join('');
     animate();
   }
 
-  function animate(scope) {
-    var root = scope || document;
-    root.querySelectorAll('.v').forEach(function (sec) {
-      var g = sec.querySelector('.needle'), box = sec.querySelector('.lcdbox'), rot = g.dataset.rot;
-      g.classList.add('needle--reset'); g.classList.remove('needle--gas'); g.style.transform = 'rotate(-90deg)';
-      box.innerHTML = lcd(-30);
-      void g.getBoundingClientRect();
-      var t0 = performance.now(), last = null;
-      setTimeout(function () { g.classList.remove('needle--reset'); g.classList.add('needle--gas'); g.style.transform = 'rotate(90deg)'; }, 250);
-      setTimeout(function () { g.classList.remove('needle--gas'); g.style.transform = 'rotate(' + rot + 'deg)'; }, 1200);
-      setTimeout(function () { box.innerHTML = lcd(Number(box.dataset.v)); }, 3300);
-      (function tick() {
-        var m = getComputedStyle(g).transform, a = -90;
-        if (m && m !== 'none') { var q = m.match(/matrix\(([^)]+)\)/); if (q) { var c = q[1].split(',').map(Number); a = Math.atan2(c[1], c[0]) * 180 / Math.PI; } }
-        var v = valOf(Math.max(0, Math.min(180, 90 - a)));
-        if (v !== last) { last = v; box.innerHTML = lcd(v); }
-        if (performance.now() - t0 < 3200) requestAnimationFrame(tick);
-      })();
-    });
+  function animate() {
+    var g = document.getElementById('needle'), box = document.getElementById('lcdbox'), rot = g.dataset.rot;
+    g.classList.add('needle--reset'); g.classList.remove('needle--gas'); g.style.transform = 'rotate(-90deg)';
+    box.innerHTML = lcd(-30);
+    void g.getBoundingClientRect();
+    var t0 = performance.now(), last = null, target = state.v;
+    setTimeout(function () { g.classList.remove('needle--reset'); g.classList.add('needle--gas'); g.style.transform = 'rotate(90deg)'; }, 250);
+    setTimeout(function () { g.classList.remove('needle--gas'); g.style.transform = 'rotate(' + rot + 'deg)'; }, 1200);
+    setTimeout(function () { if (state.v === target) box.innerHTML = lcd(target); }, 3300);
+    (function tick() {
+      if (state.v !== target) return;
+      var m = getComputedStyle(g).transform, a = -90;
+      if (m && m !== 'none') { var q = m.match(/matrix\(([^)]+)\)/); if (q) { var c = q[1].split(',').map(Number); a = Math.atan2(c[1], c[0]) * 180 / Math.PI; } }
+      var v = valOf(Math.max(0, Math.min(180, 90 - a)));
+      if (v !== last) { last = v; box.innerHTML = lcd(v); }
+      if (performance.now() - t0 < 3200) requestAnimationFrame(tick);
+    })();
   }
-  grid.addEventListener('click', function (e) { var b = e.target.closest('[data-again]'); if (b) animate(b.closest('.v')); });
 
-  document.getElementById('v').addEventListener('input', function () { state.v = Number(this.value); document.getElementById('vVal').textContent = sign(state.v) + Math.abs(state.v); draw(); });
-  document.getElementById('m').addEventListener('input', function () { state.months = Number(this.value); document.getElementById('mVal').textContent = state.months; draw(); });
-  document.querySelectorAll('[data-l]').forEach(function (b) { b.addEventListener('click', function () { document.querySelectorAll('[data-l]').forEach(function (x) { x.setAttribute('aria-pressed', 'false'); }); b.setAttribute('aria-pressed', 'true'); state.lives = Number(b.dataset.l); draw(); }); });
-  draw();
+  document.getElementById('v').addEventListener('input', function () { state.v = Number(this.value); document.getElementById('vVal').textContent = sign(state.v) + Math.abs(state.v); build(); });
+  document.getElementById('m').addEventListener('input', function () { state.months = Number(this.value); document.getElementById('mVal').textContent = state.months; build(); });
+  document.querySelectorAll('[data-l]').forEach(function (b) { b.addEventListener('click', function () { document.querySelectorAll('[data-l]').forEach(function (x) { x.setAttribute('aria-pressed', 'false'); }); b.setAttribute('aria-pressed', 'true'); state.lives = Number(b.dataset.l); build(); }); });
+  document.getElementById('cracks').addEventListener('click', function (e) { var b = e.target.closest('[data-crack]'); if (b) { state.crack = b.dataset.crack; build(); } });
+  document.getElementById('again').addEventListener('click', animate);
+  build();
 })();
 </script>
 <script src="mark.js"></script>

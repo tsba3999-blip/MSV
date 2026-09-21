@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="icon" href="favicon4.png" type="image/png">
 <meta name="theme-color" content="#F5F1EA">
-<title>Знакомство: Лайм и фиалка — МСВ</title>
+<title>Знакомство: Цветная половина — МСВ</title>
 <link rel="stylesheet" href="tokens.css">
 <style>
   html, body { height: 100%; }
@@ -22,11 +22,10 @@
     transition: background var(--msv-base) var(--msv-ease);
   }
 
-  /* Градиентное решение «Лайм и фиалка»: Диагональ от бледного лайма к лаванде через бежевый; линии рисунков — фиолетовые. */
-  .onb[data-step="1"] { background: linear-gradient(135deg, #EEF9C9 0%, #F5F1EA 50%, #E3D8FF 100%); }
-  .onb[data-step="2"] { background: linear-gradient(135deg, #E3D8FF 0%, #F5F1EA 50%, #EEF9C9 100%); }
-  .onb[data-step="3"] { background: linear-gradient(135deg, #EEF9C9 0%, #F5F1EA 45%, #FFD3D8 100%); }
-  body { background: #F5F1EA; }
+  /* Цветовое решение «Цветная половина»: Верхняя половина — цвет (лаванда → лайм → лёд), нижняя — бежевая с текстом. На компьютере цветная половина слева. */
+  body { background: linear-gradient(180deg, #CBB6FF 0 35%, #F5F1EA 35%) fixed; } body[data-step="2"] { background: linear-gradient(180deg, #C8F03C 0 35%, #F5F1EA 35%) fixed; } body[data-step="3"] { background: linear-gradient(180deg, #A2D2FF 0 35%, #F5F1EA 35%) fixed; }
+  @media (min-width: 768px) { body { background: linear-gradient(90deg, #CBB6FF 0 50%, #F5F1EA 50%) fixed; } body[data-step="2"] { background: linear-gradient(90deg, #C8F03C 0 50%, #F5F1EA 50%) fixed; } body[data-step="3"] { background: linear-gradient(90deg, #A2D2FF 0 50%, #F5F1EA 50%) fixed; } }
+  .onb { background: transparent; }
 
   .onb__head {
     display: flex;
@@ -69,7 +68,31 @@
   .onb__art svg { width: 100%; max-width: 260px; height: auto; }
   /* Рисунки тушью (файлы заказчика): чёрные линии перекрашены в графит фильтром,
      белый фон убран режимом умножения — на любом фоне остаются только линии */
-  .onb__img { display: block; width: 100%; max-width: 250px; height: auto; max-height: 200px; object-fit: contain; mix-blend-mode: multiply; filter: url(#ink); }
+  .onb__img { display: block; width: 100%; max-width: 250px; height: auto; max-height: 200px; object-fit: contain; mix-blend-mode: var(--ink-blend, multiply); filter: var(--ink-filter, url(#ink)); }
+  .onb__art svg { stroke: var(--ink, #34495E); }
+  .onb__title, .onb__text { color: var(--ink, var(--msv-graphite)); }
+  .onb__skip { color: var(--ink-soft, var(--msv-n500)); }
+  .dot { background: var(--dot, var(--msv-n300)); }
+  .dot--on { background: var(--dot-on, var(--msv-red)); }
+
+  /* Компьютер: экран во всю ширину, рисунок слева, текст справа — не «телефон посреди монитора» */
+  @media (min-width: 768px) {
+    .onb {
+      max-width: 1040px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto 1fr auto auto auto 1fr;
+      grid-template-areas: "head head" "art ." "art title" "art text" "art foot" "art .";
+      column-gap: var(--msv-s48);
+      padding: 0 var(--msv-s48) var(--msv-s32);
+    }
+    .onb__head { grid-area: head; margin: 0; padding-right: 80px; }
+    .onb__art { grid-area: art; height: auto; align-self: center; padding: 0; }
+    .onb__art svg, .onb__img { max-width: 420px; max-height: 420px; }
+    .onb__title { grid-area: title; text-align: left; font-size: 40px; line-height: 46px; align-self: end; }
+    .onb__text { grid-area: text; text-align: left; flex: none; font-size: 17px; line-height: 26px; }
+    .onb__foot { grid-area: foot; padding-top: var(--msv-s24); max-width: 360px; }
+  }
 
   /* Заголовки трёх экранов на одной высоте: картинка фиксированной
      высоты, заголовок — фиксированной, текст под ним. */
@@ -94,9 +117,9 @@
   .screen--on { display: contents; }
 </style>
 </head>
-<body>
+<body data-step="1">
 
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="ink" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0.569 0 0 0 0.431  0 0.769 0 0 0.231  0 0 0 0 1  0 0 0 1 0"/></filter></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="ink" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0.796 0 0 0 0.204  0 0.714 0 0 0.286  0 0 0.631 0 0.369  0 0 0 1 0"/></filter></svg>
 
 <div class="onb" id="onb" data-step="1">
 
@@ -184,6 +207,7 @@
   function show(n) {
     step = n;
     onb.dataset.step = String(n);
+    document.body.dataset.step = String(n);
     screens.forEach(function (s) {
       s.classList.toggle('screen--on', Number(s.dataset.screen) === n);
     });
