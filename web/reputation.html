@@ -170,8 +170,10 @@
      он заваливается набок */
   function mark(type, a) {
     var p = pt(465, a), k = 1.45;
+    /* У звезды тонкая обводка: жёлтое на сером кольце иначе теряется.
+       non-scaling-stroke держит её ровно в один пиксель на любом размере. */
     var body = type === 'star'
-      ? '<path d="' + STAR_D + '" fill="' + MARK_YELLOW + '"/>'
+      ? '<path d="' + STAR_D + '" fill="' + MARK_YELLOW + '" stroke="' + INK + '" stroke-width="1" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>'
       : '<path d="' + HEART + '" fill="' + MARK_GREY + '"/>' +
         '<path d="M12.6 5.4L10.2 9.4l3.4 1.6-3 3.6 2.8 1.8-2.6 3.6 1.2 2.2" fill="none" stroke="' + GREY + '" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>';
     return '<g transform="translate(' + f(p[0]) + ' ' + f(p[1]) + ') rotate(' + f(90 - a) + ') scale(' + k + ') translate(-12 -12)">' + body + '</g>';
@@ -210,7 +212,13 @@
       var a1 = 180 - 36 * i - 1.6, a2 = 144 - 36 * i + 1.6;
       s.push('<path d="' + ring(434, 499, a1, a2) + '" fill="' + GREY + '"/>');
       s.push('<path id="w' + i + '" d="' + arc(322, a1, a2) + '" fill="none"/>');
-      s.push('<text font-size="30" font-weight="600" fill="#fff" font-family="var(--msv-font)"><textPath href="#w' + i + '" startOffset="50%" text-anchor="middle" dominant-baseline="central">' + esc(x.word) + '</textPath></text>');
+      /* Кегль как у строки «У вас осталось жизней», прозрачность 50%.
+         На жёлтом секторе белое не читается — там 30% чёрного
+         (решение заказчика 24.09.2026). */
+      var yellow = i === 2;
+      s.push('<text font-size="26" font-weight="600" fill="' + (yellow ? '#000' : '#fff') +
+        '" fill-opacity="' + (yellow ? '.3' : '.5') + '" font-family="var(--msv-font)">' +
+        '<textPath href="#w' + i + '" startOffset="50%" text-anchor="middle" dominant-baseline="central">' + esc(x.word) + '</textPath></text>');
     });
 
     MARKS.forEach(function (m, i) {
