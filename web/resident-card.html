@@ -22,8 +22,8 @@
      карточка открывалась целиком, а не собиралась рывками.
      ============================================================ */
 
-  .card-top { display: flex; align-items: flex-start; gap: var(--msv-s16); margin-bottom: var(--msv-s16); padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r12); box-shadow: var(--msv-e1); }
-  .card-top__ava { flex: 0 0 auto; width: 72px; height: 72px; display: flex; align-items: center; justify-content: center; font: 700 22px/1 var(--msv-font); color: var(--msv-n500); background: var(--msv-n100); border-radius: 50%; object-fit: cover; }
+  .card-top { display: flex; align-items: stretch; gap: var(--msv-s16); margin-bottom: var(--msv-s16); padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r12); box-shadow: var(--msv-e1); }
+  .card-top__ava { flex: 0 0 auto; align-self: stretch; width: 96px; min-height: 96px; display: flex; align-items: center; justify-content: center; font: 700 26px/1 var(--msv-font); color: var(--msv-n500); background: var(--msv-n100); border-radius: var(--msv-r12); object-fit: cover; }
   .card-top__t { flex: 1 1 auto; min-width: 0; }
   .card-top__name { margin: 0 0 var(--msv-s4); }
   .card-top__sub { margin: 0; color: var(--msv-n500); }
@@ -124,7 +124,6 @@ MSV.ready(function (ctx) {
   }
 
   function draw(d) {
-    document.getElementById('title').textContent = d.me.name || 'Карточка резидента';
     document.title = (d.me.name || 'Карточка резидента') + ' — МСВ';
 
     var live = d.bookings.filter(function (b) {

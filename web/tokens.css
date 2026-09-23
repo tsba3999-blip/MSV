@@ -241,7 +241,8 @@ body, h1, h2, h3, p, button, a, label { hyphens: none; }
 .msv-btn {
   display: inline-flex;
   align-items: center;
-  justify-content: flex-start;
+  /* надпись по центру — стандарт, утверждённый заказчиком 24.09.2026 */
+  justify-content: center;
   gap: var(--msv-s8);
   height: var(--msv-btn-l);
   padding: 0 var(--msv-s24);
@@ -250,8 +251,10 @@ body, h1, h2, h3, p, button, a, label { hyphens: none; }
   font-family: var(--msv-font);
   font-size: 16px;
   font-weight: 600;
-  line-height: 1;
-  text-align: left;
+  /* 1,2 вместо 1: при единице строка встаёт на два пикселя выше центра —
+     проверено замером выносных элементов шрифта */
+  line-height: 1.2;
+  text-align: center;
   text-decoration: none;
   cursor: pointer;
   transition: background var(--msv-fast) var(--msv-ease),

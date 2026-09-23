@@ -525,11 +525,12 @@
 }
 .msv-sh__panel-where .msv-sh__panel-bed { color: var(--sh-muted); font-weight: 500; }
 
-/* Крестик: 16 пикселей от правого края, верх — на линии фамилии.
+/* Крестик: по центру белого поля справа от текста, верх — на линии фамилии.
    Имя набрано 15/21, поэтому строка начинается на 3 пикселя ниже своего
-   блока: 14 + 3 = 17. */
-.msv-sh__panel-close--float { position: absolute; top: 17px; right: 16px; z-index: 2; }
-.msv-sh__panel-body--flush { padding-top: 16px; }
+   блока: 14 + 3 = 17. По горизонтали: 15 пикселей полосы прокрутки плюс
+   половина от оставшихся 56 − 28 = 29. */
+.msv-sh__panel-close--float { position: absolute; top: 17px; right: 29px; z-index: 2; }
+.msv-sh__panel-body--flush { padding-top: 16px; scrollbar-gutter: stable; }
 .msv-sh__panel-body--flush .msv-sh__sect:first-child { padding-right: 56px; }   /* место под крестик */
 
 /* Лепестки мессенджеров — форма из брендбука: радиусы 24/8 по диагонали */

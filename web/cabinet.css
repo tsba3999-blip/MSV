@@ -138,7 +138,9 @@ a.side__who:focus-visible { outline: 2px solid var(--msv-white); outline-offset:
 }
 
 .notice {
-  margin: 0 0 var(--msv-s24);
+  /* тот же шаг, что у полосы фильтров ниже: иначе полоса стоит не
+     посередине между пояснением и таблицей (решение заказчика 24.09.2026) */
+  margin: 0 0 var(--msv-s16);
   padding: var(--msv-s12) var(--msv-s16);
   background: var(--msv-lavender);
   border-radius: var(--msv-r12);
