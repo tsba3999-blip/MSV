@@ -154,6 +154,17 @@
   white-space: nowrap;
 }
 
+/* Подпись, которую видно только экранному диктору: на экране её нет,
+   потому что то же слово уже написано внутри поля */
+.msv-field__label--off {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 /* Поле даты нажимается целиком, поэтому и курсор соответствующий */
 .msv-input[type="date"] { cursor: pointer; }
 
