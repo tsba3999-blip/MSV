@@ -22,6 +22,7 @@
   .row__work {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     height: var(--msv-btn-s, 36px);
     padding: 0 var(--msv-s16);
     font: 600 13px/1 var(--msv-font);
@@ -30,6 +31,10 @@
     border-radius: 18px;
     white-space: nowrap;
   }
+  /* Все кнопки в столбце действий одной ширины — по тёмной «Взять себе».
+     Надпись по центру, иначе короткое слово липнет к левому краю. */
+  .grid td.num .msv-btn,
+  .grid td.num .row__work { min-width: 108px; justify-content: center; }
 
   body { --role: var(--msv-sky); --role-ink: var(--msv-graphite); }
 </style>
