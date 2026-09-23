@@ -1,0 +1,335 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Сайт и его программное обеспечение охраняются ГК РФ (ст. 1259, 1261). Копирование без разрешения правообладателя запрещено. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#F5F1EA">
+<title>Выбор резиденции — 20 близких вариантов — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="resident.css">
+<style>
+  /* ============================================================
+     Двадцать вариантов вокруг утверждённой карточки (23.09.2026).
+
+     Разметка во всех одна и та же — та, что стоит на боевой странице:
+     фотография с лупой, знак, надкатегория, имя, «м. …», адрес
+     ссылкой, описание, метка свободных мест, цена, «Узнать больше»,
+     красная кнопка «Выбрать». Меняется только оформление, поэтому
+     любой вариант переносится на боевую страницу заменой одного
+     блока стилей.
+     ============================================================ */
+
+  body { background: var(--msv-beige); }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 var(--msv-s16) var(--msv-s32); }
+
+  .toc { position: sticky; top: 0; z-index: 5; margin: 0 calc(var(--msv-s16) * -1) var(--msv-s16); padding: var(--msv-s8) var(--msv-s16); background: var(--msv-beige); border-bottom: 1px solid var(--msv-n100); }
+  .toc__row { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+  .toc__row::-webkit-scrollbar { display: none; }
+  .toc a { flex: 0 0 auto; min-width: 34px; height: 30px; display: inline-flex; align-items: center; justify-content: center; font: 600 13px/1 var(--msv-font); color: var(--msv-graphite); background: var(--msv-white); border: 1.5px solid var(--msv-n300); border-radius: 15px; text-decoration: none; }
+  .toc a:hover { border-color: var(--msv-graphite); }
+
+  .v { padding-top: var(--msv-s32); scroll-margin-top: 56px; }
+  .v__num { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; margin-right: var(--msv-s8); font: 700 14px/1 var(--msv-font); color: var(--msv-white); background: var(--msv-graphite); border-radius: 50%; }
+  .v__head { display: flex; align-items: center; margin: 0 0 var(--msv-s4); }
+  .v__note { margin: 0 0 var(--msv-s16); color: var(--msv-n500); }
+  .g { display: grid; gap: var(--msv-s16); }
+  @media (min-width: 900px) { .g { grid-template-columns: repeat(3, 1fr); align-items: stretch; } }
+
+  /* ---------- общий скелет: ровно тот, что на боевой странице ---------- */
+
+  .res { display: flex; flex-direction: column; padding: var(--msv-s12) var(--msv-s12) var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r20); box-shadow: var(--msv-e1); }
+  .res__media { position: relative; }
+  .res__shots { display: flex; gap: 2px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; background: var(--msv-n100); border-radius: var(--msv-r12); }
+  .res__shots::-webkit-scrollbar { display: none; }
+  .res__shot { flex: 0 0 100%; scroll-snap-align: start; display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; background: var(--msv-n100); }
+  .res__noshot { flex: 0 0 100%; display: flex; align-items: center; justify-content: center; aspect-ratio: 16 / 10; padding: var(--msv-s16); font-size: var(--msv-note-size); color: var(--msv-n500); text-align: center; }
+  .res__zoom { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; color: var(--msv-graphite); background: rgba(255,255,255,.88); border-radius: 50%; box-shadow: 0 2px 10px rgba(22,32,47,.25); pointer-events: none; }
+  .res__dots { position: absolute; left: 0; right: 0; bottom: var(--msv-s8); display: flex; justify-content: center; gap: 5px; pointer-events: none; }
+  .res__dots i { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,.55); box-shadow: 0 1px 2px rgba(0,0,0,.35); }
+  .res__dots i.on { width: 16px; border-radius: 3px; background: var(--msv-white); }
+  .res__logo { position: absolute; left: 50%; bottom: -32px; transform: translateX(-50%); width: 64px; height: 64px; object-fit: cover; background: var(--msv-white); border-radius: 16px; box-shadow: 0 3px 12px rgba(22,32,47,.22); }
+  .res__body { display: flex; flex-direction: column; flex: 1 1 auto; padding-top: 40px; text-align: center; }
+  .res__kind { display: block; font: 600 10px/16px var(--msv-font); letter-spacing: .06em; text-transform: uppercase; color: var(--msv-n500); }
+  .res__name { margin: 0 0 var(--msv-s4); }
+  .res__metro { margin: 0; }
+  .res__addr { margin: 0 0 var(--msv-s4); }
+  .res__note { margin: 0; color: var(--msv-n500); }
+  .res__free { align-self: center; display: inline-flex; align-items: center; height: 28px; margin-top: var(--msv-s12); padding: 0 11px; font: 700 12px/1 var(--msv-font); letter-spacing: .04em; text-transform: uppercase; color: var(--msv-graphite); background: var(--msv-lime); border-radius: 6px; }
+  .res__free--none { color: var(--msv-white); background: var(--msv-graphite); }
+  .res__foot { margin-top: auto; padding-top: var(--msv-s12); border-top: 1px solid var(--msv-n100); }
+  .res__price { display: block; font-weight: 700; }
+  .res__price small { display: block; font-weight: 500; font-size: var(--msv-note-size); line-height: var(--msv-note-line); color: var(--msv-n500); }
+  .res__more { display: inline-block; margin: var(--msv-s8) 0 var(--msv-s12); font-size: var(--msv-note-size); }
+  .res__pick { display: block; width: 100%; }
+
+  /* =================== 1. Утверждённый — эталон =================== */
+
+  /* =================== 2. Знак кругом =================== */
+  .v2 .res__logo { border-radius: 50%; }
+
+  /* =================== 3. Знак крупнее и выше =================== */
+  .v3 .res__logo { width: 88px; height: 88px; border-radius: 22px; bottom: -44px; }
+  .v3 .res__body { padding-top: 54px; }
+
+  /* =================== 4. Знак слева, текст по левому краю =================== */
+  .v4 .res__logo { left: var(--msv-s12); transform: none; }
+  .v4 .res__body { text-align: left; }
+  .v4 .res__free { align-self: flex-start; }
+
+  /* =================== 5. Кадр квадратом =================== */
+  .v5 .res__shot, .v5 .res__noshot { aspect-ratio: 1 / 1; }
+
+  /* =================== 6. Кадр 4:3 =================== */
+  .v6 .res__shot, .v6 .res__noshot { aspect-ratio: 4 / 3; }
+
+  /* =================== 7. Фото без белых полей =================== */
+  .v7 .res { padding: 0 0 var(--msv-s16); overflow: hidden; }
+  .v7 .res__shots { border-radius: 0; }
+  .v7 .res__body { padding-left: var(--msv-s16); padding-right: var(--msv-s16); }
+
+  /* =================== 8. Без тени, тонкая рамка =================== */
+  .v8 .res { box-shadow: none; border: 1px solid var(--msv-n100); }
+
+  /* =================== 9. Метка мест поверх кадра =================== */
+  .v9 .res__free { position: absolute; right: var(--msv-s8); top: var(--msv-s8); margin: 0; z-index: 1; }
+  .v9 .res__body { position: static; }
+  .v9 .res { position: relative; }
+
+  /* =================== 10. Метка мест рядом с ценой =================== */
+  .v10 .res__free { order: 2; margin: 0; }
+  .v10 .res__foot { display: flex; align-items: center; justify-content: space-between; gap: var(--msv-s8); flex-wrap: wrap; }
+  .v10 .res__price { order: 1; }
+  .v10 .res__more { order: 3; flex: 1 1 100%; margin: var(--msv-s8) 0 var(--msv-s12); }
+  .v10 .res__pick { order: 4; flex: 1 1 100%; }
+
+  /* =================== 11. Цена заголовочным кеглем =================== */
+  .v11 .res__price { font: 700 var(--msv-sub-size)/var(--msv-sub-line) var(--msv-font); }
+
+  /* =================== 12. Цена и кнопка в одну строку =================== */
+  .v12 .res__foot { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: var(--msv-s12); }
+  .v12 .res__price { text-align: left; }
+  .v12 .res__pick { width: auto; }
+  .v12 .res__more { grid-column: 1 / -1; margin: 0; }
+
+  /* =================== 13. Кнопка не во всю ширину =================== */
+  .v13 .res__pick { display: inline-block; width: auto; min-width: 160px; }
+
+  /* =================== 14. Надкатегория под именем =================== */
+  .v14 .res__kind { order: 2; margin-top: var(--msv-s4); }
+  .v14 .res__name { order: 1; }
+  .v14 .res__metro { order: 3; }
+  .v14 .res__addr { order: 4; }
+  .v14 .res__note { order: 5; }
+  .v14 .res__free { order: 6; }
+  .v14 .res__foot { order: 7; }
+
+  /* =================== 15. Метро и адрес одной строкой =================== */
+  .v15 .res__metro { display: inline; }
+  .v15 .res__addr { display: inline; }
+  .v15 .res__metro::after { content: " · "; }
+
+  /* =================== 16. Подвал на бежевой подложке =================== */
+  .v16 .res__foot { margin-top: auto; padding: var(--msv-s12); border-top: 0; background: var(--msv-beige); border-radius: var(--msv-r12); }
+  .v16 .res__body { padding-bottom: 0; }
+
+  /* =================== 17. «Узнать больше» справа от цены =================== */
+  .v17 .res__foot { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: var(--msv-s12); }
+  .v17 .res__price { text-align: left; }
+  .v17 .res__more { margin: 0; }
+  .v17 .res__pick { grid-column: 1 / -1; margin-top: var(--msv-s12); }
+
+  /* =================== 18. Скругления лепестком =================== */
+  .v18 .res { border-radius: 32px 8px 32px 8px; }
+  .v18 .res__shots { border-radius: 24px 6px 24px 6px; }
+  .v18 .res__logo { border-radius: 18px 6px 18px 6px; }
+
+  /* =================== 19. Тёмная карточка =================== */
+  .v19 .res { background: var(--msv-graphite); color: var(--msv-white); }
+  .v19 .res__kind, .v19 .res__note, .v19 .res__price small { color: rgba(255,255,255,.7); }
+  .v19 .res__foot { border-top-color: rgba(255,255,255,.18); }
+  .v19 .res__addr a, .v19 .res__more { color: var(--msv-lime); text-decoration-color: var(--msv-lime); }
+
+  /* =================== 20. Плотная вёрстка =================== */
+  .v20 .res { padding: var(--msv-s8) var(--msv-s8) var(--msv-s12); }
+  .v20 .res__logo { width: 52px; height: 52px; border-radius: 13px; bottom: -26px; }
+  .v20 .res__body { padding-top: 32px; }
+  .v20 .res__free { margin-top: var(--msv-s8); height: 24px; }
+  .v20 .res__foot { padding-top: var(--msv-s8); }
+  .v20 .res__more { margin: var(--msv-s4) 0 var(--msv-s8); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="head">
+    <a class="head__back" href="residences.html" aria-label="Вернуться назад">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 6l-6 6 6 6"/>
+      </svg>
+    <span class="head__back-label form__back-label">Вернуться</span></a>
+    <h1 class="msv-sub head__title">Выбор резиденции: 20 близких вариантов</h1>
+  </div>
+
+  <p class="msv-body" style="margin:0 0 var(--msv-s16);color:var(--msv-n500)">Все двадцать — вокруг утверждённой карточки: тот же состав и тот же порядок сведений, меняется только оформление. Первый вариант — то, что стоит на сайте сейчас. Любой другой переносится заменой одного блока стилей.</p>
+
+  <nav class="toc" aria-label="Варианты"><div class="toc__row" id="toc"></div></nav>
+
+  <div id="all"></div>
+
+</div>
+
+<script src="photos.js"></script>
+<script src="residences.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var R = [
+    { id: 'forma', name: 'Forma', kind: 'Комфорт-резиденция', metro: 'Шаболовская', addr: 'Конный пер., 12',
+      note: 'Свои санузлы в части комнат, коворкинг, лаундж', logo: 'forma.png', beds: 57,
+      map: 'https://yandex.ru/maps/-/CTtSY62w' },
+    { id: 'uyut', name: 'Уют', kind: 'Эконом-резиденция', metro: 'Нагатинская', addr: 'Варшавское шоссе, 18к2',
+      note: 'Комнаты от двух до восьми мест, капсулы', logo: 'uyt.gif', beds: 78,
+      map: 'https://yandex.ru/maps/-/CTtSYE5l' },
+    { id: 'molod', name: 'Молодежка', kind: 'Квартира для девушек-студенток', metro: 'Молодежная', addr: 'ул. Партизанская, 40',
+      note: 'Три двухместные комнаты, только девушки', logo: 'molodejka.png', beds: 6,
+      map: 'https://yandex.ru/maps/-/CTtSaI6E' }
+  ];
+  var PRICE = {}, FREE = {};
+
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function money(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' руб.'; }
+  function places(n) { var a = n % 10, b = n % 100; if (b > 10 && b < 20) return 'мест'; if (a === 1) return 'место'; if (a >= 2 && a <= 4) return 'места'; return 'мест'; }
+
+  function minPrice(r) {
+    if (PRICE[r.id]) return PRICE[r.id];
+    var list = window.MSV_RESIDENCES || [];
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].id !== r.id) continue;
+      var min = null;
+      (list[i].beds || []).forEach(function (b) { if (b.price > 0 && (min === null || b.price < min)) min = b.price; });
+      if (min) return min;
+    }
+    return 0;
+  }
+  function hasShots(r) { return !!(window.MSV_PHOTOS && MSV_PHOTOS.all(r.id).length); }
+
+  function shots(r) {
+    var ph = (window.MSV_PHOTOS ? MSV_PHOTOS.all(r.id) : []).slice(0, 8);
+    if (!ph.length) return '<span class="res__noshot">Фотографии этой резиденции скоро появятся</span>';
+    return ph.map(function (p, i) {
+      return '<img class="res__shot" src="' + esc(p.src) + '" alt="' + esc(p.alt) + '" loading="lazy" decoding="async" data-zoom>';
+    }).join('');
+  }
+  function dots(r) {
+    var n = Math.min(8, (window.MSV_PHOTOS ? MSV_PHOTOS.all(r.id).length : 0));
+    if (n < 2) return '';
+    var out = '';
+    for (var i = 0; i < n; i++) out += '<i' + (i ? '' : ' class="on"') + '></i>';
+    return '<span class="res__dots" aria-hidden="true">' + out + '</span>';
+  }
+  function freeBadge(r) {
+    var f = FREE[r.id];
+    if (f === undefined) return '';
+    return f > 0
+      ? '<span class="res__free">' + f + ' ' + places(f) + '</span>'
+      : '<span class="res__free res__free--none">мест нет</span>';
+  }
+
+  var ZOOM = '<span class="res__zoom"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/><path d="M8.5 11h5"/><path d="M11 8.5v5"/></svg></span>';
+
+  /* Разметка одна на все двадцать: отличается только класс варианта снаружи */
+  function card(r) {
+    return '<article class="res" data-res="' + esc(r.id) + '">' +
+      '<div class="res__media">' +
+        '<div class="res__shots" data-shots data-gallery="' + esc(r.id) + '">' + shots(r) + '</div>' +
+        (hasShots(r) ? ZOOM : '') + dots(r) +
+        '<img class="res__logo" src="' + esc(r.logo) + '" alt="Знак резиденции ' + esc(r.name) + '">' +
+      '</div>' +
+      '<div class="res__body">' +
+        '<span class="res__kind">' + esc(r.kind) + '</span>' +
+        '<h3 class="msv-sub res__name">' + esc(r.name) + '</h3>' +
+        '<p class="msv-body res__metro">м. ' + esc(r.metro) + '</p>' +
+        '<p class="msv-body res__addr"><a class="msv-link" href="' + esc(r.map) + '" target="_blank" rel="noopener">' + esc(r.addr) + '</a></p>' +
+        '<p class="msv-note res__note">' + esc(r.note) + '</p>' +
+        freeBadge(r) +
+        '<div class="res__foot">' +
+          '<span class="msv-body res__price">от ' + money(minPrice(r)) + '<small>в месяц</small></span>' +
+          '<a class="msv-link res__more" href="residence.html?id=' + esc(r.id) + '">Узнать больше</a>' +
+          '<a class="msv-btn msv-btn--m msv-btn--primary res__pick" href="rooms.html?res=' + esc(r.id) + '">Выбрать</a>' +
+        '</div>' +
+      '</div>' +
+    '</article>';
+  }
+
+  var V = [
+    ['Утверждённый — как сейчас на сайте', 'Знак квадратом со скруглением, всё по центру, кнопка во всю ширину карточки.'],
+    ['Знак кругом', 'То же самое, но знак круглый — мягче и ближе к аватару.'],
+    ['Знак крупнее и выше', 'Знак 88 пикселей вместо 64: сильнее заявляет резиденцию, текста видно меньше.'],
+    ['Знак слева, текст по левому краю', 'Выключка влево — привычнее для чтения, центр остаётся только у кнопки.'],
+    ['Кадр квадратом', 'Фотография 1:1: карточка выше, снимок крупнее.'],
+    ['Кадр 4:3', 'Чуть выше обычного 16:10 — компромисс между квадратом и панорамой.'],
+    ['Фото без белых полей', 'Снимок во всю ширину карточки, паспарту убрано — плотнее и современнее.'],
+    ['Без тени, тонкая рамка', 'Карточка не «парит», а очерчена линией. Строже и спокойнее.'],
+    ['Метка мест поверх кадра', 'Свободные места видно сразу, не опускаясь к тексту.'],
+    ['Метка мест рядом с ценой', 'Все числа собраны внизу: сколько мест и почём.'],
+    ['Цена заголовочным кеглем', 'Цена набрана крупно — главный довод на виду.'],
+    ['Цена и кнопка в одну строку', 'Подвал в две колонки: слева цена, справа «Выбрать».'],
+    ['Кнопка не во всю ширину', 'Кнопка по содержанию — карточка выглядит легче.'],
+    ['Надкатегория под именем', 'Сначала имя, потом «комфорт-резиденция»: имя читается первым.'],
+    ['Метро и адрес одной строкой', 'Экономит строку, карточка короче.'],
+    ['Подвал на бежевой подложке', 'Цена и кнопка отделены не линией, а цветом.'],
+    ['«Узнать больше» справа от цены', 'Две ссылки не выстраиваются в столбик, подвал компактнее.'],
+    ['Скругления лепестком', 'Радиусы 32/8 по диагонали — фирменная форма из брендбука.'],
+    ['Тёмная карточка', 'Графитовая подложка, как у плитки события на главной. Фотографии звучат ярче.'],
+    ['Плотная вёрстка', 'Отступы и знак меньше: на экран помещается больше резиденций.']
+  ];
+
+  var all = document.getElementById('all'), toc = document.getElementById('toc');
+  function render() {
+    all.innerHTML = V.map(function (v, i) {
+      return '<section class="v v' + (i + 1) + '" id="v' + (i + 1) + '">' +
+        '<p class="v__head"><span class="v__num">' + (i + 1) + '</span><span class="msv-sub">' + v[0] + '</span></p>' +
+        '<p class="msv-note v__note">' + v[1] + '</p>' +
+        '<div class="g">' + R.map(card).join('') + '</div>' +
+      '</section>';
+    }).join('');
+  }
+  toc.innerHTML = V.map(function (v, i) { return '<a href="#v' + (i + 1) + '" title="' + esc(v[0]) + '">' + (i + 1) + '</a>'; }).join('');
+  render();
+
+  /* Цены и свободные места — те же запросы, что на боевой странице */
+  if (location.protocol !== 'file:') {
+    fetch('/api/residences', { credentials: 'same-origin' })
+      .then(function (r) { return r.status === 200 ? r.json() : null; })
+      .then(function (data) {
+        if (!data) return;
+        data.forEach(function (res) {
+          var min = null, n = 0;
+          (res.beds || []).forEach(function (b) { n++; if (b.price > 0 && (min === null || b.price < min)) min = b.price; });
+          PRICE[res.id] = min;
+          var row = R.filter(function (x) { return x.id === res.id; })[0];
+          if (row && n) row.beds = n;
+        });
+        render();
+        return Promise.all(R.map(function (r) {
+          return fetch('/api/occupancy?res=' + r.id, { credentials: 'same-origin' })
+            .then(function (x) { return x.status === 200 ? x.json() : null; })
+            .then(function (d) { if (d) FREE[r.id] = Math.max(0, r.beds - d.busy.length); })
+            .catch(function () {});
+        })).then(render);
+      })
+      .catch(function () {});
+  }
+})();
+</script>
+<script src="mark.js"></script>
+<script src="zoom.js"></script>
+<script src="protect.js"></script>
+
+</body>
+</html>

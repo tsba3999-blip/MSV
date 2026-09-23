@@ -18,10 +18,13 @@
      крупный и по центру, наезжает на нижний край кадра; под ним
      название, метро с адресом, свободные места и цена — всё по центру.
 
-     Отдельной кнопки нет: вся карточка — ссылка на выбор места, как
-     плитки на главной. Щелчок по самой фотографии открывает просмотр
-     всех снимков резиденции и на выбор места не уводит.
-     Цены и свободные места приходят с сервера.
+     Внизу карточки — «Узнать больше» (страница резиденции) и красная
+     кнопка «Выбрать» (выбор места). Карточка не ссылка целиком: в ней
+     три разных перехода — адрес открывает карту, фотография открывает
+     просмотр снимков, кнопка ведёт к выбору места.
+     Цены и свободные места приходят с сервера; пока сервер не ответил,
+     цена берётся из справочника residences.js, а не заменяется словами
+     «уточняется» (решение заказчика 23.09.2026).
      ============================================================ */
   .page { padding-bottom: var(--msv-s32); }
 
@@ -50,7 +53,22 @@
   .res__dots i { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,.55); box-shadow: 0 1px 2px rgba(0,0,0,.35); transition: width var(--msv-fast) var(--msv-ease), background var(--msv-fast) var(--msv-ease); }
   .res__dots i.on { width: 16px; border-radius: 3px; background: var(--msv-white); }
 
-  /* знак — крупный, по центру, наезжает на край кадра */
+  /* Лупа по центру кадра: подсказка, что фотографии открываются крупно.
+     Щелчок проходит сквозь неё на саму фотографию. */
+  .res__zoom {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    display: flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px;
+    color: var(--msv-graphite);
+    background: rgba(255,255,255,.88);
+    border-radius: 50%;
+    box-shadow: 0 2px 10px rgba(22,32,47,.25);
+    pointer-events: none;
+  }
+
+  /* знак — крупный, по центру, наезжает на край кадра; белых полей нет */
   .res__logo {
     position: absolute;
     left: 50%;
@@ -60,7 +78,6 @@
     height: 64px;
     object-fit: cover;
     background: var(--msv-white);
-    border: 3px solid var(--msv-white);
     border-radius: 16px;
     box-shadow: 0 3px 12px rgba(22,32,47,.22);
   }
@@ -68,7 +85,8 @@
   .res__body { padding-top: 40px; text-align: center; }
   .res__kind { display: block; font: 600 10px/16px var(--msv-font); letter-spacing: .06em; text-transform: uppercase; color: var(--msv-n500); }
   .res__name { margin: 0 0 var(--msv-s4); }
-  .res__where { margin: 0 0 var(--msv-s4); }
+  .res__metro { margin: 0; }
+  .res__addr { margin: 0 0 var(--msv-s4); }
   .res__note { margin: 0; color: var(--msv-n500); }
 
   /* свободные места: лаймовая метка, «мест нет» — графитовая */
@@ -76,9 +94,10 @@
   .res__free--none { color: var(--msv-white); background: var(--msv-graphite); }
 
   .res__foot { margin-top: var(--msv-s12); padding-top: var(--msv-s12); border-top: 1px solid var(--msv-n100); }
-  .res__price { font-weight: 700; }
+  .res__price { display: block; font-weight: 700; }
   .res__price small { display: block; font-weight: 500; font-size: var(--msv-note-size); line-height: var(--msv-note-line); color: var(--msv-n500); }
-  .res__map { display: inline-flex; align-items: center; gap: 4px; margin-top: var(--msv-s12); font-size: var(--msv-note-size); cursor: pointer; }
+  .res__more { display: inline-block; margin: var(--msv-s8) 0 var(--msv-s12); font-size: var(--msv-note-size); }
+  .res__pick { display: block; width: 100%; }
 
   /* На мониторе колонка шире обычных 460 пикселей: трём карточкам в ряд
      нужно место, иначе они сжимаются (решение заказчика 23.09.2026).
@@ -119,6 +138,7 @@
 </div>
 
 <script src="photos.js"></script>
+<script src="residences.js"></script>
 <script>
 (function () {
   'use strict';
@@ -139,6 +159,22 @@
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
   function money(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' руб.'; }
   function places(n) { var a = n % 10, b = n % 100; if (b > 10 && b < 20) return 'мест'; if (a === 1) return 'место'; if (a >= 2 && a <= 4) return 'места'; return 'мест'; }
+
+  /* Самая низкая цена резиденции. Пока сервер не ответил, берём её из
+     справочника residences.js — он лежит рядом и всегда под рукой. */
+  function minPrice(r) {
+    if (PRICE[r.id]) return PRICE[r.id];
+    var list = window.MSV_RESIDENCES || [];
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].id !== r.id) continue;
+      var min = null;
+      (list[i].beds || []).forEach(function (b) { if (b.price > 0 && (min === null || b.price < min)) min = b.price; });
+      if (min) return min;
+    }
+    return 0;
+  }
+
+  function hasShots(r) { return !!(window.MSV_PHOTOS && MSV_PHOTOS.all(r.id).length); }
 
   function shots(r) {
     var ph = (window.MSV_PHOTOS ? MSV_PHOTOS.all(r.id) : []).slice(0, 8);
@@ -162,25 +198,31 @@
       : '<span class="res__free res__free--none">мест нет</span>';
   }
 
+  var ZOOM = '<span class="res__zoom"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/><path d="M8.5 11h5"/><path d="M11 8.5v5"/></svg></span>';
+
   function card(r) {
-    return '<a class="res" data-res="' + esc(r.id) + '" href="rooms.html?res=' + esc(r.id) + '">' +
+    var p = minPrice(r);
+    return '<article class="res" data-res="' + esc(r.id) + '">' +
       '<div class="res__media">' +
         '<div class="res__shots" data-shots data-gallery="' + esc(r.id) + '">' + shots(r) + '</div>' +
+        (hasShots(r) ? ZOOM : '') +
         dots(r) +
         '<img class="res__logo" src="' + esc(r.logo) + '" alt="Знак резиденции ' + esc(r.name) + '">' +
       '</div>' +
       '<div class="res__body">' +
         '<span class="res__kind">' + esc(r.kind) + '</span>' +
         '<h2 class="msv-sub res__name">' + esc(r.name) + '</h2>' +
-        '<p class="msv-body res__where">метро ' + esc(r.metro) + ' · ' + esc(r.addr) + '</p>' +
+        '<p class="msv-body res__metro">м. ' + esc(r.metro) + '</p>' +
+        '<p class="msv-body res__addr"><a class="msv-link" href="' + esc(r.map) + '" target="_blank" rel="noopener">' + esc(r.addr) + '</a></p>' +
         '<p class="msv-note res__note">' + esc(r.note) + '</p>' +
         freeBadge(r) +
         '<div class="res__foot">' +
-          '<span class="msv-body res__price">' + (PRICE[r.id] ? 'от ' + money(PRICE[r.id]) + '<small>в месяц</small>' : 'цена уточняется') + '</span>' +
+          '<span class="msv-body res__price">от ' + money(p) + '<small>в месяц</small></span>' +
+          '<a class="msv-link res__more" href="residence.html?id=' + esc(r.id) + '">Узнать больше</a>' +
+          '<a class="msv-btn msv-btn--m msv-btn--primary res__pick" href="rooms.html?res=' + esc(r.id) + '">Выбрать</a>' +
         '</div>' +
-        '<span class="msv-link res__map" role="button" tabindex="0" data-map="' + esc(r.map) + '">посмотреть на карте</span>' +
       '</div>' +
-    '</a>';
+    '</article>';
   }
 
   var list = document.getElementById('list');
@@ -194,19 +236,6 @@
     var dd = box.parentNode.querySelectorAll('.res__dots i');
     dd.forEach(function (d, j) { d.classList.toggle('on', j === i); });
   }, true);
-
-  /* «Посмотреть на карте» лежит внутри карточки-ссылки, поэтому щелчок
-     по нему останавливаем: карта открывается, на выбор места не уходим */
-  function openMap(e) {
-    var m = e.target.closest('[data-map]'); if (!m) return;
-    e.preventDefault(); e.stopPropagation();
-    window.open(m.dataset.map, '_blank', 'noopener');
-  }
-  list.addEventListener('click', openMap);
-  list.addEventListener('keydown', function (e) {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    openMap(e);
-  });
 
   /* Цены и свободные места — с сервера */
   if (location.protocol !== 'file:') {

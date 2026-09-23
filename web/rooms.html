@@ -56,6 +56,8 @@
     </div>
   </div>
 
+  <p class="msv-note" id="soonNote" hidden style="margin:0 0 var(--msv-s12);padding-left:var(--msv-s16);color:var(--msv-red)"></p>
+
   <div id="list" aria-live="polite"></div>
 
 </div>
@@ -84,6 +86,7 @@
       (d.busy || []).forEach(function (id) { window.__BUSY__[id] = true; });
       // Места, которые ещё заняты, но уже выставлены в продажу: значение — дата заезда
       window.__SOON__ = d.soon || {};
+      window.__SOON_DAYS__ = d.soonDays || 90;
     }
   } catch (e) {}
 })();
@@ -211,6 +214,8 @@ MSV.ready(function (ctx) {
     return html;
   }
 
+  var SOON_DAYS = window.__SOON_DAYS__ || 90;
+
   /* «2026-10-15» → «15 октября» */
   var MONTHS_R = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
   function dayMonth(iso) {
@@ -219,6 +224,14 @@ MSV.ready(function (ctx) {
   }
 
   function render() {
+    /* Под красным фильтром говорим, за какой срок показываем выезды:
+       иначе непонятно, почему видно не все занятые места */
+    var sn = document.getElementById('soonNote');
+    if (filter.free === 'soon') {
+      sn.textContent = 'Места, которые освобождаются в ближайшие ' + SOON_DAYS + ' дней. Дата выезда указана в строке места — заехать можно с неё.';
+      sn.hidden = false;
+    } else { sn.hidden = true; }
+
     var rooms = ROOMS.filter(function (r) {
       if (filter.sex && r.sex !== filter.sex) return false;
       if (filter.size && String(r.size) !== filter.size) return false;
@@ -269,7 +282,7 @@ MSV.ready(function (ctx) {
         (r.text ? '<p class="msv-body room__text">' + esc(r.text) + '</p>' : '') +
         '<div class="room__shots" data-gallery="' + esc(r.resId) + '">' + shots(r, ri) + '</div>' +
         '<div class="room__prices">' + prices + '</div>' +
-        '<p class="msv-note room__terms">Цены при условии оплаты по СБП и заключении «годового контракта» (проживание и оплаты без перерыва минимум до конца августа).</p>' +
+        '<p class="msv-note room__terms">Цены указаны минимальные при условии оплаты по СБП и заключении «годового контракта» уже со скидкой 30% от розничной цены (проживание и оплаты без перерыва минимум до конца августа).</p>' +
       '</article>';
     }).join('');
   }

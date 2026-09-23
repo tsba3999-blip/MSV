@@ -67,16 +67,26 @@ module.exports = function register(route) {
     if (!s) return fail(res, 401, 'Не выполнен вход');
     const resId = String(req.query.res || '');
     const r = await query(`
-      SELECT b.bed_id, b.release_from FROM bookings b
+      SELECT b.bed_id, b.release_from, b.date_to FROM bookings b
       JOIN beds bd ON bd.id = b.bed_id
       JOIN rooms rm ON rm.id = bd.room_id
       WHERE b.date_from <= CURRENT_DATE AND b.date_to >= CURRENT_DATE
         AND ($1::text = '' OR rm.residence_id = $1)`, [resId]);
-    /* busy — занято сейчас; soon — занято, но модератор уже выставил
-       место в продажу и указал, с какой даты можно заезжать */
+
+    /* busy — занято сейчас.
+       soon — занято, но уже известно, когда освободится. Дата берётся сама
+       из даты выезда, которую модератор поставил резиденту (решение заказчика
+       23.09.2026). Годовые контракты сюда не попадают: показываем только то,
+       что освобождается в ближайшие SOON_DAYS дней. Поле release_from —
+       ручная пометка модератора, она главнее расчётной даты. */
+    const SOON_DAYS = 90;
+    const horizon = new Date(Date.now() + SOON_DAYS * 86400000);
     const soon = {};
-    r.rows.forEach((x) => { if (x.release_from) soon[x.bed_id] = isoDate(x.release_from); });
-    json(res, 200, { busy: r.rows.map((x) => x.bed_id), soon });
+    r.rows.forEach((x) => {
+      if (x.release_from) { soon[x.bed_id] = isoDate(x.release_from); return; }
+      if (x.date_to && new Date(x.date_to) <= horizon) soon[x.bed_id] = isoDate(x.date_to);
+    });
+    json(res, 200, { busy: r.rows.map((x) => x.bed_id), soon, soonDays: SOON_DAYS });
   });
 
   /* ---------- Шахматка одной резиденции ---------- */

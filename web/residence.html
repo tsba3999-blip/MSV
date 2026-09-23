@@ -1,0 +1,168 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Сайт и его программное обеспечение охраняются ГК РФ (ст. 1259, 1261). Копирование без разрешения правообладателя запрещено. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#F5F1EA">
+<title>О резиденции — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="resident.css">
+<style>
+  /* ============================================================
+     Страница резиденции — заготовка (23.09.2026).
+
+     Сюда ведёт ссылка «Узнать больше» с выбора резиденции. Пока это
+     рыба: настоящие тексты заказчик напишет позже, и они встанут
+     вместо пометок «текст появится». Всё, что уже есть в системе —
+     имя, адрес, знак, фотографии, цена, свободные места — берётся
+     из тех же источников, что и на выборе резиденции, и выдумывать
+     его не нужно.
+     ============================================================ */
+  .page { padding-bottom: var(--msv-s32); }
+
+  .hero { position: relative; margin: 0 0 var(--msv-s16); border-radius: var(--msv-r20); overflow: hidden; background: var(--msv-n100); }
+  .hero__shots { display: flex; gap: 2px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+  .hero__shots::-webkit-scrollbar { display: none; }
+  .hero__shot { flex: 0 0 100%; scroll-snap-align: start; display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+  .hero__none { display: flex; align-items: center; justify-content: center; aspect-ratio: 16 / 9; padding: var(--msv-s16); color: var(--msv-n500); font-size: var(--msv-note-size); text-align: center; }
+  .hero__zoom { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; color: var(--msv-graphite); background: rgba(255,255,255,.88); border-radius: 50%; box-shadow: 0 2px 10px rgba(22,32,47,.25); pointer-events: none; }
+
+  .top { display: flex; align-items: center; gap: var(--msv-s12); margin: 0 0 var(--msv-s16); }
+  .top__logo { flex: 0 0 auto; width: 64px; height: 64px; object-fit: cover; background: var(--msv-white); border-radius: 16px; }
+  .top__text { flex: 1 1 auto; min-width: 0; }
+  .top__kind { display: block; font: 600 10px/16px var(--msv-font); letter-spacing: .06em; text-transform: uppercase; color: var(--msv-n500); }
+  .top__name { margin: 0; }
+
+  .facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--msv-s8); margin: 0 0 var(--msv-s16); }
+  .fact { padding: var(--msv-s12); background: var(--msv-white); border-radius: var(--msv-r12); box-shadow: var(--msv-e1); }
+  .fact span { display: block; font-size: var(--msv-note-size); color: var(--msv-n500); }
+  .fact b { display: block; margin-top: 2px; font-weight: 700; }
+
+  .sect { margin: 0 0 var(--msv-s16); padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r12); box-shadow: var(--msv-e1); }
+  .sect__title { margin: 0 0 var(--msv-s8); }
+  .sect p { margin: 0 0 var(--msv-s8); }
+  .sect p:last-child { margin-bottom: 0; }
+  /* Пометка «здесь будет настоящий текст» — чтобы рыбу не приняли за готовое */
+  .todo { color: var(--msv-n500); font-style: italic; }
+
+  .foot { display: flex; flex-direction: column; gap: var(--msv-s8); }
+
+  @media (min-width: 768px) { .page { max-width: 640px; } }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="head">
+    <a class="head__back" href="residences.html" aria-label="Вернуться назад">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 6l-6 6 6 6"/>
+      </svg>
+    <span class="head__back-label form__back-label">Вернуться</span></a>
+    <h1 class="msv-sub head__title" id="title">О резиденции</h1>
+  </div>
+
+  <div id="body"></div>
+
+</div>
+
+<script src="photos.js"></script>
+<script src="residences.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* Те же сведения, что на выборе резиденции: держим их в одном месте,
+     чтобы адрес и метро не разъехались между двумя страницами. */
+  var R = {
+    forma: { name: 'Forma', kind: 'Комфорт-резиденция', metro: 'Шаболовская', addr: 'Конный пер., 12',
+      logo: 'forma.png', map: 'https://yandex.ru/maps/-/CTtSY62w' },
+    uyut:  { name: 'Уют', kind: 'Эконом-резиденция', metro: 'Нагатинская', addr: 'Варшавское шоссе, 18к2',
+      logo: 'uyt.gif', map: 'https://yandex.ru/maps/-/CTtSYE5l' },
+    molod: { name: 'Молодежка', kind: 'Квартира для девушек-студенток', metro: 'Молодежная', addr: 'ул. Партизанская, 40',
+      logo: 'molodejka.png', map: 'https://yandex.ru/maps/-/CTtSaI6E' }
+  };
+
+  var id = new URLSearchParams(location.search).get('id') || 'forma';
+  var r = R[id] || R.forma;
+
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function money(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' руб.'; }
+
+  /* Комнаты, места и цены — из справочника: их не нужно сочинять */
+  var src = (window.MSV_RESIDENCES || []).filter(function (x) { return x.id === id; })[0];
+  var rooms = src ? src.rooms.length : 0;
+  var beds = src ? src.beds.length : 0;
+  var min = null;
+  if (src) src.beds.forEach(function (b) { if (b.price > 0 && (min === null || b.price < min)) min = b.price; });
+
+  var ph = (window.MSV_PHOTOS ? MSV_PHOTOS.all(id) : []);
+  var hero = ph.length
+    ? '<div class="hero__shots" data-gallery="' + esc(id) + '">' + ph.slice(0, 8).map(function (p, i) {
+        return '<img class="hero__shot" src="' + esc(p.src) + '" alt="' + esc(p.alt) + '" loading="' + (i ? 'lazy' : 'eager') + '" data-zoom>';
+      }).join('') + '</div>' +
+      '<span class="hero__zoom"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/><path d="M8.5 11h5"/><path d="M11 8.5v5"/></svg></span>'
+    : '<div class="hero__none">Фотографии этой резиденции скоро появятся</div>';
+
+  document.title = 'Резиденция ' + r.name + ' — МСВ';
+  document.getElementById('title').textContent = r.name;
+
+  document.getElementById('body').innerHTML =
+    '<div class="hero">' + hero + '</div>' +
+
+    '<div class="top">' +
+      '<img class="top__logo" src="' + esc(r.logo) + '" alt="Знак резиденции ' + esc(r.name) + '">' +
+      '<span class="top__text">' +
+        '<span class="top__kind">' + esc(r.kind) + '</span>' +
+        '<span class="msv-sub top__name">' + esc(r.name) + '</span>' +
+        '<span class="msv-body">м. ' + esc(r.metro) + '</span><br>' +
+        '<a class="msv-link" href="' + esc(r.map) + '" target="_blank" rel="noopener">' + esc(r.addr) + '</a>' +
+      '</span>' +
+    '</div>' +
+
+    '<div class="facts">' +
+      '<div class="fact"><span>Комнат</span><b>' + (rooms || '—') + '</b></div>' +
+      '<div class="fact"><span>Мест</span><b>' + (beds || '—') + '</b></div>' +
+      '<div class="fact"><span>Цена</span><b>' + (min ? 'от ' + money(min) : '—') + '</b></div>' +
+      '<div class="fact"><span>Метро</span><b>' + esc(r.metro) + '</b></div>' +
+    '</div>' +
+
+    '<section class="sect">' +
+      '<h2 class="msv-sub sect__title">Про это место</h2>' +
+      '<p class="msv-body todo">Здесь будет рассказ резиденции: чем она отличается от двух других, кто тут живёт, какая атмосфера. Текст напишет МСВ.</p>' +
+    '</section>' +
+
+    '<section class="sect">' +
+      '<h2 class="msv-sub sect__title">Что внутри</h2>' +
+      '<p class="msv-body todo">Кухня, душевые, прачечная, коворкинг, багажная комната — список удобств именно этой резиденции. Текст напишет МСВ.</p>' +
+    '</section>' +
+
+    '<section class="sect">' +
+      '<h2 class="msv-sub sect__title">Как добраться</h2>' +
+      '<p class="msv-body">Метро ' + esc(r.metro) + ', ' + esc(r.addr) + '. <a class="msv-link" href="' + esc(r.map) + '" target="_blank" rel="noopener">Открыть на карте</a></p>' +
+      '<p class="msv-body todo">Сколько идти от метро, какой автобус, где вход — допишет МСВ.</p>' +
+    '</section>' +
+
+    '<section class="sect">' +
+      '<h2 class="msv-sub sect__title">Правила этого дома</h2>' +
+      '<p class="msv-body">Общие правила сети — в разделе <a class="msv-link" href="doc-rules.html">Правила проживания</a>.</p>' +
+      '<p class="msv-body todo">Особенности именно этой резиденции допишет МСВ.</p>' +
+    '</section>' +
+
+    '<div class="foot">' +
+      '<a class="msv-btn msv-btn--m msv-btn--primary" href="rooms.html?res=' + esc(id) + '">Выбрать место</a>' +
+      '<a class="msv-btn msv-btn--m msv-btn--tertiary" href="residences.html">Другие резиденции</a>' +
+    '</div>';
+})();
+</script>
+<script src="mark.js"></script>
+<script src="zoom.js"></script>
+<script src="edit.js"></script>
+<script src="protect.js"></script>
+
+</body>
+</html>
