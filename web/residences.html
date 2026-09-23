@@ -83,21 +83,40 @@
   }
 
   .res__body { padding-top: 40px; text-align: center; }
-  .res__kind { display: block; font: 600 10px/16px var(--msv-font); letter-spacing: .06em; text-transform: uppercase; color: var(--msv-n500); }
+  /* Надкатегория — фирменным лепестком (радиусы 24/8 по диагонали).
+     У всех трёх резиденций лепесток одинаковый; метка свободных мест —
+     зеркальный, чтобы две плашки не сливались (решение заказчика 23.09.2026) */
+  .res__kind {
+    align-self: center;
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    margin-bottom: var(--msv-s8);
+    padding: 0 14px;
+    font: 600 11px/1 var(--msv-font);
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--msv-graphite);
+    background: var(--msv-n100);
+    border-radius: 24px 8px 24px 8px;
+  }
   .res__name { margin: 0 0 var(--msv-s4); }
   .res__metro { margin: 0; }
   .res__addr { margin: 0 0 var(--msv-s4); }
   .res__note { margin: 0; color: var(--msv-n500); }
 
   /* свободные места: лаймовая метка, «мест нет» — графитовая */
-  .res__free { display: inline-flex; align-items: center; height: 28px; margin-top: var(--msv-s12); padding: 0 11px; font: 700 12px/1 var(--msv-font); letter-spacing: .04em; text-transform: uppercase; color: var(--msv-graphite); background: var(--msv-lime); border-radius: 6px; }
+  .res__free { align-self: center; display: inline-flex; align-items: center; min-height: 28px; margin-top: var(--msv-s12); padding: 0 14px; font: 700 12px/1 var(--msv-font); letter-spacing: .04em; text-transform: uppercase; color: var(--msv-graphite); background: var(--msv-lime); border-radius: 8px 24px 8px 24px; }
   .res__free--none { color: var(--msv-white); background: var(--msv-graphite); }
 
   .res__foot { margin-top: var(--msv-s12); padding-top: var(--msv-s12); border-top: 1px solid var(--msv-n100); }
   .res__price { display: block; font-weight: 700; }
   .res__price small { display: block; font-weight: 500; font-size: var(--msv-note-size); line-height: var(--msv-note-line); color: var(--msv-n500); }
   .res__more { display: inline-block; margin: var(--msv-s8) 0 var(--msv-s12); font-size: var(--msv-note-size); }
-  .res__pick { display: block; width: 100%; }
+  /* Кнопка — обычная фирменная во всю ширину (.msv-btn--block). Надпись
+     по центру: короткое слово у левого края широкой капсулы выглядело
+     сломанным (решение заказчика 23.09.2026) */
+  .res__pick { justify-content: center; }
 
   /* На мониторе колонка шире обычных 460 пикселей: трём карточкам в ряд
      нужно место, иначе они сжимаются (решение заказчика 23.09.2026).
@@ -145,13 +164,13 @@
 
   var R = [
     { id: 'forma', name: 'Forma', kind: 'Комфорт-резиденция', metro: 'Шаболовская', addr: 'Конный пер., 12',
-      note: 'Свои санузлы в части комнат, коворкинг, лаундж', logo: 'forma.png', beds: 57,
+      note: '1-, 2-, 4-, 8-местные номера в т.ч. со своим су и душем', logo: 'forma.png', beds: 57,
       map: 'https://yandex.ru/maps/-/CTtSY62w' },
     { id: 'uyut', name: 'Уют', kind: 'Эконом-резиденция', metro: 'Нагатинская', addr: 'Варшавское шоссе, 18к2',
-      note: 'Комнаты от двух до восьми мест, капсулы', logo: 'uyt.gif', beds: 78,
+      note: '2, 4, 6, 8-местные номера и капсулы', logo: 'uyt.gif', beds: 78,
       map: 'https://yandex.ru/maps/-/CTtSYE5l' },
     { id: 'molod', name: 'Молодежка', kind: 'Квартира для девушек-студенток', metro: 'Молодежная', addr: 'ул. Партизанская, 40',
-      note: 'Три двухместные комнаты, только девушки', logo: 'molodejka.png', beds: 6,
+      note: 'Большая 3-комнатная квартира в престижном районе', logo: 'molodejka.png', beds: 6,
       map: 'https://yandex.ru/maps/-/CTtSaI6E' }
   ];
   var PRICE = {}, FREE = {};
@@ -219,7 +238,7 @@
         '<div class="res__foot">' +
           '<span class="msv-body res__price">от ' + money(p) + '<small>в месяц</small></span>' +
           '<a class="msv-link res__more" href="residence.html?id=' + esc(r.id) + '">Узнать больше</a>' +
-          '<a class="msv-btn msv-btn--m msv-btn--primary res__pick" href="rooms.html?res=' + esc(r.id) + '">Выбрать</a>' +
+          '<a class="msv-btn msv-btn--m msv-btn--primary msv-btn--block res__pick" href="rooms.html?res=' + esc(r.id) + '">Выбрать</a>' +
         '</div>' +
       '</div>' +
     '</article>';
