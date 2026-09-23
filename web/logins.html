@@ -1,0 +1,105 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#F5F1EA">
+<title>История входов — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="resident.css">
+<style>
+  .log__item { display: flex; align-items: flex-start; gap: var(--msv-s12); padding: var(--msv-s12) var(--msv-s16); border-bottom: 1px solid var(--msv-n100); }
+  .log__item:last-child { border-bottom: 0; }
+  .log__mark { flex: 0 0 auto; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--msv-lime); color: var(--msv-graphite); }
+  .log__mark--bad { background: var(--msv-n100); color: var(--msv-red); }
+  .log__body { flex: 1 1 auto; min-width: 0; }
+  .log__when { display: block; font-weight: 600; }
+  .log__what { display: block; color: var(--msv-n500); overflow-wrap: anywhere; }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="head">
+    <a class="head__back" href="menu.html" aria-label="Вернуться назад">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 6l-6 6 6 6"/>
+      </svg>
+    <span class="head__back-label">Вернуться</span></a>
+    <h1 class="msv-sub head__title">История входов</h1>
+  </div>
+
+  <p class="msv-body" style="margin:0 0 var(--msv-s16);color:var(--msv-n500)">Последние входы в твой кабинет. Если видишь вход, которого не совершал, — сразу смени код и напиши модератору.</p>
+
+  <div class="rows" id="list"></div>
+
+  <div class="foot">
+    <a class="msv-btn msv-btn--block msv-btn--secondary" href="pin.html">Сменить код входа</a>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  function when(iso) {
+    var d = new Date(iso); if (isNaN(d)) return '';
+    var hh = ('0' + d.getHours()).slice(-2), mm = ('0' + d.getMinutes()).slice(-2);
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    var day = new Date(d); day.setHours(0, 0, 0, 0);
+    var diff = Math.round((today - day) / 86400000);
+    var date = diff === 0 ? 'сегодня' : diff === 1 ? 'вчера' : d.getDate() + ' ' + MONTHS[d.getMonth()];
+    return date + ', ' + hh + ':' + mm;
+  }
+  /* Из строки браузера достаём только вид устройства — резиденту важно
+     «телефон это был или компьютер», а не полная подпись. */
+  function device(a) {
+    if (/iPhone|iPad/i.test(a)) return 'iPhone или iPad';
+    if (/Android/i.test(a)) return 'телефон на Android';
+    if (/Macintosh/i.test(a)) return 'компьютер Mac';
+    if (/Windows/i.test(a)) return 'компьютер Windows';
+    if (/Linux/i.test(a)) return 'компьютер Linux';
+    return 'браузер';
+  }
+  var OK = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>';
+  var BAD = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 22 20H2z"/><path d="M12 9v5"/><path d="M12 17h.01"/></svg>';
+
+  var list = document.getElementById('list');
+  var DEMO = [
+    { at: new Date().toISOString(), ok: true, ip: '85.140.12.7', agent: 'iPhone' },
+    { at: new Date(Date.now() - 26 * 3600e3).toISOString(), ok: true, ip: '85.140.12.7', agent: 'Windows' },
+    { at: new Date(Date.now() - 3 * 86400e3).toISOString(), ok: false, ip: '31.173.84.2', agent: 'Android' }
+  ];
+
+  function render(items) {
+    if (!items.length) { list.innerHTML = '<p class="msv-note" style="padding:var(--msv-s24) var(--msv-s16);text-align:center;color:var(--msv-n500)">Записей пока нет.</p>'; return; }
+    list.innerHTML = items.map(function (x) {
+      return '<div class="log__item">' +
+        '<span class="log__mark' + (x.ok ? '' : ' log__mark--bad') + '">' + (x.ok ? OK : BAD) + '</span>' +
+        '<span class="log__body">' +
+          '<span class="log__when">' + esc(when(x.at)) + (x.ok ? '' : ' · код не подошёл') + '</span>' +
+          '<span class="msv-note log__what">' + esc(device(x.agent)) + (x.ip ? ' · ' + esc(x.ip) : '') + '</span>' +
+        '</span></div>';
+    }).join('');
+  }
+
+  render(DEMO);
+  if (location.protocol !== 'file:') {
+    fetch('/api/me/logins', { credentials: 'same-origin' })
+      .then(function (r) { return r.status === 200 ? r.json() : null; })
+      .then(function (d) { if (Array.isArray(d)) render(d); })
+      .catch(function () {});
+  }
+})();
+</script>
+<script src="mark.js"></script>
+<script src="protect.js"></script>
+
+</body>
+</html>

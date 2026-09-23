@@ -10,8 +10,17 @@
    ============================================================ */
 
 const auth = require('../lib/auth');
-const { json, fail, readJson } = require('../lib/http');
+const { json, fail, readJson, clientIp } = require('../lib/http');
 const { query } = require('../lib/db');
+
+/* Запись входа: одна строка на попытку. Браузер обрезаем — нам нужен
+   только вид устройства, а не полная подпись. */
+async function logLogin(req, userId, ok) {
+  try {
+    await query(`INSERT INTO login_log (user_id, ok, ip, agent) VALUES ($1, $2, $3, $4)`,
+      [userId, ok, clientIp(req), String(req.headers['user-agent'] || '').slice(0, 200)]);
+  } catch (e) { /* журнал не должен мешать входу */ }
+}
 
 module.exports = function register(route) {
 
@@ -32,6 +41,7 @@ module.exports = function register(route) {
        ничего не решает — здесь и закрывается вопрос, который мы
        обсуждали: три кнопки — указатель, а не разграничение. */
     // firstLogin — сайт отправит на анкету, а не в кабинет
+    await logLogin(req, r.user.id, true);
     json(res, 200, { role: r.user.role, name: r.user.name, firstLogin: !!r.firstLogin },
          { 'Set-Cookie': auth.sessionCookie(r.user) });
   });
@@ -42,8 +52,18 @@ module.exports = function register(route) {
     const body = await readJson(req);
     const r = await auth.demoLogin(body.role);
     if (!r.ok) return fail(res, 403, r.error);
+    await logLogin(req, r.user.id, true);
     json(res, 200, { role: r.user.role, name: r.user.name, firstLogin: false },
          { 'Set-Cookie': auth.sessionCookie(r.user) });
+  });
+
+  /* История входов: последние 50 записей вошедшего. */
+  route('GET', '/api/me/logins', async (req, res) => {
+    const s = auth.readSession(req);
+    if (!s) return fail(res, 401, 'Не выполнен вход');
+    const r = await query(`SELECT ok, ip, agent, created_at FROM login_log
+      WHERE user_id = $1 ORDER BY created_at DESC LIMIT 50`, [s.uid]);
+    json(res, 200, r.rows.map((x) => ({ at: x.created_at, ok: x.ok, ip: x.ip || '', agent: x.agent || '' })));
   });
 
   /* Смена пина в кабинете. Нужен текущий вход. */

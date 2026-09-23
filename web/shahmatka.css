@@ -30,9 +30,11 @@
   --sh-leaving-br: var(--msv-yellow, #FFD93D);
   --sh-leaving-tx: #8A5B00;
 
-  --sh-done-bg: #F0ECE4;
-  --sh-done-br: var(--msv-n300, #B8B1A5);
-  --sh-done-tx: var(--msv-n500, #6B665E);
+  /* «Выехал» — нейтральный светло-серый: на бежевом фоне прежний оттенок
+     читался почти как розовый «долг» (решение заказчика 22.09.2026) */
+  --sh-done-bg: #EDEDED;
+  --sh-done-br: #CFCFCF;
+  --sh-done-tx: #7A7A7A;
 
   --sh-left-w: 84px;              /* вдвое уже прежних 130: только место и иконка яруса */
   --sh-day-w: 40px;
@@ -452,8 +454,15 @@
 .msv-sh__bar:hover { filter: brightness(.96); box-shadow: 0 2px 6px rgba(22,32,47,.16); }
 .msv-sh__bar:focus-visible { outline: 2px solid var(--sh-accent); outline-offset: 1px; }
 .msv-sh__bar--selected { box-shadow: 0 0 0 2px var(--sh-accent); }
+/* бронь «взята» пальцем: видно, что удержание сработало и можно вести */
+.msv-sh__bar--hold { box-shadow: 0 0 0 2px var(--sh-accent), 0 4px 10px rgba(22,32,47,.22); transform: scale(1.02); }
 
 .msv-sh__bar-name {
+  /* Подпись «прилипает» к левому краю экрана, пока полоса в поле зрения:
+     иначе у длинной брони фамилия уезжала за край при прокрутке вправо
+     (решение заказчика 22.09.2026) */
+  position: sticky;
+  left: 4px;
   overflow: hidden;
   text-overflow: ellipsis;
   text-decoration: underline;
@@ -1062,6 +1071,9 @@ body.msv-sh-dragging .msv-sh__bar { cursor: grabbing; }
   .msv-sh__body { -webkit-overflow-scrolling: touch; }
   .msv-sh__canvas { touch-action: pan-x pan-y; }
   .msv-sh__bar-sub { display: none; }
+  /* фамилия на телефоне не сжимается до нуля и не прячется */
+  .msv-sh__bar-name { flex: 0 0 auto; max-width: 72vw; }
+  .msv-sh__bar { min-width: 34px; }
   .msv-sh__group-name { font-size: 12px; }
 }
 

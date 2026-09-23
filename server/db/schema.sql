@@ -344,6 +344,21 @@ CREATE TABLE IF NOT EXISTS audit_log (
 CREATE INDEX IF NOT EXISTS audit_log_time_idx ON audit_log(created_at DESC);
 
 -- ------------------------------------------------------------
+--  История входов: кто, когда, откуда и чем (решение заказчика 22.09.2026).
+--  Нужна и резиденту («это точно был я?»), и администрации при разборе.
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS login_log (
+  id          bigserial PRIMARY KEY,
+  user_id     bigint NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  ok          boolean NOT NULL DEFAULT true,   -- false: код не подошёл
+  ip          text,
+  agent       text,                            -- строка браузера, обрезанная до 200 знаков
+  created_at  timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS login_log_user_idx ON login_log(user_id, created_at DESC);
+
+-- ------------------------------------------------------------
 --  Правки содержимого страниц (карандаш администратора)
 --  Ключ — путь элемента в разметке. Одна правка на элемент.
 -- ------------------------------------------------------------

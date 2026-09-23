@@ -685,6 +685,21 @@
         shift: 0, newFrom: booking.from, newTo: booking.to
       };
 
+      /* Пальцем бронь двигается только после удержания (0,4 с): иначе при
+         прокрутке сетки бронь уезжала случайно (решение заказчика 22.09.2026).
+         Мышью — как раньше, сразу. */
+      if (e.pointerType !== 'mouse') {
+        self._drag.hold = false;
+        self._drag.holdTimer = setTimeout(function () {
+          if (!self._drag) return;
+          self._drag.hold = true;
+          bar.classList.add('msv-sh__bar--hold');
+          if (navigator.vibrate) { try { navigator.vibrate(12); } catch (err) {} }
+        }, 400);
+      } else {
+        self._drag.hold = true;
+      }
+
       // фокус ставим вручную: preventDefault выше его отменил
       bar.focus({ preventScroll: true });
     });
@@ -702,8 +717,13 @@
     if (!g || e.pointerId !== g.pointerId) return;
 
     if (!g.active) {
-      if (Math.abs(e.clientX - g.x0) < DRAG_THRESHOLD &&
-          Math.abs(e.clientY - g.y0) < DRAG_THRESHOLD) return;
+      var moved = Math.abs(e.clientX - g.x0) >= DRAG_THRESHOLD || Math.abs(e.clientY - g.y0) >= DRAG_THRESHOLD;
+      if (!g.hold) {
+        // палец повели раньше, чем удержали, — это прокрутка, а не перенос
+        if (moved) { clearTimeout(g.holdTimer); g.bar.classList.remove('msv-sh__bar--hold'); this._drag = null; }
+        return;
+      }
+      if (!moved) return;
       this._dragStart();
     }
 
@@ -881,6 +901,7 @@
   };
 
   Shahmatka.prototype._dragEnd = function (e) {
+    if (this._drag) { clearTimeout(this._drag.holdTimer); if (this._drag.bar) this._drag.bar.classList.remove('msv-sh__bar--hold'); }
     var g = this._drag;
     if (!g || (e && e.pointerId !== g.pointerId)) return;
 
