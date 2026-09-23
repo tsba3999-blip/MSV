@@ -30,7 +30,7 @@
 .room__name { margin: 0 0 var(--msv-s4); }
 .room__text { margin: 0 0 var(--msv-s12); }
 
-.room__name { margin: 0; }
+.room__name { margin: 0 0 var(--msv-s4); }
 .room__sex { flex: 0 0 auto; }
 
 /* Плашка пола — те же розовый и голубой, что у меток Ж и М в шахматке */
@@ -47,7 +47,7 @@
 .sex-tag--m { color: #1B4C9E; background: #E8F0FF; border-color: #C3D8FE; }
 
 /* Полоса снимков: три превью и счётчик остальных */
-.room__shots { display: flex; gap: var(--msv-s8); margin-bottom: var(--msv-s12); }
+.room__shots { display: flex; gap: var(--msv-s8); margin: var(--msv-s12) 0; }
 
 .room__shot {
   flex: 1 1 0;
@@ -74,30 +74,30 @@
   font-weight: 600;
 }
 
-.room__text { margin: 0 0 var(--msv-s12); color: var(--msv-n500); }
+.room__text { margin: 0; color: var(--msv-n500); }
 
-.room__prices { margin: 0 0 var(--msv-s16); border-top: 1px solid var(--msv-n100); }
+.room__prices { margin: 0 0 var(--msv-s16); padding-top: 1px; border-top: 1px solid var(--msv-n100); }
 
+/* Строка цены нажимается целиком. Подсветка — та же, что у строк меню
+   (решение заказчика 23.09.2026): серый MSV-100 во всю ширину строки,
+   без скруглений и без выезда за край карточки. */
 .room__price {
   display: flex;
-  cursor: pointer;
-  border-radius: var(--msv-r11);
-  margin: 0 calc(var(--msv-s8) * -1);
-  padding-left: var(--msv-s8);
-  padding-right: var(--msv-s8);
-  transition: background var(--msv-fast) var(--msv-ease);
   align-items: baseline;
   justify-content: space-between;
   gap: var(--msv-s12);
-  padding: var(--msv-s8) 0;
+  margin: 0 calc(var(--msv-s16) * -1);
+  padding: var(--msv-s8) var(--msv-s16);
+  cursor: pointer;
   border-bottom: 1px solid var(--msv-n100);
+  transition: background var(--msv-fast) var(--msv-ease);
 }
 
 .room__price span:first-child { color: var(--msv-n500); font-size: var(--msv-body-size); }
 .room__price b { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
 
-.room__price[data-pick]:hover { background: var(--msv-beige); }
-.room__price[data-pick]:focus-visible { outline: 2px solid var(--msv-violet); outline-offset: 2px; }
+.room__price[data-pick]:hover { background: var(--msv-n100); }
+.room__price[data-pick]:focus-visible { outline: 2px solid var(--msv-violet); outline-offset: -2px; }
 .room__price--out { cursor: default; }
 .room__price--out span:first-child,
 .room__price--out b { color: var(--msv-n300); font-weight: 400; }
@@ -317,12 +317,13 @@
 /* Чип другого пола на выборе комнаты — недоступен */
 .chip:disabled { opacity: .35; cursor: default; }
 
-/* Карточки одного размера: строка описания есть всегда (пустая — тоже занимает
-   место), под цены отведено место на две строки */
-.room__text { min-height: calc(2 * var(--msv-body-line)); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.room__text:empty::before { content: "\00a0"; }
-.room__prices { min-height: 92px; }
-@media (max-width: 400px) {
-  /* на узком телефоне строка цены переносится на две строки — место под две такие строки */
-  .room__prices { min-height: 174px; }
+/* Длинное описание — не больше двух строк, иначе карточки разъезжаются */
+.room__text { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* Ровные карточки нужны только там, где они стоят в два ряда: на телефоне
+   они идут одна под другой, и пустое место под описанием было лишним
+   (решение заказчика 23.09.2026). Высоту выравнивает сама колонка: блок
+   цен прижат к низу карточки. */
+@media (min-width: 1100px) {
+  .form--wide .room__text { min-height: calc(2 * var(--msv-body-line)); }
 }

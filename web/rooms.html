@@ -241,7 +241,9 @@ MSV.ready(function (ctx) {
         '</div>' +
         '<span class="room__kind">' + r.size + '-местная</span>' +
         '<h2 class="msv-sub room__name">' + esc(r.name) + '</h2>' +
-        '<p class="msv-body room__text">' + esc(r.text) + '</p>' +
+        // У части комнат описания нет. Раньше пустой абзац всё равно
+        // выводился и отодвигал фотографии на полторы строки вниз.
+        (r.text ? '<p class="msv-body room__text">' + esc(r.text) + '</p>' : '') +
         '<div class="room__shots" data-gallery="' + esc(r.resId) + '">' + shots(r, ri) + '</div>' +
         '<div class="room__prices">' + prices + '</div>' +
         '<p class="msv-note room__terms">Цены при условии оплаты по СБП и заключении «годового контракта» (проживание и оплаты без перерыва минимум до конца августа).</p>' +
