@@ -13,11 +13,11 @@
   box-shadow: var(--msv-e1);
 }
 
-/* Тип комнаты — под именем, кеглем цены (решение заказчика 22.09.2026) */
+/* Тип комнаты — над именем, кеглем цены (решение заказчика 23.09.2026) */
 .room__kind { display: block; margin: 0 0 var(--msv-s4); font-size: var(--msv-body-size); line-height: var(--msv-body-line); font-weight: 600; color: var(--msv-graphite); }
 .room__res { display: block; color: var(--msv-n500); font-weight: 600; }
-/* Условие цены — в красной рамке, как тревожная карточка в уведомлениях */
-.room__terms { margin: 0; padding: var(--msv-s8) var(--msv-s12); background: var(--msv-n100); border: 1px solid var(--msv-red); border-radius: var(--msv-r12); }
+/* Условие цены — в красной рамке на белом (решение заказчика 23.09.2026) */
+.room__terms { margin: 0; padding: var(--msv-s8) var(--msv-s12); background: var(--msv-white); border: 1px solid var(--msv-red); border-radius: var(--msv-r12); }
 
 /* Первая строка карточки: тип комнаты слева, пол справа */
 .room__top {

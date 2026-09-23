@@ -123,7 +123,7 @@
   function card(r) {
     return '<article class="res" data-res="' + esc(r.id) + '">' +
       '<div class="res__media">' +
-        '<div class="res__shots" data-shots>' + shots(r) + '</div>' +
+        '<div class="res__shots" data-shots data-gallery="' + esc(r.id) + '">' + shots(r) + '</div>' +
         '<img class="res__logo" src="' + esc(r.logo) + '" alt="">' +
         freeBadge(r) + dots(r) +
       '</div>' +

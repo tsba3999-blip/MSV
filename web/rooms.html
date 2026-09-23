@@ -191,7 +191,8 @@ MSV.ready(function (ctx) {
         return '<img class="room__shot" src="' + esc(p.src) + '" alt="' + esc(p.alt) + '" loading="lazy" decoding="async" data-zoom>';
       }).join('');
       var rest = (MSV_PHOTOS.all(room.resId).length - real.length);
-      if (rest > 0) h += '<span class="room__more">+' + rest + '</span>';
+      // «+17» открывает просмотр с первой из ещё не показанных фотографий
+      if (rest > 0) h += '<span class="room__more" role="button" tabindex="0" data-more="' + real.length + '" aria-label="Смотреть все фотографии">+' + rest + '</span>';
       return h;
     }
     var html = room.shots.map(function (c, i) {
@@ -231,17 +232,17 @@ MSV.ready(function (ctx) {
           '<b>' + money(b.price) + '</b>' + btn + '</div>';
       }).join('');
 
-      // Порядок в карточке (решение заказчика 21.09.2026): тип + пол в одной строке,
-      // резиденция, имя, описание (санузел и т.п.) сразу под именем, фото, цены.
+      // Порядок в карточке (решение заказчика 23.09.2026): резиденция и пол в одной
+      // строке, «N-местная» над именем, имя, описание (санузел и т.п.), фото, цены.
       return '<article class="room">' +
         '<div class="room__top">' +
           '<span class="msv-note room__res">' + esc(r.residenceTitle) + '</span>' +
           '<span class="sex-tag sex-tag--' + (r.sex === 'ж' ? 'f' : 'm') + '">' + (r.sex === 'ж' ? 'Женская' : 'Мужская') + '</span>' +
         '</div>' +
-        '<h2 class="msv-sub room__name">' + esc(r.name) + '</h2>' +
         '<span class="room__kind">' + r.size + '-местная</span>' +
+        '<h2 class="msv-sub room__name">' + esc(r.name) + '</h2>' +
         '<p class="msv-body room__text">' + esc(r.text) + '</p>' +
-        '<div class="room__shots">' + shots(r, ri) + '</div>' +
+        '<div class="room__shots" data-gallery="' + esc(r.resId) + '">' + shots(r, ri) + '</div>' +
         '<div class="room__prices">' + prices + '</div>' +
         '<p class="msv-note room__terms">Цены при условии оплаты по СБП и заключении «годового контракта» (проживание и оплаты без перерыва минимум до конца августа).</p>' +
       '</article>';
