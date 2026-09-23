@@ -137,6 +137,14 @@
 </div>
 
 <script>
+/* Куда вернуться после анкеты: адрес передаёт тот, кто её вызвал —
+   обычно «Проверка данных». Пускаем только свои страницы, иначе ссылку
+   можно подделать и увести человека на чужой сайт (24.09.2026). */
+var MSV_NEXT = (function () {
+  var n = new URLSearchParams(location.search).get('next') || '';
+  return /^[\w-]+\.html(\?[\w%=&.,+-]*)?$/.test(n) ? n : '';
+})();
+
 (function () {
   'use strict';
 
@@ -278,14 +286,14 @@
     });
 
     var btn = this, msg = document.getElementById('nextMsg');
-    if (location.protocol === 'file:') { location.href = 'residences.html'; return; }
+    if (location.protocol === 'file:') { location.href = MSV_NEXT || 'residences.html'; return; }
 
     btn.disabled = true; msg.textContent = 'Сохраняю анкету…'; msg.hidden = false;
     fetch('/api/me/profile', { method: 'PUT', credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(profile) })
       .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j || {} }; }, function () { return { s: r.status, j: {} }; }); })
       .then(function (r) {
-        if (r.s === 200) { location.href = 'residences.html'; return; }
+        if (r.s === 200) { location.href = MSV_NEXT || 'residences.html'; return; }
         btn.disabled = false;
         msg.textContent = r.s === 401 ? 'Сессия истекла — войди ещё раз.' : (r.j.error || 'Не удалось сохранить анкету');
       })

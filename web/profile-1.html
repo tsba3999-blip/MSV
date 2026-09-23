@@ -169,8 +169,26 @@
 })();
 </script>
 <script>
+/* Куда вернуться после анкеты: адрес передаёт тот, кто её вызвал —
+   обычно «Проверка данных». Пускаем только свои страницы, иначе ссылку
+   можно подделать и увести человека на чужой сайт (24.09.2026). */
+var MSV_NEXT = (function () {
+  var n = new URLSearchParams(location.search).get('next') || '';
+  return /^[\w-]+\.html(\?[\w%=&.,+-]*)?$/.test(n) ? n : '';
+})();
+
 (function () {
   'use strict';
+
+  /* Пол мог быть выбран раньше — на странице комнат. Подставляем его,
+     чтобы человек не отвечал на один вопрос дважды. */
+  setTimeout(function () {
+    var saved = null;
+    try { saved = localStorage.getItem('msv.sex'); } catch (e) {}
+    if (saved !== 'м' && saved !== 'ж') return;
+    var chip = document.querySelector('.chip[data-gender="' + saved + '"]');
+    if (chip && chip.getAttribute('aria-pressed') !== 'true') chip.click();
+  }, 0);
 
   /* ---------- Подсказки по вузам ---------- */
 
@@ -384,7 +402,7 @@
       return;
     }
     try { sessionStorage.setItem('msv.profile1', JSON.stringify(step1)); } catch (e) {}
-    location.href = 'profile-2.html';
+    location.href = 'profile-2.html' + (MSV_NEXT ? '?next=' + encodeURIComponent(MSV_NEXT) : '');
   });
 })();
 </script>

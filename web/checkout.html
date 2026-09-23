@@ -201,7 +201,16 @@
   // с сервером: если депозит уже есть в начислениях — блок не показываем
   if (location.protocol !== 'file:') {
     fetch('/api/me/home', { credentials: 'same-origin' }).then(function (r) { return r.status === 200 ? r.json() : null; })
-      .then(function (d) { if (d && d.booking && d.booking.depositPaid) hideDeposit(); }).catch(function () {});
+      .then(function (d) {
+        if (!d) return;
+        if (d.booking && d.booking.depositPaid) hideDeposit();
+        /* Место выбрано — теперь нужны данные. Кто анкету уже заполнил,
+           этого шага не увидит вовсе (решение заказчика 24.09.2026). */
+        var p = d.profile;
+        if (!p || !p.lastName || !p.firstName || !p.gender) {
+          location.replace('profile-1.html?next=' + encodeURIComponent(location.pathname.split('/').pop() + location.search));
+        }
+      }).catch(function () {});
   }
 
   /* Код для чужой оплаты: объявлен здесь, потому что нужен проверке документов ниже */

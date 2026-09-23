@@ -190,7 +190,8 @@
 
   next.addEventListener('click', function () {
     if (step < LAST) { show(step + 1); return; }
-    location.href = 'login.html?role=resident&next=profile-1.html';
+    // Сразу к выбору резиденции: анкету спросим перед оплатой
+    location.href = 'login.html?role=resident&next=residences.html';
   });
 
   document.addEventListener('keydown', function (e) {

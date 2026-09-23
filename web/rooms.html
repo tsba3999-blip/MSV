@@ -27,7 +27,7 @@
 
   <div class="filters">
     <div class="filters__row">
-      <span class="msv-note filters__label">Выбор комнаты и места</span>
+      <span class="msv-note filters__label" id="sexLabel">Выбор комнаты и места</span>
       <div class="chips" role="group" aria-label="Пол">
         <button class="chip" type="button" data-sex="м" aria-pressed="false">Муж.</button>
         <button class="chip" type="button" data-sex="ж" aria-pressed="false">Жен.</button>
@@ -356,13 +356,36 @@ MSV.ready(function (ctx) {
   render();
 
   /* Пол из анкеты: свой фильтр включён, чужой недоступен — комнаты в резиденциях
-     мужские и женские, и резидент видит только свои. */
+     мужские и женские, и резидент видит только свои.
+
+     Анкета теперь заполняется позже, поэтому пол может быть ещё неизвестен.
+     Тогда прямо спрашиваем его здесь: это единственное, что нужно системе,
+     чтобы показать правильные комнаты. Ответ запоминаем и подставим в анкету
+     (решение заказчика 24.09.2026). */
+  function askSex() {
+    var lab = document.getElementById('sexLabel');
+    if (lab) { lab.textContent = 'Тебе мужскую или женскую комнату?'; lab.style.color = 'var(--msv-red)'; }
+    var saved = null;
+    try { saved = localStorage.getItem('msv.sex'); } catch (e) {}
+    if (saved === 'м' || saved === 'ж') {
+      var chip = document.querySelector('.chip[data-sex="' + saved + '"]');
+      if (chip) { chip.setAttribute('aria-pressed', 'true'); filter.sex = saved; render(); }
+      if (lab) { lab.textContent = 'Выбор комнаты и места'; lab.style.color = ''; }
+    }
+    document.querySelectorAll('.chip[data-sex]').forEach(function (c) {
+      c.addEventListener('click', function () {
+        try { localStorage.setItem('msv.sex', c.getAttribute('data-sex')); } catch (e) {}
+        if (lab) { lab.textContent = 'Выбор комнаты и места'; lab.style.color = ''; }
+      });
+    });
+  }
+
   if (location.protocol !== 'file:') {
     fetch('/api/me/home', { credentials: 'same-origin' })
       .then(function (r) { return r.status === 200 ? r.json() : null; })
       .then(function (d) {
         var g = d && d.profile && d.profile.gender;
-        if (g !== 'м' && g !== 'ж') return;
+        if (g !== 'м' && g !== 'ж') { askSex(); return; }
         document.querySelectorAll('.chip[data-sex]').forEach(function (c) {
           var mine = c.getAttribute('data-sex') === g;
           c.setAttribute('aria-pressed', mine ? 'true' : 'false');
