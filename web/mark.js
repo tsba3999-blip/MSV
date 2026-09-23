@@ -97,3 +97,27 @@
       .then(function () { location.href = 'index.html'; }, function () { location.href = 'index.html'; });
   });
 })();
+
+/* ============================================================
+   «Вернуться» ведёт туда, откуда пришли
+
+   В разметке у кнопки прописан запасной адрес — он остаётся для случая,
+   когда страницу открыли по прямой ссылке или из поиска. Но если резидент
+   пришёл с другой страницы сайта (например, на «Правила» — с «Проверки
+   данных»), кнопка возвращает именно туда (решение заказчика 23.09.2026).
+   ============================================================ */
+(function () {
+  'use strict';
+  var back = document.querySelector('.head__back'); if (!back) return;
+  var ref = document.referrer; if (!ref) return;
+
+  var u; try { u = new URL(ref); } catch (e) { return; }
+  if (u.origin !== location.origin) return;            // пришли с чужого сайта
+  if (u.pathname === location.pathname) return;        // перезагрузка этой же страницы
+
+  var from = u.pathname.split('/').pop() || 'index.html';
+  // со входа и с выхода возвращать некуда
+  if (/^(login|signup)\.html$/.test(from)) return;
+
+  back.href = u.pathname + u.search;
+})();

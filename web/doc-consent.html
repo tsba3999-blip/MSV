@@ -241,28 +241,45 @@
 
 </div>
 
+<script src="signdate.js"></script>
 <script>
-/* Подпись резидента: дата и время акцепта приходят с сервера (/api/me/docs).
-   Оферта считает акцептом оплату, поэтому берём время первой оплаты; если его
-   нет — дату принятия документов из анкеты. Без сервера плашка не показывается. */
+/* Подпись документа: берём последнюю подпись именно этого документа.
+   Если подписей несколько (документы принимаются заново при каждой оплате),
+   рядом говорим сколько их и куда смотреть весь список. */
 (function () {
   'use strict';
-  if (location.protocol === 'file:') return;
-  var MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
-  fetch('/api/me/docs', { credentials: 'same-origin' })
-    .then(function (r) { return r.status === 200 ? r.json() : null; })
-    .then(function (d) {
-      if (!d || !d.signedAt) return;
-      var dt = new Date(d.signedAt); if (isNaN(dt)) return;
-      var when = dt.getDate() + ' ' + MONTHS[dt.getMonth()] + ' ' + dt.getFullYear() + ' г.';
-      if (d.exact) when += ', ' + ('0' + dt.getHours()).slice(-2) + ':' + ('0' + dt.getMinutes()).slice(-2);
-      var parts = String(d.name || '').split(/\s+/).filter(Boolean);
-      var who = parts.length >= 2 ? parts[1] + ' ' + parts[0] : (d.name || '');
-      document.getElementById('signWho').textContent = who ? 'Принято резидентом: ' + who : 'Документ принят';
-      document.getElementById('signWhen').textContent = when + (d.exact ? '' : ' (время не сохранилось)');
-      document.getElementById('sign').hidden = false;
-    })
-    .catch(function () {});
+  var KIND = 'consent';
+  MSV_SIGN.load(function (d) {
+    var mine = (d.signatures || []).filter(function (s) { return s.kind === KIND; });
+    if (!mine.length) return;
+    var last = mine[0];
+    var when = MSV_SIGN.human(last.at, last.exact);
+    if (!when) return;
+    var name = MSV_SIGN.who(d.name);
+    document.getElementById('signWho').textContent = name ? 'Принято резидентом: ' + name : 'Документ принят';
+    document.getElementById('signWhen').textContent = when
+      + (last.exact ? '' : ' (время не сохранилось)')
+      + (mine.length > 1 ? ' · всего подписей: ' + mine.length : '');
+    document.getElementById('sign').hidden = false;
+  });
+})();
+</script>
+<script>
+/* Текст документов не выделяется и не копируется обычным способом
+   (решение заказчика 23.09.2026). Честно: это неудобство для случайного
+   человека, а не защита — страницу всё равно можно сохранить или снять
+   с экрана. Настоящая мера — предупреждение в самом документе и закон.
+   Поля ввода, ссылки и шапка страницы работают как обычно. */
+(function () {
+  'use strict';
+  var doc = document.querySelector('.doc'); if (!doc) return;
+  var css = document.createElement('style');
+  css.textContent = '.doc{-webkit-user-select:none;-ms-user-select:none;user-select:none;-webkit-touch-callout:none}.doc a{user-select:text}';
+  document.head.appendChild(css);
+  doc.addEventListener('contextmenu', function (e) { if (!e.target.closest('a')) e.preventDefault(); });
+  doc.addEventListener('copy', function (e) { e.preventDefault(); });
+  doc.addEventListener('cut', function (e) { e.preventDefault(); });
+  doc.addEventListener('dragstart', function (e) { e.preventDefault(); });
 })();
 </script>
 <script src="mark.js"></script>

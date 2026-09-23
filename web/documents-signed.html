@@ -9,6 +9,17 @@
 <title>Подписанные документы — МСВ</title>
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="resident.css">
+<style>
+  /* Журнал подписей: документы принимаются заново при каждой оплате,
+     поэтому дат несколько (решение заказчика 23.09.2026) */
+  .log { margin: var(--msv-s24) 0 0; }
+  .log__title { margin: 0 0 var(--msv-s12); }
+  .log__card { padding: var(--msv-s12) var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r12); }
+  .log__group { padding: var(--msv-s8) 0; border-bottom: 1px solid var(--msv-n100); }
+  .log__group:last-child { border-bottom: 0; }
+  .log__name { display: block; font-weight: 600; }
+  .log__when { display: block; color: var(--msv-n500); }
+</style>
 </head>
 <body>
 
@@ -44,6 +55,11 @@
     </a>
   </div>
 
+  <section class="log" id="log" hidden>
+    <p class="msv-sub log__title">Даты подписей</p>
+    <div class="log__card" id="logCard"></div>
+  </section>
+
 </div>
 
 <nav class="tabbar" aria-label="Разделы кабинета">
@@ -69,6 +85,32 @@
   </a>
 </nav>
 
+<script src="signdate.js"></script>
+<script>
+/* Все подписи резидента по документам: дата и время каждой */
+(function () {
+  'use strict';
+  var NAMES = { contract: 'Договор-оферта', rules: 'Правила проживания', consent: 'Согласие на обработку персональных данных' };
+  MSV_SIGN.load(function (d) {
+    var list = d.signatures || []; if (!list.length) return;
+    var card = document.getElementById('logCard');
+    ['contract', 'rules', 'consent'].forEach(function (k) {
+      var mine = list.filter(function (s) { return s.kind === k; });
+      if (!mine.length) return;
+      var g = document.createElement('div'); g.className = 'log__group';
+      var n = document.createElement('span'); n.className = 'msv-body log__name'; n.textContent = NAMES[k];
+      g.appendChild(n);
+      mine.forEach(function (s) {
+        var w = document.createElement('span'); w.className = 'msv-note log__when';
+        w.textContent = MSV_SIGN.human(s.at, s.exact) + (s.exact ? '' : ' (время не сохранилось)');
+        g.appendChild(w);
+      });
+      card.appendChild(g);
+    });
+    if (card.children.length) document.getElementById('log').hidden = false;
+  });
+})();
+</script>
 <script src="mark.js"></script>
 <script src="protect.js"></script>
 

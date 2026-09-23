@@ -11,12 +11,26 @@
 <link rel="stylesheet" href="form.css">
 <style>
   .sbp { display: flex; align-items: center; gap: var(--msv-s12); margin: 0 0 var(--msv-s16); padding: var(--msv-s12) var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r12); box-shadow: var(--msv-e1); color: inherit; text-decoration: none; }
-  .sbp__logo { flex: 0 0 auto; width: 44px; height: 44px; }
-  .sbp__logo svg { display: block; width: 100%; height: 100%; }
+  /* Знак СБП — целиком, файл с сайта МСВ (решение заказчика 23.09.2026) */
+  .sbp__logo { flex: 0 0 auto; width: 76px; }
+  .sbp__logo img { display: block; width: 100%; height: auto; }
   .sbp__text { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
   .sbp__title { font-size: 17px; line-height: 22px; }
   .sbp__note { color: var(--msv-n500); }
   .sbp__chev { flex: 0 0 auto; color: var(--msv-n300); }
+  /* Подписание документов */
+  .sign-docs { margin: 0 0 var(--msv-s16); padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r12); }
+  .sign-docs__title { margin: 0 0 var(--msv-s8); font-weight: 600; }
+  /* Внутри карточки галочки без своей подложки — иначе белое на белом */
+  .sign-docs .check { margin: 0; padding: var(--msv-s12) 0; background: none; box-shadow: none; border-radius: 0; border-top: 1px solid var(--msv-n100); }
+  .sign-docs .check:last-of-type { padding-bottom: 0; }
+  .sign-docs__lead { margin: 0 0 var(--msv-s12); color: var(--msv-n500); }
+  .sign-docs__note { margin: var(--msv-s8) 0 0; color: var(--msv-n500); }
+  .sign-docs--miss { border: 1px solid var(--msv-red); background: var(--msv-n100); }
+  /* Сумма и пояснение к ней — одной колонкой справа (решение заказчика 23.09.2026) */
+  .total--note { align-items: flex-start; margin-bottom: var(--msv-s12); }
+  .total__right { text-align: right; }
+  .total__note { display: block; margin-top: var(--msv-s4); max-width: 260px; color: var(--msv-n500); }
 </style>
 <link rel="stylesheet" href="rooms.css">
 <style>
@@ -48,6 +62,19 @@
       <span class="msv-note check__note">Сумма к оплате удваивается. Депозит возвращается при выезде.</span>
     </span>
   </label>
+
+  <!-- Подписание документов: без всех трёх галочек оплата недоступна -->
+  <div class="sign-docs">
+    <p class="msv-body sign-docs__title">Перед оплатой прими документы</p>
+    <p class="msv-note sign-docs__lead">Документы принимаются заново при каждой оплате. Дата и время каждой подписи сохраняются в разделе «Подписанные документы».</p>
+    <label class="check"><input class="check__box" type="checkbox" id="dContract" data-doc>
+      <span class="check__text"><span class="check__name">Я принимаю <a class="msv-link" href="doc-contract.html" target="_blank" rel="noopener">Договор-оферту</a></span></span></label>
+    <label class="check"><input class="check__box" type="checkbox" id="dRules" data-doc>
+      <span class="check__text"><span class="check__name">Я принимаю <a class="msv-link" href="doc-rules.html" target="_blank" rel="noopener">Правила проживания</a></span></span></label>
+    <label class="check"><input class="check__box" type="checkbox" id="dConsent" data-doc>
+      <span class="check__text"><span class="check__name">Я даю <a class="msv-link" href="doc-consent.html" target="_blank" rel="noopener">Согласие на обработку персональных данных</a></span></span></label>
+    <p class="msv-note sign-docs__note" id="docsNote">Оплата станет доступна, когда примешь все три документа. Дата и время принятия сохранятся в документах.</p>
+  </div>
 
   <div class="payer">
     <p class="msv-sub payer__title">Платит не резидент?</p>
@@ -86,16 +113,7 @@
 
   <!-- СБП: знак, пояснение и условие цены (решение заказчика 22.09.2026) -->
   <a class="sbp" href="sbp.html">
-    <span class="sbp__logo" aria-hidden="true">
-      <svg viewBox="0 0 48 48" role="img" aria-label="СБП">
-        <path d="M6 14l7 10-7 10z" fill="#5B57A2"/>
-        <path d="M13 24l7-10 4 6-7 10z" fill="#D90751"/>
-        <path d="M20 14h9l4 6h-9z" fill="#FAB718"/>
-        <path d="M29 14l7 10-7 10-4-6 3-4-3-4z" fill="#ED6F26"/>
-        <path d="M33 28l-4 6h-9l4-6z" fill="#63B22F"/>
-        <path d="M13 24l7 10h-7z" fill="#1487C9"/>
-      </svg>
-    </span>
+    <span class="sbp__logo"><img src="sbp-logo.png" width="1024" height="514" alt="Система быстрых платежей"></span>
     <span class="sbp__text">
       <span class="msv-sub sbp__title">Почему мы просим оплачивать по СБП?</span>
       <span class="msv-note sbp__note">Открыть пояснение</span>
@@ -104,12 +122,14 @@
   </a>
 
   <div class="form__foot">
-    <div class="total">
+    <div class="total total--note">
       <span class="msv-body">К оплате</span>
-      <b id="total">0 руб.</b>
+      <span class="total__right">
+        <b id="total">0 руб.</b>
+        <span class="msv-note total__note">Данная стоимость только при условии оплаты по СБП.</span>
+      </span>
     </div>
-    <p class="msv-note" style="margin:0 0 var(--msv-s12);color:var(--msv-n500)">Данная стоимость только при условии оплаты по СБП.</p>
-    <button class="msv-btn msv-btn--block msv-btn--primary" id="pay" type="button">Перейти к оплате</button>
+    <button class="msv-btn msv-btn--block msv-btn--primary" id="pay" type="button" disabled>Перейти к оплате</button>
   </div>
 
 </div>
@@ -182,6 +202,21 @@
       .then(function (d) { if (d && d.booking && d.booking.depositPaid) hideDeposit(); }).catch(function () {});
   }
 
+  /* Документы: пока не приняты все три — кнопка оплаты выключена */
+  var docs = Array.prototype.slice.call(document.querySelectorAll('[data-doc]'));
+  var payBtn = document.getElementById('pay');
+  function docsOk() { return docs.every(function (d) { return d.checked; }); }
+  function syncDocs() {
+    var ok = docsOk();
+    payBtn.disabled = !ok;
+    document.getElementById('docsNote').textContent = ok
+      ? 'Документы приняты. Дата и время подписи сохранятся при оплате.'
+      : 'Оплата станет доступна, когда примешь все три документа. Дата и время принятия сохранятся в документах.';
+    document.querySelector('.sign-docs').classList.remove('sign-docs--miss');
+  }
+  docs.forEach(function (d) { d.addEventListener('change', syncDocs); });
+  syncDocs();
+
   deposit.addEventListener('change', syncTotal);
   syncTotal();
 
@@ -224,6 +259,11 @@
 
   document.getElementById('pay').addEventListener('click', function () {
     var btn = this;
+    if (!docsOk()) {
+      document.querySelector('.sign-docs').classList.add('sign-docs--miss');
+      document.querySelector('.sign-docs').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
     var bedId = params.get('bed');
     var from = params.get('from');
 
@@ -232,7 +272,8 @@
     btn.disabled = true;
     fetch('/api/bookings', { method: 'POST', credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bedId: bedId, from: from, deposit: deposit.checked }) })
+      body: JSON.stringify({ bedId: bedId, from: from, deposit: deposit.checked,
+        docs: { contract: true, rules: true, consent: true } }) })
       .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j || {} }; }, function () { return { s: r.status, j: {} }; }); })
       .then(function (r) {
         if (r.s === 201) { location.href = 'cabinet-resident.html'; return; }

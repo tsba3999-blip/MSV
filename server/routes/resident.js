@@ -21,8 +21,10 @@ module.exports = function register(route) {
 
   /* ---------- Главная резидента: бронь, баланс, заявки, уведомления ---------- */
 
-  /* Когда резидент подписал документы: дата принятия (docs_signed_at) и, если
-     есть, время первой оплаты — именно она по оферте считается акцептом. */
+  /* Подписи документов. Резидент подписывает договор, правила и согласие
+     заново при каждой оплате, поэтому отдаём весь список: страницам документа
+     нужна последняя подпись, разделу «Подписанные документы» — все. Старые
+     записи (до журнала) подставляем из даты принятия анкеты. */
   route('GET', '/api/me/docs', async (req, res) => {
     const s = auth.readSession(req);
     if (!s) return fail(res, 401, 'Не выполнен вход');
@@ -34,10 +36,23 @@ module.exports = function register(route) {
       FROM users u LEFT JOIN resident_profiles p ON p.user_id = u.id
       WHERE u.id = $1`, [s.uid]);
     const row = r.rows[0] || {};
+
+    const sg = await query(
+      `SELECT kind, signed_at FROM doc_signatures WHERE user_id = $1 ORDER BY signed_at DESC`, [s.uid]);
+    const list = sg.rows.map((x) => ({ kind: x.kind, at: x.signed_at, exact: true }));
+
+    // Резиденты, подписавшие до появления журнала: одна запись по каждому документу
+    if (!list.length && (row.first_paid || row.docs_signed_at)) {
+      const at = row.first_paid || row.docs_signed_at;
+      ['contract', 'rules', 'consent'].forEach((k) => list.push({ kind: k, at, exact: !!row.first_paid }));
+    }
+
     json(res, 200, {
       name: row.name || '',
-      signedAt: row.first_paid || row.docs_signed_at || null,
-      exact: !!row.first_paid            // true — известно время, false — только дата
+      signatures: list,
+      // старые поля — чтобы ничего не сломалось, если страница ещё не обновилась
+      signedAt: list.length ? list[0].at : null,
+      exact: list.length ? list[0].exact : false
     });
   });
 
@@ -162,6 +177,12 @@ module.exports = function register(route) {
     const b = await readJson(req);
 
     if (!b.bedId || !/^\d{4}-\d{2}-\d{2}$/.test(String(b.from || ''))) return fail(res, 400, 'Нужны место и дата заезда');
+    /* Документы подписываются галочками на «Проверке данных» — без них
+       бронь не создаётся (решение заказчика 23.09.2026). Проверяем и на
+       сервере: страницу можно обойти, сервер обойти нельзя. */
+    if (!(b.docs && b.docs.contract && b.docs.rules && b.docs.consent)) {
+      return fail(res, 400, 'Сначала прими договор, правила и согласие на обработку данных');
+    }
     const from = b.from;
     // Годовой контракт: выезд через год минус день, если не задано иначе
     const to = /^\d{4}-\d{2}-\d{2}$/.test(String(b.to || '')) ? b.to : null;
@@ -185,6 +206,14 @@ module.exports = function register(route) {
         if (b.deposit) {
           await q(`INSERT INTO charges (booking_id, kind, amount) VALUES ($1, 'deposit', $2)`, [id, price]);
         }
+        /* Подписи документов: отдельная запись на каждый документ и каждую оплату */
+        for (const kind of ['contract', 'rules', 'consent']) {
+          await q(`INSERT INTO doc_signatures (user_id, kind, booking_id) VALUES ($1, $2, $3)`, [s.uid, kind, id]);
+        }
+        await q(`UPDATE resident_profiles SET docs_signed_at = COALESCE(docs_signed_at, CURRENT_DATE) WHERE user_id = $1`, [s.uid]);
+        await q(`INSERT INTO audit_log (actor_id, action, target, payload)
+                 VALUES ($1, 'docs.accept', $2, $3)`,
+          [s.uid, 'booking:' + id, JSON.stringify({ contract: true, rules: true, consent: true })]);
         return ins.rows[0];
       });
       json(res, 201, { id: String(out.id), from: iso(out.date_from), to: iso(out.date_to) });

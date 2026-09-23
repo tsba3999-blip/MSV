@@ -576,4 +576,16 @@ LEFT JOIN bookings bk ON bk.bed_id = bd.id
   AND bk.date_from <= CURRENT_DATE AND bk.date_to >= CURRENT_DATE
 LEFT JOIN users u ON u.id = bk.user_id;
 
+-- Журнал подписей документов.
+-- Резидент подписывает договор, правила и согласие заново при каждой оплате
+-- (решение заказчика 23.09.2026), поэтому храним не одну дату, а список.
+CREATE TABLE IF NOT EXISTS doc_signatures (
+  id          bigserial PRIMARY KEY,
+  user_id     bigint NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  kind        text NOT NULL,              -- 'contract' | 'rules' | 'consent'
+  booking_id  bigint REFERENCES bookings(id) ON DELETE SET NULL,
+  signed_at   timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS doc_signatures_user_idx ON doc_signatures (user_id, signed_at DESC);
+
 COMMIT;
