@@ -10,6 +10,27 @@
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="cabinet.css">
 <style>
+  /* Заявка, которую сотрудник взял себе: строка подсвечена, в конце —
+     плашка «В работе» (решение заказчика 23.09.2026).
+
+     Цвет — осветлённый фирменный лайм C8F03C. В брендбуке бледного
+     зелёного нет, а лайм в полную силу на всю строку глушит текст;
+     этот оттенок уже работает в продукте — им отмечены «живёт сейчас»
+     в шахматке и метка «Выполнена». Сама плашка — лайм в полную силу. */
+  .grid tbody tr.row--mine > td { background: #EEF9D8; }
+  .grid tbody tr.row--mine:hover > td { background: #E4F4C4; }
+  .row__work {
+    display: inline-flex;
+    align-items: center;
+    height: var(--msv-btn-s, 36px);
+    padding: 0 var(--msv-s16);
+    font: 600 13px/1 var(--msv-font);
+    color: var(--msv-graphite);
+    background: var(--msv-lime);
+    border-radius: 18px;
+    white-space: nowrap;
+  }
+
   body { --role: var(--msv-sky); --role-ink: var(--msv-graphite); }
 </style>
 </head>
@@ -187,7 +208,11 @@ MSV.ready(function (ctx) {
   function row(t) {
     var late = t.overdue && t.status !== 'Выполнена' && t.status !== 'Отклонена'
       ? ' <span class="tag tag--bad">просрочена</span>' : '';
-    return '<tr data-id="' + esc(t.id) + '">' +
+    /* Своя и уже в работе — подсвечиваем всю строку. Назначенная, но ещё
+       не начатая остаётся обычной: иначе плашка спорила бы со статусом. */
+    var mine = t.master === ME && t.status === 'В работе';
+    var assigned = t.master === ME && t.status === 'Принята';
+    return '<tr data-id="' + esc(t.id) + '"' + (mine ? ' class="row--mine"' : '') + '>' +
       '<td><span class="who-cell__name">' + esc(t.category) + late + '</span>' +
         '<span class="msv-note sub">' + esc(t.text) + '</span>' +
         '<span class="msv-note sub" style="color:var(--msv-n300)">№' + esc(String(t.id).replace(/^.*-t/, '')) + ' · ' + esc(when(t.created)) + '</span></td>' +
@@ -200,7 +225,8 @@ MSV.ready(function (ctx) {
       '<td class="num">' + (
         (!t.master && t.status !== 'Выполнена' && t.status !== 'Отклонена')
           ? '<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-act="take">Взять себе</button>'
-          : (t.master === ME ? '<span class="msv-note">моя</span>' : '')) + '</td>' +
+          : (mine ? '<span class="row__work">В работе</span>'
+                 : (assigned ? '<span class="msv-note">моя</span>' : ''))) + '</td>' +
     '</tr>';
   }
 

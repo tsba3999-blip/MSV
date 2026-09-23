@@ -231,18 +231,24 @@
 
 .hint[hidden] { display: none; }
 
+/* Стрелка своя, а не браузерная: браузер прижимает её к самому краю, и
+   у скруглённых полей она выглядит приклеенной. Рисуем тот же шеврон, что
+   у строк меню, и отводим ему 16 пикселей от края — шаг сетки из брендбука
+   (решение заказчика 23.09.2026). */
 .msv-select {
   display: block;
   width: 100%;
   height: var(--msv-field);
-  padding: 0 var(--msv-s16);
+  padding: 0 44px 0 var(--msv-s16);
   font-family: var(--msv-font);
   font-size: var(--msv-body-size);
   color: var(--msv-graphite);
-  background: var(--msv-white);
+  background: var(--msv-white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2334495E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right var(--msv-s16) center;
   border: 2px solid var(--msv-n300);
   border-radius: var(--msv-r11);
   cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 .msv-select:focus { outline: none; border-color: var(--msv-graphite); }

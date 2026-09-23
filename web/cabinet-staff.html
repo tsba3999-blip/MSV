@@ -10,7 +10,9 @@
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="cabinet.css">
 <style>
-  .bar__sel { height: var(--msv-btn-m); padding: 0 var(--msv-s12); font: 600 13px/1 var(--msv-font); color: var(--msv-graphite); background: var(--msv-white); border: 1px solid var(--msv-n100); border-radius: calc(var(--msv-btn-m) / 2); cursor: pointer; }
+  /* Стрелка своя: браузерная прижималась к краю капсулы. Тот же шеврон,
+     что у строк меню, в 16 пикселях от края — как в общем выпадающем списке */
+  .bar__sel { height: var(--msv-btn-m); padding: 0 40px 0 var(--msv-s16); font: 600 13px/1 var(--msv-font); color: var(--msv-graphite); background: var(--msv-white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2334495E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right var(--msv-s16) center; border: 1px solid var(--msv-n100); border-radius: calc(var(--msv-btn-m) / 2); cursor: pointer; appearance: none; -webkit-appearance: none; }
   .bar__sel:focus { outline: none; border-color: var(--msv-graphite); }
   .bar__sel--on { border-color: var(--msv-graphite); }
 </style>
