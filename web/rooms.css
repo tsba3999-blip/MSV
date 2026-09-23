@@ -314,11 +314,12 @@
   .room__price .msv-btn { margin-left: auto; }
 }
 
-/* Третий фильтр — фирменным красным и в обычном состоянии: это заметная
-   возможность, а не рядовой фильтр (решение заказчика 23.09.2026) */
-.chip--soon { color: var(--msv-white); background: var(--msv-red); border-color: var(--msv-red); }
-.chip--soon:hover { background: var(--msv-red-press); border-color: var(--msv-red-press); }
-.chip--soon[aria-pressed="true"] { color: var(--msv-white); background: var(--msv-red-press); border-color: var(--msv-red-press); box-shadow: 0 0 0 2px var(--msv-graphite); }
+/* Третий фильтр — красный, но как все чипы: не выбран — обводка и надпись
+   красным, выбран — залит красным (решение заказчика 24.09.2026) */
+.chip--soon { color: var(--msv-red); background: transparent; border-color: var(--msv-red); }
+.chip--soon:hover { background: rgba(251, 52, 74, .07); border-color: var(--msv-red); }
+.chip--soon[aria-pressed="true"] { color: var(--msv-white); background: var(--msv-red); border-color: var(--msv-red); }
+.chip--soon[aria-pressed="true"]:hover { background: var(--msv-red-press); border-color: var(--msv-red-press); }
 
 /* Строка места, которое скоро освободится: дата под названием места */
 .room__soon { display: block; font-size: var(--msv-note-size); line-height: var(--msv-note-line); color: var(--msv-red); }

@@ -9,7 +9,33 @@
 <title>Проверка данных — МСВ</title>
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="form.css">
+<script>
+/* Нужна ли анкета — знает сервер. Пока он молчит, страницу не показываем:
+   иначе она мелькнёт и тут же сменится анкетой. Ответ кладём в MSV_HOME,
+   чтобы ниже не спрашивать второй раз (24.09.2026). */
+(function () {
+  if (location.protocol === 'file:') return;
+  var h = document.documentElement;
+  h.className += ' gate';
+  var shown = false;
+  function show() { if (shown) return; shown = true; h.className = h.className.replace(/\s*\bgate\b/, ''); }
+  var late = setTimeout(show, 3000);  /* сеть молчит — не держим человека перед пустым экраном */
+  window.MSV_HOME = fetch('/api/me/home', { credentials: 'same-origin' })
+    .then(function (r) { return r.status === 200 ? r.json() : null; })
+    .catch(function () { return null; });
+  window.MSV_HOME.then(function (d) {
+    clearTimeout(late);
+    var p = d && d.profile;
+    if (d && (!p || !p.lastName || !p.firstName || !p.gender)) {
+      location.replace('profile-1.html?next=' + encodeURIComponent(location.pathname.split('/').pop() + location.search));
+      return;
+    }
+    show();
+  });
+})();
+</script>
 <style>
+  html.gate body { visibility: hidden; }
   .sbp { display: flex; align-items: center; gap: var(--msv-s12); margin: 0 0 var(--msv-s16); padding: var(--msv-s12) var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r12); box-shadow: var(--msv-e1); color: inherit; text-decoration: none; }
   /* Знак СБП — целиком, файл с сайта МСВ (решение заказчика 23.09.2026) */
   .sbp__logo { flex: 0 0 auto; width: 76px; }
@@ -199,18 +225,12 @@
   function hideDeposit() { deposit.checked = false; deposit.closest('.check').hidden = true; syncTotal(); }
   if (DEPOSIT_PAID) hideDeposit();
   // с сервером: если депозит уже есть в начислениях — блок не показываем
-  if (location.protocol !== 'file:') {
-    fetch('/api/me/home', { credentials: 'same-origin' }).then(function (r) { return r.status === 200 ? r.json() : null; })
-      .then(function (d) {
-        if (!d) return;
-        if (d.booking && d.booking.depositPaid) hideDeposit();
-        /* Место выбрано — теперь нужны данные. Кто анкету уже заполнил,
-           этого шага не увидит вовсе (решение заказчика 24.09.2026). */
-        var p = d.profile;
-        if (!p || !p.lastName || !p.firstName || !p.gender) {
-          location.replace('profile-1.html?next=' + encodeURIComponent(location.pathname.split('/').pop() + location.search));
-        }
-      }).catch(function () {});
+  /* Ответ сервера уже запрошен в шапке страницы — там же решается,
+     не отправить ли человека сперва заполнить анкету. */
+  if (window.MSV_HOME) {
+    window.MSV_HOME.then(function (d) {
+      if (d && d.booking && d.booking.depositPaid) hideDeposit();
+    });
   }
 
   /* Код для чужой оплаты: объявлен здесь, потому что нужен проверке документов ниже */
