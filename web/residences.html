@@ -11,48 +11,84 @@
 <link rel="stylesheet" href="resident.css">
 <style>
   /* ============================================================
-     Выбор резиденции по фотографиям (23.09.2026). Прежние варианты
-     строились на логотипах и заказчику не нравились; с появлением
-     настоящих снимков главным становится фото, а логотип уходит
-     в угол карточки как знак.
-     Устройство карточки: большое фото с лентой снимков (листается
-     пальцем), поверх — знак и бейдж свободных мест; под фото —
-     имя, метро и адрес, цена и кнопка.
+     Выбор резиденции — компоновка «паспарту» (вариант 8 из двадцати,
+     утверждён заказчиком 23.09.2026).
+
+     Устройство карточки: фотография в белых полях, знак резиденции
+     крупный и по центру, наезжает на нижний край кадра; под ним
+     название, метро с адресом, свободные места и цена — всё по центру.
+
+     Отдельной кнопки нет: вся карточка — ссылка на выбор места, как
+     плитки на главной. Щелчок по самой фотографии открывает просмотр
+     всех снимков резиденции и на выбор места не уводит.
      Цены и свободные места приходят с сервера.
      ============================================================ */
   .page { padding-bottom: var(--msv-s32); }
 
-  .res { margin-bottom: var(--msv-s24); background: var(--msv-white); border-radius: var(--msv-r20); overflow: hidden; box-shadow: var(--msv-e1); }
-  .res:last-of-type { margin-bottom: var(--msv-s16); }
+  .res {
+    display: block;
+    margin-bottom: var(--msv-s16);
+    padding: var(--msv-s12) var(--msv-s12) var(--msv-s16);
+    color: inherit;
+    text-decoration: none;
+    background: var(--msv-white);
+    border-radius: var(--msv-r20);
+    box-shadow: var(--msv-e1);
+    transition: transform var(--msv-fast) var(--msv-ease);
+  }
+  .res:active { transform: scale(.99); }
+  .res:focus-visible { outline: 2px solid var(--msv-violet); outline-offset: 2px; }
 
-  /* лента фотографий */
-  .res__shots { position: relative; display: flex; gap: 2px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; background: var(--msv-n100); }
+  /* лента фотографий: листается пальцем, снимки одного размера */
+  .res__media { position: relative; }
+  .res__shots { display: flex; gap: 2px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; background: var(--msv-n100); border-radius: var(--msv-r12); }
   .res__shots::-webkit-scrollbar { display: none; }
   .res__shot { flex: 0 0 100%; scroll-snap-align: start; display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; background: var(--msv-n100); }
-  .res__noshot { flex: 0 0 100%; display: flex; align-items: center; justify-content: center; aspect-ratio: 16 / 10; color: var(--msv-n500); font-size: var(--msv-note-size); text-align: center; padding: var(--msv-s16); }
+  .res__noshot { flex: 0 0 100%; display: flex; align-items: center; justify-content: center; aspect-ratio: 16 / 10; padding: var(--msv-s16); font-size: var(--msv-note-size); color: var(--msv-n500); text-align: center; }
 
-  .res__media { position: relative; }
-  .res__logo { position: absolute; left: var(--msv-s12); top: var(--msv-s12); width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--msv-white); object-fit: cover; box-shadow: 0 2px 8px rgba(22,32,47,.25); }
-  .res__free { position: absolute; right: var(--msv-s12); top: var(--msv-s12); display: inline-flex; align-items: center; height: 26px; padding: 0 10px; font: 700 12px/1 var(--msv-font); letter-spacing: .04em; text-transform: uppercase; color: var(--msv-graphite); background: var(--msv-lime); border-radius: 4px; }
-  .res__free--none { color: var(--msv-white); background: var(--msv-graphite); }
   .res__dots { position: absolute; left: 0; right: 0; bottom: var(--msv-s8); display: flex; justify-content: center; gap: 5px; pointer-events: none; }
   .res__dots i { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,.55); box-shadow: 0 1px 2px rgba(0,0,0,.35); transition: width var(--msv-fast) var(--msv-ease), background var(--msv-fast) var(--msv-ease); }
   .res__dots i.on { width: 16px; border-radius: 3px; background: var(--msv-white); }
 
-  .res__body { padding: var(--msv-s16); }
-  .res__kind { display: block; font-size: 10px; line-height: 16px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--msv-n500); }
+  /* знак — крупный, по центру, наезжает на край кадра */
+  .res__logo {
+    position: absolute;
+    left: 50%;
+    bottom: -32px;
+    transform: translateX(-50%);
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    background: var(--msv-white);
+    border: 3px solid var(--msv-white);
+    border-radius: 16px;
+    box-shadow: 0 3px 12px rgba(22,32,47,.22);
+  }
+
+  .res__body { padding-top: 40px; text-align: center; }
+  .res__kind { display: block; font: 600 10px/16px var(--msv-font); letter-spacing: .06em; text-transform: uppercase; color: var(--msv-n500); }
   .res__name { margin: 0 0 var(--msv-s4); }
   .res__where { margin: 0 0 var(--msv-s4); }
   .res__note { margin: 0; color: var(--msv-n500); }
-  .res__foot { display: flex; align-items: center; justify-content: space-between; gap: var(--msv-s12); margin-top: var(--msv-s12); padding-top: var(--msv-s12); border-top: 1px solid var(--msv-n100); }
-  .res__price { font-weight: 700; white-space: nowrap; }
-  .res__price small { display: block; font-weight: 500; font-size: var(--msv-note-size); line-height: var(--msv-note-line); color: var(--msv-n500); }
-  .res__map { display: inline-flex; align-items: center; gap: 4px; margin-top: var(--msv-s8); font-size: var(--msv-note-size); cursor: pointer; }
 
-  /* на компьютере — три карточки в ряд */
+  /* свободные места: лаймовая метка, «мест нет» — графитовая */
+  .res__free { display: inline-flex; align-items: center; height: 28px; margin-top: var(--msv-s12); padding: 0 11px; font: 700 12px/1 var(--msv-font); letter-spacing: .04em; text-transform: uppercase; color: var(--msv-graphite); background: var(--msv-lime); border-radius: 6px; }
+  .res__free--none { color: var(--msv-white); background: var(--msv-graphite); }
+
+  .res__foot { margin-top: var(--msv-s12); padding-top: var(--msv-s12); border-top: 1px solid var(--msv-n100); }
+  .res__price { font-weight: 700; }
+  .res__price small { display: block; font-weight: 500; font-size: var(--msv-note-size); line-height: var(--msv-note-line); color: var(--msv-n500); }
+  .res__map { display: inline-flex; align-items: center; gap: 4px; margin-top: var(--msv-s12); font-size: var(--msv-note-size); cursor: pointer; }
+
+  /* На компьютере — три карточки в ряд и одной высоты, даже если описания
+     разной длины: цена прижата к низу карточки (так же, как в выборе
+     комнаты — заказчику понравилось именно это, 23.09.2026) */
   @media (min-width: 1100px) {
-    .res-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--msv-s16); align-items: start; }
-    .res { margin-bottom: 0; }
+    .res-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--msv-s16); align-items: stretch; }
+    .res { display: flex; flex-direction: column; margin-bottom: 0; }
+    .res__body { display: flex; flex-direction: column; flex: 1 1 auto; }
+    .res__free { align-self: center; }
+    .res__foot { margin-top: auto; }
   }
 </style>
 </head>
@@ -95,7 +131,7 @@
   var PRICE = {}, FREE = {};
 
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
-  function money(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' руб.'; }
+  function money(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' руб.'; }
   function places(n) { var a = n % 10, b = n % 100; if (b > 10 && b < 20) return 'мест'; if (a === 1) return 'место'; if (a >= 2 && a <= 4) return 'места'; return 'мест'; }
 
   function shots(r) {
@@ -121,24 +157,24 @@
   }
 
   function card(r) {
-    return '<article class="res" data-res="' + esc(r.id) + '">' +
+    return '<a class="res" data-res="' + esc(r.id) + '" href="rooms.html?res=' + esc(r.id) + '">' +
       '<div class="res__media">' +
         '<div class="res__shots" data-shots data-gallery="' + esc(r.id) + '">' + shots(r) + '</div>' +
-        '<img class="res__logo" src="' + esc(r.logo) + '" alt="">' +
-        freeBadge(r) + dots(r) +
+        dots(r) +
+        '<img class="res__logo" src="' + esc(r.logo) + '" alt="Знак резиденции ' + esc(r.name) + '">' +
       '</div>' +
       '<div class="res__body">' +
         '<span class="res__kind">' + esc(r.kind) + '</span>' +
         '<h2 class="msv-sub res__name">' + esc(r.name) + '</h2>' +
         '<p class="msv-body res__where">метро ' + esc(r.metro) + ' · ' + esc(r.addr) + '</p>' +
         '<p class="msv-note res__note">' + esc(r.note) + '</p>' +
-        '<span class="msv-link res__map" role="link" tabindex="0" data-map="' + esc(r.map) + '">посмотреть на карте</span>' +
+        freeBadge(r) +
         '<div class="res__foot">' +
           '<span class="msv-body res__price">' + (PRICE[r.id] ? 'от ' + money(PRICE[r.id]) + '<small>в месяц</small>' : 'цена уточняется') + '</span>' +
-          '<a class="msv-btn msv-btn--m msv-btn--primary" href="rooms.html?res=' + esc(r.id) + '">Смотреть места</a>' +
         '</div>' +
+        '<span class="msv-link res__map" role="button" tabindex="0" data-map="' + esc(r.map) + '">посмотреть на карте</span>' +
       '</div>' +
-    '</article>';
+    '</a>';
   }
 
   var list = document.getElementById('list');
@@ -153,15 +189,17 @@
     dd.forEach(function (d, j) { d.classList.toggle('on', j === i); });
   }, true);
 
-  /* «Посмотреть на карте» — карта открывается отдельно, чтобы не мешать кнопке */
-  list.addEventListener('click', function (e) {
+  /* «Посмотреть на карте» лежит внутри карточки-ссылки, поэтому щелчок
+     по нему останавливаем: карта открывается, на выбор места не уходим */
+  function openMap(e) {
     var m = e.target.closest('[data-map]'); if (!m) return;
+    e.preventDefault(); e.stopPropagation();
     window.open(m.dataset.map, '_blank', 'noopener');
-  });
+  }
+  list.addEventListener('click', openMap);
   list.addEventListener('keydown', function (e) {
     if (e.key !== 'Enter' && e.key !== ' ') return;
-    var m = e.target.closest('[data-map]'); if (!m) return;
-    e.preventDefault(); window.open(m.dataset.map, '_blank', 'noopener');
+    openMap(e);
   });
 
   /* Цены и свободные места — с сервера */

@@ -235,6 +235,65 @@
   .v19 .t { min-width: 0; }
   .v19 .pr { text-align: right; }
 
+
+  /* ============================================================
+     Варианты 21–25 (23.09.2026): собраны из тех приёмов, что уже
+     работают на сайте, — карточка комнаты, строки меню, аккордеон
+     «О проекте», карточка уведомления, фильтр-чипы. Своего почти
+     ничего не придумано: те же классы, отступы и разделители.
+     ============================================================ */
+
+  /* ---- 21. Скелет карточки комнаты ---- */
+  .v21 .card { padding: var(--msv-s16); }
+  .v21 .kind21 { display: block; font-size: var(--msv-body-size); line-height: var(--msv-body-line); font-weight: 600; }
+  .v21 .thumbs { display: flex; gap: var(--msv-s8); margin: var(--msv-s12) 0; }
+  .v21 .thumbs img, .v21 .more { flex: 1 1 0; min-width: 0; aspect-ratio: 1/1; object-fit: cover; border-radius: var(--msv-r11); background: var(--msv-n100); }
+  .v21 .more { display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--msv-n500); }
+  .v21 .lg { margin-bottom: var(--msv-s8); }
+  .v21 .lines { margin: 0 calc(var(--msv-s16) * -1); border-top: 1px solid var(--msv-n100); }
+  .v21 .line { display: flex; align-items: center; justify-content: space-between; gap: var(--msv-s12); padding: var(--msv-s8) var(--msv-s16); border-bottom: 1px solid var(--msv-n100); }
+  .v21 .line:last-child { border-bottom: 0; }
+  .v21 .line span:first-child { color: var(--msv-n500); }
+  .v21 .line b { margin-left: auto; font-weight: 600; white-space: nowrap; }
+
+  /* ---- 22. Строки меню ---- */
+  .v22 .rows22 { background: var(--msv-white); border-radius: var(--msv-r20); box-shadow: var(--msv-e1); overflow: hidden; }
+  .v22 .row22 { display: flex; align-items: center; gap: var(--msv-s16); min-height: 56px; padding: var(--msv-s12) var(--msv-s16); color: var(--msv-graphite); text-decoration: none; border-bottom: 1px solid var(--msv-n100); transition: background var(--msv-fast) var(--msv-ease); }
+  .v22 .row22:last-child { border-bottom: 0; }
+  .v22 .row22:hover { background: var(--msv-n100); }
+  .v22 .t { flex: 1 1 auto; min-width: 0; }
+  .v22 .end { flex: 0 0 auto; display: flex; align-items: center; gap: var(--msv-s8); color: var(--msv-n300); }
+  .v22 .end .free { color: var(--msv-graphite); }
+
+  /* ---- 23. Аккордеон, как в «О проекте» ---- */
+  .v23 .acc { background: var(--msv-white); border-radius: var(--msv-r20); box-shadow: var(--msv-e1); overflow: hidden; }
+  .v23 details { border-bottom: 1px solid var(--msv-n100); }
+  .v23 details:last-child { border-bottom: 0; }
+  .v23 summary { display: flex; align-items: center; gap: var(--msv-s16); min-height: 56px; padding: var(--msv-s12) var(--msv-s16); cursor: pointer; list-style: none; }
+  .v23 summary::-webkit-details-marker { display: none; }
+  .v23 .t { flex: 1 1 auto; min-width: 0; }
+  .v23 .chev { color: var(--msv-n300); transition: transform .28s var(--msv-ease); }
+  .v23 details[open] .chev { transform: rotate(90deg); }
+  .v23 .inside { padding: 0 var(--msv-s16) var(--msv-s16); }
+  .v23 .shots { border-radius: var(--msv-r12); aspect-ratio: 16/9; }
+  .v23 .foot { display: flex; align-items: center; justify-content: space-between; gap: var(--msv-s12); margin-top: var(--msv-s12); }
+
+  /* ---- 24. Карточка, как уведомление ---- */
+  .v24 .card { display: flex; gap: var(--msv-s12); padding: var(--msv-s16); }
+  .v24 .lg { flex: 0 0 auto; }
+  .v24 .t { flex: 1 1 auto; min-width: 0; }
+  .v24 .strip { display: flex; gap: 4px; margin-top: var(--msv-s12); }
+  .v24 .strip img { width: 25%; aspect-ratio: 4/3; object-fit: cover; border-radius: var(--msv-r11); }
+  .v24 .foot { display: flex; align-items: center; justify-content: space-between; gap: var(--msv-s12); margin-top: var(--msv-s12); padding-top: var(--msv-s12); border-top: 1px solid var(--msv-n100); }
+
+  /* ---- 25. Чипы сверху, одна карточка под ними ---- */
+  .v25 .bar25 { display: flex; flex-wrap: wrap; gap: var(--msv-s8); margin-bottom: var(--msv-s12); }
+  .v25 .chip25 { min-height: var(--msv-chip); padding: 0 var(--msv-s16); font: 600 13px/1 var(--msv-font); color: var(--msv-graphite); background: transparent; border: 1.5px solid var(--msv-n300); border-radius: calc(var(--msv-chip) / 2); cursor: pointer; }
+  .v25 .chip25[aria-pressed="true"] { color: var(--msv-white); background: var(--msv-graphite); border-color: var(--msv-graphite); }
+  .v25 .shots { aspect-ratio: 16/9; }
+  .v25 .body { display: flex; align-items: center; gap: var(--msv-s12); padding: var(--msv-s16); }
+  .v25 .t { flex: 1 1 auto; min-width: 0; }
+
   /* ============ 20. Самое короткое: фото, имя, одна строка ============ */
   .v20 .shots { aspect-ratio: 3/2; }
   .v20 .body { padding: var(--msv-s12) var(--msv-s16) var(--msv-s16); }
@@ -570,6 +629,79 @@
         '<div class="body">' +
           '<h3 class="msv-sub" style="margin:0">' + esc(r.name) + '</h3>' +
           '<p class="msv-body one"><b>' + freeText(r) + '</b> · ' + (PRICE[r.id] ? 'от ' + money(PRICE[r.id]) : 'цена уточняется') + '</p>' +
+        '</div></a>'; } },
+
+    { t: 'Как карточка комнаты',
+      n: 'Тот же скелет, что на «Выборе комнаты»: надкатегория, имя, описание, три миниатюры с «+17», ниже строки во всю ширину с разделителями. Резидент увидит знакомое устройство дважды подряд.',
+      grid: 'g g--3',
+      c: function (r) { var list = ph(r, 3); var rest = ph(r, 99).length - list.length;
+        return '<a class="card" href="' + href(r) + '">' + logo(r, 56) +
+        '<span class="kind21">' + esc(r.kind) + '</span>' +
+        '<h3 class="msv-sub" style="margin:0 0 4px">' + esc(r.name) + '</h3>' +
+        '<p class="msv-note" style="margin:0;color:var(--msv-n500)">' + where(r) + '</p>' +
+        (list.length
+          ? '<div class="thumbs">' + list.map(function (p) { return '<img src="' + esc(p.src) + '" alt="' + esc(p.alt) + '" loading="lazy">'; }).join('') +
+            (rest > 0 ? '<span class="more">+' + rest + '</span>' : '') + '</div>'
+          : '<div class="thumbs"><span class="more">фото скоро</span></div>') +
+        '<div class="lines">' +
+          '<div class="line"><span>Свободно</span><b>' + freeText(r) + '</b></div>' +
+          '<div class="line"><span>Цена</span><b>' + (PRICE[r.id] ? 'от ' + money(PRICE[r.id]) : 'уточняется') + '</b></div>' +
+        '</div></a>'; } },
+
+    { t: 'Строки меню',
+      n: 'Буквально компонент меню резидента: знак вместо значка, имя и метро, справа свободные места и шеврон. Подсветка строки — та же серая.',
+      grid: '',
+      whole: function (rows) { return '<div class="rows22">' + rows + '</div>'; },
+      c: function (r) { return '<a class="row22" href="' + href(r) + '">' + logo(r, 56) +
+        '<span class="t">' +
+          '<span class="msv-body" style="display:block;font-weight:600">' + esc(r.name) + '</span>' +
+          '<span class="msv-note" style="color:var(--msv-n500)">' + where(r) + ' · ' + (PRICE[r.id] ? 'от ' + money(PRICE[r.id]) : 'цена уточняется') + '</span>' +
+        '</span>' +
+        '<span class="end">' + freeTag(r) + chev() + '</span></a>'; } },
+
+    { t: 'Аккордеон, как в «О проекте»',
+      n: 'Сначала три строки — ничего лишнего. Нажал — раскрылись фотографии и цена. Тот же приём, что в разделе «О проекте» и в «Чаво».',
+      grid: '',
+      whole: function (rows) { return '<div class="acc">' + rows + '</div>'; },
+      c: function (r) { return '<details' + (r.id === 'forma' ? ' open' : '') + '>' +
+        '<summary>' + logo(r, 56) +
+          '<span class="t">' +
+            '<span class="msv-body" style="display:block;font-weight:600">' + esc(r.name) + '</span>' +
+            '<span class="msv-note" style="color:var(--msv-n500)">' + where(r) + '</span>' +
+          '</span>' + freeTag(r) +
+          '<svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>' +
+        '</summary>' +
+        '<div class="inside">' + shots(r) +
+          '<div class="foot">' + priceHtml(r) + '<a class="msv-btn msv-btn--m msv-btn--primary" href="' + href(r) + '">Выбрать</a></div>' +
+        '</div></details>'; } },
+
+    { t: 'Как карточка уведомления',
+      n: 'Знак слева вместо значка уведомления, текст справа, снимки узкой полосой, цена и места под чертой. Устройство один в один как в «Уведомлениях».',
+      grid: 'g',
+      c: function (r) { var list = ph(r, 4);
+        return '<a class="card" href="' + href(r) + '">' + logo(r, 56) +
+        '<span class="t">' +
+          '<span class="kind">' + esc(r.kind) + '</span>' +
+          '<span class="msv-sub" style="display:block">' + esc(r.name) + '</span>' +
+          '<span class="msv-note" style="color:var(--msv-n500)">' + where(r) + ' · ' + esc(r.note) + '</span>' +
+          (list.length ? '<span class="strip">' + list.map(function (p) { return '<img src="' + esc(p.src) + '" alt="' + esc(p.alt) + '" loading="lazy">'; }).join('') + '</span>' : '') +
+          '<span class="foot">' + priceHtml(r) + freeTag(r) + '</span>' +
+        '</span></a>'; } },
+
+    { t: 'Чипы сверху, одна карточка',
+      n: 'Как на «Выборе комнаты»: сверху фильтр чипами, ниже одна большая карточка выбранной резиденции. Меньше прокрутки, сравнение переключением.',
+      grid: '',
+      whole: function (rows) {
+        var chips = R.map(function (r, i) { return '<button class="chip25" type="button" data-r25="' + esc(r.id) + '" aria-pressed="' + (i ? 'false' : 'true') + '">' + esc(r.name) + '</button>'; }).join('');
+        return '<div class="bar25">' + chips + '</div><div id="v25box">' + rows + '</div>';
+      },
+      c: function (r) { return '<a class="card" data-r25card="' + esc(r.id) + '" href="' + href(r) + '"' + (r.id === 'forma' ? '' : ' hidden') + '>' +
+        shots(r) +
+        '<div class="body">' + logo(r, 64) +
+          '<span class="t">' +
+            '<span class="msv-sub" style="display:block">' + esc(r.name) + '</span>' +
+            '<span class="msv-note" style="color:var(--msv-n500)">' + where(r) + '</span>' +
+          '</span>' + priceHtml(r) + freeTag(r) +
         '</div></a>'; } }
   ];
 
@@ -588,6 +720,15 @@
       '</section>';
     }).join('');
   }
+  /* Чипы 25-го варианта: показываем карточку выбранной резиденции */
+  document.addEventListener('click', function (e) {
+    var c = e.target.closest('[data-r25]'); if (!c) return;
+    var box = document.getElementById('v25box'); if (!box) return;
+    c.parentNode.querySelectorAll('[data-r25]').forEach(function (x) { x.setAttribute('aria-pressed', 'false'); });
+    c.setAttribute('aria-pressed', 'true');
+    box.querySelectorAll('[data-r25card]').forEach(function (x) { x.hidden = x.getAttribute('data-r25card') !== c.getAttribute('data-r25'); });
+  });
+
   toc.innerHTML = V.map(function (v, i) { return '<a href="#v' + (i + 1) + '" title="' + esc(v.t) + '">' + (i + 1) + '</a>'; }).join('');
   render();
 
