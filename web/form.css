@@ -351,7 +351,7 @@
 
 /* Подпись раздела в шапке анкеты — ссылка «назад», как и стрелка рядом */
 /* Шапка: стрелка с подписью «Вернуться» в первой строке, заголовок раздела — строкой ниже */
-.form__head { flex-wrap: wrap; height: auto; min-height: var(--msv-header); padding-top: var(--msv-s8); padding-bottom: var(--msv-s12); row-gap: 0; }   /* под заголовком — 12 px, как под подзаголовками */
+.form__head { flex-wrap: wrap; height: auto; min-height: var(--msv-header); padding-top: var(--msv-s8); padding-bottom: var(--msv-s12); }   /* под заголовком — 12 px, как под подзаголовками; над ним — тот же отступ, что в шапке кабинета */
 .form__back:has(.form__back-label) { width: auto; height: var(--msv-tap); padding-right: var(--msv-s8); border-radius: 22px; gap: 2px; }
 .form__back-label { font-size: var(--msv-note-size); line-height: var(--msv-note-line); color: var(--msv-n500); }
 .form__title-link { flex: 1 1 100%; margin: var(--msv-s4) 0 0; color: var(--msv-graphite); text-decoration: none; }   /* заголовок раздела — не ссылка (решение заказчика 22.09.2026) */
