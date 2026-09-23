@@ -68,8 +68,8 @@
     pointer-events: none;
   }
 
-  /* Знак: квадрат со скруглением, на 50% крупнее прежнего (96 вместо 64),
-     по центру, наезжает на край кадра.
+  /* Знак: квадрат со скруглением, 68 пикселей, без тени, по центру,
+     наезжает на край кадра.
 
      Белых углов нет: сами знаки — круги на прозрачном квадрате, поэтому
      подложка квадрата красится в цвет круга этого знака, и круг сливается
@@ -78,40 +78,39 @@
   .res__logo {
     position: absolute;
     left: 50%;
-    bottom: -48px;
+    bottom: -34px;
     transform: translateX(-50%);
-    width: 96px;
-    height: 96px;
+    width: 68px;
+    height: 68px;
     object-fit: cover;
-    border-radius: 24px;
-    box-shadow: 0 3px 12px rgba(22,32,47,.22);
+    border-radius: 17px;
   }
   .res__logo[data-res="forma"] { background: #EDEDED; }
   .res__logo[data-res="uyut"]  { background: #C41618; }
   .res__logo[data-res="molod"] { background: #3784BF; }
 
-  .res__body { padding-top: 56px; text-align: center; }
+  .res__body { padding-top: 42px; text-align: center; }
   /* Надкатегория — фирменным лепестком (радиусы 24/8 по диагонали).
      У всех трёх резиденций лепесток одинаковый; метка свободных мест —
      зеркальный, чтобы две плашки не сливались (решение заказчика 23.09.2026) */
-  /* Лепесток — ровно такой же, как у мессенджеров в шахматке: высота 26,
-     поля 12, 12/700, радиусы 24/8 по диагонали */
+  /* Надкатегория — тот же чип, что «Telegram» в анкете резидента:
+     капсула с серой обводкой, без заливки (решение заказчика 23.09.2026) */
   .res__kind {
     align-self: center;
     display: inline-flex;
     align-items: center;
-    height: 26px;
+    min-height: var(--msv-chip);
     margin-bottom: var(--msv-s8);
-    padding: 0 12px;
-    font: 700 12px/1 var(--msv-font);
+    padding: 0 var(--msv-s16);
+    font: 600 13px/1 var(--msv-font);
     color: var(--msv-graphite);
-    background: var(--msv-n100);
-    border-radius: 24px 8px 24px 8px;
+    background: transparent;
+    border: 1.5px solid var(--msv-n300);
+    border-radius: calc(var(--msv-chip) / 2);
   }
   .res__name { margin: 0 0 var(--msv-s4); }
   .res__metro { margin: 0; }
-  .res__addr { margin: 0 0 var(--msv-s4); }
-  .res__note { margin: 0; color: var(--msv-n500); }
+  .res__addr { margin: 0; }
 
   /* свободные места: лаймовая метка, «мест нет» — графитовая */
   .res__free { align-self: center; display: inline-flex; align-items: center; height: 26px; margin-top: var(--msv-s12); padding: 0 12px; font: 700 12px/1 var(--msv-font); color: var(--msv-graphite); background: var(--msv-lime); border-radius: 8px 24px 8px 24px; }
@@ -240,7 +239,6 @@
         '<h2 class="msv-sub res__name">' + esc(r.name) + '</h2>' +
         '<p class="msv-body res__metro">м. ' + esc(r.metro) + '</p>' +
         '<p class="msv-body res__addr"><a class="msv-link" href="' + esc(r.map) + '" target="_blank" rel="noopener">' + esc(r.addr) + '</a></p>' +
-        '<p class="msv-note res__note">' + esc(r.note) + '</p>' +
         freeBadge(r) +
         '<div class="res__foot">' +
           '<span class="msv-body res__price">от ' + money(p) + '<small>в месяц</small></span>' +
