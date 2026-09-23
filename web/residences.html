@@ -80,10 +80,16 @@
   .res__price small { display: block; font-weight: 500; font-size: var(--msv-note-size); line-height: var(--msv-note-line); color: var(--msv-n500); }
   .res__map { display: inline-flex; align-items: center; gap: 4px; margin-top: var(--msv-s12); font-size: var(--msv-note-size); cursor: pointer; }
 
-  /* На компьютере — три карточки в ряд и одной высоты, даже если описания
-     разной длины: цена прижата к низу карточки (так же, как в выборе
-     комнаты — заказчику понравилось именно это, 23.09.2026) */
+  /* На мониторе колонка шире обычных 460 пикселей: трём карточкам в ряд
+     нужно место, иначе они сжимаются (решение заказчика 23.09.2026).
+     Так же расширена главная резидента.
+     Карточки одной высоты, даже если описания разной длины: цена прижата
+     к низу — как в выборе комнаты. */
+  @media (min-width: 768px) {
+    .page { max-width: 640px; }
+  }
   @media (min-width: 1100px) {
+    .page { max-width: 1040px; }
     .res-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--msv-s16); align-items: stretch; }
     .res { display: flex; flex-direction: column; margin-bottom: 0; }
     .res__body { display: flex; flex-direction: column; flex: 1 1 auto; }
