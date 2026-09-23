@@ -30,6 +30,13 @@ require('./routes/forms')(router.route);
 require('./routes/waitlist')(router.route);
 require('./routes/staff')(router.route);
 require('./routes/card')(router.route);
+require('./routes/holds')(router.route);
+
+/* Бесплатные брони: раз в десять минут гасим сгоревшие и предупреждаем
+   тех, у кого до конца меньше четырёх часов (решение заказчика 24.09.2026) */
+const holds = require('./routes/holds');
+setInterval(() => { holds.sweepHolds().catch((e) => console.error('[holds]', e.message)); }, 10 * 60 * 1000);
+setTimeout(() => { holds.sweepHolds().catch(() => {}); }, 20 * 1000);
 
 // Проверка живости — для nginx и для себя
 router.route('GET', '/api/health', async (req, res) => {

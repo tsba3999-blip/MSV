@@ -33,6 +33,7 @@
   var WEEKDAYS = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
 
   var STATUS_LABEL = {
+    holdfree: 'Бронь без оплаты',
     booked:  'Забронировано',
     active:  'Проживает',
     leaving: 'Скоро выезд',
@@ -260,7 +261,11 @@
         accrued: Number(firstDefined(b.accrued, b.amount, b.total, 0)) || 0,
         paid: Number(firstDefined(b.paid, 0)) || 0,
         note: firstDefined(b.note, '') || '',
-        bookedAt: parseDay(firstDefined(b.bookedAt, b.created, null))
+        bookedAt: parseDay(firstDefined(b.bookedAt, b.created, null)),
+        // бесплатная бронь: срок в часах, имя и контакт человека со стороны
+        holdUntil: b.holdUntil || null,
+        holdName: firstDefined(b.holdName, '') || '',
+        holdContact: firstDefined(b.holdContact, '') || ''
       });
     });
 
@@ -304,9 +309,18 @@
     return map;
   }
 
+  /* Срок бесплатной брони словами: «26 сентября, 18:00» */
+  function holdWhen(v) {
+    var t = new Date(v);
+    if (isNaN(t)) return '';
+    return t.getDate() + ' ' + MONTHS_SHORT[t.getMonth()] + ', ' +
+      String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0');
+  }
+
   /* ---------- Вычисление статуса ---------- */
 
   function statusOf(booking, today) {
+    if (booking.holdUntil) return 'holdfree';      // бесплатная бронь — всегда серая
     if (booking.status && STATUS_LABEL[booking.status]) return booking.status;
     var balance = booking.accrued - booking.paid;
     if (booking.to < today) return balance > 0.5 ? 'debt' : 'done';
@@ -472,6 +486,11 @@
       '<button type="button" class="msv-sh__btn" data-act="scale" aria-pressed="false">Весь год</button>' +
       '<button type="button" class="msv-sh__btn" data-act="onlyfree" aria-pressed="false" title="Показать только свободные сегодня места">Только свободные</button>' +
       '<span class="msv-sh__spacer"></span>' +
+      // Бесплатная бронь: нужна редко, поэтому стоит в углу и объясняет
+      // себя подсказкой при наведении (решение заказчика 24.09.2026)
+      '<button type="button" class="msv-sh__btn msv-sh__hold-btn" data-act="hold" aria-label="Забронировать место без оплаты">Забронировать' +
+        '<span class="msv-sh__hold-tip" role="tooltip">Бесплатная бронь на 24 или 48 часов</span>' +
+      '</button>' +
       '<input type="search" class="msv-sh__search" data-act="search" placeholder="Фамилия, комната или место" aria-label="Поиск">' +
       '<span class="msv-sh__zoom" role="group" aria-label="Масштаб">' +
         '<button type="button" class="msv-sh__btn" data-zoom="s">Мелко</button>' +
@@ -530,6 +549,7 @@
       if (act === 'today') self.setStart(startOfMonth(todayUTC()));
       if (act === 'scale') self.setScale(self.opts.scale === 'year' ? 'day' : 'year');
       if (act === 'onlyfree') { self.onlyFree = !self.onlyFree; self.refresh(); }
+      if (act === 'hold') self.startHold();
     });
 
     this._on(bar, 'change', function (e) {
@@ -615,6 +635,10 @@
         return;
       }
       if (btn.dataset.act === 'close') self.closePanel();
+      if (btn.dataset.act === 'unhold' && typeof self.opts.onUnhold === 'function') {
+        self.opts.onUnhold(self._bookingById(self.selectedId));
+        return;
+      }
       if (btn.dataset.act === 'edit' && typeof self.opts.onEdit === 'function') {
         self.opts.onEdit(self._bookingById(self.selectedId));
       }
@@ -1051,6 +1075,115 @@
   /* ---------- Навигация ---------- */
 
   /* В режиме дней листаем по месяцу, в режиме года — по году. */
+  /* ---------- Бесплатная бронь ----------
+     Нажали «Забронировать» — шахматка переходит в режим выбора: строки
+     мест подсвечиваются, щелчок по свободному месту открывает окно с
+     часами, именем и контактом. Esc отменяет. */
+
+  Shahmatka.prototype.startHold = function () {
+    var self = this;
+    if (this._holdPick) return this.cancelHold();
+    this._holdPick = true;
+    this.root.classList.add('msv-sh--picking');
+
+    var hint = document.createElement('div');
+    hint.className = 'msv-sh__pickbar';
+    hint.innerHTML = '<span>Выберите свободное место — на него встанет бронь без оплаты</span>' +
+      '<button type="button" class="msv-sh__btn" data-act="pickcancel">Отмена</button>';
+    this.root.insertBefore(hint, this.scroll);
+    this._holdHint = hint;
+
+    this._holdEsc = function (e) { if (e.key === 'Escape') self.cancelHold(); };
+    document.addEventListener('keydown', this._holdEsc);
+
+    this._holdClick = function (e) {
+      if (e.target.closest('[data-act="pickcancel"]')) { self.cancelHold(); return; }
+      var row = e.target.closest('.msv-sh__row');
+      if (!row || !self._holdPick) return;
+      e.preventDefault(); e.stopPropagation();
+      var bedId = row.getAttribute('data-bed');
+      if (self._bedBusyToday(bedId)) { self._holdSay('Это место сейчас занято — выберите свободное.'); return; }
+      self.cancelHold();
+      self.askHold(bedId);
+    };
+    this.root.addEventListener('click', this._holdClick, true);
+  };
+
+  Shahmatka.prototype.cancelHold = function () {
+    this._holdPick = false;
+    this.root.classList.remove('msv-sh--picking');
+    if (this._holdHint) { this._holdHint.remove(); this._holdHint = null; }
+    if (this._holdEsc) { document.removeEventListener('keydown', this._holdEsc); this._holdEsc = null; }
+    if (this._holdClick) { this.root.removeEventListener('click', this._holdClick, true); this._holdClick = null; }
+  };
+
+  Shahmatka.prototype._holdSay = function (text) {
+    if (this._holdHint) this._holdHint.querySelector('span').textContent = text;
+  };
+
+  /* Занято ли место прямо сейчас — по тем же броням, что рисует шахматка */
+  Shahmatka.prototype._bedBusyToday = function (bedId) {
+    var today = todayUTC();
+    return (this.data.bookings || []).some(function (b) {
+      return b.bedId === bedId && b.from <= today && b.to >= today;
+    });
+  };
+
+  /* Окно: 24 или 48 часов, имя и контакт */
+  Shahmatka.prototype.askHold = function (bedId) {
+    var self = this;
+    var bed = null, room = null;
+    (this.data.beds || []).forEach(function (x) { if (x.id === bedId) bed = x; });
+    (this.data.rooms || []).forEach(function (r) { if (bed && r.id === bed.roomId) room = r; });
+    var where = (room ? room.name + ' · ' : '') + (bed ? bed.label : bedId);
+
+    var box = document.createElement('div');
+    box.className = 'msv-sh__holdmodal';
+    box.innerHTML =
+      '<div class="msv-sh__holdcard" role="dialog" aria-label="Бронь без оплаты">' +
+        '<h2 class="msv-sh__holdtitle">Бронь без оплаты</h2>' +
+        '<p class="msv-sh__holdplace">' + esc(where) + '</p>' +
+        '<div class="msv-sh__holdhours" role="group" aria-label="На сколько часов">' +
+          '<button type="button" class="msv-sh__btn" data-h="24" aria-pressed="true">24 часа</button>' +
+          '<button type="button" class="msv-sh__btn" data-h="48" aria-pressed="false">48 часов</button>' +
+        '</div>' +
+        '<label class="msv-sh__holdfield"><span>Имя</span><input type="text" id="shHoldName" placeholder="Кому держим место"></label>' +
+        '<label class="msv-sh__holdfield"><span>Почта или Телеграм</span><input type="text" id="shHoldContact" placeholder="name@mail.ru или @nick"></label>' +
+        '<p class="msv-sh__holdnote">За четыре часа до конца брони на почту придёт напоминание. По телеграм-нику написать сможем только тому, кто уже переписывался с ботом, — иначе напомним администрации.</p>' +
+        '<p class="msv-sh__holderr" id="shHoldErr" hidden></p>' +
+        '<div class="msv-sh__holdfoot">' +
+          '<button type="button" class="msv-sh__btn msv-sh__btn--primary" id="shHoldOk">Забронировать</button>' +
+          '<button type="button" class="msv-sh__btn" id="shHoldNo">Отмена</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(box);
+
+    var hours = 24;
+    box.querySelectorAll('[data-h]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        hours = Number(b.dataset.h);
+        box.querySelectorAll('[data-h]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      });
+    });
+    function close() { box.remove(); }
+    box.querySelector('#shHoldNo').addEventListener('click', close);
+    box.addEventListener('click', function (e) { if (e.target === box) close(); });
+    box.querySelector('#shHoldName').focus();
+
+    box.querySelector('#shHoldOk').addEventListener('click', function () {
+      var err = box.querySelector('#shHoldErr');
+      var name = box.querySelector('#shHoldName').value.trim();
+      var contact = box.querySelector('#shHoldContact').value.trim();
+      if (!name) { err.textContent = 'Напишите имя — на кого держим место.'; err.hidden = false; return; }
+      if (typeof self.opts.onHold !== 'function') { err.textContent = 'Бронь без оплаты работает только с сервером.'; err.hidden = false; return; }
+      err.hidden = true;
+      self.opts.onHold({ bedId: bedId, hours: hours, name: name, contact: contact }, function (msg) {
+        if (msg) { err.textContent = msg; err.hidden = false; return; }
+        close();
+      });
+    });
+  };
+
   Shahmatka.prototype.shift = function (delta) {
     var d = new Date(this.start);
     var step = this.opts.scale === 'year' ? 3 : 1;   // в режиме года — кварталами
@@ -1456,8 +1589,9 @@
 
       var st = statusOf(b, today);
       var res = d.residentById[b.residentId];
-      var name = res ? shortName(res.name) : 'Место свободно';
-      var sub = res && res.university ? res.university : '';
+      /* У бесплатной брони резидента нет: имя и срок пришли с сервера */
+      var name = b.holdUntil ? (b.holdName || 'Бронь') : (res ? shortName(res.name) : 'Место свободно');
+      var sub = b.holdUntil ? ('до ' + holdWhen(b.holdUntil)) : (res && res.university ? res.university : '');
 
       var bday = birthdayMark(res, b, axis, left, w);
 
@@ -1739,8 +1873,10 @@
 
       '</div>' +
       '<div class="msv-sh__panel-foot">' +
-        '<button type="button" class="msv-sh__btn msv-sh__btn--primary" data-act="edit">Изменить бронь</button>' +
-        '<button type="button" class="msv-sh__btn" data-act="profile">Профиль</button>' +
+        (b.holdUntil
+          ? '<button type="button" class="msv-sh__btn msv-sh__btn--primary" data-act="unhold">Снять бронь</button>'
+          : '<button type="button" class="msv-sh__btn msv-sh__btn--primary" data-act="edit">Изменить бронь</button>' +
+            '<button type="button" class="msv-sh__btn" data-act="profile">Профиль</button>') +
       '</div>';
 
     this.panel.innerHTML = html;

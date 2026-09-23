@@ -183,6 +183,29 @@ MSV.ready(function (ctx) {
   }, {
     title: '', days: 35, months: 12,
     readOnly: !canEdit,
+    /* Бесплатная бронь: модератор придерживает место на 24 или 48 часов.
+       Кнопку, выбор места и окно рисует сама шахматка — сюда приходит
+       готовый набор полей (решение заказчика 24.09.2026). */
+    onHold: function (payload, done) {
+      if (!ctx.live) { done('Без сервера бронь не поставить.'); return; }
+      ctx.api('POST', '/api/holds', payload)
+        .then(function (r) {
+          if (r.status !== 201) { done((r.body && r.body.error) || 'Не удалось поставить бронь.'); return; }
+          done(null);
+          location.reload();
+        })
+        .catch(function () { done('Сервер не отвечает.'); });
+    },
+    onUnhold: function (b) {
+      if (!b || !ctx.live) { alert('Без сервера бронь не снять.'); return; }
+      if (!confirm('Снять бронь без оплаты с этого места?')) return;
+      ctx.api('DELETE', '/api/holds/' + encodeURIComponent(b.id), null)
+        .then(function (r) {
+          if (r.status !== 200) { alert((r.body && r.body.error) || 'Не удалось снять бронь.'); return; }
+          location.reload();
+        })
+        .catch(function () { alert('Сервер не отвечает.'); });
+    },
     onMove: function (b, was, now) {
       if (!ctx.live) return;
       var iso = function (ts) { return new Date(ts).toISOString().slice(0, 10); };

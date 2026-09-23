@@ -173,6 +173,19 @@ CREATE TABLE IF NOT EXISTS bookings (
   CONSTRAINT bookings_dates CHECK (date_to > date_from)
 );
 
+-- Бесплатная бронь на 24 или 48 часов: модератор придерживает место,
+-- пока человек думает или едет оплачивать (решение заказчика 24.09.2026).
+-- Это обычная строка bookings, но с заполненным hold_until — так место
+-- блокируется тем же ограничением, что и настоящие брони. Резидента у
+-- такой брони может не быть: имя и контакт человека со стороны лежат
+-- рядом. Поэтому user_id стал необязательным.
+ALTER TABLE bookings ALTER COLUMN user_id DROP NOT NULL;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS hold_until     timestamptz;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS hold_name      text;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS hold_contact   text;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS hold_warned_at timestamptz;
+CREATE INDEX IF NOT EXISTS bookings_hold_idx ON bookings(hold_until) WHERE hold_until IS NOT NULL;
+
 -- Место занято, но резидент уезжает и модератор уже выставил его в продажу.
 -- В этой колонке дата, с которой можно заезжать следующему (решение
 -- заказчика 23.09.2026). Пусто — место просто занято.

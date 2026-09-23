@@ -100,6 +100,7 @@ module.exports = function register(route) {
     const bookings = await query(`
       SELECT b.id, b.bed_id, b.user_id, b.date_from, b.date_to, b.check_in, b.check_out,
              b.source, b.tariff, b.note, b.created_at, b.release_from,
+             b.hold_until, b.hold_name, b.hold_contact,
              COALESCE(bal.accrued, 0) AS accrued, COALESCE(bal.paid, 0) AS paid
       FROM bookings b
       JOIN beds bd ON bd.id = b.bed_id
@@ -107,8 +108,9 @@ module.exports = function register(route) {
       LEFT JOIN booking_balance bal ON bal.booking_id = b.id
       WHERE r.residence_id = $1`, [resId]);
 
-    const userIds = [...new Set(bookings.rows.map((b) => b.user_id))];
-    if (!userIds.length) return json(res, 200, { residents: [], bookings: [], payments: [] });
+    /* У бесплатной брони резидента нет вовсе — в список людей она не идёт */
+    const userIds = [...new Set(bookings.rows.map((b) => b.user_id).filter(Boolean))];
+    if (!userIds.length && !bookings.rows.length) return json(res, 200, { residents: [], bookings: [], payments: [] });
 
     const [users, regs, pays] = await Promise.all([
       query(`
@@ -138,7 +140,8 @@ module.exports = function register(route) {
         }))
       })),
       bookings: bookings.rows.map((b) => ({
-        id: String(b.id), bedId: b.bed_id, residentId: String(b.user_id),
+        id: String(b.id), bedId: b.bed_id, residentId: b.user_id ? String(b.user_id) : '',
+        holdUntil: b.hold_until, holdName: b.hold_name || '', holdContact: b.hold_contact || '',
         from: isoDate(b.date_from), to: isoDate(b.date_to),
         checkIn: String(b.check_in).slice(0, 5), checkOut: String(b.check_out).slice(0, 5),
         source: SOURCE[b.source] || b.source, tariff: b.tariff, note: b.note || '',
