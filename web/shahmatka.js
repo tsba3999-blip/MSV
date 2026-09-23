@@ -1143,9 +1143,10 @@
       '<div class="msv-sh__holdcard" role="dialog" aria-label="Бронь без оплаты">' +
         '<h2 class="msv-sh__holdtitle">Бронь без оплаты</h2>' +
         '<p class="msv-sh__holdplace">' + esc(where) + '</p>' +
-        '<div class="msv-sh__holdhours" role="group" aria-label="На сколько часов">' +
-          '<button type="button" class="msv-sh__btn" data-h="24" aria-pressed="true">24 часа</button>' +
-          '<button type="button" class="msv-sh__btn" data-h="48" aria-pressed="false">48 часов</button>' +
+        '<span class="msv-sh__holdlabel">На сколько держим место</span>' +
+        '<div class="msv-sh__switch" role="group" aria-label="На сколько часов">' +
+          '<button type="button" data-h="24" aria-pressed="true">24 часа</button>' +
+          '<button type="button" data-h="48" aria-pressed="false">48 часов</button>' +
         '</div>' +
         '<label class="msv-sh__holdfield"><span>Имя</span><input type="text" id="shHoldName" placeholder="Кому держим место"></label>' +
         '<label class="msv-sh__holdfield"><span>Почта или Телеграм</span><input type="text" id="shHoldContact" placeholder="name@mail.ru или @nick"></label>' +
@@ -1156,7 +1157,7 @@
           '<button type="button" class="msv-sh__btn" id="shHoldNo">Отмена</button>' +
         '</div>' +
       '</div>';
-    document.body.appendChild(box);
+    this.root.appendChild(box);   // внутрь .msv-sh: там объявлена палитра
 
     var hours = 24;
     box.querySelectorAll('[data-h]').forEach(function (b) {
