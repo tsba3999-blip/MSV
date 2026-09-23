@@ -31,6 +31,7 @@
   .total--note { align-items: flex-start; margin-bottom: var(--msv-s12); }
   .total__right { text-align: right; }
   .total__note { display: block; margin-top: var(--msv-s4); max-width: 260px; color: var(--msv-n500); }
+  .payer__lock { margin: var(--msv-s8) 0 0; color: var(--msv-n500); }
 </style>
 <link rel="stylesheet" href="rooms.css">
 <style>
@@ -79,7 +80,8 @@
   <div class="payer">
     <p class="msv-sub payer__title">Платит не резидент?</p>
     <p class="msv-body payer__text">Сделай код и отправь тому, кто оплачивает. Сумма и назначение платежа уже внутри.</p>
-    <button class="msv-btn msv-btn--m msv-btn--secondary" type="button" id="qrBtn">Сгенерировать QR</button>
+    <button class="msv-btn msv-btn--m msv-btn--secondary" type="button" id="qrBtn" disabled>Сгенерировать QR</button>
+    <p class="msv-note payer__lock" id="qrLock">Код появится, когда примешь все три документа.</p>
     <div class="qr" id="qr">
       <svg viewBox="0 0 100 100" width="100%" height="100%" role="img" aria-label="Заглушка кода оплаты">
         <rect width="100" height="100" fill="#EAE4DA"/>
@@ -202,18 +204,39 @@
       .then(function (d) { if (d && d.booking && d.booking.depositPaid) hideDeposit(); }).catch(function () {});
   }
 
-  /* Документы: пока не приняты все три — кнопка оплаты выключена */
+  /* Код для чужой оплаты: объявлен здесь, потому что нужен проверке документов ниже */
+  var qrBtn = document.getElementById('qrBtn');
+  var qr = document.getElementById('qr');
+  var qrNote = document.getElementById('qrNote');
+  var qrActions = document.getElementById('qrActions');
+  function hideQr() {
+    qr.classList.remove('qr--on');
+    qrNote.hidden = true; qrActions.hidden = true;
+    qrBtn.textContent = 'Сгенерировать QR';
+  }
+
+  /* Документы: пока не приняты все три — оплата и код выключены */
   var docs = Array.prototype.slice.call(document.querySelectorAll('[data-doc]'));
   var payBtn = document.getElementById('pay');
   function docsOk() { return docs.every(function (d) { return d.checked; }); }
   function syncDocs() {
     var ok = docsOk();
     payBtn.disabled = !ok;
+    /* Код для чужой оплаты — тоже только после подписей: в нём сумма и
+       назначение платежа, то есть уже согласие с условиями. Если галочку
+       сняли при открытом коде — код прячем. */
+    if (qrBtn) {
+      qrBtn.disabled = !ok;
+      document.getElementById('qrLock').hidden = ok;
+      if (!ok && qr.classList.contains('qr--on')) hideQr();
+    }
     document.getElementById('docsNote').textContent = ok
       ? 'Документы приняты. Дата и время подписи сохранятся при оплате.'
       : 'Оплата станет доступна, когда примешь все три документа. Дата и время принятия сохранятся в документах.';
     document.querySelector('.sign-docs').classList.remove('sign-docs--miss');
   }
+  /* syncDocs зовётся до объявления блока с кодом, поэтому обе переменные
+     объявлены заранее, а сама сборка кода — ниже по странице */
   docs.forEach(function (d) { d.addEventListener('change', syncDocs); });
   syncDocs();
 
@@ -222,12 +245,8 @@
 
   /* ---------- Код для оплаты другим человеком ---------- */
 
-  var qrBtn = document.getElementById('qrBtn');
-  var qr = document.getElementById('qr');
-  var qrNote = document.getElementById('qrNote');
-
-  var qrActions = document.getElementById('qrActions');
   qrBtn.addEventListener('click', function () {
+    if (!docsOk()) return;
     var on = qr.classList.toggle('qr--on');
     qrNote.hidden = !on; qrActions.hidden = !on;
     qrBtn.textContent = on ? 'Скрыть код' : 'Сгенерировать QR';
