@@ -338,3 +338,7 @@
 @media (min-width: 1100px) {
   .form--wide .room__text { min-height: calc(2 * var(--msv-body-line)); }
 }
+
+/* Пояснение под недоступной кнопкой пола (24.09.2026) */
+.filters__why { margin: var(--msv-s8) 0 0; color: var(--msv-n500); }
+.filters__why a { color: var(--msv-red); }

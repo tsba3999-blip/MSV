@@ -22,7 +22,7 @@
         <path d="M15 6l-6 6 6 6"/>
       </svg>
     <span class="head__back-label form__back-label">Вернуться</span></a>
-    <h1 class="msv-sub form__title-link">Резиденция Уют</h1>
+    <h1 class="msv-sub form__title-link">Резиденция</h1>
   </div>
 
   <div class="filters">
@@ -32,6 +32,7 @@
         <button class="chip" type="button" data-sex="м" aria-pressed="false">Муж.</button>
         <button class="chip" type="button" data-sex="ж" aria-pressed="false">Жен.</button>
       </div>
+      <p class="msv-note filters__why" id="sexWhy" hidden></p>
     </div>
 
     <div class="filters__row">
@@ -392,6 +393,14 @@ MSV.ready(function (ctx) {
           c.disabled = !mine;
           if (!mine) c.title = 'Комнаты другого пола недоступны';
         });
+        /* Кнопка другого пола гаснет молча — человек видит мёртвую кнопку и не
+           понимает, почему. Объясняем и показываем выход (24.09.2026). */
+        var why = document.getElementById('sexWhy');
+        if (why) {
+          why.innerHTML = 'Показываем ' + (g === 'ж' ? 'женские' : 'мужские') +
+            ' комнаты — так записано в твоих данных. Ошибка? <a href="support.html">Напиши в поддержку</a>.';
+          why.hidden = false;
+        }
         filter.sex = g;
         render();
       })

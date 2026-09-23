@@ -101,6 +101,7 @@ module.exports = function register(route) {
     json(res, 200, {
       me: { id: String(user.id), name: user.name, phone: user.phone, email: user.email },
       profile: user.user_id ? {
+        lastName: user.last_name, firstName: user.first_name, middleName: user.middle_name,
         birthday: iso(user.birthday), city: user.city, university: user.university,
         course: user.course, faculty: user.faculty, about: user.about, gender: user.gender || null,
         messengers: user.messengers || [], docsSignedAt: iso(user.docs_signed_at)
