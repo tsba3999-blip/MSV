@@ -1,0 +1,340 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Сайт и его программное обеспечение охраняются ГК РФ (ст. 1259, 1261). Копирование без разрешения правообладателя запрещено. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#F5F1EA">
+<title>Карточка резидента — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="cabinet.css">
+<style>
+  /* ============================================================
+     Карточка резидента (23.09.2026).
+
+     Открывается щелчком по имени в шахматке. Здесь всё, что система
+     знает о человеке: анкета (её же можно править), проживание и
+     деньги, документы — подписанные, выданные и загруженные им,
+     репутация, заявки технику, запросы, обращения, входы.
+
+     Данные приходят одним запросом /api/residents/:id/card, чтобы
+     карточка открывалась целиком, а не собиралась рывками.
+     ============================================================ */
+
+  .card-top { display: flex; align-items: flex-start; gap: var(--msv-s16); margin-bottom: var(--msv-s16); padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r12); box-shadow: var(--msv-e1); }
+  .card-top__ava { flex: 0 0 auto; width: 72px; height: 72px; display: flex; align-items: center; justify-content: center; font: 700 22px/1 var(--msv-font); color: var(--msv-n500); background: var(--msv-n100); border-radius: 50%; object-fit: cover; }
+  .card-top__t { flex: 1 1 auto; min-width: 0; }
+  .card-top__name { margin: 0 0 var(--msv-s4); }
+  .card-top__sub { margin: 0; color: var(--msv-n500); }
+  .card-top__tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: var(--msv-s8); }
+
+  /* числа в ряд: сколько денег, какая репутация, сколько заявок */
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--msv-s8); margin-bottom: var(--msv-s16); }
+  .fact { padding: var(--msv-s12); background: var(--msv-white); border-radius: var(--msv-r12); box-shadow: var(--msv-e1); }
+  .fact span { display: block; font-size: var(--msv-note-size); color: var(--msv-n500); }
+  .fact b { display: block; margin-top: 2px; font: 700 20px/26px var(--msv-font); }
+  .fact b.bad { color: var(--msv-red); }
+  .fact b.ok { color: #4A6B12; }
+
+  .sect { margin-bottom: var(--msv-s16); padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r12); box-shadow: var(--msv-e1); }
+  .sect__head { display: flex; align-items: center; justify-content: space-between; gap: var(--msv-s12); margin-bottom: var(--msv-s12); }
+  .sect__title { margin: 0; }
+  .sect__empty { margin: 0; color: var(--msv-n500); }
+
+  .pairs { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--msv-s8) var(--msv-s16); margin: 0; }
+  .pairs div { display: flex; gap: var(--msv-s8); padding: 6px 0; border-bottom: 1px solid var(--msv-n100); }
+  .pairs dt { flex: 0 0 44%; color: var(--msv-n500); }
+  .pairs dd { flex: 1 1 auto; margin: 0; min-width: 0; overflow-wrap: anywhere; }
+
+  .edit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--msv-s12); }
+  .edit-foot { display: flex; flex-wrap: wrap; gap: var(--msv-s8); margin-top: var(--msv-s16); padding-top: var(--msv-s16); border-top: 1px solid var(--msv-n100); }
+
+  .lst { margin: 0; }
+  .lst__row { display: flex; align-items: flex-start; gap: var(--msv-s12); padding: var(--msv-s8) 0; border-bottom: 1px solid var(--msv-n100); }
+  .lst__row:last-child { border-bottom: 0; }
+  .lst__when { flex: 0 0 auto; width: 132px; color: var(--msv-n500); font-size: var(--msv-note-size); }
+  .lst__body { flex: 1 1 auto; min-width: 0; }
+  .lst__end { flex: 0 0 auto; text-align: right; white-space: nowrap; }
+  .lst__name { display: block; font-weight: 600; }
+  .lst__note { display: block; color: var(--msv-n500); font-size: var(--msv-note-size); }
+  .num { font-variant-numeric: tabular-nums; }
+
+  .files { display: flex; flex-wrap: wrap; gap: var(--msv-s8); }
+  .files a { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 var(--msv-s12); font-size: 13px; color: var(--msv-graphite); background: var(--msv-beige); border-radius: var(--msv-r11); text-decoration: none; }
+  .files a:hover { background: var(--msv-n100); }
+
+  @media (max-width: 720px) { .lst__when { width: 100px; } }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <aside class="side" id="side"></aside>
+
+  <div class="work">
+    <header class="work__top">
+      <a class="msv-btn msv-btn--s msv-btn--tertiary" href="admin-shahmatka.html" style="margin-right:var(--msv-s12)">← К шахматке</a>
+      <h1 class="msv-sub work__title" id="title">Карточка резидента</h1>
+    </header>
+
+    <main class="work__body" id="body">
+      <p class="msv-note">Загружаем…</p>
+    </main>
+  </div>
+
+</div>
+
+<script src="api.js"></script>
+<script>
+MSV.ready(function (ctx) {
+  'use strict';
+
+  var id = new URLSearchParams(location.search).get('id') || '';
+  var body = document.getElementById('body');
+
+  function esc(s) { return String(s === null || s === undefined ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function money(n) { return String(Math.round(n || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' руб.'; }
+  var MON = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+  function day(v) { var d = new Date(v); if (isNaN(d)) return '—'; return d.getDate() + ' ' + MON[d.getMonth()] + ' ' + d.getFullYear(); }
+  function dayTime(v) { var d = new Date(v); if (isNaN(d)) return '—'; return day(v) + ', ' + ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2); }
+  function monthOf(v) { var d = new Date(v); if (isNaN(d)) return '—'; return MON[d.getMonth()] + ' ' + d.getFullYear(); }
+  function initials(name) { return String(name || '').split(/\s+/).filter(Boolean).slice(0, 2).map(function (w) { return w[0]; }).join('').toUpperCase(); }
+
+  function sect(title, inner, extra) {
+    return '<section class="sect"><div class="sect__head"><h2 class="msv-sub sect__title">' + title + '</h2>' + (extra || '') + '</div>' + inner + '</section>';
+  }
+  function empty(text) { return '<p class="msv-body sect__empty">' + text + '</p>'; }
+
+  function rows(list, fn) {
+    return '<div class="lst">' + list.map(fn).join('') + '</div>';
+  }
+  function row(when, name, note, end) {
+    return '<div class="lst__row">' +
+      '<span class="lst__when">' + esc(when) + '</span>' +
+      '<span class="lst__body"><span class="lst__name">' + name + '</span>' + (note ? '<span class="lst__note">' + note + '</span>' : '') + '</span>' +
+      (end ? '<span class="lst__end">' + end + '</span>' : '') +
+    '</div>';
+  }
+
+  function field(label, name, value, type) {
+    return '<label class="msv-field"><span class="msv-field__label">' + esc(label) + '</span>' +
+      '<input class="msv-input" data-f="' + name + '" type="' + (type || 'text') + '" value="' + esc(value) + '"></label>';
+  }
+
+  function draw(d) {
+    document.getElementById('title').textContent = d.me.name || 'Карточка резидента';
+    document.title = (d.me.name || 'Карточка резидента') + ' — МСВ';
+
+    var live = d.bookings.filter(function (b) {
+      var t = new Date().toISOString().slice(0, 10);
+      return b.from <= t && b.to >= t;
+    })[0] || d.bookings[0] || null;
+
+    var balance = d.bookings.reduce(function (s, b) { return s + b.balance; }, 0);
+    var openTickets = d.tickets.filter(function (t) { return t.status === 'Принята' || t.status === 'В работе'; }).length;
+
+    var html = '';
+
+    /* ---------- шапка ---------- */
+    html += '<div class="card-top">' +
+      (d.profile.photo
+        ? '<img class="card-top__ava" src="' + esc(d.profile.photo) + '" alt="" data-zoom>'
+        : '<span class="card-top__ava">' + esc(initials(d.me.name)) + '</span>') +
+      '<span class="card-top__t">' +
+        '<h2 class="msv-sub card-top__name">' + esc(d.me.name || 'Без имени') + '</h2>' +
+        '<p class="msv-body card-top__sub">' + (live
+            ? esc((live.tier ? live.tier[0].toUpperCase() + live.tier.slice(1) : 'Место') + ' ' + live.label + ' · ' + live.room + ' · ' + live.residence)
+            : 'Места сейчас нет') + '</p>' +
+        '<p class="msv-body card-top__sub">' + esc(d.me.phone || 'телефон не указан') + (d.me.email ? ' · ' + esc(d.me.email) : '') + '</p>' +
+        '<span class="card-top__tags">' +
+          (balance > 0.5 ? '<span class="tag tag--bad">долг ' + esc(money(balance)) + '</span>' : '<span class="tag tag--ok">долгов нет</span>') +
+          (d.profile.docsSignedAt ? '<span class="tag tag--info">документы приняты</span>' : '<span class="tag tag--warn">документы не приняты</span>') +
+          (d.me.isActive ? '' : '<span class="tag tag--bad">вход закрыт</span>') +
+        '</span>' +
+      '</span></div>';
+
+    /* ---------- числа ---------- */
+    html += '<div class="facts">' +
+      '<div class="fact"><span>Баланс</span><b class="' + (balance > 0.5 ? 'bad' : 'ok') + '">' + esc(balance > 0.5 ? money(balance) : 'нет долга') + '</b></div>' +
+      '<div class="fact"><span>Репутация</span><b>' + d.reputation.score + '</b></div>' +
+      '<div class="fact"><span>Жизней</span><b>' + d.reputation.lives + ' из 3</b></div>' +
+      '<div class="fact"><span>Заявок открыто</span><b>' + openTickets + '</b></div>' +
+      '<div class="fact"><span>Входов</span><b>' + d.logins.total + '</b></div>' +
+      '<div class="fact"><span>Оплат</span><b>' + d.payments.length + '</b></div>' +
+    '</div>';
+
+    /* ---------- анкета ---------- */
+    var p = d.profile;
+    html += sect('Анкета',
+      '<dl class="pairs">' +
+        '<div><dt>Фамилия</dt><dd>' + esc(p.lastName || '—') + '</dd></div>' +
+        '<div><dt>Имя</dt><dd>' + esc(p.firstName || '—') + '</dd></div>' +
+        '<div><dt>Отчество</dt><dd>' + esc(p.middleName || '—') + '</dd></div>' +
+        '<div><dt>Пол</dt><dd>' + esc(p.gender === 'ж' ? 'женский' : (p.gender === 'м' ? 'мужской' : '—')) + '</dd></div>' +
+        '<div><dt>Дата рождения</dt><dd>' + (p.birthday ? esc(day(p.birthday)) : '—') + '</dd></div>' +
+        '<div><dt>Город</dt><dd>' + esc(p.city || '—') + '</dd></div>' +
+        '<div><dt>ВУЗ</dt><dd>' + esc(p.university || '—') + '</dd></div>' +
+        '<div><dt>Курс</dt><dd>' + esc(p.course || '—') + '</dd></div>' +
+        '<div><dt>Факультет</dt><dd>' + esc(p.faculty || '—') + '</dd></div>' +
+        '<div><dt>Телефон</dt><dd>' + esc(d.me.phone || '—') + '</dd></div>' +
+        '<div><dt>Почта</dt><dd>' + esc(d.me.email || '—') + '</dd></div>' +
+        '<div><dt>Мессенджеры</dt><dd>' + esc((p.messengers || []).map(function (m) { return m === 'tg' ? 'Telegram' : 'Макс'; }).join(', ') || '—') + '</dd></div>' +
+        '<div><dt>Контактное лицо</dt><dd>' + esc(p.contactPerson || '—') + '</dd></div>' +
+        '<div><dt>Профиль VK</dt><dd>' + (p.vk ? '<a class="msv-link" href="' + esc(p.vk) + '" target="_blank" rel="noopener">' + esc(p.vk) + '</a>' : '—') + '</dd></div>' +
+        '<div><dt>Самочувствие</dt><dd>' + esc(p.healthScore ? p.healthScore + ' из 5' : '—') + '</dd></div>' +
+        '<div><dt>Анкета обновлена</dt><dd>' + (p.updatedAt ? esc(dayTime(p.updatedAt)) : '—') + '</dd></div>' +
+      '</dl>' +
+      (p.about ? '<p class="msv-body" style="margin:var(--msv-s12) 0 0"><b>О себе.</b> ' + esc(p.about) + '</p>' : '') +
+      '<div class="edit" id="edit" hidden style="margin-top:var(--msv-s16)">' +
+        '<div class="edit-grid">' +
+          field('Фамилия', 'lastName', p.lastName) + field('Имя', 'firstName', p.firstName) +
+          field('Отчество', 'middleName', p.middleName) + field('Дата рождения', 'birthday', p.birthday || '', 'date') +
+          field('Город', 'city', p.city) + field('ВУЗ', 'university', p.university) +
+          field('Курс', 'course', p.course) + field('Факультет', 'faculty', p.faculty) +
+          field('Телефон', 'phone', d.me.phone, 'tel') + field('Почта', 'email', d.me.email, 'email') +
+          field('Контактное лицо', 'contactPerson', p.contactPerson) + field('Профиль VK', 'vk', p.vk) +
+        '</div>' +
+        '<p class="msv-note" style="margin:var(--msv-s12) 0 0">Каждая правка попадает в журнал: видно, кто и когда менял.</p>' +
+        '<div class="edit-foot">' +
+          '<button class="msv-btn msv-btn--m msv-btn--primary" type="button" id="save">Сохранить</button>' +
+          '<button class="msv-btn msv-btn--m msv-btn--tertiary" type="button" id="cancel">Отмена</button>' +
+          '<span class="msv-note" id="saveMsg"></span>' +
+        '</div>' +
+      '</div>',
+      '<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" id="editBtn">Править анкету</button>');
+
+    /* ---------- проживание ---------- */
+    html += sect('Проживание', d.bookings.length
+      ? rows(d.bookings, function (b) {
+          return row(day(b.from) + ' — ' + day(b.to),
+            esc(b.room + ' · ' + b.label + (b.tier ? ' (' + b.tier + ')' : '')),
+            esc(b.residence + ' · ' + b.tariff + ' · ' + money(b.price) + ' в месяц') +
+              (b.releaseFrom ? ' · <b>в продаже с ' + esc(day(b.releaseFrom)) + '</b>' : ''),
+            '<span class="num">' + esc(money(b.paid)) + ' из ' + esc(money(b.accrued)) + '</span>');
+        })
+      : empty('Броней не было.'));
+
+    /* ---------- деньги ---------- */
+    html += sect('Начисления', d.charges.length
+      ? rows(d.charges, function (c) {
+          return row(c.period ? monthOf(c.period) : day(c.at),
+            esc(c.kind === 'deposit' ? 'Депозит' : (c.kind === 'penalty' ? 'Пени' : 'Проживание')),
+            esc(c.note || (c.due ? 'оплатить до ' + day(c.due) : '')),
+            '<span class="num">' + esc(money(c.amount)) + '</span>');
+        })
+      : empty('Начислений нет.'));
+
+    html += sect('Оплаты', d.payments.length
+      ? rows(d.payments, function (x) {
+          return row(dayTime(x.at),
+            esc(x.period ? 'за ' + monthOf(x.period) : 'платёж'),
+            esc(({ sbp: 'СБП', card: 'карта', cash: 'наличные', transfer: 'перевод', other: 'другое' })[x.method] || x.method) + (x.note ? ' · ' + esc(x.note) : ''),
+            '<span class="num">' + esc(money(x.amount)) + '</span>');
+        })
+      : empty('Оплат не было.'));
+
+    /* ---------- документы ---------- */
+    html += sect('Подписанные документы', d.signatures.length
+      ? rows(d.signatures, function (x) { return row(dayTime(x.at), esc(x.name), '', ''); })
+      : empty('Документы ещё не подписаны.'));
+
+    html += sect('Выданные документы', (d.registrations.length || d.requests.filter(function (r) { return r.url; }).length)
+      ? rows(d.registrations.map(function (r) { return { t: 'Регистрация ' + (r.number || ''), n: r.address || '', w: day(r.issued) + ' — ' + day(r.until), u: '' }; })
+          .concat(d.requests.filter(function (r) { return r.url; }).map(function (r) { return { t: r.kind, n: r.note, w: day(r.at), u: r.url }; })),
+          function (x) { return row(x.w, esc(x.t), esc(x.n), x.u ? '<a class="msv-link" href="' + esc(x.u) + '" target="_blank" rel="noopener">файл</a>' : ''); })
+      : empty('Документов пока не выдавали.'));
+
+    html += sect('Загруженные резидентом', d.files.length
+      ? '<div class="files">' + d.files.map(function (f) {
+          return '<a href="' + esc(f.url) + '" target="_blank" rel="noopener">' + esc(f.kindName) + ' · ' + esc(day(f.at)) + '</a>';
+        }).join('') + '</div>'
+      : empty('Резидент ничего не загружал.'));
+
+    /* ---------- репутация ---------- */
+    html += sect('Репутация', d.reputation.events.length
+      ? rows(d.reputation.events, function (e) {
+          return row(dayTime(e.at), esc(e.title), esc(e.details) + (e.author ? ' · ' + esc(e.author) : ''),
+            '<b class="num" style="color:' + (e.delta < 0 ? 'var(--msv-red)' : '#4A6B12') + '">' + (e.delta > 0 ? '+' : '') + e.delta + '</b>');
+        })
+      : empty('Событий репутации нет.'));
+
+    /* ---------- заявки и запросы ---------- */
+    html += sect('Заявки технику', d.tickets.length
+      ? rows(d.tickets, function (t) {
+          return row(dayTime(t.at), esc(t.category + (t.room ? ' · ' + t.room : '')),
+            esc(t.text) + (t.master ? ' · ' + esc(t.master) : ''),
+            '<span class="msv-note">' + esc(t.status) + '</span>');
+        })
+      : empty('Заявок не было.'));
+
+    html += sect('Запросы документов', d.requests.length
+      ? rows(d.requests, function (r) { return row(dayTime(r.at), esc(r.kind), esc(r.note), '<span class="msv-note">' + esc(r.status) + '</span>'); })
+      : empty('Запросов не было.'));
+
+    html += sect('Обращения «Хочу сказать»', d.feedback.length
+      ? rows(d.feedback, function (f) { return row(dayTime(f.at), esc(f.topic), esc(f.text), '<span class="msv-note">' + (f.answered ? 'отвечено' : 'без ответа') + '</span>'); })
+      : empty('Обращений не было.'));
+
+    /* ---------- входы и уведомления ---------- */
+    html += sect('Входы в кабинет', d.logins.last.length
+      ? rows(d.logins.last, function (l) { return row(dayTime(l.at), l.ok ? 'вход' : 'неудачная попытка', esc(l.ip), ''); })
+      : empty('Входов не было.'),
+      '<span class="msv-note">всего ' + d.logins.total + '</span>');
+
+    html += sect('Уведомления', d.notices.length
+      ? rows(d.notices, function (n) { return row(dayTime(n.at), esc(n.text), '', '<span class="msv-note">' + (n.read ? 'прочитано' : 'не прочитано') + '</span>'); })
+      : empty('Уведомлений не было.'));
+
+    body.innerHTML = html;
+    wireEdit(d);
+  }
+
+  function wireEdit(d) {
+    var edit = document.getElementById('edit');
+    var btn = document.getElementById('editBtn');
+    if (!edit || !btn) return;
+    btn.addEventListener('click', function () {
+      edit.hidden = !edit.hidden;
+      btn.textContent = edit.hidden ? 'Править анкету' : 'Свернуть правку';
+    });
+    document.getElementById('cancel').addEventListener('click', function () {
+      edit.hidden = true; btn.textContent = 'Править анкету';
+    });
+    document.getElementById('save').addEventListener('click', function () {
+      var msg = document.getElementById('saveMsg');
+      var payload = { messengers: d.profile.messengers, gender: d.profile.gender, healthScore: d.profile.healthScore, about: d.profile.about };
+      edit.querySelectorAll('[data-f]').forEach(function (i) { payload[i.dataset.f] = i.value.trim(); });
+      if (!ctx.live) { msg.textContent = 'Без сервера правка не сохраняется.'; return; }
+      msg.textContent = 'Сохраняем…';
+      ctx.api('PUT', '/api/residents/' + encodeURIComponent(d.me.id) + '/profile', payload)
+        .then(function (r) {
+          if (r.status !== 200) { msg.textContent = (r.body && r.body.error) || 'Не удалось сохранить.'; return; }
+          msg.textContent = 'Сохранено.';
+          load();
+        })
+        .catch(function () { msg.textContent = 'Сервер не отвечает.'; });
+    });
+  }
+
+  function load() {
+    if (!id) { body.innerHTML = '<p class="msv-body">Не указан резидент: откройте карточку из шахматки.</p>'; return; }
+    if (!ctx.live) { body.innerHTML = '<p class="msv-body">Карточка резидента работает только с сервером.</p>'; return; }
+    ctx.api('GET', '/api/residents/' + encodeURIComponent(id) + '/card')
+      .then(function (r) {
+        if (r.status !== 200) { body.innerHTML = '<p class="msv-body">' + esc((r.body && r.body.error) || 'Не удалось загрузить карточку.') + '</p>'; return; }
+        draw(r.body);
+      })
+      .catch(function () { body.innerHTML = '<p class="msv-body">Сервер не отвечает.</p>'; });
+  }
+
+  load();
+});
+</script>
+<script src="mark.js"></script>
+<script src="zoom.js"></script>
+<script src="protect.js"></script>
+
+</body>
+</html>

@@ -29,6 +29,7 @@ require('./routes/resident')(router.route);
 require('./routes/forms')(router.route);
 require('./routes/waitlist')(router.route);
 require('./routes/staff')(router.route);
+require('./routes/card')(router.route);
 
 // Проверка живости — для nginx и для себя
 router.route('GET', '/api/health', async (req, res) => {

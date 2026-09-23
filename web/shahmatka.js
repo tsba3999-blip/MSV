@@ -1671,12 +1671,17 @@
       '<button type="button" class="msv-sh__panel-close msv-sh__panel-close--float" data-act="close" aria-label="Закрыть карточку">×</button>' +
       '<div class="msv-sh__panel-body msv-sh__panel-body--flush">' +
 
+        // Щелчок по имени открывает полную карточку резидента: анкета,
+        // документы, деньги, репутация, заявки, входы (23.09.2026).
+        // Аватар остаётся своей кнопкой — он показывает фото крупно.
         '<div class="msv-sh__sect"><div class="msv-sh__ident">' + avatar +
-          '<div><div class="msv-sh__ident-name">' + esc(res ? res.name : 'Без имени') + '</div>' +
-          '<div class="msv-sh__ident-sub"><span class="msv-sh__badge msv-sh__badge--' + st + '">' +
-            esc(STATUS_LABEL[st]) + '</span></div>' +
-          // где живёт — под именем и статусом «проживает»
-          '<div class="msv-sh__ident-place">' + esc(upFirst(placeText)) + '</div></div>' +
+          '<a class="msv-sh__ident-link" href="resident-card.html?id=' + esc(res ? res.id : '') + '" title="Открыть карточку резидента">' +
+            '<div class="msv-sh__ident-name">' + esc(res ? res.name : 'Без имени') + '</div>' +
+            '<div class="msv-sh__ident-sub"><span class="msv-sh__badge msv-sh__badge--' + st + '">' +
+              esc(STATUS_LABEL[st]) + '</span></div>' +
+            // где живёт — под именем и статусом «проживает»
+            '<div class="msv-sh__ident-place">' + esc(upFirst(placeText)) + '</div>' +
+          '</a>' +
         '</div></div>' +
 
         '<div class="msv-sh__sect">' +

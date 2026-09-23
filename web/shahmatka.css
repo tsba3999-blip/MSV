@@ -813,6 +813,20 @@ body.msv-sh-dragging .msv-sh__bar { cursor: grabbing; }
 .msv-sh__sect:last-child { border-bottom: 0; }
 
 .msv-sh__ident { display: flex; align-items: center; gap: 12px; }
+/* Имя, статус и место — одна большая ссылка в карточку резидента */
+.msv-sh__ident-link {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: -6px -8px;
+  padding: 6px 8px;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background .12s ease;
+}
+.msv-sh__ident-link:hover { background: var(--sh-bg-alt); }
+.msv-sh__ident-link:focus-visible { outline: 2px solid var(--sh-accent); outline-offset: 2px; }
 
 .msv-sh__avatar-btn {
   flex: 0 0 auto;
