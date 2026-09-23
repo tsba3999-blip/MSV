@@ -222,7 +222,7 @@ MSV.ready(function (ctx) {
     var rooms = ROOMS.filter(function (r) {
       if (filter.sex && r.sex !== filter.sex) return false;
       if (filter.size && String(r.size) !== filter.size) return false;
-      if (filter.free === 'soon') return r.beds.some(function (b) { return b.soon > 0; });
+      if (filter.free === 'soon') return r.beds.some(function (b) { return b.soon > 0 && b.left === 0; });
       if (filter.free && !r.beds.some(function (b) { return b.left > 0; })) return false;
       return true;
     });
