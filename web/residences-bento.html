@@ -1,0 +1,623 @@
+<!doctype html>
+<!-- © 2026 МСВ. Все права защищены. Сайт и его программное обеспечение охраняются ГК РФ (ст. 1259, 1261). Копирование без разрешения правообладателя запрещено. Подробнее: /legal.html -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon4.png" type="image/png">
+<meta name="theme-color" content="#F5F1EA">
+<title>Выбор резиденции — 20 вариантов — МСВ</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="resident.css">
+<style>
+  /* ============================================================
+     Двадцать компоновок страницы выбора резиденции (23.09.2026).
+
+     Что сохранено во всех вариантах: фотография, число свободных
+     мест (и «мест нет»), цена, метро и адрес, знак резиденции.
+     Что изменено по замечаниям заказчика:
+       — придуманной кнопки «Смотреть места» нет нигде. Либо вся
+         карточка — ссылка (как плитки на главной), либо кнопка
+         подписана словом «Выбрать», которое уже есть в продукте;
+       — знаки крупные: от 56 до 88 пикселей вместо 44;
+       — компоновки разные, многие построены на бенто-плитках.
+     По брендбуку: фон бежевый, карточки белые, красный только на
+     главном действии, не больше двух акцентов на экран.
+     ============================================================ */
+
+  body { background: var(--msv-beige); }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 var(--msv-s16) var(--msv-s32); }
+
+  /* ---------- оглавление ---------- */
+  .toc { position: sticky; top: 0; z-index: 5; margin: 0 calc(var(--msv-s16) * -1) var(--msv-s16); padding: var(--msv-s8) var(--msv-s16); background: var(--msv-beige); border-bottom: 1px solid var(--msv-n100); }
+  .toc__row { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+  .toc__row::-webkit-scrollbar { display: none; }
+  .toc a { flex: 0 0 auto; min-width: 34px; height: 30px; display: inline-flex; align-items: center; justify-content: center; font: 600 13px/1 var(--msv-font); color: var(--msv-graphite); background: var(--msv-white); border: 1.5px solid var(--msv-n300); border-radius: 15px; text-decoration: none; }
+  .toc a:hover { border-color: var(--msv-graphite); }
+
+  /* ---------- заголовок варианта ---------- */
+  .v { padding-top: var(--msv-s32); scroll-margin-top: 56px; }
+  .v__num { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; margin-right: var(--msv-s8); font: 700 14px/1 var(--msv-font); color: var(--msv-white); background: var(--msv-graphite); border-radius: 50%; }
+  .v__head { display: flex; align-items: center; margin: 0 0 var(--msv-s4); }
+  .v__note { margin: 0 0 var(--msv-s16); color: var(--msv-n500); }
+  .v__body { }
+
+  /* ---------- общее для всех вариантов ---------- */
+  .g { display: grid; gap: var(--msv-s16); }
+  @media (min-width: 900px) { .g--3 { grid-template-columns: repeat(3, 1fr); align-items: start; } }
+
+  .shots { position: relative; display: flex; gap: 2px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; background: var(--msv-n100); }
+  .shots::-webkit-scrollbar { display: none; }
+  .shots img { flex: 0 0 100%; scroll-snap-align: start; display: block; width: 100%; height: 100%; object-fit: cover; }
+  .noshot { flex: 0 0 100%; display: flex; align-items: center; justify-content: center; padding: var(--msv-s16); font-size: var(--msv-note-size); color: var(--msv-n500); text-align: center; }
+
+  .free { display: inline-flex; align-items: center; height: 28px; padding: 0 11px; font: 700 12px/1 var(--msv-font); letter-spacing: .04em; text-transform: uppercase; color: var(--msv-graphite); background: var(--msv-lime); border-radius: 6px; white-space: nowrap; }
+  .free--none { color: var(--msv-white); background: var(--msv-graphite); }
+
+  .lg { display: block; object-fit: cover; background: var(--msv-white); }
+  .lg--56 { width: 56px; height: 56px; border-radius: 14px; }
+  .lg--64 { width: 64px; height: 64px; border-radius: 16px; }
+  .lg--72 { width: 72px; height: 72px; border-radius: 18px; }
+  .lg--88 { width: 88px; height: 88px; border-radius: 22px; }
+  .lg--ring { border: 3px solid var(--msv-white); box-shadow: 0 3px 12px rgba(22,32,47,.22); }
+
+  .kind { display: block; font: 600 10px/16px var(--msv-font); letter-spacing: .06em; text-transform: uppercase; color: var(--msv-n500); }
+  .price b { font-weight: 700; white-space: nowrap; }
+  .price small { display: block; font-weight: 500; font-size: var(--msv-note-size); line-height: var(--msv-note-line); color: var(--msv-n500); }
+  .card { display: block; color: inherit; text-decoration: none; background: var(--msv-white); border-radius: var(--msv-r20); box-shadow: var(--msv-e1); overflow: hidden; transition: transform var(--msv-fast) var(--msv-ease); }
+  .card:active { transform: scale(.99); }
+  .card:focus-visible { outline: 2px solid var(--msv-violet); outline-offset: 2px; }
+
+  /* ============ 1. Бенто: фото-плитка и две плитки под ней ============ */
+  .v1 .top { position: relative; aspect-ratio: 16/10; }
+  .v1 .top .shots { height: 100%; }
+  .v1 .lg { position: absolute; left: var(--msv-s12); top: var(--msv-s12); }
+  .v1 .free { position: absolute; right: var(--msv-s12); top: var(--msv-s12); }
+  .v1 .body { padding: var(--msv-s16); }
+  .v1 .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: var(--msv-s8); margin-top: var(--msv-s12); }
+  .v1 .tile { padding: var(--msv-s12); background: var(--msv-beige); border-radius: var(--msv-r12); }
+  .v1 .tile span { display: block; font-size: var(--msv-note-size); color: var(--msv-n500); }
+  .v1 .tile b { display: block; margin-top: 2px; font-weight: 700; }
+
+  /* ============ 2. Фото во всю карточку, подпись на затемнении ============ */
+  .v2 .card { position: relative; aspect-ratio: 4/5; }
+  .v2 .shots { position: absolute; inset: 0; }
+  .v2 .veil { position: absolute; inset: auto 0 0 0; padding: var(--msv-s16); color: var(--msv-white);
+    background: linear-gradient(to top, rgba(16,22,31,.88), rgba(16,22,31,.55) 55%, rgba(16,22,31,0)); }
+  .v2 .veil .kind { color: rgba(255,255,255,.75); }
+  .v2 .lg { position: absolute; left: var(--msv-s16); top: var(--msv-s16); }
+  .v2 .free { position: absolute; right: var(--msv-s16); top: var(--msv-s16); }
+  .v2 .row { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--msv-s12); margin-top: var(--msv-s8); }
+  .v2 .price small { color: rgba(255,255,255,.75); }
+
+  /* ============ 3. Знак крупно в шапке, фото ниже ============ */
+  .v3 .head3 { display: flex; align-items: center; gap: var(--msv-s12); padding: var(--msv-s16); }
+  .v3 .head3 .t { flex: 1 1 auto; min-width: 0; }
+  .v3 .shots { aspect-ratio: 16/9; }
+  .v3 .foot { display: flex; align-items: center; justify-content: space-between; gap: var(--msv-s12); padding: var(--msv-s16); }
+
+  /* ============ 4. Горизонтальная: фото слева ============ */
+  .v4 .card { display: flex; flex-direction: column; }
+  .v4 .shots { aspect-ratio: 16/10; }
+  .v4 .body { flex: 1 1 auto; padding: var(--msv-s16); }
+  .v4 .foot { display: flex; align-items: center; justify-content: space-between; gap: var(--msv-s12); margin-top: var(--msv-s12); }
+  @media (min-width: 720px) {
+    .v4 .card { flex-direction: row; align-items: stretch; }
+    .v4 .media { position: relative; flex: 0 0 44%; }
+    .v4 .shots { height: 100%; aspect-ratio: auto; }
+    .v4 .lg { position: absolute; left: var(--msv-s12); top: var(--msv-s12); }
+  }
+
+  /* ============ 5. Мозаика: фото 2×1, знак, места, цена ============ */
+  .v5 .card { padding: var(--msv-s12); }
+  .v5 .m { display: grid; grid-template-columns: 1fr 1fr; gap: var(--msv-s8); }
+  .v5 .m > * { border-radius: var(--msv-r12); }
+  .v5 .shots { grid-column: span 2; aspect-ratio: 16/9; border-radius: var(--msv-r12); }
+  .v5 .cell { display: flex; flex-direction: column; justify-content: space-between; min-height: 84px; padding: var(--msv-s12); background: var(--msv-beige); }
+  .v5 .cell span { font-size: var(--msv-note-size); color: var(--msv-n500); }
+  .v5 .cell b { font-weight: 700; }
+  .v5 .who { grid-column: span 2; display: flex; align-items: center; gap: var(--msv-s12); padding: var(--msv-s8) var(--msv-s4) var(--msv-s4); }
+
+  /* ============ 6. Строка списка: знак, имя, число мест ============ */
+  .v6 .card { display: flex; align-items: center; gap: var(--msv-s16); padding: var(--msv-s16); border-radius: var(--msv-r20); }
+  .v6 .t { flex: 1 1 auto; min-width: 0; }
+  .v6 .n { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+  .v6 .n b { font-size: var(--msv-sub-size); line-height: 1; font-weight: 700; }
+  .v6 .n span { font-size: var(--msv-note-size); color: var(--msv-n500); }
+  .v6 .ch { flex: 0 0 auto; color: var(--msv-n300); }
+
+  /* ============ 7. Число свободных мест — главный герой ============ */
+  .v7 .card { position: relative; }
+  .v7 .shots { aspect-ratio: 16/10; }
+  .v7 .big { position: absolute; right: var(--msv-s12); top: var(--msv-s12); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 78px; height: 78px; background: var(--msv-lime); border-radius: 20px; }
+  .v7 .big b { font: 700 30px/1 var(--msv-font); color: var(--msv-graphite); }
+  .v7 .big span { font: 600 10px/14px var(--msv-font); letter-spacing: .04em; text-transform: uppercase; color: var(--msv-graphite); }
+  .v7 .big--none { background: var(--msv-graphite); }
+  .v7 .big--none b, .v7 .big--none span { color: var(--msv-white); }
+  .v7 .big--none b { font-size: 15px; line-height: 20px; text-align: center; }
+  .v7 .body { display: flex; align-items: center; gap: var(--msv-s12); padding: var(--msv-s16); }
+  .v7 .t { flex: 1 1 auto; min-width: 0; }
+
+  /* ============ 8. Паспарту: фото в белых полях, знак внахлёст ============ */
+  .v8 .card { padding: var(--msv-s12) var(--msv-s12) var(--msv-s16); }
+  .v8 .media { position: relative; }
+  .v8 .shots { aspect-ratio: 16/10; border-radius: var(--msv-r12); }
+  .v8 .lg { position: absolute; left: 50%; bottom: -28px; transform: translateX(-50%); }
+  .v8 .body { padding-top: 36px; text-align: center; }
+  .v8 .foot { display: flex; align-items: center; justify-content: center; gap: var(--msv-s12); margin-top: var(--msv-s12); }
+  .v8 .free { margin-top: var(--msv-s8); }
+
+  /* ============ 9. Цветная подложка по наличию мест ============ */
+  .v9 .card { background: var(--msv-lime); }
+  .v9 .card--none { background: var(--msv-graphite); color: var(--msv-white); }
+  .v9 .inner { margin: var(--msv-s12); background: var(--msv-white); border-radius: var(--msv-r12); overflow: hidden; color: var(--msv-graphite); }
+  .v9 .shots { aspect-ratio: 16/10; }
+  .v9 .body { padding: var(--msv-s12); }
+  .v9 .strip { display: flex; align-items: center; justify-content: space-between; gap: var(--msv-s12); padding: 0 var(--msv-s16) var(--msv-s12); font: 700 13px/1 var(--msv-font); letter-spacing: .04em; text-transform: uppercase; }
+
+  /* ============ 10. Фото на всю ширину экрана, сведения в капсуле ============ */
+  .v10 .card { background: none; box-shadow: none; overflow: visible; }
+  .v10 .shots { aspect-ratio: 16/9; border-radius: var(--msv-r20); }
+  .v10 .cap { position: relative; margin: -32px var(--msv-s16) 0; padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r20); box-shadow: var(--msv-e1); }
+  .v10 .cap .lg { position: absolute; right: var(--msv-s16); top: calc(var(--msv-s16) * -1); }
+  .v10 .foot { display: flex; align-items: center; justify-content: space-between; gap: var(--msv-s12); margin-top: var(--msv-s12); }
+
+  /* ============ 11. Две колонки внутри карточки ============ */
+  .v11 .shots { aspect-ratio: 21/9; }
+  .v11 .body { display: flex; gap: var(--msv-s16); padding: var(--msv-s16); }
+  .v11 .l { flex: 1 1 auto; min-width: 0; }
+  .v11 .r { flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-end; gap: var(--msv-s8); text-align: right; }
+
+  /* ============ 12. Столбец мини-плиток под фото ============ */
+  .v12 .shots { aspect-ratio: 16/10; }
+  .v12 .body { padding: var(--msv-s16); }
+  .v12 .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--msv-s8); margin-top: var(--msv-s12); text-align: center; }
+  .v12 .three div { padding: var(--msv-s8) var(--msv-s4); background: var(--msv-beige); border-radius: var(--msv-r11); }
+  .v12 .three b { display: block; font-weight: 700; }
+  .v12 .three span { display: block; font-size: 11px; line-height: 15px; color: var(--msv-n500); }
+
+  /* ============ 13. Без карточки: фото прямо на беже ============ */
+  .v13 .card { background: none; box-shadow: none; }
+  .v13 .media { position: relative; }
+  .v13 .shots { aspect-ratio: 4/3; border-radius: var(--msv-r20); }
+  .v13 .lg { position: absolute; left: var(--msv-s12); bottom: var(--msv-s12); }
+  .v13 .free { position: absolute; right: var(--msv-s12); top: var(--msv-s12); }
+  .v13 .body { padding: var(--msv-s12) var(--msv-s4) 0; }
+  .v13 .foot { display: flex; align-items: center; justify-content: space-between; gap: var(--msv-s12); margin-top: var(--msv-s8); }
+
+  /* ============ 14. Табло: крупная типографика, знак как аватар ============ */
+  .v14 .card { padding: var(--msv-s16); }
+  .v14 .row1 { display: flex; align-items: center; gap: var(--msv-s12); }
+  .v14 .row1 .t { flex: 1 1 auto; min-width: 0; }
+  .v14 .huge { margin: var(--msv-s12) 0 0; font: 700 34px/38px var(--msv-font); letter-spacing: -.01em; }
+  .v14 .huge small { display: block; font: 500 var(--msv-note-size)/var(--msv-note-line) var(--msv-font); color: var(--msv-n500); }
+  .v14 .thumbs { display: flex; gap: 4px; margin-top: var(--msv-s12); }
+  .v14 .thumbs img { width: 56px; height: 56px; object-fit: cover; border-radius: var(--msv-r11); }
+  .v14 .foot { display: flex; align-items: center; justify-content: space-between; gap: var(--msv-s12); margin-top: var(--msv-s12); }
+
+  /* ============ 15. Обложка 4:5 со знаком по центру ============ */
+  .v15 .card { position: relative; aspect-ratio: 4/5; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .v15 .shots { position: absolute; inset: 0; }
+  .v15 .dim { position: absolute; inset: 0; background: rgba(16,22,31,.5); }
+  .v15 .mid { position: relative; padding: var(--msv-s16); color: var(--msv-white); }
+  .v15 .mid .lg { margin: 0 auto var(--msv-s12); }
+  .v15 .free { position: absolute; left: 50%; bottom: var(--msv-s16); transform: translateX(-50%); }
+
+  /* ============ 16. Сравнение: три строки одной таблицей ============ */
+  .v16 .tbl { background: var(--msv-white); border-radius: var(--msv-r20); box-shadow: var(--msv-e1); overflow: hidden; }
+  .v16 .r16 { display: flex; align-items: center; gap: var(--msv-s12); padding: var(--msv-s12) var(--msv-s16); border-bottom: 1px solid var(--msv-n100); color: inherit; text-decoration: none; }
+  .v16 .r16:last-child { border-bottom: 0; }
+  .v16 .ph { flex: 0 0 auto; width: 84px; height: 60px; object-fit: cover; border-radius: var(--msv-r11); background: var(--msv-n100); }
+  .v16 .t { flex: 1 1 auto; min-width: 0; }
+  .v16 .num { flex: 0 0 auto; text-align: right; }
+  .v16 .num b { display: block; font-weight: 700; }
+  .v16 .num span { font-size: var(--msv-note-size); color: var(--msv-n500); }
+
+  /* ============ 17. Лепесток: брендовая форма карточки ============ */
+  .v17 .card { border-radius: 32px 8px 32px 8px; }
+  .v17 .card:nth-child(even) { border-radius: 8px 32px 8px 32px; }
+  .v17 .media { position: relative; }
+  .v17 .shots { aspect-ratio: 16/10; }
+  .v17 .lg { position: absolute; right: var(--msv-s12); bottom: calc(var(--msv-s12) * -1); border-radius: 18px 6px 18px 6px; }
+  .v17 .body { padding: var(--msv-s16); }
+  .v17 .foot { display: flex; align-items: center; justify-content: space-between; gap: var(--msv-s12); margin-top: var(--msv-s12); }
+
+  /* ============ 18. Знак на цветном поле сверху, фото снизу ============ */
+  .v18 .cap18 { display: flex; align-items: center; gap: var(--msv-s12); padding: var(--msv-s16); background: var(--msv-beige); }
+  .v18 .cap18 .t { flex: 1 1 auto; min-width: 0; }
+  .v18 .shots { aspect-ratio: 16/9; }
+  .v18 .foot { display: flex; align-items: center; justify-content: space-between; gap: var(--msv-s12); padding: var(--msv-s16); }
+
+  /* ============ 19. Фотолента во всю ширину, текст сбоку от неё ============ */
+  .v19 .card { padding: 0; }
+  .v19 .shots { aspect-ratio: 16/9; }
+  .v19 .under { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: var(--msv-s12); padding: var(--msv-s12) var(--msv-s16); }
+  .v19 .t { min-width: 0; }
+  .v19 .pr { text-align: right; }
+
+  /* ============ 20. Самое короткое: фото, имя, одна строка ============ */
+  .v20 .shots { aspect-ratio: 3/2; }
+  .v20 .body { padding: var(--msv-s12) var(--msv-s16) var(--msv-s16); }
+  .v20 .one { margin: var(--msv-s4) 0 0; color: var(--msv-n500); }
+  .v20 .one b { color: var(--msv-graphite); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="head">
+    <a class="head__back" href="residences.html" aria-label="Вернуться назад">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 6l-6 6 6 6"/>
+      </svg>
+    <span class="head__back-label form__back-label">Вернуться</span></a>
+    <h1 class="msv-sub head__title">Выбор резиденции: 20 вариантов</h1>
+  </div>
+
+  <p class="msv-body" style="margin:0 0 var(--msv-s16);color:var(--msv-n500)">Во всех вариантах одни и те же сведения: фотографии, свободные места, цена, метро и адрес, знак резиденции. Придуманной кнопки «Смотреть места» нет: либо вся карточка — ссылка, как плитки на главной, либо кнопка подписана словом «Выбрать», которое уже есть на выборе места. Знаки крупные. Цены и свободные места настоящие, с сервера.</p>
+
+  <nav class="toc" aria-label="Варианты"><div class="toc__row" id="toc"></div></nav>
+
+  <div id="all"></div>
+
+</div>
+
+<script src="photos.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- данные: те же, что на боевой странице ---------- */
+
+  var R = [
+    { id: 'forma', name: 'Forma', kind: 'Комфорт-резиденция', metro: 'Шаболовская', addr: 'Конный пер., 12',
+      note: 'Свои санузлы в части комнат, коворкинг, лаундж', logo: 'forma.png', beds: 57 },
+    { id: 'uyut', name: 'Уют на Варшавке', kind: 'Эконом-резиденция', metro: 'Нагатинская', addr: 'Варшавское шоссе, 18к2',
+      note: 'Комнаты от двух до восьми мест, капсулы', logo: 'uyt.gif', beds: 78 },
+    { id: 'molod', name: 'Молодежка', kind: 'Квартира для девушек-студенток', metro: 'Молодежная', addr: 'ул. Партизанская, 40',
+      note: 'Три двухместные комнаты, только девушки', logo: 'molodejka.png', beds: 6 }
+  ];
+  var PRICE = {}, FREE = {};
+
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function money(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' руб.'; }
+  function places(n) { var a = n % 10, b = n % 100; if (b > 10 && b < 20) return 'мест'; if (a === 1) return 'место'; if (a >= 2 && a <= 4) return 'места'; return 'мест'; }
+  function href(r) { return 'rooms.html?res=' + esc(r.id); }
+
+  function ph(r, n) { return (window.MSV_PHOTOS ? MSV_PHOTOS.all(r.id) : []).slice(0, n || 8); }
+
+  /* Лента фотографий. Пока снимков нет — честная надпись, а не пустое место */
+  function shots(r, n) {
+    var list = ph(r, n);
+    if (!list.length) return '<div class="shots"><span class="noshot">Фотографии этой резиденции скоро появятся</span></div>';
+    return '<div class="shots">' + list.map(function (p, i) {
+      return '<img src="' + esc(p.src) + '" alt="' + esc(p.alt) + '" loading="' + (i ? 'lazy' : 'eager') + '" decoding="async">';
+    }).join('') + '</div>';
+  }
+  function one(r) {
+    var list = ph(r, 1);
+    return list.length ? '<img class="ph" src="' + esc(list[0].src) + '" alt="' + esc(list[0].alt) + '" loading="lazy">' : '<span class="ph"></span>';
+  }
+  function logo(r, size) { return '<img class="lg lg--' + (size || 64) + '" src="' + esc(r.logo) + '" alt="Знак резиденции ' + esc(r.name) + '">'; }
+  function logoRing(r, size) { return '<img class="lg lg--' + (size || 64) + ' lg--ring" src="' + esc(r.logo) + '" alt="Знак резиденции ' + esc(r.name) + '">'; }
+
+  function freeN(r) { return FREE[r.id]; }
+  function freeTag(r) {
+    var f = freeN(r);
+    if (f === undefined) return '';
+    return f > 0 ? '<span class="free">' + f + ' ' + places(f) + '</span>'
+                 : '<span class="free free--none">мест нет</span>';
+  }
+  function freeText(r) {
+    var f = freeN(r);
+    if (f === undefined) return 'места уточняются';
+    return f > 0 ? f + ' ' + places(f) + ' свободно' : 'мест нет';
+  }
+  function priceHtml(r) {
+    return PRICE[r.id]
+      ? '<span class="price"><b>от ' + money(PRICE[r.id]) + '</b><small>в месяц</small></span>'
+      : '<span class="price"><b>цена уточняется</b></span>';
+  }
+  function pick() { return '<span class="msv-btn msv-btn--m msv-btn--primary">Выбрать</span>'; }
+  function chev() { return '<svg class="ch" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>'; }
+  function where(r) { return 'метро ' + esc(r.metro) + ' · ' + esc(r.addr); }
+
+  /* ---------- двадцать компоновок ---------- */
+
+  var V = [
+
+    { t: 'Бенто как на главной',
+      n: 'Фото-плитка во всю ширину, под ней две плитки: свободные места и цена. Вся карточка — ссылка, кнопки нет.',
+      grid: 'g g--3',
+      c: function (r) { return '<a class="card" href="' + href(r) + '">' +
+        '<div class="top">' + shots(r) + logoRing(r, 64) + freeTag(r) + '</div>' +
+        '<div class="body">' +
+          '<span class="kind">' + esc(r.kind) + '</span>' +
+          '<h3 class="msv-sub" style="margin:0 0 4px">' + esc(r.name) + '</h3>' +
+          '<p class="msv-note" style="margin:0;color:var(--msv-n500)">' + where(r) + '</p>' +
+          '<div class="tiles">' +
+            '<div class="tile"><span>Свободно</span><b>' + freeText(r) + '</b></div>' +
+            '<div class="tile"><span>Цена</span><b>' + (PRICE[r.id] ? 'от ' + money(PRICE[r.id]) : 'уточняется') + '</b></div>' +
+          '</div>' +
+        '</div></a>'; } },
+
+    { t: 'Обложка: подпись поверх фотографии',
+      n: 'Вертикальный кадр 4:5, имя и цена на затемнении внизу, знак и число мест по углам.',
+      grid: 'g g--3',
+      c: function (r) { return '<a class="card" href="' + href(r) + '">' + shots(r) + logoRing(r, 64) + freeTag(r) +
+        '<div class="veil">' +
+          '<span class="kind">' + esc(r.kind) + '</span>' +
+          '<h3 class="msv-sub" style="margin:0">' + esc(r.name) + '</h3>' +
+          '<p class="msv-note" style="margin:2px 0 0;color:rgba(255,255,255,.8)">' + where(r) + '</p>' +
+          '<div class="row">' + priceHtml(r) + '</div>' +
+        '</div></a>'; } },
+
+    { t: 'Знак крупно в шапке',
+      n: 'Сначала знакомство: большой знак и имя, потом фотографии, потом цена с кнопкой «Выбрать».',
+      grid: 'g g--3',
+      c: function (r) { return '<a class="card" href="' + href(r) + '">' +
+        '<div class="head3">' + logo(r, 72) + '<span class="t">' +
+          '<span class="kind">' + esc(r.kind) + '</span>' +
+          '<span class="msv-sub" style="display:block">' + esc(r.name) + '</span>' +
+          '<span class="msv-note" style="color:var(--msv-n500)">' + where(r) + '</span>' +
+        '</span></div>' + shots(r) +
+        '<div class="foot">' + priceHtml(r) + freeTag(r) + '</div></a>'; } },
+
+    { t: 'Горизонтальная карточка',
+      n: 'На мониторе фотография слева, сведения справа; на телефоне — одна под другой.',
+      grid: 'g',
+      c: function (r) { return '<a class="card" href="' + href(r) + '">' +
+        '<div class="media">' + shots(r) + logoRing(r, 64) + '</div>' +
+        '<div class="body">' +
+          '<span class="kind">' + esc(r.kind) + '</span>' +
+          '<h3 class="msv-sub" style="margin:0 0 4px">' + esc(r.name) + '</h3>' +
+          '<p class="msv-body" style="margin:0 0 4px">' + where(r) + '</p>' +
+          '<p class="msv-note" style="margin:0;color:var(--msv-n500)">' + esc(r.note) + '</p>' +
+          '<div class="foot">' + priceHtml(r) + freeTag(r) + '</div>' +
+        '</div></a>'; } },
+
+    { t: 'Мозаика из плиток',
+      n: 'Бенто внутри карточки: фото на две колонки, под ним квадраты «свободно» и «цена».',
+      grid: 'g g--3',
+      c: function (r) { return '<a class="card" href="' + href(r) + '"><div class="m">' +
+        shots(r) +
+        '<div class="cell"><span>Свободно</span><b>' + freeText(r) + '</b></div>' +
+        '<div class="cell"><span>Цена</span><b>' + (PRICE[r.id] ? 'от ' + money(PRICE[r.id]) : 'уточняется') + '</b></div>' +
+        '<div class="who">' + logo(r, 56) + '<span>' +
+          '<span class="msv-sub" style="display:block">' + esc(r.name) + '</span>' +
+          '<span class="msv-note" style="color:var(--msv-n500)">' + where(r) + '</span>' +
+        '</span></div>' +
+      '</div></a>'; } },
+
+    { t: 'Строгий список без фотографий',
+      n: 'Как строки меню: крупный знак, имя, метро и число свободных мест. Самый быстрый для того, кто уже знает адреса.',
+      grid: 'g',
+      c: function (r) { return '<a class="card" href="' + href(r) + '">' + logo(r, 64) +
+        '<span class="t">' +
+          '<span class="kind">' + esc(r.kind) + '</span>' +
+          '<span class="msv-sub" style="display:block">' + esc(r.name) + '</span>' +
+          '<span class="msv-note" style="color:var(--msv-n500)">' + where(r) + '</span>' +
+        '</span>' +
+        '<span class="n"><b>' + (freeN(r) === undefined ? '—' : freeN(r)) + '</b><span>' + (freeN(r) ? places(freeN(r)) + ' свободно' : 'мест нет') + '</span></span>' +
+        chev() + '</a>'; } },
+
+    { t: 'Число мест — главный герой',
+      n: 'Крупная цифра свободных мест на фотографии: видно с одного взгляда, куда вообще можно заехать.',
+      grid: 'g g--3',
+      c: function (r) { var f = freeN(r);
+        var big = f === undefined ? '' : (f > 0
+          ? '<span class="big"><b>' + f + '</b><span>' + places(f) + '</span></span>'
+          : '<span class="big big--none"><b>мест<br>нет</b></span>');
+        return '<a class="card" href="' + href(r) + '">' + shots(r) + big +
+        '<div class="body">' + logo(r, 56) + '<span class="t">' +
+          '<span class="msv-sub" style="display:block">' + esc(r.name) + '</span>' +
+          '<span class="msv-note" style="color:var(--msv-n500)">' + where(r) + '</span>' +
+        '</span>' + priceHtml(r) + '</div></a>'; } },
+
+    { t: 'Паспарту, знак по центру',
+      n: 'Фотография в белых полях, знак наезжает на её край. Спокойная, «журнальная» подача.',
+      grid: 'g g--3',
+      c: function (r) { return '<a class="card" href="' + href(r) + '">' +
+        '<div class="media">' + shots(r) + logoRing(r, 64) + '</div>' +
+        '<div class="body">' +
+          '<span class="kind">' + esc(r.kind) + '</span>' +
+          '<h3 class="msv-sub" style="margin:0 0 4px">' + esc(r.name) + '</h3>' +
+          '<p class="msv-note" style="margin:0;color:var(--msv-n500)">' + where(r) + '</p>' +
+          freeTag(r) +
+          '<div class="foot">' + priceHtml(r) + '</div>' +
+        '</div></a>'; } },
+
+    { t: 'Цвет подложки говорит о наличии',
+      n: 'Есть места — лаймовая рамка вокруг карточки, мест нет — графитовая. Понятно, не читая текста.',
+      grid: 'g g--3',
+      c: function (r) { var f = freeN(r); var none = f === 0;
+        return '<a class="card' + (none ? ' card--none' : '') + '" href="' + href(r) + '">' +
+        '<div class="inner">' + shots(r) +
+          '<div class="body">' +
+            '<span class="kind">' + esc(r.kind) + '</span>' +
+            '<span class="msv-sub" style="display:block">' + esc(r.name) + '</span>' +
+            '<span class="msv-note" style="color:var(--msv-n500)">' + where(r) + '</span>' +
+            '<div style="margin-top:8px">' + priceHtml(r) + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="strip"><span>' + freeText(r) + '</span>' + logo(r, 56) + '</div></a>'; } },
+
+    { t: 'Фото во всю ширину, сведения в капсуле',
+      n: 'Кадр без рамки, под ним белая капсула с наездом. Знак — кружком на её краю.',
+      grid: 'g g--3',
+      c: function (r) { return '<a class="card" href="' + href(r) + '">' + shots(r) +
+        '<div class="cap">' + logoRing(r, 56) +
+          '<span class="kind">' + esc(r.kind) + '</span>' +
+          '<h3 class="msv-sub" style="margin:0 0 4px">' + esc(r.name) + '</h3>' +
+          '<p class="msv-note" style="margin:0;color:var(--msv-n500)">' + where(r) + '</p>' +
+          '<div class="foot">' + priceHtml(r) + freeTag(r) + '</div>' +
+        '</div></a>'; } },
+
+    { t: 'Две колонки: имя слева, числа справа',
+      n: 'Широкий кадр 21:9, под ним слева название и адрес, справа цена и места — как в билетном табло.',
+      grid: 'g',
+      c: function (r) { return '<a class="card" href="' + href(r) + '">' + shots(r) +
+        '<div class="body">' +
+          '<span class="l">' + logo(r, 56) +
+            '<span class="kind" style="margin-top:8px">' + esc(r.kind) + '</span>' +
+            '<span class="msv-sub" style="display:block">' + esc(r.name) + '</span>' +
+            '<span class="msv-note" style="color:var(--msv-n500)">' + where(r) + '</span>' +
+          '</span>' +
+          '<span class="r">' + freeTag(r) + priceHtml(r) + pick() + '</span>' +
+        '</div></a>'; } },
+
+    { t: 'Три мини-плитки под фотографией',
+      n: 'Места, цена и метро — тремя равными плитками. Сравнивать резиденции удобно: цифры всегда на одном месте.',
+      grid: 'g g--3',
+      c: function (r) { return '<a class="card" href="' + href(r) + '">' + shots(r) +
+        '<div class="body">' +
+          '<h3 class="msv-sub" style="margin:0 0 4px">' + esc(r.name) + '</h3>' +
+          '<p class="msv-note" style="margin:0;color:var(--msv-n500)">' + esc(r.note) + '</p>' +
+          '<div class="three">' +
+            '<div><b>' + (freeN(r) === undefined ? '—' : freeN(r)) + '</b><span>свободно</span></div>' +
+            '<div><b>' + (PRICE[r.id] ? money(PRICE[r.id]).replace(' руб.', '') : '—') + '</b><span>руб. в месяц</span></div>' +
+            '<div><b>' + esc(r.metro) + '</b><span>метро</span></div>' +
+          '</div>' +
+        '</div></a>'; } },
+
+    { t: 'Без карточки: фото прямо на фоне',
+      n: 'Белой подложки нет, страница дышит. Знак и метка мест — на самом кадре.',
+      grid: 'g g--3',
+      c: function (r) { return '<a class="card" href="' + href(r) + '">' +
+        '<div class="media">' + shots(r) + logoRing(r, 64) + freeTag(r) + '</div>' +
+        '<div class="body">' +
+          '<h3 class="msv-sub" style="margin:0 0 2px">' + esc(r.name) + '</h3>' +
+          '<p class="msv-note" style="margin:0;color:var(--msv-n500)">' + where(r) + '</p>' +
+          '<div class="foot">' + priceHtml(r) + chev() + '</div>' +
+        '</div></a>'; } },
+
+    { t: 'Табло с крупной ценой',
+      n: 'Главное — цена: набрана крупно. Фотографии идут снизу маленькими квадратами.',
+      grid: 'g g--3',
+      c: function (r) { var list = ph(r, 4);
+        return '<a class="card" href="' + href(r) + '">' +
+        '<div class="row1">' + logo(r, 64) + '<span class="t">' +
+          '<span class="kind">' + esc(r.kind) + '</span>' +
+          '<span class="msv-sub" style="display:block">' + esc(r.name) + '</span>' +
+        '</span>' + freeTag(r) + '</div>' +
+        '<p class="huge">' + (PRICE[r.id] ? 'от ' + money(PRICE[r.id]) : 'цена уточняется') + '<small>' + where(r) + '</small></p>' +
+        (list.length ? '<div class="thumbs">' + list.map(function (p) { return '<img src="' + esc(p.src) + '" alt="' + esc(p.alt) + '" loading="lazy">'; }).join('') + '</div>' : '') +
+        '</a>'; } },
+
+    { t: 'Обложка со знаком по центру',
+      n: 'Кадр затемнён, знак и имя ровно посередине. Самая «афишная» подача.',
+      grid: 'g g--3',
+      c: function (r) { return '<a class="card" href="' + href(r) + '">' + shots(r) + '<span class="dim"></span>' +
+        '<span class="mid">' + logoRing(r, 88) +
+          '<span class="msv-sub" style="display:block;color:#fff">' + esc(r.name) + '</span>' +
+          '<span class="msv-note" style="color:rgba(255,255,255,.8)">' + where(r) + '</span>' +
+          '<span class="msv-body" style="display:block;margin-top:8px;color:#fff;font-weight:700">' + (PRICE[r.id] ? 'от ' + money(PRICE[r.id]) : 'цена уточняется') + '</span>' +
+        '</span>' + freeTag(r) + '</a>'; } },
+
+    { t: 'Сравнение одной таблицей',
+      n: 'Все три резиденции в одном блоке строками: миниатюра, имя, места и цена. Выбор «глазами по столбцу».',
+      grid: '',
+      whole: function (rows) { return '<div class="tbl">' + rows + '</div>'; },
+      c: function (r) { return '<a class="r16" href="' + href(r) + '">' + one(r) +
+        '<span class="t">' +
+          '<span class="msv-sub" style="display:block">' + esc(r.name) + '</span>' +
+          '<span class="msv-note" style="color:var(--msv-n500)">' + where(r) + '</span>' +
+        '</span>' +
+        '<span class="num"><b>' + freeText(r) + '</b><span>' + (PRICE[r.id] ? 'от ' + money(PRICE[r.id]) : 'цена уточняется') + '</span></span>' +
+        chev() + '</a>'; } },
+
+    { t: 'Лепесток — брендовая форма',
+      n: 'Карточка со скруглениями 32/8 по диагонали, как лепестки в брендбуке; у соседней — зеркально.',
+      grid: 'g g--3',
+      c: function (r) { return '<a class="card" href="' + href(r) + '">' +
+        '<div class="media">' + shots(r) + logoRing(r, 64) + '</div>' +
+        '<div class="body">' +
+          '<span class="kind">' + esc(r.kind) + '</span>' +
+          '<h3 class="msv-sub" style="margin:0 0 4px">' + esc(r.name) + '</h3>' +
+          '<p class="msv-note" style="margin:0;color:var(--msv-n500)">' + where(r) + '</p>' +
+          '<div class="foot">' + priceHtml(r) + freeTag(r) + '</div>' +
+        '</div></a>'; } },
+
+    { t: 'Перевёрнутая: сначала имя, потом кадр',
+      n: 'Сверху бежевая полоса со знаком и именем, ниже фотография, в самом низу цена и места.',
+      grid: 'g g--3',
+      c: function (r) { return '<a class="card" href="' + href(r) + '">' +
+        '<div class="cap18">' + logo(r, 64) + '<span class="t">' +
+          '<span class="kind">' + esc(r.kind) + '</span>' +
+          '<span class="msv-sub" style="display:block">' + esc(r.name) + '</span>' +
+          '<span class="msv-note" style="color:var(--msv-n500)">' + where(r) + '</span>' +
+        '</span></div>' + shots(r) +
+        '<div class="foot">' + priceHtml(r) + freeTag(r) + '</div></a>'; } },
+
+    { t: 'Одна строка под кадром',
+      n: 'Фотолента, а под ней всё в одну линию: знак, имя с адресом, цена. Самая компактная из «фотографических».',
+      grid: 'g',
+      c: function (r) { return '<a class="card" href="' + href(r) + '">' + shots(r) +
+        '<div class="under">' + logo(r, 56) +
+          '<span class="t">' +
+            '<span class="msv-sub" style="display:block">' + esc(r.name) + '</span>' +
+            '<span class="msv-note" style="color:var(--msv-n500)">' + where(r) + ' · ' + freeText(r) + '</span>' +
+          '</span>' +
+          '<span class="pr">' + priceHtml(r) + '</span>' +
+        '</div></a>'; } },
+
+    { t: 'Самое короткое',
+      n: 'Кадр, имя и одна строка: сколько мест и от какой цены. Ничего лишнего.',
+      grid: 'g g--3',
+      c: function (r) { return '<a class="card" href="' + href(r) + '">' + shots(r) +
+        '<div class="body">' +
+          '<h3 class="msv-sub" style="margin:0">' + esc(r.name) + '</h3>' +
+          '<p class="msv-body one"><b>' + freeText(r) + '</b> · ' + (PRICE[r.id] ? 'от ' + money(PRICE[r.id]) : 'цена уточняется') + '</p>' +
+        '</div></a>'; } }
+  ];
+
+  /* ---------- сборка страницы ---------- */
+
+  var all = document.getElementById('all'), toc = document.getElementById('toc');
+
+  function render() {
+    all.innerHTML = V.map(function (v, i) {
+      var rows = R.map(v.c).join('');
+      var body = v.whole ? v.whole(rows) : '<div class="' + (v.grid || 'g') + '">' + rows + '</div>';
+      return '<section class="v v' + (i + 1) + '" id="v' + (i + 1) + '">' +
+        '<p class="v__head"><span class="v__num">' + (i + 1) + '</span><span class="msv-sub">' + v.t + '</span></p>' +
+        '<p class="msv-note v__note">' + v.n + '</p>' +
+        '<div class="v__body">' + body + '</div>' +
+      '</section>';
+    }).join('');
+  }
+  toc.innerHTML = V.map(function (v, i) { return '<a href="#v' + (i + 1) + '" title="' + esc(v.t) + '">' + (i + 1) + '</a>'; }).join('');
+  render();
+
+  /* Цены и свободные места — те же запросы, что на боевой странице */
+  if (location.protocol !== 'file:') {
+    fetch('/api/residences', { credentials: 'same-origin' })
+      .then(function (r) { return r.status === 200 ? r.json() : null; })
+      .then(function (data) {
+        if (!data) return;
+        data.forEach(function (res) {
+          var min = null, n = 0;
+          (res.beds || []).forEach(function (b) { n++; if (b.price > 0 && (min === null || b.price < min)) min = b.price; });
+          PRICE[res.id] = min;
+          var row = R.filter(function (x) { return x.id === res.id; })[0];
+          if (row && n) row.beds = n;
+        });
+        render();
+        return Promise.all(R.map(function (r) {
+          return fetch('/api/occupancy?res=' + r.id, { credentials: 'same-origin' })
+            .then(function (x) { return x.status === 200 ? x.json() : null; })
+            .then(function (d) { if (d) FREE[r.id] = Math.max(0, r.beds - d.busy.length); })
+            .catch(function () {});
+        })).then(render);
+      })
+      .catch(function () {});
+  }
+})();
+</script>
+<script src="mark.js"></script>
+<script src="protect.js"></script>
+
+</body>
+</html>
