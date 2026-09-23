@@ -67,12 +67,16 @@ module.exports = function register(route) {
     if (!s) return fail(res, 401, 'Не выполнен вход');
     const resId = String(req.query.res || '');
     const r = await query(`
-      SELECT b.bed_id FROM bookings b
+      SELECT b.bed_id, b.release_from FROM bookings b
       JOIN beds bd ON bd.id = b.bed_id
       JOIN rooms rm ON rm.id = bd.room_id
       WHERE b.date_from <= CURRENT_DATE AND b.date_to >= CURRENT_DATE
         AND ($1::text = '' OR rm.residence_id = $1)`, [resId]);
-    json(res, 200, { busy: r.rows.map((x) => x.bed_id) });
+    /* busy — занято сейчас; soon — занято, но модератор уже выставил
+       место в продажу и указал, с какой даты можно заезжать */
+    const soon = {};
+    r.rows.forEach((x) => { if (x.release_from) soon[x.bed_id] = isoDate(x.release_from); });
+    json(res, 200, { busy: r.rows.map((x) => x.bed_id), soon });
   });
 
   /* ---------- Шахматка одной резиденции ---------- */
@@ -85,7 +89,7 @@ module.exports = function register(route) {
 
     const bookings = await query(`
       SELECT b.id, b.bed_id, b.user_id, b.date_from, b.date_to, b.check_in, b.check_out,
-             b.source, b.tariff, b.note, b.created_at,
+             b.source, b.tariff, b.note, b.created_at, b.release_from,
              COALESCE(bal.accrued, 0) AS accrued, COALESCE(bal.paid, 0) AS paid
       FROM bookings b
       JOIN beds bd ON bd.id = b.bed_id
@@ -128,7 +132,8 @@ module.exports = function register(route) {
         from: isoDate(b.date_from), to: isoDate(b.date_to),
         checkIn: String(b.check_in).slice(0, 5), checkOut: String(b.check_out).slice(0, 5),
         source: SOURCE[b.source] || b.source, tariff: b.tariff, note: b.note || '',
-        accrued: Number(b.accrued), paid: Number(b.paid), bookedAt: isoDate(b.created_at)
+        accrued: Number(b.accrued), paid: Number(b.paid), bookedAt: isoDate(b.created_at),
+        releaseFrom: isoDate(b.release_from)
       })),
       payments: pays.rows.map((p) => ({
         id: String(p.id), residentId: String(p.user_id), bookingId: String(p.booking_id),
@@ -139,7 +144,9 @@ module.exports = function register(route) {
   });
 
   /* ---------- Переселение и сдвиг дат ----------
-     Тело: { bedId, from, to } — любое поле можно опустить.
+     Тело: { bedId, from, to, releaseFrom } — любое поле можно опустить.
+     releaseFrom — дата, с которой место выставлено в продажу, хотя ещё
+     занято; null убирает пометку.
      Пересечение с другой бронью отклонит сама база (EXCLUDE) —
      здесь только переводим её ошибку в понятный ответ. */
 
@@ -155,17 +162,19 @@ module.exports = function register(route) {
     if (body.bedId) { vals.push(String(body.bedId)); sets.push(`bed_id = $${vals.length}`); }
     if (body.from)  { vals.push(String(body.from).slice(0, 10)); sets.push(`date_from = $${vals.length}`); }
     if (body.to)    { vals.push(String(body.to).slice(0, 10)); sets.push(`date_to = $${vals.length}`); }
+    if (body.releaseFrom === null) { sets.push(`release_from = NULL`); }
+    else if (body.releaseFrom) { vals.push(String(body.releaseFrom).slice(0, 10)); sets.push(`release_from = $${vals.length}`); }
     if (!sets.length) return fail(res, 400, 'Нечего менять');
     vals.push(id);
 
     try {
       const out = await tx(async (q) => {
-        const before = await q(`SELECT bed_id, date_from, date_to FROM bookings WHERE id = $1 FOR UPDATE`, [id]);
+        const before = await q(`SELECT bed_id, date_from, date_to, release_from FROM bookings WHERE id = $1 FOR UPDATE`, [id]);
         if (!before.rows[0]) return null;
 
         const upd = await q(
           `UPDATE bookings SET ${sets.join(', ')} WHERE id = $${vals.length}
-           RETURNING id, bed_id, date_from, date_to`, vals);
+           RETURNING id, bed_id, date_from, date_to, release_from`, vals);
 
         await q(`INSERT INTO audit_log (actor_id, action, target, payload) VALUES ($1, 'booking.move', $2, $3)`,
           [s.uid, 'booking:' + id, JSON.stringify({ before: before.rows[0], after: upd.rows[0] })]);
@@ -174,7 +183,7 @@ module.exports = function register(route) {
       });
 
       if (!out) return fail(res, 404, 'Бронь не найдена');
-      json(res, 200, { id: String(out.id), bedId: out.bed_id, from: isoDate(out.date_from), to: isoDate(out.date_to) });
+      json(res, 200, { id: String(out.id), bedId: out.bed_id, from: isoDate(out.date_from), to: isoDate(out.date_to), releaseFrom: isoDate(out.release_from) });
       // переселение освобождает место — сообщаем всем в очереди
       waitlist.checkAndNotify().catch(() => {});
     } catch (err) {

@@ -250,6 +250,8 @@ MSV.ready(function (ctx) {
           '<label class="msv-field"><span class="msv-field__label">Место</span><select class="msv-input" id="bkBed"></select></label>' +
           '<label class="msv-field"><span class="msv-field__label">Заезд</span><input class="msv-input" id="bkFrom" type="date"></label>' +
           '<label class="msv-field"><span class="msv-field__label">Выезд</span><input class="msv-input" id="bkTo" type="date"></label>' +
+          '<label class="msv-field"><span class="msv-field__label">Выставить место в продажу с</span><input class="msv-input" id="bkRel" type="date"></label>' +
+          '<p class="msv-note" style="margin:calc(var(--msv-s12) * -1) 0 var(--msv-s16);color:var(--msv-n500)">Резидент ещё живёт, но уже съезжает: место появится у желающих под красной кнопкой «Освободятся скоро». Пусто — место просто занято.</p>' +
           '<p class="msv-note" id="bkErr" hidden style="color:var(--msv-red)"></p>' +
           '<div style="display:flex;gap:var(--msv-s12);margin-top:var(--msv-s16)">' +
             '<button class="msv-btn msv-btn--m msv-btn--primary" type="button" id="bkSave">Сохранить</button>' +
@@ -267,17 +269,20 @@ MSV.ready(function (ctx) {
       });
       box.querySelector('#bkFrom').value = iso(b.from);
       box.querySelector('#bkTo').value = iso(b.to);
+      box.querySelector('#bkRel').value = b.releaseFrom || '';
       function close() { box.remove(); }
       box.querySelector('#bkCancel').addEventListener('click', close);
       box.addEventListener('click', function (e) { if (e.target === box) close(); });
       box.querySelector('#bkSave').addEventListener('click', function () {
         var bedId = sel.value, from = box.querySelector('#bkFrom').value, to = box.querySelector('#bkTo').value;
+        var rel = box.querySelector('#bkRel').value;
         var err = box.querySelector('#bkErr');
         if (!from || !to || to <= from) { err.textContent = 'Выезд должен быть позже заезда.'; err.hidden = false; return; }
-        ctx.api('PATCH', '/api/bookings/' + encodeURIComponent(b.id), { bedId: bedId, from: from, to: to })
+        ctx.api('PATCH', '/api/bookings/' + encodeURIComponent(b.id), { bedId: bedId, from: from, to: to, releaseFrom: rel || null })
           .then(function (r) {
             if (r.status !== 200) { err.textContent = (r.body && r.body.error) || 'Не удалось сохранить.'; err.hidden = false; return; }
             b.bedId = bedId; b.from = new Date(from + 'T00:00:00').getTime(); b.to = new Date(to + 'T00:00:00').getTime();
+            b.releaseFrom = rel || '';
             window.sh.refresh(); close();
           })
           .catch(function () { err.textContent = 'Сервер не отвечает.'; err.hidden = false; });

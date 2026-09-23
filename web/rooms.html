@@ -39,6 +39,7 @@
       <div class="chips" role="group" aria-label="Наличие мест">
         <button class="chip" type="button" data-free="1" aria-pressed="true">Только свободные места</button>
         <button class="chip" type="button" data-free="" aria-pressed="false">Показать все места</button>
+        <button class="chip chip--soon" type="button" data-free="soon" aria-pressed="false">Освободятся скоро</button>
       </div>
     </div>
 
@@ -81,6 +82,8 @@
       var d = JSON.parse(req.responseText);
       window.__BUSY__ = {};
       (d.busy || []).forEach(function (id) { window.__BUSY__[id] = true; });
+      // Места, которые ещё заняты, но уже выставлены в продажу: значение — дата заезда
+      window.__SOON__ = d.soon || {};
     }
   } catch (e) {}
 })();
@@ -110,6 +113,7 @@ MSV.ready(function (ctx) {
     // Занятые места для резидента: шахматка ему закрыта, поэтому берём
     // короткий список занятых мест (/api/occupancy) — без имён и броней.
     if (!DEMO && window.__BUSY__) Object.keys(window.__BUSY__).forEach(function (id) { busy[id] = true; });
+    var SOON = (!DEMO && window.__SOON__) ? window.__SOON__ : {};
     res.rooms.forEach(function (r, i) {
       var beds = res.beds.filter(function (b) { return b.roomId === r.id; });
       var tiers = {};
@@ -119,8 +123,13 @@ MSV.ready(function (ctx) {
       beds.forEach(function (b) { if (b.tier) priceTier[b.price] = priceTier[b.price] || b.tier; });
       beds.forEach(function (b) {
         var k = b.tier || priceTier[b.price] || 'Место';
-        tiers[k] = tiers[k] || { kind: k === 'нижнее' ? 'Нижнее место' : (k === 'верхнее' ? 'Верхнее место' : 'Место'), left: 0, price: b.price, ids: [] };
+        tiers[k] = tiers[k] || { kind: k === 'нижнее' ? 'Нижнее место' : (k === 'верхнее' ? 'Верхнее место' : 'Место'), left: 0, price: b.price, ids: [], soon: 0, soonIds: [], soonFrom: null };
         if (!busy[b.id]) { tiers[k].left++; tiers[k].ids.push(b.id); }
+        else if (SOON[b.id]) {
+          // занято сейчас, но модератор указал дату освобождения
+          tiers[k].soon++; tiers[k].soonIds.push(b.id);
+          if (!tiers[k].soonFrom || SOON[b.id] < tiers[k].soonFrom) tiers[k].soonFrom = SOON[b.id];
+        }
       });
       var list = Object.keys(tiers).map(function (k) { return tiers[k]; }).sort(function (a, b) { return a.price - b.price; });
       var freeIds = []; list.forEach(function (t) { freeIds = freeIds.concat(t.ids); });
@@ -202,16 +211,27 @@ MSV.ready(function (ctx) {
     return html;
   }
 
+  /* «2026-10-15» → «15 октября» */
+  var MONTHS_R = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+  function dayMonth(iso) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || '')); if (!m) return '';
+    return Number(m[3]) + ' ' + MONTHS_R[Number(m[2]) - 1];
+  }
+
   function render() {
     var rooms = ROOMS.filter(function (r) {
       if (filter.sex && r.sex !== filter.sex) return false;
       if (filter.size && String(r.size) !== filter.size) return false;
+      if (filter.free === 'soon') return r.beds.some(function (b) { return b.soon > 0; });
       if (filter.free && !r.beds.some(function (b) { return b.left > 0; })) return false;
       return true;
     });
 
     if (!rooms.length) {
-      list.innerHTML = '<p class="msv-body rooms__empty">' + (filter.free ? 'Свободных мест с такими условиями нет. Нажми «Показать все места» или встань в <a class="msv-link" href="relocation.html">очередь</a>.' : 'Комнат с такими условиями нет.') + '</p>';
+      var empty = filter.free === 'soon'
+        ? 'Сейчас никто не съезжает. Загляни позже или встань в <a class="msv-link" href="relocation.html">очередь</a> — сообщим, как только место освободится.'
+        : (filter.free ? 'Свободных мест с такими условиями нет. Нажми «Показать все места» или встань в <a class="msv-link" href="relocation.html">очередь</a>.' : 'Комнат с такими условиями нет.');
+      list.innerHTML = '<p class="msv-body rooms__empty">' + empty + '</p>';
       return;
     }
 
@@ -220,15 +240,18 @@ MSV.ready(function (ctx) {
     // у выкупленных мест — неактивная «Продано» (решение заказчика 21.09.2026).
     list.innerHTML = rooms.map(function (r, ri) {
       var prices = r.beds.map(function (b, ti) {
-        var out = b.left === 0;
+        var free = b.left > 0;
+        var soon = !free && b.soon > 0;          // занято, но уже в продаже
+        var out = !free && !soon;
         var btn;
         if (out) {
           btn = '<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" disabled>Продано</button>';
         } else {
           btn = '<button class="msv-btn msv-btn--s msv-btn--primary" type="button" data-pick="' + esc(r.id) + '" data-tier="' + ti + '">Выбрать</button>';
         }
-        return '<div class="room__price' + (out ? ' room__price--out' : '') + '"' + (out ? '' : ' role="button" tabindex="0" data-pick="' + esc(r.id) + '" data-tier="' + ti + '"') + '>' +
-          '<span>' + esc(b.kind) + '</span>' +
+        var label = esc(b.kind) + (soon ? '<span class="room__soon">освободится ' + esc(dayMonth(b.soonFrom)) + '</span>' : '');
+        return '<div class="room__price' + (out ? ' room__price--out' : '') + (soon ? ' room__price--soon' : '') + '"' + (out ? '' : ' role="button" tabindex="0" data-pick="' + esc(r.id) + '" data-tier="' + ti + '"') + '>' +
+          '<span>' + label + '</span>' +
           '<b>' + money(b.price) + '</b>' + btn + '</div>';
       }).join('');
 
@@ -301,11 +324,15 @@ MSV.ready(function (ctx) {
     // Вид места выбран здесь (верхнее / нижнее); конкретную кровать этого
     // вида резидент уточнит с куратором — берём первую свободную
     var tier = room.beds[Number(btn.dataset.tier)] || room.beds[0];
-    var bed = (tier && tier.ids && tier.ids[0]) || '';
+    // Свободное место берём первое; если свободных нет — место, которое
+    // скоро освободится, и передаём дальше дату, раньше которой не заехать
+    var free = tier && tier.ids && tier.ids.length;
+    var bed = free ? tier.ids[0] : ((tier && tier.soonIds && tier.soonIds[0]) || '');
     location.href = 'month.html?room=' + encodeURIComponent(room.name) +
                     '&size=' + room.size + '&bed=' + encodeURIComponent(bed) +
                     '&kind=' + encodeURIComponent(tier ? tier.kind : '') +
-                    '&price=' + (tier ? tier.price : room.price || 0);
+                    '&price=' + (tier ? tier.price : room.price || 0) +
+                    (free ? '' : '&notbefore=' + encodeURIComponent(tier.soonFrom || ''));
   });
 
   render();

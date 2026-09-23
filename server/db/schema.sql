@@ -173,6 +173,12 @@ CREATE TABLE IF NOT EXISTS bookings (
   CONSTRAINT bookings_dates CHECK (date_to > date_from)
 );
 
+-- Место занято, но резидент уезжает и модератор уже выставил его в продажу.
+-- В этой колонке дата, с которой можно заезжать следующему (решение
+-- заказчика 23.09.2026). Пусто — место просто занято.
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS release_from date;
+CREATE INDEX IF NOT EXISTS bookings_release_idx ON bookings(release_from) WHERE release_from IS NOT NULL;
+
 CREATE INDEX IF NOT EXISTS bookings_bed_idx  ON bookings(bed_id, date_from, date_to);
 CREATE INDEX IF NOT EXISTS bookings_user_idx ON bookings(user_id);
 

@@ -314,6 +314,16 @@
   .room__price .msv-btn { margin-left: auto; }
 }
 
+/* Третий фильтр — красный: места, которые ещё заняты, но модератор уже
+   выставил их в продажу (решение заказчика 23.09.2026) */
+.chip--soon { color: var(--msv-red); border-color: var(--msv-red); }
+.chip--soon:hover { border-color: var(--msv-red-press); }
+.chip--soon[aria-pressed="true"] { color: var(--msv-white); background: var(--msv-red); border-color: var(--msv-red); }
+
+/* Строка места, которое скоро освободится: дата под названием места */
+.room__soon { display: block; font-size: var(--msv-note-size); line-height: var(--msv-note-line); color: var(--msv-red); }
+.room__price--soon b { font-weight: 600; }
+
 /* Чип другого пола на выборе комнаты — недоступен */
 .chip:disabled { opacity: .35; cursor: default; }
 
