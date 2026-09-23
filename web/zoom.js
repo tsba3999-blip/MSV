@@ -120,8 +120,10 @@
   document.addEventListener('click', function (e) {
     if (document.body.classList.contains('editing')) return;   // в режиме правки не увеличиваем
 
-    // «+17» — открыть галерею с первой из ещё не показанных
-    var more = e.target.closest('[data-more]');
+    // «+17» — открыть галерею с первой из ещё не показанных.
+    // Ищем только внутри галереи: тем же именем data-more помечена
+    // кнопка «подробнее» в таблице сотрудников.
+    var more = e.target.closest('[data-gallery] [data-more]');
     if (more) {
       var mWrap = more.closest('[data-gallery]');
       var mAll = mWrap && fromGallery(mWrap);
@@ -154,7 +156,7 @@
   var css = document.createElement('style');
   css.textContent =
     'img[data-zoom],.zoomable img{cursor:zoom-in}' +
-    '[data-more]{cursor:zoom-in}' +
+    '[data-gallery] [data-more]{cursor:zoom-in}' +
     '.msv-zoom{position:fixed;inset:0;z-index:10060;display:flex;flex-direction:column;align-items:center;justify-content:center;' +
       'gap:12px;padding:24px;background:rgba(16,22,31,.85);cursor:zoom-out}' +
     '.msv-zoom img{max-width:min(92vw,1100px);max-height:82vh;border-radius:12px;object-fit:contain;cursor:default;background:#F5F1EA}' +
