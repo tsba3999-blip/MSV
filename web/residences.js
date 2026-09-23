@@ -101,9 +101,9 @@ window.MSV_RESIDENCES = [
   {
     id: "uyut", name: "Уют", title: "Резиденция Уют", logo: "uyt.gif",
     rooms: [
-      {"id": "uyut-r1", "buildingId": "uyut", "number": "1", "name": "№1 Иваново", "gender": "ж", "size": 6, "note": "6 мест: четыре основных и два дополнительных"},
-      {"id": "uyut-r2", "buildingId": "uyut", "number": "2", "name": "№2 Казань", "gender": "ж", "size": 6, "note": "6 мест: четыре основных и два дополнительных"},
-      {"id": "uyut-r3", "buildingId": "uyut", "number": "3", "name": "№3 Ярославль", "gender": "м", "size": 6, "note": "6 мест: четыре основных и два в гостиной"},
+      {"id": "uyut-r1", "buildingId": "uyut", "number": "1", "name": "№1 Иваново", "gender": "ж", "size": 6, "note": ""},
+      {"id": "uyut-r2", "buildingId": "uyut", "number": "2", "name": "№2 Казань", "gender": "ж", "size": 6, "note": ""},
+      {"id": "uyut-r3", "buildingId": "uyut", "number": "3", "name": "№3 Ярославль", "gender": "м", "size": 6, "note": ""},
       {"id": "uyut-r4", "buildingId": "uyut", "number": "4", "name": "№4 Екб", "gender": "ж", "size": 2, "note": ""},
       {"id": "uyut-r6", "buildingId": "uyut", "number": "6", "name": "№6 Ростов", "gender": "м", "size": 4, "note": ""},
       {"id": "uyut-r7", "buildingId": "uyut", "number": "7", "name": "№7 Воронеж", "gender": "м", "size": 4, "note": ""},

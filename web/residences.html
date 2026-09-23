@@ -68,34 +68,42 @@
     pointer-events: none;
   }
 
-  /* знак — крупный, по центру, наезжает на край кадра; белых полей нет */
+  /* Знак: квадрат со скруглением, на 50% крупнее прежнего (96 вместо 64),
+     по центру, наезжает на край кадра.
+
+     Белых углов нет: сами знаки — круги на прозрачном квадрате, поэтому
+     подложка квадрата красится в цвет круга этого знака, и круг сливается
+     с ней. Цвета взяты из самих файлов, не на глаз (решение заказчика
+     23.09.2026). Новый знак — добавить цвет сюда же. */
   .res__logo {
     position: absolute;
     left: 50%;
-    bottom: -32px;
+    bottom: -48px;
     transform: translateX(-50%);
-    width: 64px;
-    height: 64px;
+    width: 96px;
+    height: 96px;
     object-fit: cover;
-    background: var(--msv-white);
-    border-radius: 16px;
+    border-radius: 24px;
     box-shadow: 0 3px 12px rgba(22,32,47,.22);
   }
+  .res__logo[data-res="forma"] { background: #EDEDED; }
+  .res__logo[data-res="uyut"]  { background: #C41618; }
+  .res__logo[data-res="molod"] { background: #3784BF; }
 
-  .res__body { padding-top: 40px; text-align: center; }
+  .res__body { padding-top: 56px; text-align: center; }
   /* Надкатегория — фирменным лепестком (радиусы 24/8 по диагонали).
      У всех трёх резиденций лепесток одинаковый; метка свободных мест —
      зеркальный, чтобы две плашки не сливались (решение заказчика 23.09.2026) */
+  /* Лепесток — ровно такой же, как у мессенджеров в шахматке: высота 26,
+     поля 12, 12/700, радиусы 24/8 по диагонали */
   .res__kind {
     align-self: center;
     display: inline-flex;
     align-items: center;
-    min-height: 28px;
+    height: 26px;
     margin-bottom: var(--msv-s8);
-    padding: 0 14px;
-    font: 600 11px/1 var(--msv-font);
-    letter-spacing: .04em;
-    text-transform: uppercase;
+    padding: 0 12px;
+    font: 700 12px/1 var(--msv-font);
     color: var(--msv-graphite);
     background: var(--msv-n100);
     border-radius: 24px 8px 24px 8px;
@@ -106,13 +114,12 @@
   .res__note { margin: 0; color: var(--msv-n500); }
 
   /* свободные места: лаймовая метка, «мест нет» — графитовая */
-  .res__free { align-self: center; display: inline-flex; align-items: center; min-height: 28px; margin-top: var(--msv-s12); padding: 0 14px; font: 700 12px/1 var(--msv-font); letter-spacing: .04em; text-transform: uppercase; color: var(--msv-graphite); background: var(--msv-lime); border-radius: 8px 24px 8px 24px; }
+  .res__free { align-self: center; display: inline-flex; align-items: center; height: 26px; margin-top: var(--msv-s12); padding: 0 12px; font: 700 12px/1 var(--msv-font); color: var(--msv-graphite); background: var(--msv-lime); border-radius: 8px 24px 8px 24px; }
   .res__free--none { color: var(--msv-white); background: var(--msv-graphite); }
 
-  .res__foot { margin-top: var(--msv-s12); padding-top: var(--msv-s12); border-top: 1px solid var(--msv-n100); }
-  .res__price { display: block; font-weight: 700; }
+  .res__foot { margin-top: var(--msv-s12); padding-top: var(--msv-s12); }
+  .res__price { display: block; margin-bottom: var(--msv-s12); font-weight: 700; }
   .res__price small { display: block; font-weight: 500; font-size: var(--msv-note-size); line-height: var(--msv-note-line); color: var(--msv-n500); }
-  .res__more { display: inline-block; margin: var(--msv-s8) 0 var(--msv-s12); font-size: var(--msv-note-size); }
   /* Кнопка — обычная фирменная во всю ширину (.msv-btn--block). Надпись
      по центру: короткое слово у левого края широкой капсулы выглядело
      сломанным (решение заказчика 23.09.2026) */
@@ -226,7 +233,7 @@
         '<div class="res__shots" data-shots data-gallery="' + esc(r.id) + '">' + shots(r) + '</div>' +
         (hasShots(r) ? ZOOM : '') +
         dots(r) +
-        '<img class="res__logo" src="' + esc(r.logo) + '" alt="Знак резиденции ' + esc(r.name) + '">' +
+        '<img class="res__logo" data-res="' + esc(r.id) + '" src="' + esc(r.logo) + '" alt="Знак резиденции ' + esc(r.name) + '">' +
       '</div>' +
       '<div class="res__body">' +
         '<span class="res__kind">' + esc(r.kind) + '</span>' +
@@ -237,7 +244,6 @@
         freeBadge(r) +
         '<div class="res__foot">' +
           '<span class="msv-body res__price">от ' + money(p) + '<small>в месяц</small></span>' +
-          '<a class="msv-link res__more" href="residence.html?id=' + esc(r.id) + '">Узнать больше</a>' +
           '<a class="msv-btn msv-btn--m msv-btn--primary msv-btn--block res__pick" href="rooms.html?res=' + esc(r.id) + '">Выбрать</a>' +
         '</div>' +
       '</div>' +

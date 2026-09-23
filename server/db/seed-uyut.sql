@@ -4,8 +4,9 @@
 BEGIN;
 
 -- Структура по факту: комнаты 1–3 по 6 мест, Сочи — 12 капсул
-UPDATE rooms SET size = 6, note = '6 мест: четыре основных и два дополнительных' WHERE id IN ('uyut-r1','uyut-r2');
-UPDATE rooms SET size = 6, note = '6 мест: четыре основных и два в гостиной' WHERE id = 'uyut-r3';
+-- Пояснение про основные и дополнительные места снято заказчиком 23.09.2026:
+-- количество мест и так стоит строкой выше в карточке
+UPDATE rooms SET size = 6, note = NULL WHERE id IN ('uyut-r1','uyut-r2','uyut-r3');
 UPDATE rooms SET size = 12 WHERE id = 'uyut-r12';
 
 INSERT INTO beds (id, room_id, label, tier, price) VALUES
