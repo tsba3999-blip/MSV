@@ -65,6 +65,13 @@
   var room = params.get('room') || '';
   var size = params.get('size') || '';
 
+  /* Назад — в ту же резиденцию, а не на пустой список */
+  (function () {
+    var b = document.querySelector('.form__back'); if (!b) return;
+    var res = String(params.get('bed') || '').split('-')[0];
+    if (res) b.href = 'rooms.html?res=' + encodeURIComponent(res);
+  })();
+
   var now = new Date();
   var curY = now.getFullYear();
   var curM = now.getMonth();          // 0-11

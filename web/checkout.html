@@ -167,6 +167,15 @@
   'use strict';
 
   var params = new URLSearchParams(location.search);
+
+  /* Назад — к выбору месяца с тем же местом, иначе выбор теряется */
+  (function () {
+    var b = document.querySelector('.form__back'); if (!b) return;
+    var q = ['room', 'size', 'bed', 'kind', 'price'].filter(function (k) { return params.get(k); })
+      .map(function (k) { return k + '=' + encodeURIComponent(params.get(k)); }).join('&');
+    if (q) b.href = 'month.html?' + q;
+  })();
+
   var room = params.get('room') || 'не выбрана';
   var size = params.get('size') || '';
   var kind = (params.get('kind') || '').toLowerCase();   // «верхнее место» / «нижнее место» — выбрано на странице комнат
@@ -194,7 +203,7 @@
 
   // Резиденция — по коду места (forma-…, uyut-…, molod-…): имя, метро, адрес
   var RES = {
-    forma: 'Резиденция FORMA · м. Шаболовская · Москва, Конный пер., 12',
+    forma: 'FORMA · м. Шаболовская · Москва, Конный пер., 12',
     uyut:  'Уют · м. Нагатинская · Москва, Варшавское шоссе, 18к2',
     molod: 'Молодежка · м. Молодежная · Москва, ул. Партизанская, 40'
   };
@@ -210,8 +219,8 @@
   ];
   if (COUNT > 1) rows.push(['За ' + COUNT + ' мес.', money(RENT)]);
 
-  document.getElementById('recap').innerHTML = rows.map(function (r) {
-    return '<div class="recap__row"><dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1]) + '</dd></div>';
+  document.getElementById('recap').innerHTML = rows.map(function (r, i) {
+    return '<div class="recap__row"><dt>' + esc(r[0]) + '</dt><dd' + (i === 0 ? ' id="who"' : '') + '>' + esc(r[1]) + '</dd></div>';
   }).join('');
 
   /* ---------- Итог ---------- */
@@ -229,7 +238,10 @@
      не отправить ли человека сперва заполнить анкету. */
   if (window.MSV_HOME) {
     window.MSV_HOME.then(function (d) {
-      if (d && d.booking && d.booking.depositPaid) hideDeposit();
+      if (!d) return;
+      if (d.booking && d.booking.depositPaid) hideDeposit();
+      var who = document.getElementById('who');
+      if (who && d.me && d.me.name) who.textContent = d.me.name;
     });
   }
 
