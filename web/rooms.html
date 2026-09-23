@@ -216,6 +216,11 @@ MSV.ready(function (ctx) {
 
   var SOON_DAYS = window.__SOON_DAYS__ || 90;
 
+  /* Тип комнаты: у капсульных пишем «Капсулы», у обычных — сколько мест */
+  function kindOf(r) {
+    return /капсул/i.test(r.text || '') ? 'Капсулы' : (r.size + '-местная');
+  }
+
   /* «2026-10-15» → «15 октября» */
   var MONTHS_R = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
   function dayMonth(iso) {
@@ -275,11 +280,11 @@ MSV.ready(function (ctx) {
           '<span class="msv-note room__res">' + esc(r.residenceTitle) + '</span>' +
           '<span class="sex-tag sex-tag--' + (r.sex === 'ж' ? 'f' : 'm') + '">' + (r.sex === 'ж' ? 'Женская' : 'Мужская') + '</span>' +
         '</div>' +
-        '<span class="room__kind">' + r.size + '-местная</span>' +
+        '<span class="room__kind">' + kindOf(r) + '</span>' +
         '<h2 class="msv-sub room__name">' + esc(r.name) + '</h2>' +
         // У части комнат описания нет. Раньше пустой абзац всё равно
         // выводился и отодвигал фотографии на полторы строки вниз.
-        (r.text ? '<p class="msv-body room__text">' + esc(r.text) + '</p>' : '') +
+        (r.text && !/капсул/i.test(r.text) ? '<p class="msv-body room__text">' + esc(r.text) + '</p>' : '') +
         '<div class="room__shots" data-gallery="' + esc(r.resId) + '">' + shots(r, ri) + '</div>' +
         '<div class="room__prices">' + prices + '</div>' +
         '<p class="msv-note room__terms">Цены указаны минимальные при условии оплаты по СБП и заключении «годового контракта» уже со скидкой 30% от розничной цены (проживание и оплаты без перерыва минимум до конца августа).</p>' +
