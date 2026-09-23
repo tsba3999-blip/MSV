@@ -525,9 +525,12 @@
 }
 .msv-sh__panel-where .msv-sh__panel-bed { color: var(--sh-muted); font-weight: 500; }
 
-.msv-sh__panel-close--float { position: absolute; top: 10px; right: 10px; z-index: 2; }
+/* Крестик: 16 пикселей от правого края, верх — на линии фамилии.
+   Имя набрано 15/21, поэтому строка начинается на 3 пикселя ниже своего
+   блока: 14 + 3 = 17. */
+.msv-sh__panel-close--float { position: absolute; top: 17px; right: 16px; z-index: 2; }
 .msv-sh__panel-body--flush { padding-top: 16px; }
-.msv-sh__panel-body--flush .msv-sh__sect:first-child { padding-right: 40px; }   /* место под крестик */
+.msv-sh__panel-body--flush .msv-sh__sect:first-child { padding-right: 56px; }   /* место под крестик */
 
 /* Лепестки мессенджеров — форма из брендбука: радиусы 24/8 по диагонали */
 .msv-sh__petals { display: inline-flex; gap: 6px; margin-left: 8px; vertical-align: middle; }
@@ -1066,6 +1069,7 @@ body.msv-sh-dragging .msv-sh__bar { cursor: grabbing; }
   /* карточка — на весь экран, крестик крупнее */
   .msv-sh__panel { width: 100%; max-width: none; }
   .msv-sh__panel-close--float { width: 40px; height: 40px; font-size: 26px; }
+  .msv-sh__panel-body--flush .msv-sh__sect:first-child { padding-right: 68px; }   /* крестик крупнее — место шире */
   /* сетка листается пальцем в обе стороны; перетаскивание брони —
      удержанием, чтобы не мешать прокрутке */
   .msv-sh__body { -webkit-overflow-scrolling: touch; }
