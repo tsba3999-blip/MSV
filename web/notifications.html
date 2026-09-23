@@ -9,6 +9,19 @@
 <title>Уведомления — МСВ</title>
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="resident.css">
+<style>
+  .legend { margin: 0 0 var(--msv-s16); padding: var(--msv-s12) var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r12); }
+  .legend__item { display: flex; align-items: center; gap: var(--msv-s12); padding: var(--msv-s4) 0; }
+  .legend__item .note-card__mark { flex: 0 0 auto; }
+  .bar { display: flex; flex-wrap: wrap; gap: var(--msv-s8); margin: 0 0 var(--msv-s16); padding-left: var(--msv-s16); }
+  /* Статус уведомления: не прочитано — красная точка и жирный текст; прочитано — обычный;
+     отправлено в мессенджер или на почту — значок «улетело» */
+  .note-card { position: relative; }
+  .note-card--new .note-card__text { font-weight: 600; }
+  .note-card--new::before { content: ""; position: absolute; left: 6px; top: 50%; width: 8px; height: 8px; margin-top: -4px; border-radius: 50%; background: var(--msv-red); }
+  .note-card__state { display: inline-flex; align-items: center; gap: 4px; margin-left: var(--msv-s8); color: var(--msv-n500); }
+  .note-card__state svg { width: 14px; height: 14px; }
+</style>
 </head>
 <body>
 
@@ -24,28 +37,43 @@
     <h1 class="msv-sub head__title">Уведомления</h1>
   </div>
 
-  <a class="note-card note-card--alarm" href="cabinet-resident-debt.html" style="text-decoration:none;color:inherit">
+  <!-- Расшифровка значков и статусов (решение заказчика 22.09.2026) -->
+  <div class="legend">
+    <div class="legend__item"><span class="note-card__mark note-card__mark--alarm"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 22 20H2z"/><path d="M12 9v5"/><path d="M12 17h.01"/></svg></span><span class="msv-note">Важное: долг, пени, риск расторжения договора</span></div>
+    <div class="legend__item"><span class="note-card__mark note-card__mark--pay"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 12h5a3.5 3.5 0 0 0 0-7H9v14"/><path d="M7 15h7"/></svg></span><span class="msv-note">Оплата: сроки, чеки, напоминания</span></div>
+    <div class="legend__item"><span class="note-card__mark note-card__mark--info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg></span><span class="msv-note">Сообщение от модератора или куратора</span></div>
+    <div class="legend__item"><span class="note-card__mark note-card__mark--ok"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l2.4 5 5.6.8-4 3.9 1 5.5-5-2.7-5 2.7 1-5.5-4-3.9 5.6-.8z"/></svg></span><span class="msv-note">Хорошее: события, репутация, скидки</span></div>
+  </div>
+
+  <div class="bar" id="bar">
+    <button class="chip" type="button" data-f="" aria-pressed="true">Все</button>
+    <button class="chip" type="button" data-f="new" aria-pressed="false">Не прочитано</button>
+    <button class="chip" type="button" data-f="read" aria-pressed="false">Прочитано</button>
+    <button class="chip" type="button" data-f="sent" aria-pressed="false">Отправлено</button>
+  </div>
+
+  <a class="note-card note-card--alarm note-card--new" data-state="new" href="cabinet-resident-debt.html" style="text-decoration:none;color:inherit">
     <span class="note-card__mark note-card__mark--alarm"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 22 20H2z"/><path d="M12 9v5"/><path d="M12 17h.01"/></svg></span>
     <div class="note-card__body">
       <p class="msv-body note-card__text">Уважаемый резидент МСВ! Вы не внесли вовремя оплату за следующий месяц и, согласно договора, вам начисляется пени за первый день просрочки 3000 руб. Ваш рейтинг понизился. Свяжитесь пожалуйста с модератором.</p>
       <span class="msv-note note-card__when">сегодня, 10:00</span>
     </div>
   </a>
-  <article class="note-card ">
+  <article class="note-card note-card--new" data-state="new">
     <span class="note-card__mark note-card__mark--pay"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 12h5a3.5 3.5 0 0 0 0-7H9v14"/><path d="M7 15h7"/></svg></span>
     <div class="note-card__body">
       <p class="msv-body note-card__text">Уважаемый резидент МСВ! Напоминаем, что завтра последний день оплаты за следующий месяц.</p>
-      <span class="msv-note note-card__when">14 сентября, 10:00</span>
+      <span class="msv-note note-card__when">14 сентября, 10:00</span><span class="msv-note note-card__state" title="Отправлено в мессенджер и на почту"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3L10 14"/><path d="M21 3l-7 18-4-8-8-4z"/></svg>отправлено</span>$SENT
     </div>
   </article>
-  <article class="note-card ">
+  <article class="note-card" data-state="sent">
     <span class="note-card__mark note-card__mark--info"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg></span>
     <div class="note-card__body">
       <p class="msv-body note-card__text">Уважаемый резидент МСВ! Последняя оплата была осуществлена не верно. Чтобы ваш рейтинг не понижался свяжитесь пожалуйста в модератором.</p>
-      <span class="msv-note note-card__when">2 сентября, 12:30</span>
+      <span class="msv-note note-card__when">2 сентября, 12:30</span><span class="msv-note note-card__state" title="Отправлено в мессенджер и на почту"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3L10 14"/><path d="M21 3l-7 18-4-8-8-4z"/></svg>отправлено</span>$SENT
     </div>
   </article>
-  <article class="note-card ">
+  <article class="note-card" data-state="read">
     <span class="note-card__mark note-card__mark--ok"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l2.4 5 5.6.8-4 3.9 1 5.5-5-2.7-5 2.7 1-5.5-4-3.9 5.6-.8z"/></svg></span>
     <div class="note-card__body">
       <p class="msv-body note-card__text">Заявка по электрике закрыта. Мастер заменил розетку в комнате 412.</p>
@@ -80,6 +108,35 @@
   </a>
 </nav>
 
+<script>
+/* Три статуса уведомления (решение заказчика 22.09.2026):
+   не прочитано → прочитано (как только резидент открыл страницу и увидел карточку)
+   → отправлено, если копия ушла в мессенджер или на почту.
+   Сейчас статусы заданы в разметке; с сервером они придут вместе с уведомлением. */
+(function () {
+  'use strict';
+  var bar = document.getElementById('bar');
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.note-card[data-state]'));
+  bar.addEventListener('click', function (e) {
+    var c = e.target.closest('.chip'); if (!c) return;
+    bar.querySelectorAll('.chip').forEach(function (x) { x.setAttribute('aria-pressed', 'false'); });
+    c.setAttribute('aria-pressed', 'true');
+    var f = c.dataset.f;
+    cards.forEach(function (card) {
+      var s = card.dataset.state;
+      card.hidden = !(!f || s === f || (f === 'read' && s === 'sent'));
+    });
+  });
+  /* Прочитано: через три секунды на странице непрочитанные становятся прочитанными */
+  setTimeout(function () {
+    cards.forEach(function (card) {
+      if (card.dataset.state !== 'new') return;
+      card.dataset.state = 'read';
+      card.classList.remove('note-card--new');
+    });
+  }, 3000);
+})();
+</script>
 <script src="mark.js"></script>
 <script src="zoom.js"></script>
 <script src="edit.js"></script>

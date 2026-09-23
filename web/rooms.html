@@ -65,6 +65,25 @@
 <script src="residents-uyut.js"></script>
 <script src="residents-forma.js"></script>
 <script>
+/* Сначала спрашиваем занятость мест, потом строим страницу: иначе все места
+   выглядят свободными (шахматка резиденту закрыта). */
+(function () {
+  'use strict';
+  if (location.protocol === 'file:') return;
+  var res = new URLSearchParams(location.search).get('res') || '';
+  var req = new XMLHttpRequest();
+  req.open('GET', '/api/occupancy?res=' + encodeURIComponent(res), false);   // до отрисовки
+  req.withCredentials = true;
+  try {
+    req.send(null);
+    if (req.status === 200) {
+      var d = JSON.parse(req.responseText);
+      window.__BUSY__ = {};
+      (d.busy || []).forEach(function (id) { window.__BUSY__[id] = true; });
+    }
+  } catch (e) {}
+})();
+
 MSV.ready(function (ctx) {
   'use strict';
 
@@ -87,6 +106,9 @@ MSV.ready(function (ctx) {
     // занятым, чтобы в одной карточке были и «Выбрать», и «Продано».
     // Реальные брони не меняются, это только показ.
     if (DEMO) { busy = {}; res.beds.forEach(function (b, i) { if (i % 2 === 0) busy[b.id] = true; }); }
+    // Занятые места для резидента: шахматка ему закрыта, поэтому берём
+    // короткий список занятых мест (/api/occupancy) — без имён и броней.
+    if (!DEMO && window.__BUSY__) Object.keys(window.__BUSY__).forEach(function (id) { busy[id] = true; });
     res.rooms.forEach(function (r, i) {
       var beds = res.beds.filter(function (b) { return b.roomId === r.id; });
       var tiers = {};
@@ -192,9 +214,9 @@ MSV.ready(function (ctx) {
         if (out) {
           btn = '<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" disabled>Продано</button>';
         } else {
-          btn = '<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-pick="' + esc(r.id) + '" data-tier="' + ti + '">Выбрать</button>';
+          btn = '<button class="msv-btn msv-btn--s msv-btn--primary" type="button" data-pick="' + esc(r.id) + '" data-tier="' + ti + '">Выбрать</button>';
         }
-        return '<div class="room__price' + (out ? ' room__price--out' : '') + '">' +
+        return '<div class="room__price' + (out ? ' room__price--out' : '') + '"' + (out ? '' : ' role="button" tabindex="0" data-pick="' + esc(r.id) + '" data-tier="' + ti + '"') + '>' +
           '<span>' + esc(b.kind) + '</span>' +
           '<b>' + money(b.price) + '</b>' + btn + '</div>';
       }).join('');
@@ -203,20 +225,27 @@ MSV.ready(function (ctx) {
       // резиденция, имя, описание (санузел и т.п.) сразу под именем, фото, цены.
       return '<article class="room">' +
         '<div class="room__top">' +
-          '<span class="msv-note room__kind">' + r.size + '-местная комната</span>' +
+          '<span class="msv-note room__res">' + esc(r.residenceTitle) + '</span>' +
           '<span class="sex-tag sex-tag--' + (r.sex === 'ж' ? 'f' : 'm') + '">' + (r.sex === 'ж' ? 'Женская' : 'Мужская') + '</span>' +
         '</div>' +
-        '<span class="msv-note room__res">' + esc(r.residenceTitle) + '</span>' +
         '<h2 class="msv-sub room__name">' + esc(r.name) + '</h2>' +
+        '<span class="room__kind">' + r.size + '-местная</span>' +
         '<p class="msv-body room__text">' + esc(r.text) + '</p>' +
         '<div class="room__shots">' + shots(r) + '</div>' +
         '<div class="room__prices">' + prices + '</div>' +
-        '<p class="msv-note" style="margin:0">Цены при условии заключения «годового контракта» (проживание минимум до конца августа).</p>' +
+        '<p class="msv-note room__terms">Цены при условии оплаты по СБП и заключении «годового контракта» (проживание и оплаты без перерыва минимум до конца августа).</p>' +
       '</article>';
     }).join('');
   }
 
   /* ---------- Фильтры ---------- */
+
+  // Выбор места: щелчок по всей строке (не только по кнопке) и Enter с клавиатуры
+  document.getElementById('list').addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var row = e.target.closest('.room__price[data-pick]'); if (!row) return;
+    e.preventDefault(); row.click();
+  });
 
   document.querySelector('.filters').addEventListener('click', function (e) {
     var chip = e.target.closest('.chip');

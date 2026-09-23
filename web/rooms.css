@@ -13,8 +13,11 @@
   box-shadow: var(--msv-e1);
 }
 
-.room__kind { display: block; }
-.room__res { display: block; margin-bottom: var(--msv-s4); color: var(--msv-graphite); font-weight: 600; }
+/* Тип комнаты — под именем, кеглем цены (решение заказчика 22.09.2026) */
+.room__kind { display: block; margin: 0 0 var(--msv-s4); font-size: var(--msv-body-size); line-height: var(--msv-body-line); font-weight: 600; color: var(--msv-graphite); }
+.room__res { display: block; color: var(--msv-n500); font-weight: 600; }
+/* Условие цены — в красной рамке, как тревожная карточка в уведомлениях */
+.room__terms { margin: 0; padding: var(--msv-s8) var(--msv-s12); background: var(--msv-n100); border: 1px solid var(--msv-red); border-radius: var(--msv-r12); }
 
 /* Первая строка карточки: тип комнаты слева, пол справа */
 .room__top {
@@ -73,6 +76,12 @@
 
 .room__price {
   display: flex;
+  cursor: pointer;
+  border-radius: var(--msv-r11);
+  margin: 0 calc(var(--msv-s8) * -1);
+  padding-left: var(--msv-s8);
+  padding-right: var(--msv-s8);
+  transition: background var(--msv-fast) var(--msv-ease);
   align-items: baseline;
   justify-content: space-between;
   gap: var(--msv-s12);
@@ -83,6 +92,9 @@
 .room__price span:first-child { color: var(--msv-n500); font-size: var(--msv-body-size); }
 .room__price b { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
 
+.room__price[data-pick]:hover { background: var(--msv-beige); }
+.room__price[data-pick]:focus-visible { outline: 2px solid var(--msv-violet); outline-offset: 2px; }
+.room__price--out { cursor: default; }
 .room__price--out span:first-child,
 .room__price--out b { color: var(--msv-n300); font-weight: 400; }
 

@@ -58,6 +58,23 @@ module.exports = function register(route) {
     json(res, 200, out);
   });
 
+  /* Занятость мест для выбора комнаты: только идентификаторы занятых мест,
+     без имён и броней. Доступно любому вошедшему — резидент должен видеть,
+     какое место уже продано (до этого шахматка была закрыта ролью staff,
+     и на странице комнат всё выглядело свободным). */
+  route('GET', '/api/occupancy', async (req, res) => {
+    const s = auth.readSession(req);
+    if (!s) return fail(res, 401, 'Не выполнен вход');
+    const resId = String(req.query.res || '');
+    const r = await query(`
+      SELECT b.bed_id FROM bookings b
+      JOIN beds bd ON bd.id = b.bed_id
+      JOIN rooms rm ON rm.id = bd.room_id
+      WHERE b.date_from <= CURRENT_DATE AND b.date_to >= CURRENT_DATE
+        AND ($1::text = '' OR rm.residence_id = $1)`, [resId]);
+    json(res, 200, { busy: r.rows.map((x) => x.bed_id) });
+  });
+
   /* ---------- Шахматка одной резиденции ---------- */
 
   route('GET', '/api/shahmatka', async (req, res) => {
