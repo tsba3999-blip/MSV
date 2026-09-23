@@ -51,9 +51,13 @@
 
 .room__shot {
   flex: 1 1 0;
+  min-width: 0;
   height: 72px;
   border-radius: var(--msv-r11);
   overflow: hidden;
+  object-fit: cover;          /* настоящие фото не растягиваются */
+  background: var(--msv-n100);
+  cursor: zoom-in;
 }
 
 .room__more {

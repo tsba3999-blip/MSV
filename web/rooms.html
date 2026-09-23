@@ -61,6 +61,7 @@
 
 <script src="api.js"></script>
 <script src="residences.js"></script>
+<script src="photos.js"></script>
 <script src="demo-bookings.js"></script>
 <script src="residents-uyut.js"></script>
 <script src="residents-forma.js"></script>
@@ -124,7 +125,7 @@ MSV.ready(function (ctx) {
       var list = Object.keys(tiers).map(function (k) { return tiers[k]; }).sort(function (a, b) { return a.price - b.price; });
       var freeIds = []; list.forEach(function (t) { freeIds = freeIds.concat(t.ids); });
       ROOMS.push({
-        id: r.id, size: r.size || beds.length, sex: r.gender || '', name: r.name, residence: res.name, residenceTitle: res.title || res.name,
+        id: r.id, size: r.size || beds.length, sex: r.gender || '', name: r.name, residence: res.name, resId: res.id, residenceTitle: res.title || res.name,
         shots: SHOTS[(ri * 7 + i) % SHOTS.length], more: 0,
         text: r.note ? r.note.charAt(0).toUpperCase() + r.note.slice(1) : '',   // без описания — ничего, резиденция уже подписана выше
         beds: list, bedIds: freeIds, price: list.length ? list[0].price : 0
@@ -182,9 +183,18 @@ MSV.ready(function (ctx) {
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
-  function shots(room) {
+  function shots(room, idx) {
+    // Настоящие фотографии резиденции (photos.js). Пока их нет — цветные плашки.
+    var real = window.MSV_PHOTOS ? MSV_PHOTOS.forRoom(room.resId, idx || 0, 3) : [];
+    if (real.length) {
+      var h = real.map(function (p) {
+        return '<img class="room__shot" src="' + esc(p.src) + '" alt="' + esc(p.alt) + '" loading="lazy" decoding="async" data-zoom>';
+      }).join('');
+      var rest = (MSV_PHOTOS.all(room.resId).length - real.length);
+      if (rest > 0) h += '<span class="room__more">+' + rest + '</span>';
+      return h;
+    }
     var html = room.shots.map(function (c, i) {
-      // Пока фото нет — цветные плашки. Когда появятся, здесь будет <img data-zoom>
       return '<span class="room__shot" style="background:' + esc(c) + '" title="Фото ' + (i + 1) + ' появится после загрузки администратором"></span>';
     }).join('');
     if (room.more > 0) html += '<span class="room__more">+' + room.more + '</span>';
@@ -207,7 +217,7 @@ MSV.ready(function (ctx) {
     // Кнопка «Выбрать» — у каждого вида места (верхнее / нижнее): у них
     // разная цена, и выбор происходит именно здесь. Все кнопки одинаковые;
     // у выкупленных мест — неактивная «Продано» (решение заказчика 21.09.2026).
-    list.innerHTML = rooms.map(function (r) {
+    list.innerHTML = rooms.map(function (r, ri) {
       var prices = r.beds.map(function (b, ti) {
         var out = b.left === 0;
         var btn;
@@ -231,7 +241,7 @@ MSV.ready(function (ctx) {
         '<h2 class="msv-sub room__name">' + esc(r.name) + '</h2>' +
         '<span class="room__kind">' + r.size + '-местная</span>' +
         '<p class="msv-body room__text">' + esc(r.text) + '</p>' +
-        '<div class="room__shots">' + shots(r) + '</div>' +
+        '<div class="room__shots">' + shots(r, ri) + '</div>' +
         '<div class="room__prices">' + prices + '</div>' +
         '<p class="msv-note room__terms">Цены при условии оплаты по СБП и заключении «годового контракта» (проживание и оплаты без перерыва минимум до конца августа).</p>' +
       '</article>';
