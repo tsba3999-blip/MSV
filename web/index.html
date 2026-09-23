@@ -13,18 +13,22 @@
   /* Первая страница — красное полотно с паттерном.
      Экран 04 прототипа, растянутый на любую ширину. */
 
-  /* Первая страница целиком красная: страница не скроллится, красное поле — ровно окно
-     (иначе на некоторых экранах появлялась полоса прокрутки и бежевая кромка справа) */
-  html, body { height: 100%; overflow: hidden; background: var(--msv-red); }
+  /* Первая страница целиком красная. Прокрутка вниз разрешена: подвал со
+     входом для сотрудников и правовой строкой намеренно уведён под линию
+     сгиба — чтобы его увидеть, страницу надо протянуть примерно на треть
+     экрана (решение заказчика 24.09.2026). Вбок не скроллится: раньше на
+     некоторых экранах вылезала полоса и бежевая кромка справа. */
+  html, body { min-height: 100%; overflow-x: hidden; background: var(--msv-red); }
+  body { margin: 0; }
 
   .start {
     position: relative;
     display: flex;
     flex-direction: column;
-    height: 100%;
-    min-height: 0;
+    /* экран плюс треть: ровно столько, чтобы подвал начинался за сгибом */
+    min-height: 100vh;
+    min-height: 130svh;
     background: var(--msv-red);
-    overflow: auto;
   }
 
   /* Паттерн — полосой поверху, не заходя под знак и не мешая кнопкам.
@@ -59,18 +63,31 @@
   .start__glow span:nth-child(3) { --c: #B0102A; opacity: .6; }
   @media (prefers-reduced-motion: reduce) { .start__glow span { transition: none; } }
 
+  /* Первый экран: знак и вход ровно по центру окна */
   .start__inner {
     position: relative;
     display: grid;
     grid-template-rows: 1fr auto 1fr;
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     width: 100%;
     max-width: 460px;
+    min-height: 100vh;
+    min-height: 100svh;
     margin: 0 auto;
-    padding: var(--msv-s24) var(--msv-s24) max(var(--msv-s24), env(safe-area-inset-bottom));
+    padding: var(--msv-s24);
+    box-sizing: border-box;
   }
   .start__hero { grid-row: 2; display: flex; flex-direction: column; align-items: center; }
-  .start__foot { grid-row: 3; align-self: end; }
+
+  /* Подвал прижат к низу всей страницы — то есть на треть экрана ниже сгиба */
+  .start__foot {
+    position: relative;
+    width: 100%;
+    max-width: 460px;
+    margin: auto auto 0;
+    padding: 0 var(--msv-s24) max(var(--msv-s24), env(safe-area-inset-bottom));
+    box-sizing: border-box;
+  }
   .start__brand { display: block; width: 100%; max-width: 340px; }
   .start__entry { width: 100%; max-width: 340px; margin-top: var(--msv-s24); }
 
@@ -210,12 +227,15 @@
     </div>
     </div>
 
-    <!-- Служебные входы. По просьбе заказчика — без подписей: эти две
-         фигуры узнают только сотрудники и администрация. Подписи для
-         экранного диктора оставлены: без них человек с нарушением зрения
-         не сможет войти. Скрытость здесь не защита — доступ разграничивает
-         роль в учётной записи, а не вид кнопки. -->
-    <div class="start__foot">
+  </div>
+
+  <!-- Служебные входы. По просьбе заказчика — без подписей: эти две
+       фигуры узнают только сотрудники и администрация. Подписи для
+       экранного диктора оставлены: без них человек с нарушением зрения
+       не сможет войти. Скрытость здесь не защита — доступ разграничивает
+       роль в учётной записи, а не вид кнопки.
+       Блок вынесен из первого экрана: он должен лежать ниже сгиба. -->
+  <div class="start__foot">
     <div class="start__staff">
       <a class="staff-mark" href="login.html?role=staff" aria-label="Вход для сотрудников" title="Сотрудники">
         <span class="staff-mark__letter" aria-hidden="true">С</span>
@@ -227,8 +247,6 @@
     </div>
 
     <p class="start__legal">© 2026 МСВ. Все права защищены. <a href="legal.html">Правовая информация</a></p>
-    </div>
-
   </div>
 </main>
 
