@@ -124,15 +124,23 @@
     padding-top: var(--msv-s16);
   }
 
-  /* Плитки 1×1: иконка сверху, подпись снизу — и больше ничего */
+  /* Плитки 1×1: иконка сверху, подпись снизу — и больше ничего.
+     Разделы те же, что в меню (решение заказчика 23.09.2026). По брендбуку
+     на экране не больше двух акцентов, поэтому цветные только две плитки,
+     остальные белые, а красная — одна, платёжная. */
   .tile--small { min-height: 112px; }
   .tile--aqua { background: var(--msv-aqua); }
   .tile--lime { background: var(--msv-lime); }
   .tile--lav  { background: var(--msv-lavender); }
   .tile--plain { background: var(--msv-white); box-shadow: var(--msv-e1); }
+  /* Последняя плитка во всю ширину: разделов нечётное число */
+  .tile--wide { grid-column: 1 / -1; min-height: 88px; flex-direction: row; align-items: center; gap: var(--msv-s12); }
+  .tile--wide .tile__cap { margin: 0; padding: 0; }
+  /* Счётчик непрочитанного — как в строке меню */
+  .tile__count { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; margin-left: var(--msv-s8); padding: 0 6px; font-size: 12px; line-height: 20px; color: var(--msv-white); background: var(--msv-red); border-radius: 10px; vertical-align: middle; }
 
   .tile__icon { flex: 0 0 auto; }
-  .tile__cap { margin-top: auto; padding-top: var(--msv-s12); font-size: 15px; line-height: 20px; font-weight: 600; }
+  .tile__cap { margin-top: auto; padding-top: var(--msv-s12); font-size: 14px; line-height: 19px; font-weight: 600; }
 
   /* Событие дня 2×1, графит */
   .tile--event {
@@ -154,10 +162,12 @@
   @media (min-width: 768px) {
     .app { max-width: 640px; padding: 0 var(--msv-s32); }
     .tabbar { max-width: 576px; }
+    .bento { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .tile--pay { grid-column: span 2; grid-row: span 2; }
   }
   @media (min-width: 1100px) {
-    .app { max-width: 720px; }
-    .tabbar { max-width: 656px; }
+    .app { max-width: 880px; }
+    .tabbar { max-width: 816px; }
   }
   .tile__evtitle { margin: var(--msv-s4) 0 0; font-size: var(--msv-sub-size); line-height: var(--msv-sub-line); font-weight: 600; }
 
@@ -205,51 +215,74 @@
   <main class="bento">
 
     <!-- Красная плитка всегда первая и единственная красная на экране -->
-    <a class="tile tile--pay" href="checkout.html" aria-label="К оплате 12 400 рублей до 25 сентября">
+    <a class="tile tile--pay" href="checkout.html" aria-label="К оплате">
       <span class="tile__label">К оплате</span>
-      <span class="tile__sum">12&#8201;400 руб.</span>
-      <span class="tile__due">до 25 сентября</span>
+      <span class="tile__sum">&mdash;</span>
+      <span class="tile__due">&nbsp;</span>
       <span class="tile__cta">
         <span class="msv-btn msv-btn--m" style="background:var(--msv-white);color:var(--msv-red)">Оплатить</span>
       </span>
     </a>
 
-    <a class="tile tile--small tile--aqua" href="stub.html?t=Прачечная">
-      <svg class="tile__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <rect x="4" y="3" width="16" height="18" rx="3"/><circle cx="12" cy="13" r="4"/><path d="M8 6.5h.01"/>
-      </svg>
-      <span class="tile__cap">Прачечная</span>
+    <a class="tile tile--small tile--plain" href="notifications.html">
+      <svg class="tile__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 9a6 6 0 1 0-12 0c0 6-3 7-3 7h18s-3-1-3-7"/><path d="M10.5 20.5a2 2 0 0 0 3 0"/></svg>
+      <span class="tile__cap">Уведомления<span class="tile__count" id="noteCount" hidden></span></span>
     </a>
-
-    <a class="tile tile--small tile--lime" href="stub.html?t=Пропуск">
-      <svg class="tile__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <rect x="3" y="5" width="18" height="14" rx="3"/><path d="M8 9v6"/><path d="M12 9v6"/>
-      </svg>
-      <span class="tile__cap">Пропуск</span>
+    <a class="tile tile--small tile--plain" href="payments.html">
+      <svg class="tile__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.5l9-5 9 5"/><path d="M4 20h16"/><path d="M6 12.5v5M12 12.5v5M18 12.5v5"/><path d="M4.5 12.5h3M10.5 12.5h3M16.5 12.5h3"/></svg>
+      <span class="tile__cap">История оплат</span>
     </a>
-
-    <a class="tile tile--small tile--lav" href="stub.html?t=Соседи">
-      <svg class="tile__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6.5a3 3 0 0 1 0 5.8"/><path d="M18 20a5.5 5.5 0 0 0-3-4.6"/>
-      </svg>
-      <span class="tile__cap">Соседи</span>
+    <a class="tile tile--small tile--lime" href="reputation.html">
+      <svg class="tile__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l2.4 5 5.6.8-4 3.9 1 5.5-5-2.7-5 2.7 1-5.5-4-3.9 5.6-.8z"/></svg>
+      <span class="tile__cap">Моя репутация</span>
     </a>
-
     <a class="tile tile--small tile--plain" href="repair.html">
-      <svg class="tile__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/><path d="M10 13v3h4v-3"/></svg>
-      <span class="tile__cap">Заявление</span>
+      <svg class="tile__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.34 6.49A4.6 4.6 0 0 1 14.09 12.18L6.33 19.93A1.6 1.6 0 0 1 4.07 17.67L11.82 9.92A4.6 4.6 0 0 1 17.51 3.66L15.25 5.92 18.08 8.75Z"/></svg>
+      <span class="tile__cap">Заявка технику</span>
     </a>
-
-    <a class="tile tile--event" href="stub.html?t=Четверг, 19:00 Вечер настолок">
-      <span class="tile__thumb" aria-hidden="true"></span>
-      <span>
-        <span class="tile__label">Четверг, 19:00</span>
-        <span class="tile__evtitle">Вечер настолок</span>
-      </span>
+    <a class="tile tile--small tile--lav" href="say.html">
+      <svg class="tile__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 5H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3v4l5-4h8a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z"/></svg>
+      <span class="tile__cap">Хочу сказать</span>
+    </a>
+    <a class="tile tile--small tile--plain" href="documents.html">
+      <svg class="tile__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
+      <span class="tile__cap">Мои документы</span>
+    </a>
+    <a class="tile tile--small tile--plain" href="documents-signed.html">
+      <svg class="tile__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 14l2 2 4-4"/></svg>
+      <span class="tile__cap">Подписанные документы</span>
+    </a>
+    <a class="tile tile--small tile--plain" href="mydata.html">
+      <svg class="tile__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
+      <span class="tile__cap">Мои данные</span>
+    </a>
+    <a class="tile tile--small tile--plain" href="requests.html">
+      <svg class="tile__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3L3 10l7 3 3 7z"/></svg>
+      <span class="tile__cap">Запросы</span>
+    </a>
+    <a class="tile tile--small tile--plain" href="about.html">
+      <svg class="tile__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg>
+      <span class="tile__cap">О проекте МСВ</span>
+    </a>
+    <a class="tile tile--small tile--plain" href="ads.html">
+      <svg class="tile__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4h4l6 4V6l-6 4z"/><path d="M18 9a4 4 0 0 1 0 6"/></svg>
+      <span class="tile__cap">Реклама</span>
+    </a>
+    <a class="tile tile--small tile--plain" href="logins.html">
+      <svg class="tile__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      <span class="tile__cap">История входов</span>
+    </a>
+    <a class="tile tile--small tile--plain" href="pin.html">
+      <svg class="tile__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="7" width="19" height="10" rx="2.5"/><circle cx="8" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="16" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>
+      <span class="tile__cap">Сменить пароль</span>
+    </a>
+    <a class="tile tile--small tile--plain" href="faq.html">
+      <svg class="tile__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.2 2.4c-.5.2-.7.6-.7 1.1v.5"/><path d="M12 17h.01"/></svg>
+      <span class="tile__cap">Чаво</span>
+    </a>
+    <a class="tile tile--small tile--plain tile--wide" href="support.html">
+      <svg class="tile__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/><path d="M5.6 5.6l3.9 3.9"/><path d="M14.5 14.5l3.9 3.9"/><path d="M18.4 5.6l-3.9 3.9"/><path d="M9.5 14.5l-3.9 3.9"/></svg>
+      <span class="tile__cap">Поддержка</span>
     </a>
 
   </main>
@@ -279,6 +312,11 @@
         pay.querySelector('.tile__due').textContent = bal > 0 ? 'к оплате сейчас' : 'всё оплачено';
         pay.querySelector('.tile__label').textContent = bal > 0 ? 'К оплате' : 'Баланс';
       }
+
+      // Непрочитанные уведомления — числом на плитке, как в строке меню
+      var un = (d.notices || []).filter(function (n) { return !n.read; }).length;
+      var cnt = document.getElementById('noteCount');
+      if (cnt && un) { cnt.textContent = un; cnt.hidden = false; }
     })
     .catch(function () {});
 })();
