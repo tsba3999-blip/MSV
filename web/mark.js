@@ -55,7 +55,11 @@
     /* карандаш редактора сдвигаем левее, чтобы не наезжал */
     '.edit-bar{right:70px!important}' +
     /* на страницах резидента шапка узкая — освобождаем место справа */
-    '.page .head,.app .top{padding-right:56px}';
+    '.page .head,.app .top{padding-right:56px}' +
+    /* в кабинете сотрудника справа в шапке стоят знаки резиденций —
+       отводим место под «М» и карандаш, иначе они накладываются */
+    '.work__top{padding-right:132px}' +
+    '@media (max-width:760px){.work__top{padding-right:72px}}';
   document.head.appendChild(css);
 
   document.body.appendChild(a);
