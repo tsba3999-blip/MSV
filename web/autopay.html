@@ -31,6 +31,11 @@
     <p class="msv-body" style="margin:0;color:var(--msv-n500)">Автоплатёж возможен только через банк: он хранит карту и списывает деньги по расписанию. Сайт сам этого делать не может и не должен — хранить карты без банковской лицензии запрещено. Как только МСВ подключит эквайринг, здесь появится кнопка привязки карты.</p>
   </div>
 
+  <h2 class="msv-sub group__title" style="margin-top:var(--msv-s24)">День списания</h2>
+  <p class="msv-body" style="margin:0 0 var(--msv-s12);color:var(--msv-n500)">Выбери число, в которое банк будет списывать оплату. Настройку сохраним сейчас — она применится, как только подключим эквайринг.</p>
+  <div class="chips" role="group" aria-label="День списания" id="days" style="display:flex;flex-wrap:wrap;gap:var(--msv-s8);margin-bottom:var(--msv-s8);padding-left:var(--msv-s16)"></div>
+  <p class="msv-note" id="dayNote" style="margin:0 0 var(--msv-s24);padding-left:var(--msv-s16);color:var(--msv-n500)">С 1 по 14 число: позже 15-го начисляются пени.</p>
+
   <h2 class="msv-sub group__title" style="margin-top:var(--msv-s24)">Как это будет работать</h2>
   <div class="rows">
     <div class="row" style="cursor:default"><span class="row__text"><span class="row__name">1. Привязать карту</span><span class="msv-note row__note">Через защищённую страницу банка. Сайт карту не видит.</span></span></div>
@@ -67,6 +72,34 @@
     <span class="tab__cap">Оплата</span>
   </a>
 </nav>
+<script>
+/* День автоплатежа: выбор с 1 по 14 число. Пока эквайринга нет, храним
+   выбор в браузере и показываем в подписи; при подключении банка отправим
+   его вместе с привязкой карты. */
+(function () {
+  'use strict';
+  var box = document.getElementById('days'), note = document.getElementById('dayNote');
+  var saved = null;
+  try { saved = localStorage.getItem('msv-autopay-day'); } catch (e) {}
+  for (var d = 1; d <= 14; d++) {
+    var b = document.createElement('button');
+    b.className = 'chip'; b.type = 'button'; b.textContent = d;
+    b.setAttribute('aria-pressed', String(String(d) === saved));
+    box.appendChild(b);
+  }
+  function text(d) { return d ? 'Списание ' + d + '-го числа каждого месяца. Позже 15-го начисляются пени.' : 'С 1 по 14 число: позже 15-го начисляются пени.'; }
+  note.textContent = text(saved);
+  box.addEventListener('click', function (e) {
+    var b = e.target.closest('.chip'); if (!b) return;
+    var on = b.getAttribute('aria-pressed') === 'true';
+    box.querySelectorAll('.chip').forEach(function (x) { x.setAttribute('aria-pressed', 'false'); });
+    b.setAttribute('aria-pressed', on ? 'false' : 'true');
+    var day = on ? null : b.textContent;
+    try { day ? localStorage.setItem('msv-autopay-day', day) : localStorage.removeItem('msv-autopay-day'); } catch (e2) {}
+    note.textContent = text(day);
+  });
+})();
+</script>
 <script src="mark.js"></script>
 <script src="edit.js"></script>
 <script src="protect.js"></script>

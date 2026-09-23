@@ -170,9 +170,19 @@ function validPin(pin) {
   return null;
 }
 
-async function setPin(userId, pin) {
+/* Смена кода: сначала подтверждаем действующий (решение заказчика 22.09.2026).
+   current обязателен, если код уже установлен: иначе чужой человек за
+   разблокированным телефоном сменил бы код в два касания. */
+async function setPin(userId, pin, current) {
   const bad = validPin(pin);
   if (bad) return { ok: false, error: bad };
+  const cur = await query(`SELECT pin_hash FROM users WHERE id = $1`, [userId]);
+  const row = cur.rows[0];
+  if (row && row.pin_hash) {
+    if (!/^\d{4}$/.test(String(current || ""))) return { ok: false, error: "Введи действующий код" };
+    const same = crypto.timingSafeEqual(Buffer.from(row.pin_hash, "hex"), Buffer.from(hashPin(current, userId), "hex"));
+    if (!same) return { ok: false, error: "Действующий код не подошёл" };
+  }
   await query(`UPDATE users SET pin_hash = $1, pin_expires = NULL, pin_attempts = 0 WHERE id = $2`,
     [hashPin(pin, userId), userId]);
   return { ok: true };

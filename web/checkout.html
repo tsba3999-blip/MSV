@@ -9,6 +9,15 @@
 <title>Проверка данных — МСВ</title>
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="form.css">
+<style>
+  .sbp { display: flex; align-items: center; gap: var(--msv-s12); margin: 0 0 var(--msv-s16); padding: var(--msv-s12) var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r12); box-shadow: var(--msv-e1); color: inherit; text-decoration: none; }
+  .sbp__logo { flex: 0 0 auto; width: 44px; height: 44px; }
+  .sbp__logo svg { display: block; width: 100%; height: 100%; }
+  .sbp__text { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .sbp__title { font-size: 17px; line-height: 22px; }
+  .sbp__note { color: var(--msv-n500); }
+  .sbp__chev { flex: 0 0 auto; color: var(--msv-n300); }
+</style>
 <link rel="stylesheet" href="rooms.css">
 <style>
   .qr-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--msv-s8); margin-top: var(--msv-s12); }
@@ -75,11 +84,31 @@
 
   <a class="msv-btn msv-btn--block msv-btn--secondary" href="autopay.html" style="margin-bottom:var(--msv-s16)">Вы можете настроить ежемесячный автоплатёж</a>
 
+  <!-- СБП: знак, пояснение и условие цены (решение заказчика 22.09.2026) -->
+  <a class="sbp" href="sbp.html">
+    <span class="sbp__logo" aria-hidden="true">
+      <svg viewBox="0 0 48 48" role="img" aria-label="СБП">
+        <path d="M6 14l7 10-7 10z" fill="#5B57A2"/>
+        <path d="M13 24l7-10 4 6-7 10z" fill="#D90751"/>
+        <path d="M20 14h9l4 6h-9z" fill="#FAB718"/>
+        <path d="M29 14l7 10-7 10-4-6 3-4-3-4z" fill="#ED6F26"/>
+        <path d="M33 28l-4 6h-9l4-6z" fill="#63B22F"/>
+        <path d="M13 24l7 10h-7z" fill="#1487C9"/>
+      </svg>
+    </span>
+    <span class="sbp__text">
+      <span class="msv-sub sbp__title">Почему мы просим оплачивать по СБП?</span>
+      <span class="msv-note sbp__note">Открыть пояснение</span>
+    </span>
+    <svg class="sbp__chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+  </a>
+
   <div class="form__foot">
     <div class="total">
       <span class="msv-body">К оплате</span>
       <b id="total">0 руб.</b>
     </div>
+    <p class="msv-note" style="margin:0 0 var(--msv-s12);color:var(--msv-n500)">Данная стоимость только при условии оплаты по СБП.</p>
     <button class="msv-btn msv-btn--block msv-btn--primary" id="pay" type="button">Перейти к оплате</button>
   </div>
 

@@ -57,6 +57,14 @@
     </div>
 
     <div class="sect">
+      <p class="msv-body q">Пол <span class="msv-note" style="font-weight:400">— из твоей анкеты, можно поменять</span></p>
+      <div class="chips" role="group" aria-label="Пол" id="gender">
+        <button class="chip" type="button" data-gender="м" aria-pressed="false">Мужской</button>
+        <button class="chip" type="button" data-gender="ж" aria-pressed="false">Женский</button>
+      </div>
+    </div>
+
+    <div class="sect">
       <p class="msv-body q">Количество человек в комнате <span class="msv-note" style="font-weight:400">— можно отметить несколько или все</span></p>
       <div class="chips" role="group" aria-label="Количество человек в комнате" id="sizes">
         <button class="chip" type="button" data-size="1" aria-pressed="false">1</button>
@@ -94,7 +102,7 @@
 
     <p class="msv-note" id="err" hidden style="color:var(--msv-red);margin:0 0 var(--msv-s12)"></p>
     <div class="foot">
-      <button class="msv-btn msv-btn--block msv-btn--primary" type="button" id="send">Подать заявление</button>
+      <button class="msv-btn msv-btn--block msv-btn--primary" type="button" id="send">Подать заявление на переселение</button>
     </div>
   </div>
 
@@ -122,6 +130,22 @@
     else { var all = this.querySelector('[data-size="all"]'); if (all) all.setAttribute('aria-pressed', 'false'); }
     c.setAttribute('aria-pressed', on ? 'false' : 'true');
   });
+  // Пол: один из двух; подставляем из анкеты резидента
+  document.getElementById('gender').addEventListener('click', function (e) {
+    var c = e.target.closest('.chip'); if (!c) return;
+    var on = c.getAttribute('aria-pressed') === 'true';
+    this.querySelectorAll('.chip').forEach(function (x) { x.setAttribute('aria-pressed', 'false'); });
+    c.setAttribute('aria-pressed', on ? 'false' : 'true');
+  });
+  if (location.protocol !== 'file:') {
+    fetch('/api/me/home', { credentials: 'same-origin' }).then(function (r) { return r.status === 200 ? r.json() : null; })
+      .then(function (d) {
+        var g = d && d.me && d.me.gender; if (!g) return;
+        var c = document.querySelector('#gender .chip[data-gender="' + g + '"]');
+        if (c) c.setAttribute('aria-pressed', 'true');
+      }).catch(function () {});
+  }
+
   document.getElementById('otherCb').addEventListener('change', function () {
     document.getElementById('otherField').hidden = !this.checked;
     if (this.checked) document.getElementById('otherText').focus();
@@ -138,7 +162,8 @@
     var strict = document.querySelector('input[name="strict"]:checked').value === 'strict' ? 'только так' : 'рассмотрю варианты';
     var sz = sizes();
     var szText = !sz.length || sz.indexOf('all') >= 0 ? 'любая комната' : 'мест: ' + sz.map(function (s) { return s === 'caps' ? 'капсулы' : s; }).join('/');
-    var note = ['Переселение', strict, szText, reasons.join(', ').replace('другая причина', 'другая причина: ' + other)]
+    var g = document.querySelector('#gender .chip[aria-pressed="true"]');
+    var note = ['Переселение', g ? (g.dataset.gender === 'ж' ? 'женская комната' : 'мужская комната') : '', strict, szText, reasons.join(', ').replace('другая причина', 'другая причина: ' + other)]
       .filter(Boolean).join(' · ').slice(0, 300);
     var numeric = sz.filter(function (s) { return /^\d+$/.test(s); });
     var body = {

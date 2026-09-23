@@ -263,7 +263,8 @@
 
 .pay-head {
   display: grid;
-  grid-template-columns: 52px 1fr 1fr 64px;
+  /* колонки поровну (решение заказчика 22.09.2026) */
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--msv-s12);
   padding: 0 var(--msv-s16) var(--msv-s8);
 }
@@ -272,7 +273,7 @@
 
 .pay-row {
   display: grid;
-  grid-template-columns: 52px 1fr 1fr 64px;
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--msv-s12);
   align-items: baseline;
   padding: var(--msv-s12) var(--msv-s16);

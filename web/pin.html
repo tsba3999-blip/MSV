@@ -37,6 +37,15 @@
   <div id="form">
     <p class="msv-body" style="margin:0 0 var(--msv-s24);color:var(--msv-n500)">Код выдал модератор при заселении. Замени его на свой — четыре цифры, которые помнишь только ты.</p>
 
+    <p class="msv-note" style="margin-bottom:var(--msv-s8)">Введи действующий код</p>
+    <div class="pin" id="pin0">
+      <input class="pin__cell" type="password" inputmode="numeric" maxlength="1" aria-label="Первая цифра действующего кода">
+      <input class="pin__cell" type="password" inputmode="numeric" maxlength="1" aria-label="Вторая цифра действующего кода">
+      <input class="pin__cell" type="password" inputmode="numeric" maxlength="1" aria-label="Третья цифра действующего кода">
+      <input class="pin__cell" type="password" inputmode="numeric" maxlength="1" aria-label="Четвёртая цифра действующего кода">
+    </div>
+    <p class="msv-note" style="margin:0 0 var(--msv-s24)">Тайна пароля — ваша ответственность.</p>
+
     <p class="msv-note" style="margin-bottom:var(--msv-s8)">Новый код</p>
     <div class="pin" id="pin1">
       <input class="pin__cell" type="password" inputmode="numeric" maxlength="1" aria-label="Первая цифра">
@@ -77,7 +86,7 @@
   'use strict';
 
   function cells(id) { return Array.prototype.slice.call(document.querySelectorAll('#' + id + ' .pin__cell')); }
-  var c1 = cells('pin1'), c2 = cells('pin2');
+  var c0 = cells('pin0'), c1 = cells('pin1'), c2 = cells('pin2');
   var save = document.getElementById('save');
   var err = document.getElementById('err'), errText = document.getElementById('errText');
 
@@ -96,6 +105,7 @@
       });
     });
   }
+  wire(c0, c1);
   wire(c1, c2); wire(c2, null);
 
   function weak(p) {
@@ -107,23 +117,26 @@
 
   function sync() {
     err.hidden = true;
+    document.getElementById('pin0').classList.remove('pin--error');
     document.getElementById('pin1').classList.remove('pin--error');
     document.getElementById('pin2').classList.remove('pin--error');
-    save.disabled = !(val(c1).length === 4 && val(c2).length === 4);
+    save.disabled = !(val(c0).length === 4 && val(c1).length === 4 && val(c2).length === 4);
   }
 
   save.addEventListener('click', function () {
-    var a = val(c1), b = val(c2);
+    var cur = val(c0), a = val(c1), b = val(c2);
+    if (cur.length !== 4) { show('Введи действующий код', 'pin0'); return; }
+    if (cur === a) { show('Новый код должен отличаться от действующего', 'pin1'); return; }
     var bad = weak(a);
     if (bad) { show(bad, 'pin1'); return; }
     if (a !== b) { show('Коды не совпадают', 'pin2'); return; }
 
     save.disabled = true;
     fetch('/api/auth/set-pin', { method: 'POST', credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pin: a }) })
+      headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pin: a, current: cur }) })
       .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j }; }); })
       .then(function (r) {
-        if (r.s !== 200) { show(r.j.error || 'Не удалось сохранить', 'pin1'); save.disabled = false; return; }
+        if (r.s !== 200) { show(r.j.error || 'Не удалось сохранить', /действующий/i.test(r.j.error || '') ? 'pin0' : 'pin1'); save.disabled = false; return; }
         document.getElementById('form').style.display = 'none';
         document.getElementById('ok').classList.add('ok--on');
       })

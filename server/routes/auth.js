@@ -51,7 +51,7 @@ module.exports = function register(route) {
     const s = auth.readSession(req);
     if (!s) return fail(res, 401, 'Не выполнен вход');
     const body = await readJson(req);
-    const r = await auth.setPin(s.uid, body.pin);
+    const r = await auth.setPin(s.uid, body.pin, body.current);
     if (!r.ok) return fail(res, 400, r.error);
     json(res, 200, { ok: true });
   });

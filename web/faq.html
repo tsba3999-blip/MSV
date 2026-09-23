@@ -40,6 +40,9 @@
   </div>
 
   <p class="msv-body" style="margin:0 0 var(--msv-s16);color:var(--msv-n500)">Мы собрали самые часто задаваемые вопросы. Не нашли ответа — <a class="msv-link" href="support.html">напишите в поддержку</a>.</p>
+  <input class="msv-input" id="q" type="search" placeholder="Поиск по вопросам и ответам" aria-label="Поиск" style="margin-bottom:var(--msv-s16)">
+  <p class="msv-note" id="qCount" hidden style="margin:calc(var(--msv-s12) * -1) 0 var(--msv-s12);padding-left:var(--msv-s16);color:var(--msv-n500)"></p>
+
   <div class="rows">
     <details class="qa">
       <summary class="qa__q">Что такое резиденция? Почему вы себя так называете? Ведь вы общежитие!<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
@@ -180,6 +183,43 @@
     <span class="tab__cap">Оплата</span>
   </a>
 </nav>
+<script>
+/* Поиск по «Чаво»: прячем вопросы, где нет искомого слова; совпадения
+   подсвечиваем и сразу раскрываем ответ. */
+(function () {
+  'use strict';
+  var q = document.getElementById('q'), count = document.getElementById('qCount');
+  var items = Array.prototype.slice.call(document.querySelectorAll('.qa'));
+  items.forEach(function (qa) { qa.dataset.text = qa.textContent.toLowerCase(); });
+  function mark(el, needle) {
+    el.querySelectorAll('mark').forEach(function (m) { m.replaceWith(document.createTextNode(m.textContent)); });
+    el.normalize();
+    if (!needle) return;
+    var walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null), nodes = [], n;
+    while ((n = walk.nextNode())) nodes.push(n);
+    nodes.forEach(function (node) {
+      var i = node.nodeValue.toLowerCase().indexOf(needle);
+      if (i < 0) return;
+      var after = node.splitText(i), rest = after.splitText(needle.length);
+      var m = document.createElement('mark'); m.style.cssText = 'background:var(--msv-yellow);color:inherit;border-radius:3px';
+      m.appendChild(document.createTextNode(after.nodeValue)); after.replaceWith(m);
+    });
+  }
+  function run() {
+    var s = q.value.trim().toLowerCase(), found = 0;
+    items.forEach(function (qa) {
+      var hit = !s || qa.dataset.text.indexOf(s) >= 0;
+      qa.hidden = !hit;
+      if (hit) found++;
+      mark(qa, s && hit ? s : '');
+      if (s && hit) qa.open = true; else if (!s) qa.open = false;
+    });
+    count.hidden = !s;
+    count.textContent = s ? (found ? 'Нашлось: ' + found : 'Ничего не нашлось — попробуй другое слово') : '';
+  }
+  q.addEventListener('input', run);
+})();
+</script>
 <script>
 /* Плавное раскрытие ответов. <details> сам открывается рывком, поэтому
    перехватываем нажатие и анимируем высоту ответа: 0 → его высота → auto. */

@@ -54,22 +54,22 @@
 
     <label class="msv-field">
       <span class="msv-field__label">Фамилия</span>
-      <input class="msv-input" name="last" id="fLast" autocomplete="family-name" placeholder="Логинов">
+      <input class="msv-input" name="last" id="fLast" autocomplete="family-name" placeholder="Фамилия">
     </label>
 
     <label class="msv-field">
       <span class="msv-field__label">Имя</span>
-      <input class="msv-input" name="first" id="fFirst" autocomplete="given-name" placeholder="Артём">
+      <input class="msv-input" name="first" id="fFirst" autocomplete="given-name" placeholder="Имя">
     </label>
 
     <label class="msv-field">
       <span class="msv-field__label">Отчество</span>
-      <input class="msv-input" name="middle" id="fMiddle" autocomplete="additional-name" placeholder="Сергеевич">
+      <input class="msv-input" name="middle" id="fMiddle" autocomplete="additional-name" placeholder="Отчество">
     </label>
 
     <!-- Пол — обязательное поле: комнаты в резиденциях мужские и женские,
          на выборе комнаты чужой пол будет недоступен -->
-    <p class="msv-note" style="margin-bottom:var(--msv-s8)">Пол</p>
+    <p class="msv-note" style="margin-bottom:var(--msv-s8)">Какой пол выберите — такие места и будут показываться</p>
     <div class="chips" role="group" aria-label="Пол" style="margin-bottom:var(--msv-s12)">
       <button class="chip" type="button" data-group="gender" data-gender="м" aria-pressed="false">Мужской</button>
       <button class="chip" type="button" data-group="gender" data-gender="ж" aria-pressed="false">Женский</button>
@@ -97,7 +97,7 @@
     <h2 class="msv-sub sect__title">Дата рождения</h2>
 
     <label class="msv-field">
-      <span class="msv-field__label">День, месяц и год</span>
+      <span class="msv-field__label">Замени на свою дату рождения</span>
       <input class="msv-input" id="birth" type="date" autocomplete="bday" value="2010-01-01">
     </label>
     <p class="msv-note" id="ageNote">Замени на свою дату рождения.</p>
@@ -119,12 +119,10 @@
     <h2 class="msv-sub sect__title">Мой ВУЗ/Колледж</h2>
 
     <label class="msv-field msv-field--sug">
-      <span class="msv-field__label">Вуз или колледж</span>
       <input class="msv-input" id="school" name="school" placeholder="Начни вводить название">
     </label>
-    <p class="msv-note" style="margin:calc(var(--msv-s12) * -1) 0 var(--msv-s12)">Учишься не в Москве? Впиши своё — список не обязателен.</p>
 
-    <p class="msv-note" style="margin-bottom:var(--msv-s8)">Курс</p>
+    <p class="msv-field__label" style="margin:0 0 var(--msv-s8)">Курс</p>
     <div class="chips" role="group" aria-label="Курс" style="margin-bottom:var(--msv-s12)">
       <button class="chip" type="button" data-group="course" aria-pressed="false">1</button>
       <button class="chip" type="button" data-group="course" aria-pressed="false">2</button>
@@ -148,6 +146,28 @@
 
 <script src="universities.js"></script>
 <script src="suggest.js"></script>
+<script>
+/* ФИО — только по-русски (решение заказчика 22.09.2026): латиница не принимается,
+   под полем показывается подсказка. Дефис, апостроф и пробел разрешены. */
+(function () {
+  'use strict';
+  var RU = /^[А-Яа-яЁё\s\-']*$/;
+  ['fLast', 'fFirst', 'fMiddle'].forEach(function (id) {
+    var el = document.getElementById(id); if (!el) return;
+    var hint = document.createElement('span');
+    hint.className = 'msv-note'; hint.hidden = true;
+    hint.style.cssText = 'display:block;margin-top:4px;color:var(--msv-red)';
+    hint.textContent = 'Необходимо вводить данные по-русски';
+    el.parentNode.appendChild(hint);
+    el.addEventListener('input', function () {
+      var bad = !RU.test(el.value);
+      if (bad) el.value = el.value.replace(/[^А-Яа-яЁё\s\-']/g, '');
+      hint.hidden = !bad;
+      if (bad) { clearTimeout(el._t); el._t = setTimeout(function () { hint.hidden = true; }, 4000); }
+    });
+  });
+})();
+</script>
 <script>
 (function () {
   'use strict';

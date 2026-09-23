@@ -41,7 +41,6 @@
     <textarea class="msv-area" id="note" maxlength="500" style="min-height:96px;width:100%;box-sizing:border-box" placeholder="Уточнение, если нужно: для какого вуза, что исправить, куда переселить"></textarea>
     <div style="display:flex;gap:var(--msv-s8);margin-top:var(--msv-s12)">
       <button class="msv-btn msv-btn--m msv-btn--primary" type="button" id="send">Отправить запрос</button>
-      <button class="msv-btn msv-btn--m msv-btn--tertiary" type="button" id="cancel">Отмена</button>
     </div>
   </div>
 
@@ -128,7 +127,7 @@
     if (kinds) {
       kinds.hidden = true; if (kindsTitle) kindsTitle.hidden = true;
       var other = document.createElement('p'); other.className = 'msv-note'; other.style.margin = '0 0 var(--msv-s16)';
-      other.innerHTML = '<a class="msv-link" href="requests.html">Другой запрос</a>';
+      other.innerHTML = '';
       var form = document.getElementById('form'); if (form && form.parentNode) form.parentNode.insertBefore(other, form.nextSibling);
     }
   }
