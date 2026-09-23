@@ -21,6 +21,26 @@ module.exports = function register(route) {
 
   /* ---------- Главная резидента: бронь, баланс, заявки, уведомления ---------- */
 
+  /* Когда резидент подписал документы: дата принятия (docs_signed_at) и, если
+     есть, время первой оплаты — именно она по оферте считается акцептом. */
+  route('GET', '/api/me/docs', async (req, res) => {
+    const s = auth.readSession(req);
+    if (!s) return fail(res, 401, 'Не выполнен вход');
+    const r = await query(`SELECT p.docs_signed_at,
+        (SELECT min(pay.paid_at) FROM payments pay
+           JOIN bookings b ON b.id = pay.booking_id
+          WHERE b.user_id = $1) AS first_paid,
+        u.name
+      FROM users u LEFT JOIN resident_profiles p ON p.user_id = u.id
+      WHERE u.id = $1`, [s.uid]);
+    const row = r.rows[0] || {};
+    json(res, 200, {
+      name: row.name || '',
+      signedAt: row.first_paid || row.docs_signed_at || null,
+      exact: !!row.first_paid            // true — известно время, false — только дата
+    });
+  });
+
   /* Репутация резидента: баллы −30 … +50 (сумма событий), три жизни (каждое нарушение
      модератора сжигает одну), история событий */
   route('GET', '/api/me/reputation', async (req, res) => {

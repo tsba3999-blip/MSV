@@ -21,6 +21,20 @@
   .doc table { width: 100%; border-collapse: collapse; margin: 0 0 var(--msv-s12); font-size: var(--msv-note-size); }
   .doc td, .doc th { padding: var(--msv-s8); border: 1px solid var(--msv-n100); vertical-align: top; text-align: left; }
   .src { margin: 0 0 var(--msv-s16); padding-left: var(--msv-s16); color: var(--msv-n500); }
+  /* Плашка подписи: одинаковая на всех трёх документах (решение заказчика 23.09.2026).
+     Дата и время — момент акцепта: по оферте это первая оплата. Если времени в базе
+     нет (старые записи), показываем только дату принятия. */
+  .sign { display: flex; align-items: flex-start; gap: var(--msv-s12); margin: 0 0 var(--msv-s16); padding: var(--msv-s12) var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r12); box-shadow: var(--msv-e1); }
+  .sign__mark { flex: 0 0 auto; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: var(--msv-graphite); background: var(--msv-lime); }
+  .sign__body { flex: 1 1 auto; min-width: 0; }
+  .sign__who { display: block; font-weight: 600; }
+  .sign__when { display: block; color: var(--msv-n500); }
+  /* Предупреждение о копировании и дата обновления — в красной рамке,
+     как тревожная карточка в уведомлениях (решение заказчика 23.09.2026) */
+  .doc__warn { margin: 0 0 var(--msv-s16); padding: var(--msv-s12) var(--msv-s16); background: var(--msv-n100); border: 1px solid var(--msv-red); border-radius: var(--msv-r12); }
+  .doc__warn p:last-child { margin-bottom: 0; }
+  /* Название документа — тем же кеглем, что заголовки разделов */
+  .doc p.doc__title { margin: var(--msv-s24) 0 var(--msv-s12); font: 600 var(--msv-sub-size)/var(--msv-sub-line) var(--msv-font); letter-spacing: var(--msv-sub-track); color: var(--msv-graphite); }
 </style>
 </head>
 <body>
@@ -39,15 +53,24 @@
 
   <p class="msv-note src">Текст приведён полностью, как на сайте: <a class="msv-link" href="https://moscow-comfort.ru/pravila-prozhivaniya/" target="_blank" rel="noopener">https://moscow-comfort.ru/pravila-prozhivaniya/</a></p>
 
+  <!-- Кто и когда принял документ -->
+  <div class="sign" id="sign" hidden>
+    <span class="sign__mark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></span>
+    <span class="sign__body">
+      <span class="msv-body sign__who" id="signWho">Документ принят</span>
+      <span class="msv-note sign__when" id="signWhen"></span>
+    </span>
+  </div>
+
   <div class="doc">
-<p>МИНИМУМ (часть любого объема) КОПИРОВАНИЯ ДАННОГО ДОГОВОРА ЗАПРЕЩЁН Настоящий договор является коммерческой информацией (режим введён Приказом № 207 от «11» сентября 2025 г.), его копирование, распространение или использование третьими лицами без письменного согласия правообладателя запрещено и влечёт ответственность по ст. 183 УК РФ (незаконное получение/разглашение КИ), ст. 147 Закона № 135-ФЗ «О защите конкуренции» и иным нормам. В любой части копирования данного договора, нарушители будут преследоваться в судебном и административном порядке.</p>
+<div class="doc__warn"><p>МИНИМУМ (часть любого объема) КОПИРОВАНИЯ ДАННОГО ДОГОВОРА ЗАПРЕЩЁН Настоящий договор является коммерческой информацией (режим введён Приказом № 207 от «11» сентября 2025 г.), его копирование, распространение или использование третьими лицами без письменного согласия правообладателя запрещено и влечёт ответственность по ст. 183 УК РФ (незаконное получение/разглашение КИ), ст. 147 Закона № 135-ФЗ «О защите конкуренции» и иным нормам. В любой части копирования данного договора, нарушители будут преследоваться в судебном и административном порядке.</p>
 <p>Последнее обновление 14 августа 2026 г.<br>
 Дополнен п. 6.1. Размер депозита равен стоимости аренды места в месяц.<br>
-В новой редакции звучит так: 6.1. Размер депозита равен стоимости аренды места в месяц и является оплатой за последний месяц проживания годового контракта (августа следующего года, после которого был заключен годовой контракт).</p>
+В новой редакции звучит так: 6.1. Размер депозита равен стоимости аренды места в месяц и является оплатой за последний месяц проживания годового контракта (августа следующего года, после которого был заключен годовой контракт).</p></div>
 <h2>НАСТОЯТЕЛЬНО</h2>
 <p>рекомендуем Резидентам и Подписантам потратить несколько минут, чтобы тщательно ознакомиться с данными Правилами во избежание штрафов в десятки тысяч рублей или выселения без возврата средств и депозита. Не теряйте свои деньги! Будьте внимательны к тому, что подписываете, тем более, когда речь идет о деньгах, о детях, об условиях проживания в длительном периоде.</p>
 <h2>Мы прикладываем усилия, чтобы данные правила работали в полном объеме.</h2>
-<p>ПРАВИЛА ПРОЖИВАНИЯ<br>
+<p class="doc__title">ПРАВИЛА ПРОЖИВАНИЯ<br>
 сети общежитий высокой культуры «Москва в студента верит!»</p>
 <p>Общежитие № 1: «Уют на Варшавке» Москва, Варшавское шоссе, 18, корп. 2;<br>
 Общежитие № 2: «Форма» Москва, Конный, переулок, 12;<br>
@@ -293,6 +316,30 @@
 
 </div>
 
+<script>
+/* Подпись резидента: дата и время акцепта приходят с сервера (/api/me/docs).
+   Оферта считает акцептом оплату, поэтому берём время первой оплаты; если его
+   нет — дату принятия документов из анкеты. Без сервера плашка не показывается. */
+(function () {
+  'use strict';
+  if (location.protocol === 'file:') return;
+  var MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+  fetch('/api/me/docs', { credentials: 'same-origin' })
+    .then(function (r) { return r.status === 200 ? r.json() : null; })
+    .then(function (d) {
+      if (!d || !d.signedAt) return;
+      var dt = new Date(d.signedAt); if (isNaN(dt)) return;
+      var when = dt.getDate() + ' ' + MONTHS[dt.getMonth()] + ' ' + dt.getFullYear() + ' г.';
+      if (d.exact) when += ', ' + ('0' + dt.getHours()).slice(-2) + ':' + ('0' + dt.getMinutes()).slice(-2);
+      var parts = String(d.name || '').split(/\s+/).filter(Boolean);
+      var who = parts.length >= 2 ? parts[1] + ' ' + parts[0] : (d.name || '');
+      document.getElementById('signWho').textContent = who ? 'Принято резидентом: ' + who : 'Документ принят';
+      document.getElementById('signWhen').textContent = when + (d.exact ? '' : ' (время не сохранилось)');
+      document.getElementById('sign').hidden = false;
+    })
+    .catch(function () {});
+})();
+</script>
 <script src="mark.js"></script>
 <script src="protect.js"></script>
 
