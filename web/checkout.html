@@ -20,7 +20,7 @@
   .sbp__chev { flex: 0 0 auto; color: var(--msv-n300); }
   /* Подписание документов */
   .sign-docs { margin: 0 0 var(--msv-s16); padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r12); }
-  .sign-docs__title { margin: 0 0 var(--msv-s8); font-weight: 600; }
+  .sign-docs__title { margin: 0 0 var(--msv-s8); }
   /* Внутри карточки галочки без своей подложки — иначе белое на белом */
   .sign-docs .check { margin: 0; padding: var(--msv-s12) 0; background: none; box-shadow: none; border-radius: 0; border-top: 1px solid var(--msv-n100); }
   .sign-docs .check:last-of-type { padding-bottom: 0; }
@@ -66,15 +66,15 @@
 
   <!-- Подписание документов: без всех трёх галочек оплата недоступна -->
   <div class="sign-docs">
-    <p class="msv-body sign-docs__title">Перед оплатой прими документы</p>
-    <p class="msv-note sign-docs__lead">Документы принимаются заново при каждой оплате. Дата и время каждой подписи сохраняются в разделе «Подписанные документы».</p>
+    <p class="msv-sub sign-docs__title">Обязательно прочитайте перед подписанием</p>
+    <p class="msv-note sign-docs__lead">Подписывая данные Договор и Правила, вы подтверждаете, что вы прочитали, поняли и согласны со всеми условиями, включая те, что изложены в приложениях и дополнительных соглашениях. Неизучение текста договора до подписания не освобождает вас от исполнения принятых на себя обязательств и не служит основанием для оспаривания условий договора.</p>
     <label class="check"><input class="check__box" type="checkbox" id="dContract" data-doc>
       <span class="check__text"><span class="check__name">Я принимаю <a class="msv-link" href="doc-contract.html" target="_blank" rel="noopener">Договор-оферту</a></span></span></label>
     <label class="check"><input class="check__box" type="checkbox" id="dRules" data-doc>
       <span class="check__text"><span class="check__name">Я принимаю <a class="msv-link" href="doc-rules.html" target="_blank" rel="noopener">Правила проживания</a></span></span></label>
     <label class="check"><input class="check__box" type="checkbox" id="dConsent" data-doc>
       <span class="check__text"><span class="check__name">Я даю <a class="msv-link" href="doc-consent.html" target="_blank" rel="noopener">Согласие на обработку персональных данных</a></span></span></label>
-    <p class="msv-note sign-docs__note" id="docsNote">Оплата станет доступна, когда примешь все три документа. Дата и время принятия сохранятся в документах.</p>
+    <p class="msv-note sign-docs__note" id="docsNote">Оплата станет доступна, когда примешь все три документа. Документы принимаются заново при каждой оплате — дата и время каждой подписи хранятся в разделе «Подписанные документы».</p>
   </div>
 
   <div class="payer">
@@ -232,7 +232,7 @@
     }
     document.getElementById('docsNote').textContent = ok
       ? 'Документы приняты. Дата и время подписи сохранятся при оплате.'
-      : 'Оплата станет доступна, когда примешь все три документа. Дата и время принятия сохранятся в документах.';
+      : 'Оплата станет доступна, когда примешь все три документа. Документы принимаются заново при каждой оплате — дата и время каждой подписи хранятся в разделе «Подписанные документы».';
     document.querySelector('.sign-docs').classList.remove('sign-docs--miss');
   }
   /* syncDocs зовётся до объявления блока с кодом, поэтому обе переменные
