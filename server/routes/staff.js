@@ -131,6 +131,29 @@ module.exports = function register(route) {
   route('PATCH', '/api/staff/:id', async (req, res) => {
     const s = adminOnly(req, res); if (!s) return;
     const uid = Number(req.params.id); const b = await readJson(req);
+
+    /* Имя и контакт для входа тоже правит администратор: при заведении
+       сотрудника контакт мог быть временным, а сменить его было нечем
+       (24.09.2026). Контакт — это логин, поэтому проверяем и ловим
+       занятость. */
+    if (b.name !== undefined || b.phone !== undefined || b.email !== undefined) {
+      const name = b.name === undefined ? null : String(b.name).trim().slice(0, 200);
+      const phone = b.phone === undefined ? null : String(b.phone).trim();
+      const email = b.email === undefined ? null : String(b.email).trim();
+      if (name !== null && !name) return fail(res, 400, 'Нужны фамилия и имя');
+      if (phone) { const c = auth.normalizeContact(phone); if (!c) return fail(res, 400, 'Проверь телефон'); }
+      if (email) { const c = auth.normalizeContact(email); if (!c) return fail(res, 400, 'Проверь почту'); }
+      try {
+        await query(`UPDATE users SET
+                       name  = COALESCE($2, name),
+                       phone = CASE WHEN $3::text IS NULL THEN phone ELSE NULLIF($3, '') END,
+                       email = CASE WHEN $4::text IS NULL THEN email ELSE NULLIF($4, '') END
+                     WHERE id = $1`, [uid, name, phone, email]);
+      } catch (e) {
+        if (e.code === '23505') return fail(res, 409, 'Такой телефон или почта уже заняты');
+        throw e;
+      }
+    }
     await query(`INSERT INTO staff_profiles (user_id, position, place, birthday, started_at, salary, pay_to, relation, can_edit_shahmatka, updated_at)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, COALESCE($9, false), now())
       ON CONFLICT (user_id) DO UPDATE SET

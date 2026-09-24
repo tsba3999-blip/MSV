@@ -393,9 +393,15 @@
       // Роль — из учётной записи на сервере. Кнопка на первой странице
       // ничего не решает: сотрудник через кнопку резидента попадёт к себе.
       var r = serverRole && CABINET[serverRole] ? serverRole : 'resident';
+
+      /* «Куда дальше» слушаем только для резидента: онборды зовут на выбор
+         резиденции, и если той же дорогой пройдёт модератор, его утащит
+         выбирать себе койку вместо кабинета (24.09.2026). */
+      if (r !== 'resident') { location.href = CABINET[r]; return; }
+
       // Новый порядок: сперва место, потом данные. Новичок идёт туда, куда
-      // его звали, а по умолчанию — выбирать резиденцию (24.09.2026).
-      if (firstLogin && r === 'resident') { location.href = safeNext || 'residences.html'; return; }
+      // его звали, а по умолчанию — выбирать резиденцию.
+      if (firstLogin) { location.href = safeNext || 'residences.html'; return; }
       location.href = safeNext || CABINET[r];
     }
 
