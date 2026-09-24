@@ -233,6 +233,24 @@ CREATE INDEX IF NOT EXISTS contracts_user_idx ON contracts(user_id);
 ALTER TABLE bookings ADD COLUMN IF NOT EXISTS contract_id bigint REFERENCES contracts(id) ON DELETE SET NULL;
 CREATE INDEX IF NOT EXISTS bookings_contract_idx ON bookings(contract_id);
 
+-- Брони, заведённые до появления контрактов, остались бы без него, и
+-- шахматке нечего было бы рисовать контуром. Заводим каждой свой контракт
+-- с её же сроком. Повторный запуск ничего не делает: берём только те, у
+-- которых контракта ещё нет (24.09.2026).
+DO $$
+DECLARE r RECORD; cid bigint;
+BEGIN
+  FOR r IN SELECT b.id, b.user_id, b.date_from, b.date_to, bd.price
+             FROM bookings b JOIN beds bd ON bd.id = b.bed_id
+            WHERE b.contract_id IS NULL AND b.user_id IS NOT NULL
+  LOOP
+    INSERT INTO contracts (user_id, date_from, date_to, annual, price)
+    VALUES (r.user_id, r.date_from, r.date_to, true, r.price)
+    RETURNING id INTO cid;
+    UPDATE bookings SET contract_id = cid WHERE id = r.id;
+  END LOOP;
+END $$;
+
 CREATE EXTENSION IF NOT EXISTS btree_gist;
 
 -- EXCLUDE создаёт индекс, поэтому при повторе ошибка не duplicate_object,
