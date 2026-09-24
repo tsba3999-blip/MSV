@@ -277,6 +277,27 @@ module.exports = function register(route) {
     }
     const contractTo = to || augustAfter(from);
 
+    /* Комнаты у нас мужские и женские, и это не пожелание, а условие
+       проживания. Страница показывает только подходящие, но страницу
+       можно обойти — запрос уходит с любым местом. Проверяем здесь:
+       на прогоне мужчина спокойно забронировал место в женской комнате
+       (найдено 25.09.2026).
+
+       Комната без пометки пола подходит всем. Резидент без указанного
+       пола в женскую и мужскую комнату не идёт: сначала анкета. */
+    const g = await query(`
+      SELECT r.gender AS room, r.name AS room_name, p.gender AS person
+        FROM beds bd JOIN rooms r ON r.id = bd.room_id
+        LEFT JOIN resident_profiles p ON p.user_id = $2
+       WHERE bd.id = $1`, [b.bedId, s.uid]);
+    const who = g.rows[0];
+    if (who && who.room) {
+      if (!who.person) return fail(res, 400, 'Сначала укажите пол в анкете — от него зависит, какие комнаты можно выбрать');
+      if (who.person !== who.room) {
+        return fail(res, 400, who.room === 'ж' ? 'Это женская комната' : 'Это мужская комната');
+      }
+    }
+
     try {
       const out = await tx(async (q) => {
         const bed = await q(`SELECT price FROM beds WHERE id = $1`, [b.bedId]);
