@@ -94,7 +94,7 @@ module.exports = function register(route) {
   route('GET', '/api/auth/me', async (req, res) => {
     const s = auth.readSession(req);
     if (!s) return fail(res, 401, 'Не выполнен вход');
-    const r = await query(`SELECT u.id, u.role, u.name, u.is_active, u.can_edit_site, u.photo_url, p.place, p.can_edit_shahmatka, p.can_payroll
+    const r = await query(`SELECT u.id, u.role, u.name, u.is_active, u.can_edit_site, u.photo_url, p.position, p.place, p.can_edit_shahmatka, p.can_payroll
                            FROM users u LEFT JOIN staff_profiles p ON p.user_id = u.id WHERE u.id = $1`, [s.uid]);
     const u = r.rows[0];
     if (!u || !u.is_active) return fail(res, 401, 'Учётная запись отключена');
@@ -108,6 +108,11 @@ module.exports = function register(route) {
       canPayroll: u.role === 'admin' || !!u.can_payroll,
       canEditSite: !!u.can_edit_site,
       photo: u.photo_url || '',
+      /* Как человек подписан в кабинете. Роль — это права, должность —
+         как его зовут в деле: «Администратор 1», «Администратор 2».
+         Двое могут быть администраторами и подписываться по-разному
+         (решение заказчика 25.09.2026). */
+      position: u.position || '',
       moneyRules: !!(mr.rows[0] && mr.rows[0].value === '1') });
   });
 };

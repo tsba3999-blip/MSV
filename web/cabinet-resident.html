@@ -332,7 +332,7 @@
       var nm = document.querySelector('.top__name'); if (nm) nm.textContent = 'Привет, ' + first;
       var pl = document.querySelector('.top__place');
       var ROLE = { admin: 'Администратор', moderator: 'Модератор', staff: 'Сотрудник' };
-      if (pl) pl.textContent = d.booking ? (d.booking.residence + ' · ' + d.booking.room + ' · ' + (d.booking.tier || 'место')) : (ROLE[d.me.role] || 'место ещё не выбрано');
+      if (pl) pl.textContent = d.booking ? (d.booking.residence + ' · ' + d.booking.room + ' · ' + (d.booking.tier || 'место')) : (d.me.position || ROLE[d.me.role] || 'место ещё не выбрано');
 
       var pay = document.querySelector('.tile--pay');
       if (pay && d.booking) {

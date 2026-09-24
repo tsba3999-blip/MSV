@@ -100,7 +100,7 @@
     var ROLE = { admin: 'Администратор', moderator: 'Модератор', staff: 'Сотрудник' };
     document.getElementById('dPlace').textContent = d.booking
       ? d.booking.residence + ' · ' + d.booking.room + ' · ' + (d.booking.tier || 'место')
-      : (ROLE[d.me.role] || 'место ещё не выбрано');
+      : (d.me.position || ROLE[d.me.role] || 'место ещё не выбрано');
 
     /* Правило «данные меняет модератор» — про резидента. Сотруднику и
        администратору оно ни к чему: свой профиль они правят сами

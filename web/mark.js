@@ -117,7 +117,7 @@
     /* Подпись под именем. Резиденту — его место, остальным — должность:
        «место ещё не выбрано» администратору ничего не говорит. */
     var place = document.querySelector('.who__place');
-    if (place && role !== 'resident') place.textContent = ROLE_NAME[role] || role;
+    if (place && role !== 'resident') place.textContent = me.position || ROLE_NAME[role] || role;
 
     /* Кабинет резидента глазами не резидента. Не прячем страницу — она
        нужна, чтобы посмотреть, что видит жилец, — но говорим прямо, чей
@@ -128,7 +128,7 @@
       var bar = document.createElement('div');
       bar.className = 'msv-role-bar';
       bar.style.background = ROLE_COLOR[role] || '#34495E';
-      bar.innerHTML = '<span>Вы вошли как <b>' + (ROLE_NAME[role] || role) +
+      bar.innerHTML = '<span>Вы вошли как <b>' + (me.position || ROLE_NAME[role] || role) +
         '</b>. Это кабинет резидента — так его видит жилец.</span>' +
         '<a href="' + (ROLE_SELF[role] || 'menu.html') + '">Мой профиль</a>' +
         '<a href="' + (ROLE_HOME[role] || 'menu.html') + '">Мой кабинет</a>';
@@ -176,7 +176,9 @@
         var n = who.querySelector('.side__name');
         var r = who.querySelector('.side__role');
         if (n && me.name) n.textContent = me.name;
-        if (r && me.role) r.textContent = ROLE_NAME[me.role] || me.role;
+        /* Подписываем должностью, если она указана: у двух
+           администраторов подписи разные (25.09.2026) */
+        if (r) r.textContent = me.position || ROLE_NAME[me.role] || me.role;
         setInitials();
         /* Своё лицо в боковом меню. Кружок рисует ::before, картинку
            передаём ему переменной: в CSS нельзя подставить адрес из

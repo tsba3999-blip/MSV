@@ -88,6 +88,17 @@ const server = http.createServer(async (req, res) => {
     if (req.path.startsWith('/api/')) return fail(res, 404, 'Нет такого адреса');
     if (req.method !== 'GET' && req.method !== 'HEAD') return fail(res, 405, 'Метод не поддерживается');
 
+    /* Адрес /uploads/… остаётся прежним, а файлы берутся из своей
+       папки: страницам и записям в базе ничего менять не нужно. */
+    if (req.path.startsWith('/uploads/')) {
+      req.path = req.path.slice('/uploads'.length);
+      if (!serveStatic(config.uploadDir, req, res)) {
+        res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+        res.end('Файл не найден');
+      }
+      return;
+    }
+
     if (!serveStatic(config.webDir, req, res)) {
       res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
       res.end('Страница не найдена');

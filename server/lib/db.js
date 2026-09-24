@@ -42,6 +42,12 @@ const config = {
   databaseUrl: process.env.DATABASE_URL || '',
   sessionSecret: process.env.SESSION_SECRET || '',
   webDir: path.resolve(__dirname, '..', process.env.WEB_DIR || '../web'),
+  /* Загруженные файлы — фото комнат и лица в профилях — лежат отдельно
+     от сайта. Внутри папки сайта они жили ровно до следующей выкладки:
+     она копирует web/ из репозитория с удалением лишнего. Плюс systemd
+     держит эту папку только для чтения, и загрузка падала с «ошибкой
+     сервера» (найдено 25.09.2026). */
+  uploadDir: path.resolve(__dirname, '..', process.env.UPLOAD_DIR || '../web/uploads'),
   demoMode: process.env.DEMO_MODE === '1',
   demoPin: '7777',
   pinTtlMinutes: 10,

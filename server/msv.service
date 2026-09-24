@@ -23,7 +23,8 @@ RestartSec=3
 NoNewPrivileges=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=/opt/msv/server
+# Загруженные файлы живут вне выкладки — служба должна уметь туда писать
+ReadWritePaths=/opt/msv/server /var/lib/msv
 
 [Install]
 WantedBy=multi-user.target

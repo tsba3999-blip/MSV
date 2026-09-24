@@ -173,7 +173,7 @@
       var pl = document.querySelector('.who__place');
       if (pl) pl.textContent = d.booking
         ? d.booking.residence + ' · ' + d.booking.room + ' · ' + (d.booking.tier ? d.booking.tier + ' место' : 'место')
-        : (ROLE[d.me.role] || 'место ещё не выбрано');
+        : (d.me.position || ROLE[d.me.role] || 'место ещё не выбрано');
     })
     .catch(function () {});
 })();

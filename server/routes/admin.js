@@ -23,7 +23,7 @@ const auth = require('../lib/auth');
 const { json, fail, readJson } = require('../lib/http');
 const { query, config } = require('../lib/db');
 
-const UPLOAD_DIR = path.join(config.webDir, 'uploads');
+const UPLOAD_DIR = config.uploadDir;
 const MAX_UPLOAD = 8 * 1024 * 1024;   // 8 МБ
 const TYPES = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp', 'image/gif': '.gif' };
 

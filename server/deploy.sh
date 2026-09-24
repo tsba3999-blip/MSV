@@ -28,8 +28,27 @@ command -v psql >/dev/null || { echo "ОШИБКА: psql не установле
 
 echo "==> Копирование в $APP"
 mkdir -p "$APP"
-rsync -a --delete "$REPO/web/"    "$APP/web/"
-rsync -a --delete --exclude='.env' --exclude='node_modules' "$REPO/server/" "$APP/server/"
+# --exclude=uploads: загруженные фото не из репозитория, и --delete их
+# стирал при каждой выкладке. Теперь они и лежат отдельно, но исключение
+# оставляем — на случай старой установки (25.09.2026).
+rsync -a --delete --exclude='uploads' "$REPO/web/"    "$APP/web/"
+rsync -a --delete --exclude='.env' --exclude='node_modules' --exclude='uploads' "$REPO/server/" "$APP/server/"
+
+echo "==> Папка для загруженных файлов"
+# Живёт вне выкладки: сюда попадают фото комнат и лица в профилях.
+UPLOADS="/var/lib/msv/uploads"
+mkdir -p "$UPLOADS"
+chown -R msv:msv /var/lib/msv 2>/dev/null || true
+# Старые файлы из папки сайта переносим один раз, чтобы ссылки не побились
+if [ -d "$APP/web/uploads" ]; then
+  cp -an "$APP/web/uploads/." "$UPLOADS/" 2>/dev/null || true
+fi
+
+# Путь к загрузкам дописываем в .env сам, если его там ещё нет
+if [ -f "$APP/server/.env" ] && ! grep -q '^UPLOAD_DIR=' "$APP/server/.env"; then
+  echo "UPLOAD_DIR=$UPLOADS" >> "$APP/server/.env"
+  echo "    добавлено UPLOAD_DIR=$UPLOADS"
+fi
 
 if [ ! -f "$APP/server/.env" ]; then
   cp "$APP/server/.env.example" "$APP/server/.env"
