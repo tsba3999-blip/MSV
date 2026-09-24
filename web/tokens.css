@@ -288,6 +288,17 @@ body, h1, h2, h3, p, button, a, label { hyphens: none; }
 .msv-btn--tertiary { background: transparent; color: var(--msv-graphite); }
 .msv-btn--tertiary:hover { background: var(--msv-n100); }
 
+/* ------------------------------------------------------------
+   Где какая обводка (правило, 24.09.2026)
+
+   2 px, внутренней тенью  — кнопка с обводкой. Тень, а не рамка:
+                             иначе кнопка выходит выше залитой и
+                             ряд кнопок перестаёт быть ровным.
+   2 px рамкой             — поле ввода: .msv-input, .msv-area.
+   1.5 px                  — чип: .chip.
+   1 px                    — тонкие линии: рамки карточек, таблиц,
+                             плашек-предупреждений. Кнопкам не подходит.
+   ------------------------------------------------------------ */
 .msv-btn--destructive {
   background: transparent;
   color: var(--msv-red);
