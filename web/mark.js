@@ -59,10 +59,27 @@
     /* в кабинете сотрудника справа в шапке стоят знаки резиденций —
        отводим место под «М» и карандаш, иначе они накладываются */
     '.work__top{padding-right:132px}' +
-    '@media (max-width:760px){.work__top{padding-right:72px}}';
+    '@media (max-width:760px){.work__top{padding-right:72px}}' +
+    /* значок «фильтр» перед строкой отбора */
+    '.bar__ico{flex:0 0 auto;display:inline-flex;align-items:center;color:var(--msv-n500)}';
   document.head.appendChild(css);
 
   document.body.appendChild(a);
+
+  /* Значок «фильтр» перед строкой отбора: чтобы она читалась как фильтр, а
+     не как россыпь кнопок. Ставим сами на каждой странице, где такая строка
+     появится — и на будущих тоже (решение заказчика 24.09.2026). */
+  Array.prototype.forEach.call(document.querySelectorAll('.bar'), function (bar) {
+    if (!bar.querySelector('.bar__search, .bar__chip')) return;   // строка не про отбор
+    if (bar.querySelector('.bar__ico')) return;
+    var ico = document.createElement('span');
+    ico.className = 'bar__ico';
+    ico.title = 'Фильтр';
+    ico.setAttribute('aria-hidden', 'true');
+    ico.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+      'stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16l-6.5 7.5V19L10.5 21v-8.5z"/></svg>';
+    bar.insertBefore(ico, bar.firstChild);
+  });
 
   // Сворачивание бокового меню кабинетов: << у имени, >> в свёрнутом виде
   (function () {

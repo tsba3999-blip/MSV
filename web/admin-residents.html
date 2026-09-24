@@ -156,11 +156,17 @@
         <span class="msv-note bar__count" id="count"></span>
       </div>
 
-      <table class="grid">
+      <table class="grid" style="table-layout:fixed">
+        <colgroup>
+          <col style="width:27%"><col style="width:21%"><col style="width:16%">
+          <col style="width:12%"><col style="width:16%"><col style="width:8%">
+        </colgroup>
         <thead>
           <tr>
-            <th>Резидент</th><th>Место</th><th>Телефон</th>
-            <th class="num">Оплата</th><th>Регистрация</th><th></th>
+            <th><button class="sort" type="button" data-sort="name">Резидент</button> / <button class="sort" type="button" data-sort="uni">ВУЗ</button></th>
+            <th><button class="sort" type="button" data-sort="place">Место</button></th>
+            <th>Телефон</th>
+            <th>Оплата</th><th>Регистрация</th><th></th>
           </tr>
         </thead>
         <tbody id="rows"></tbody>
@@ -293,8 +299,59 @@ MSV.ready(function (ctx) {
     return p.length > 1 ? (p[0][0] + p[1][0]).toUpperCase() : p[0][0].toUpperCase();
   }
 
+  /* Порядок строк. Заголовки таблицы — переключатели: первое нажатие
+     выстраивает от А до Я, повторное переворачивает (решение заказчика
+     24.09.2026). Места сравниваем «по-человечески»: 2 раньше 13. */
+  var sort = { by: 'name', dir: 1 };
+
+  function chunks(s) {
+    return String(s || '').split(/(\d+)/).filter(Boolean)
+      .map(function (p) { return /^\d+$/.test(p) ? Number(p) : p; });
+  }
+  function cmpPlace(a, b) {
+    var x = chunks(a), y = chunks(b);
+    for (var i = 0; i < Math.max(x.length, y.length); i++) {
+      if (x[i] === undefined) return -1;
+      if (y[i] === undefined) return 1;
+      if (typeof x[i] === 'number' && typeof y[i] === 'number') { if (x[i] !== y[i]) return x[i] - y[i]; }
+      else { var c = String(x[i]).localeCompare(String(y[i]), 'ru'); if (c) return c; }
+    }
+    return 0;
+  }
+  function ordered(list) {
+    return list.slice().sort(function (a, b) {
+      var c;
+      if (sort.by === 'uni') {
+        var au = a.university || '', bu = b.university || '';
+        if (!au !== !bu) return au ? -1 : 1;          // без вуза — всегда в конец
+        c = au.localeCompare(bu, 'ru') || a.name.localeCompare(b.name, 'ru');
+      } else if (sort.by === 'place') {
+        c = String(a.res.name).localeCompare(String(b.res.name), 'ru') || cmpPlace(a.bed, b.bed);
+      } else {
+        c = a.name.localeCompare(b.name, 'ru');
+      }
+      return c * sort.dir;
+    });
+  }
+
+  function markSort() {
+    document.querySelectorAll('.sort').forEach(function (b) {
+      var on = b.getAttribute('data-sort') === sort.by;
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      b.setAttribute('data-dir', on ? (sort.dir > 0 ? 'up' : 'down') : '');
+    });
+  }
+
+  document.querySelector('.grid thead').addEventListener('click', function (e) {
+    var b = e.target.closest('.sort'); if (!b) return;
+    var by = b.getAttribute('data-sort');
+    if (sort.by === by) sort.dir = -sort.dir; else { sort.by = by; sort.dir = 1; }
+    render();
+  });
+
   function render() {
-    var list = ALL.filter(matches);
+    markSort();
+    var list = ordered(ALL.filter(matches));
     countBox.textContent = list.length + ' из ' + ALL.length;
 
     if (!list.length) {
@@ -325,7 +382,7 @@ MSV.ready(function (ctx) {
         '<td><a href="admin-shahmatka.html?res=' + encodeURIComponent(x.res.id) + '">' +
           esc(x.bed) + '</a><span class="msv-note sub">' + esc(x.room) + ' · ' + esc(x.res.name) + '</span></td>' +
         '<td>' + (x.phone ? '<a href="tel:+' + esc(x.phone.replace(/\D/g, '')) + '">' + esc(x.phone) + '</a>' : '—') + '</td>' +
-        '<td class="num">' + pay + '</td>' +
+        '<td>' + pay + '</td>' +
         '<td>' + reg + ' <button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" data-reg title="Загрузить регистрацию">Загрузить</button></td>' +
         '<td class="num"><button class="msv-btn msv-btn--s msv-btn--tertiary del" type="button" data-del title="Удалить резидента из базы">Удалить</button></td>' +
       '</tr>';
