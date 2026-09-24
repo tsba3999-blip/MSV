@@ -233,6 +233,11 @@ CREATE INDEX IF NOT EXISTS contracts_user_idx ON contracts(user_id);
 ALTER TABLE bookings ADD COLUMN IF NOT EXISTS contract_id bigint REFERENCES contracts(id) ON DELETE SET NULL;
 CREATE INDEX IF NOT EXISTS bookings_contract_idx ON bookings(contract_id);
 
+-- Сколько раз человек менял код входа. Менять можно сколько угодно,
+-- а счётчик помогает заметить неладное: если код меняют часто и не ты,
+-- значит, к записи кто-то ещё имеет доступ (решение заказчика 24.09.2026).
+ALTER TABLE users ADD COLUMN IF NOT EXISTS pin_changes integer NOT NULL DEFAULT 0;
+
 CREATE EXTENSION IF NOT EXISTS btree_gist;
 
 -- EXCLUDE создаёт индекс, поэтому при повторе ошибка не duplicate_object,

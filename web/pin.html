@@ -84,7 +84,12 @@
 
   <div class="ok" id="ok">
     <h2 class="msv-h" style="margin:0 0 var(--msv-s12)">Код сменён</h2>
-    <p class="msv-body" style="margin:0 0 var(--msv-s32);color:var(--msv-n500)">Со следующего входа действует новый.</p>
+    <p class="msv-body" style="margin:0 0 var(--msv-s8);color:var(--msv-n500)">Со следующего входа действует новый.</p>
+    <!-- Менять код можно сколько угодно раз. Счётчик показываем затем,
+         чтобы человек заметил чужие смены: если он менял код дважды, а
+         система говорит «пятый раз» — к записи есть чужой доступ
+         (решение заказчика 24.09.2026) -->
+    <p class="msv-note" id="okCount" style="margin:0 0 var(--msv-s32)"></p>
     <a class="msv-btn msv-btn--block msv-btn--secondary" href="menu.html">В меню</a>
   </div>
 </div>
@@ -147,6 +152,13 @@
         if (r.s !== 200) { show(r.j.error || 'Не удалось сохранить', /действующий/i.test(r.j.error || '') ? 'pin0' : 'pin1'); save.disabled = false; return; }
         document.getElementById('form').style.display = 'none';
         document.getElementById('ok').classList.add('ok--on');
+        var n = Number(r.j && r.j.changes) || 0;
+        var box = document.getElementById('okCount');
+        if (box && n) {
+          box.textContent = n === 1
+            ? 'Это первая смена кода.'
+            : 'Код сменён ' + n + '-й раз. Если меняли не вы — сообщите модератору.';
+        }
       })
       .catch(function () {
         // страница открыта без сервера — показываем, как это будет выглядеть

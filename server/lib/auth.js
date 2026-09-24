@@ -191,9 +191,12 @@ async function setPin(userId, pin, current, force) {
       Buffer.from(row.pin_hash, "hex"), Buffer.from(hashPin(current, userId), "hex"));
     if (!same) return { ok: false, error: "Действующий код не подошёл" };
   }
-  await query(`UPDATE users SET pin_hash = $1, pin_expires = NULL, pin_attempts = 0 WHERE id = $2`,
+  const upd = await query(
+    `UPDATE users SET pin_hash = $1, pin_expires = NULL, pin_attempts = 0,
+       pin_changes = pin_changes + 1
+     WHERE id = $2 RETURNING pin_changes`,
     [hashPin(pin, userId), userId]);
-  return { ok: true };
+  return { ok: true, changes: upd.rows[0] ? Number(upd.rows[0].pin_changes) : 0 };
 }
 
 /* Приглашение: модератор создаёт учётную запись и выдаёт код. */

@@ -104,6 +104,12 @@
 
   .pin__cell::-webkit-outer-spin-button,
   .pin__cell::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  /* Код не показываем цифрами: через плечо читается мгновенно
+     (решение заказчика 24.09.2026) */
+  .pin__cell { -webkit-text-security: disc; text-security: disc; }
+  .pin__cell::-ms-reveal, .pin__cell::-ms-clear { display: none; }
+  .pin__cell::-webkit-credentials-auto-fill-button,
+  .pin__cell::-webkit-strong-password-auto-fill-button { display: none !important; visibility: hidden; width: 0; margin: 0; }
 
   .pin__cell:focus { outline: none; border-color: var(--msv-graphite); }
   .pin--error .pin__cell { background: var(--msv-n100); border-color: var(--msv-red); }
@@ -191,13 +197,18 @@
     </div>
 
     <div class="pin" id="pin">
-      <input class="pin__cell" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="Первая цифра">
-      <input class="pin__cell" type="text" inputmode="numeric" maxlength="1" aria-label="Вторая цифра">
-      <input class="pin__cell" type="text" inputmode="numeric" maxlength="1" aria-label="Третья цифра">
-      <input class="pin__cell" type="text" inputmode="numeric" maxlength="1" aria-label="Четвёртая цифра">
+      <input class="pin__cell" type="password" inputmode="numeric" maxlength="1" autocomplete="off" data-lpignore="true" data-1p-ignore data-form-type="other" aria-label="Первая цифра">
+      <input class="pin__cell" type="password" inputmode="numeric" maxlength="1" autocomplete="off" data-lpignore="true" data-1p-ignore data-form-type="other" aria-label="Вторая цифра">
+      <input class="pin__cell" type="password" inputmode="numeric" maxlength="1" autocomplete="off" data-lpignore="true" data-1p-ignore data-form-type="other" aria-label="Третья цифра">
+      <input class="pin__cell" type="password" inputmode="numeric" maxlength="1" autocomplete="off" data-lpignore="true" data-1p-ignore data-form-type="other" aria-label="Четвёртая цифра">
     </div>
 
     <p class="msv-note" id="btnResend" hidden></p>
+
+    <!-- Самостоятельного восстановления нет и быть не может: код никуда не
+         высылается, его выдаёт человек. Говорим об этом прямо, чтобы не
+         гадали (решение заказчика 24.09.2026) -->
+    <p class="msv-note" style="margin-top:var(--msv-s8)">Забыли код? Восстановить его самому нельзя — новый выдаёт модератор.</p>
 
     <div class="foot">
       <button class="msv-btn msv-btn--block msv-btn--primary" id="btnLogin" type="button" disabled>Войти</button>

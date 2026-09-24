@@ -73,7 +73,7 @@ module.exports = function register(route) {
     const body = await readJson(req);
     const r = await auth.setPin(s.uid, body.pin, body.current);
     if (!r.ok) return fail(res, 400, r.error);
-    json(res, 200, { ok: true });
+    json(res, 200, { ok: true, changes: r.changes });
   });
 
   /* Приглашение резидента: модератор или администратор. */
