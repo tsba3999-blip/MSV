@@ -906,7 +906,7 @@ body.msv-sh-dragging .msv-sh__bar { cursor: grabbing; }
 
 .msv-sh__panel-body { flex: 1 1 auto; overflow: auto; padding: 0 0 12px; }
 
-.msv-sh__sect { padding: 14px; border-bottom: 1px solid var(--sh-line-soft); }
+.msv-sh__sect { padding: 10px 14px; border-bottom: 1px solid var(--sh-line-soft); }   /* плотнее: карточка должна помещаться на экран ПК целиком (24.09.2026) */
 .msv-sh__sect:last-child { border-bottom: 0; }
 
 .msv-sh__ident { display: flex; align-items: center; gap: 12px; }
@@ -986,7 +986,7 @@ body.msv-sh-dragging .msv-sh__bar { cursor: grabbing; }
 .msv-sh__value a:hover { text-decoration: underline; }
 .msv-sh__value--empty { color: #9AA6B6; font-style: italic; }
 
-.msv-sh__pairs { display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; align-items: baseline; }
+.msv-sh__pairs { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; align-items: baseline; }
 .msv-sh__pairs dt { color: var(--sh-muted); font-size: 12px; margin: 0; }
 .msv-sh__pairs dd { margin: 0; font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
 .msv-sh__pairs dd.msv-sh__total { font-weight: 700; }

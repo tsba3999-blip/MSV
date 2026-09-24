@@ -1839,7 +1839,7 @@
       }
       if (!r || r.docsSigned === false) return '';          // покажется «не указано»
       if (signed === null) return 'подписаны';
-      return 'Договор и Правила подписаны ' + esc(fmtDateFull(signed));
+      return 'подписаны ' + esc(fmtDateFull(signed));
     }
 
     /* Дата подписи равна дате первой оплаты — так заведено у заказчика. */
@@ -1922,8 +1922,6 @@
             pair('Профиль в VK', res && res.vk
               ? '<a href="' + esc(safeUrl(res.vk)) + '" target="_blank" rel="noopener noreferrer">' + esc(res.vk) + '</a>' : '') +
             pair('Документы', docsLine(res, pays)) +
-            (res && res.registrations && res.registrations.length ? '' : pair('Миграционный учёт', '')) +
-            (pays.length ? '' : pair('История платежей', '')) +
           '</dl>' +
         '</div>' +
 
