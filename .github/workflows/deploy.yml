@@ -29,7 +29,62 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # ------------------------------------------------------------
+  #  Проверка идёт первой. Пока она не прошла, выкладка не
+  #  начинается: сломанное не должно попадать на сайт.
+  #  Что именно проверяется и почему — в ОШИБКИ.md.
+  # ------------------------------------------------------------
+  check:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: probe
+          POSTGRES_DB: msv
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Схема собирается на чистой базе
+        env:
+          PGPASSWORD: probe
+        run: |
+          psql -h 127.0.0.1 -U postgres -d msv -v ON_ERROR_STOP=1 -f server/db/schema.sql
+          echo "схема применилась с нуля"
+
+      - name: Зависимости
+        run: cd server && npm install --omit=dev --silent
+
+      - name: Запустить сервер и проверить
+        env:
+          DATABASE_URL: postgres://postgres:probe@127.0.0.1:5432/msv
+          SESSION_SECRET: probe-secret-probe-secret-probe
+          PORT: '3031'
+          WEB_DIR: web
+          DEMO_MODE: '0'
+        run: |
+          node server/index.js &
+          for i in $(seq 1 30); do
+            curl -sf http://127.0.0.1:3031/api/health >/dev/null && break
+            sleep 1
+          done
+          node server/selftest.js http://127.0.0.1:3031
+
   deploy:
+    needs: check
     runs-on: ubuntu-latest
     steps:
       - name: Обновить и перезапустить на сервере
