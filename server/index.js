@@ -50,6 +50,12 @@ const sale = require('./lib/sale');
 setInterval(() => { sale.sweepSale().catch((e) => console.error('[sale]', e.message)); }, 60 * 60 * 1000);
 setTimeout(() => { sale.sweepSale().catch(() => {}); }, 60 * 1000);
 
+/* Выехал — на следующий день доступ в кабинет закрывается. Данные
+   остаются: отключаем запись, а не удаляем (решение заказчика 25.09.2026) */
+const access = require('./lib/access');
+setInterval(() => { access.sweepAccess().catch((e) => console.error('[access]', e.message)); }, 60 * 60 * 1000);
+setTimeout(() => { access.sweepAccess().catch(() => {}); }, 80 * 1000);
+
 // Проверка живости — для nginx и для себя
 router.route('GET', '/api/health', async (req, res) => {
   try {

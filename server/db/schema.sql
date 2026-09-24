@@ -249,6 +249,11 @@ ALTER TABLE staff_profiles ADD COLUMN IF NOT EXISTS can_payroll boolean NOT NULL
 -- назвав кодовое слово (решение заказчика 24.09.2026).
 ALTER TABLE users ADD COLUMN IF NOT EXISTS can_edit_site boolean NOT NULL DEFAULT false;
 
+-- Кто закрыл доступ: система после выезда или человек руками. Система
+-- открывает обратно только своё — запись, отключённую администратором,
+-- не трогает (решение заказчика 25.09.2026).
+ALTER TABLE users ADD COLUMN IF NOT EXISTS closed_by_system boolean NOT NULL DEFAULT false;
+
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM users WHERE can_edit_site) THEN
     UPDATE users SET can_edit_site = true WHERE phone = '+79261273999';

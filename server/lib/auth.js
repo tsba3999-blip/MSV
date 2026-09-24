@@ -99,6 +99,13 @@ async function verifyPin(rawContact, rawPin) {
   const user = await findUser(contact);
 
   if (!user || !user.is_active) {
+    /* Выехавшему говорим прямо, почему не пускает: «код не подошёл» он
+       будет набирать снова и снова, а дело не в коде. Про несуществующий
+       контакт по-прежнему молчим — по ответу нельзя понять, есть ли такая
+       запись (решение заказчика 25.09.2026). */
+    if (user && !user.is_active) {
+      return { ok: false, error: 'Доступ закрыт: проживание завершено. По вопросам — к модератору.' };
+    }
     if (await strangerLocked(contact)) return { ok: false, error: locked };
     const a = await strangerAttempt(contact);
     if (a.locked_until && new Date(a.locked_until) > new Date()) return { ok: false, error: locked };
