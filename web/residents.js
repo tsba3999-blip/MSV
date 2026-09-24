@@ -311,7 +311,12 @@ MSV.ready(function (ctx) {
     }, 150);
   });
 
-  document.querySelector('.bar').addEventListener('click', function (e) {
+  /* Строк «.bar» на странице две: сверху приглашение и рассылка, ниже
+     отбор. Слушали первую — и фильтры не нажимались вовсе. Берём ту,
+     в которой чипы и лежат (24.09.2026). */
+  var anyChip = document.querySelector('.bar__chip');
+  var filterBar = anyChip ? anyChip.closest('.bar') : document.querySelector('.bar');
+  filterBar.addEventListener('click', function (e) {
     var chip = e.target.closest('.bar__chip');
     if (!chip) return;
 
