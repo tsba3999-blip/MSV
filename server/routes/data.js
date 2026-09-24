@@ -121,7 +121,9 @@ module.exports = function register(route) {
     const [users, regs, pays] = await Promise.all([
       query(`
         SELECT u.id, u.name, u.phone, p.birthday, p.city, p.university, p.faculty,
-               p.contact_person, p.vk, p.photo_url, p.messengers, p.docs_signed_at
+               p.contact_person, p.vk, p.messengers, p.docs_signed_at,
+               -- фото человек ставит себе сам, оно лежит в учётной записи
+               COALESCE(u.photo_url, p.photo_url) AS photo_url
         FROM users u LEFT JOIN resident_profiles p ON p.user_id = u.id
         WHERE u.id = ANY($1)`, [userIds]),
       query(`SELECT user_id, number, issued_at, valid_until, address FROM registrations

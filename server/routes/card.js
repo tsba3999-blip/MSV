@@ -56,7 +56,8 @@ module.exports = function register(route) {
     const u = await query(`
       SELECT u.id, u.name, u.role, u.phone, u.email, u.is_active, u.created_at, u.first_login, u.invited_at,
              p.last_name, p.first_name, p.middle_name, p.birthday, p.city, p.university, p.course,
-             p.faculty, p.about, p.health_score, p.contact_person, p.vk, p.photo_url, p.messengers,
+             p.faculty, p.about, p.health_score, p.contact_person, p.vk, p.messengers,
+             COALESCE(u.photo_url, p.photo_url) AS photo_url,
              p.gender, p.docs_signed_at, p.updated_at
       FROM users u LEFT JOIN resident_profiles p ON p.user_id = u.id
       WHERE u.id = $1`, [id]);
