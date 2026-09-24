@@ -1418,7 +1418,13 @@
       }
       // граница колонки продолжает разделитель из шапки на всю высоту
       if (i < axis.cols.length - 1) {
-        under += '<div class="msv-sh__gridline" style="left:' + (c.x + c.w) + 'px"></div>';
+        /* Начало месяца отбиваем линией потемнее и поверх броней: иначе на
+           длинных контрактах не видно, где кончается один месяц и начинается
+           другой (решение заказчика 24.09.2026). */
+        var next = axis.cols[i + 1];
+        var isMonth = next && new Date(next.ts).getUTCDate() === 1;
+        under += '<div class="msv-sh__gridline' + (isMonth ? ' msv-sh__gridline--month' : '') +
+                 '" style="left:' + (c.x + c.w) + 'px"></div>';
       }
     });
     if (today >= start && today <= end) {
@@ -1601,14 +1607,48 @@
       if (cutR) cls += ' msv-sh__bar--cut-right';
       if (self.selectedId === b.id) cls += ' msv-sh__bar--selected';
 
+      /* Контракт — это обязательство жить и платить до конца августа, и
+         рисуется он контуром. Внутри контура залиты оплаченные месяцы, на
+         них стоит фамилия. Пустая часть контура — место закреплено, но
+         месяц ещё не оплачен (решение заказчика 24.09.2026).
+
+         У бесплатной брони и у свободного места контракта нет — там всё
+         остаётся как было, сплошной заливкой. */
+      var isContract = !b.holdUntil && !!b.residentId;
+      var months = isContract && b.paidMonths && b.paidMonths.length ? b.paidMonths : null;
+      var top = 4 + b._lane * laneH;
+      var fills = '';
+
+      if (months) {
+        months.forEach(function (key) {
+          var p = String(key).split('-');
+          var ms = Date.UTC(+p[0], +p[1] - 1, 1);
+          var me = Date.UTC(+p[0], +p[1], 0);
+          if (me < b.from || ms > b.to) return;
+          if (ms < b.from) ms = b.from;
+          if (me > b.to) me = b.to;
+          var fl = axis.pos(ms), fr = axis.pos(me);
+          if (fr < 0 || fl > trackW) return;
+          if (fl < 0) fl = 0;
+          if (fr > trackW) fr = trackW;
+          var fw = fr - fl;
+          if (fw < 4) fw = 4;
+          if (fl + fw > trackW) fw = trackW - fl;
+          fills += '<div class="msv-sh__paid msv-sh__paid--' + st + '" style="left:' + fl.toFixed(1) +
+            'px;width:' + fw.toFixed(1) + 'px;top:' + (top + 4) + 'px">' + esc(name) + '</div>';
+        });
+      }
+      if (isContract) cls += ' msv-sh__bar--contract';
+
       bars += '<div class="' + cls + '" data-id="' + esc(b.id) + '" tabindex="0" role="button" ' +
         'aria-label="' + esc(name + ', ' + fmtDateFull(b.from) + ' — ' + fmtDateFull(b.to)) + '" ' +
-        'style="left:' + left.toFixed(1) + 'px;width:' + w.toFixed(1) + 'px;top:' + (4 + b._lane * laneH) + 'px">' +
-        '<span class="msv-sh__bar-dot"></span>' +
-        '<span class="msv-sh__bar-name">' + esc(name) + '</span>' +
-        (sub ? '<span class="msv-sh__bar-sub">' + esc(sub) + '</span>' : '') +
+        'style="left:' + left.toFixed(1) + 'px;width:' + w.toFixed(1) + 'px;top:' + top + 'px">' +
+        (months ? '' :
+          '<span class="msv-sh__bar-dot"></span>' +
+          '<span class="msv-sh__bar-name">' + esc(name) + '</span>' +
+          (sub ? '<span class="msv-sh__bar-sub">' + esc(sub) + '</span>' : '')) +
         bday +
-        '</div>';
+        '</div>' + fills;
     });
 
     /* Пол, номер и название комнаты уже стоят в её заголовке —

@@ -283,6 +283,9 @@
   background: var(--sh-line-soft);
 }
 
+/* Начало месяца — линия потемнее и поверх броней (24.09.2026) */
+.msv-sh__gridline--month { background: var(--msv-n300, #C9C1B4); z-index: 5; }
+
 .msv-sh__nowline--top { z-index: 4; }
 
 .msv-sh__nowline {
@@ -497,6 +500,33 @@
 .msv-sh__bar--done    { background: var(--sh-done-bg);    border-color: var(--sh-done-br);    color: var(--sh-done-tx); }
 /* Бесплатная бронь — серая и пунктиром: место придержано, но не оплачено */
 .msv-sh__bar--holdfree { background: #F0F0F0; border: 1px dashed #B8B1A5; color: #6B665E; }
+
+/* Контракт: только контур, цвет берётся из состояния брони.
+   Правило идёт после цветов состояний, иначе заливка его перебьёт. */
+.msv-sh__bar--contract { background: transparent; }
+
+/* Оплаченный месяц: заливка внутри контура, на ней фамилия.
+   Щелчки пропускает насквозь — нажимается сам контур (24.09.2026) */
+.msv-sh__paid {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  height: 14px;
+  padding: 0 6px;
+  border: 1px solid;
+  border-radius: 3px;
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  pointer-events: none;
+}
+.msv-sh__paid--booked  { background: var(--sh-booked-bg);  border-color: var(--sh-booked-br);  color: var(--sh-booked-tx); }
+.msv-sh__paid--active  { background: var(--sh-active-bg);  border-color: var(--sh-active-br);  color: var(--sh-active-tx); }
+.msv-sh__paid--debt    { background: var(--sh-debt-bg);    border-color: var(--sh-debt-br);    color: var(--sh-debt-tx); }
+.msv-sh__paid--leaving { background: var(--sh-leaving-bg); border-color: var(--sh-leaving-br); color: var(--sh-leaving-tx); }
+.msv-sh__paid--done    { background: var(--sh-done-bg);    border-color: var(--sh-done-br);    color: var(--sh-done-tx); }
 
 /* Кнопка «Забронировать» с подсказкой через две секунды наведения */
 .msv-sh__hold-btn { position: relative; }
