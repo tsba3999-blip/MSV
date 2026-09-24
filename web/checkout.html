@@ -82,11 +82,21 @@
 
   <dl class="recap" id="recap"></dl>
 
+  <!-- Скидка 30% даётся за обязательство прожить и платить до конца августа.
+       Снял галочку — платишь розничную цену (решение заказчика 24.09.2026). -->
+  <label class="check">
+    <input class="check__box" type="checkbox" id="annual" checked>
+    <span class="check__text">
+      <span class="check__name">Согласен на годовой контракт и условия</span>
+      <span class="msv-note check__note">Скидка 30% даётся за обещание прожить и платить без перерыва до конца августа. Без неё цена месяца — розничная.</span>
+    </span>
+  </label>
+
   <label class="check">
     <input class="check__box" type="checkbox" id="deposit">
     <span class="check__text">
       <span class="check__name">Внести депозит сразу</span>
-      <span class="msv-note check__note">Сумма к оплате удваивается. Депозит возвращается при выезде.</span>
+      <span class="msv-note check__note">Сумма к оплате удваивается. Депозит — это оплата августа, последнего месяца контракта.</span>
     </span>
   </label>
 
@@ -219,8 +229,11 @@
   ];
   if (COUNT > 1) rows.push(['За ' + COUNT + ' мес.', money(RENT)]);
 
-  document.getElementById('recap').innerHTML = rows.map(function (r, i) {
-    return '<div class="recap__row"><dt>' + esc(r[0]) + '</dt><dd' + (i === 0 ? ' id="who"' : '') + '>' + esc(r[1]) + '</dd></div>';
+  /* Строки, которые меняются на ходу, получают имя */
+  var RECAP_ID = { 'Резидент': 'who', 'Стоимость месяца': 'rMonth', 'Условие': 'rTerm' };
+  document.getElementById('recap').innerHTML = rows.map(function (r) {
+    var id = RECAP_ID[r[0]] || (/^За \d+ мес\.$/.test(r[0]) ? 'rSum' : '');
+    return '<div class="recap__row"><dt>' + esc(r[0]) + '</dt><dd' + (id ? ' id="' + id + '"' : '') + '>' + esc(r[1]) + '</dd></div>';
   }).join('');
 
   /* ---------- Итог ---------- */
@@ -228,8 +241,19 @@
   var deposit = document.getElementById('deposit');
   var total = document.getElementById('total');
 
+  var annual = document.getElementById('annual');
+
+  /* Цена на странице — уже со скидкой 30% за годовой контракт и 5% за СБП.
+     Снял галочку — скидка 30% уходит, остаётся только СБП: делим на 0,7. */
+  function priceNow() { return annual.checked ? PRICE : Math.round(PRICE / 0.7); }
+
   function syncTotal() {
-    total.textContent = money(RENT + (deposit.checked ? PRICE : 0));   // депозит — одна месячная плата
+    var p = priceNow(), rent = p * COUNT;
+    total.textContent = money(rent + (deposit.checked ? p : 0));   // депозит — одна месячная плата
+    var m = document.getElementById('rMonth'); if (m) m.textContent = money(p);
+    var s = document.getElementById('rSum');   if (s) s.textContent = money(rent);
+    var c = document.getElementById('rTerm');
+    if (c) c.textContent = annual.checked ? 'Годовой контракт' : 'Без годового контракта';
   }
   function hideDeposit() { deposit.checked = false; deposit.closest('.check').hidden = true; syncTotal(); }
   if (DEPOSIT_PAID) hideDeposit();
@@ -282,6 +306,7 @@
   syncDocs();
 
   deposit.addEventListener('change', syncTotal);
+  annual.addEventListener('change', syncTotal);
   syncTotal();
 
   /* ---------- Код для оплаты другим человеком ---------- */
@@ -333,6 +358,7 @@
     fetch('/api/bookings', { method: 'POST', credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ bedId: bedId, from: from, deposit: deposit.checked,
+        annual: annual.checked,
         months: params.get('months') || '',
         docs: { contract: true, rules: true, consent: true } }) })
       .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j || {} }; }, function () { return { s: r.status, j: {} }; }); })

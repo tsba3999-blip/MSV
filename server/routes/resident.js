@@ -243,7 +243,9 @@ module.exports = function register(route) {
         const bed = await q(`SELECT price FROM beds WHERE id = $1`, [b.bedId]);
         if (!bed.rows[0]) throw Object.assign(new Error('Такого места нет'), { code: 'nobed' });
 
-        const price = bed.rows[0].price;
+        /* Цена в базе — со скидкой 30% за годовой контракт. Отказался от
+           контракта — платит розничную: делим на 0,7 (24.09.2026). */
+        const price = annual ? bed.rows[0].price : Math.round(bed.rows[0].price / 0.7);
 
         /* Контракт заводим до брони: бронь на него ссылается, и при переезде
            новая бронь встанет под тот же контракт. */
