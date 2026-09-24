@@ -188,4 +188,40 @@ function securityHeaders(res) {
     "connect-src 'self'; frame-ancestors 'self'");
 }
 
-module.exports = { json, fail, readJson, createRouter, serveStatic, createLimiter, clientIp, securityHeaders };
+/* ============================================================
+   Неудачные попытки входа с одного адреса
+
+   Считаем отдельно от общего потока. Почему так: в общежитии все
+   сидят за одним Wi-Fi, и наружу весь дом выглядит одним адресом.
+   Ограничение «десять входов в минуту на адрес» первого сентября
+   означало бы, что одиннадцатый заселяющийся получает «слишком
+   много попыток» — хотя он вводит свой код первый раз в жизни
+   (найдено на прогоне 25.09.2026).
+
+   Поэтому удачный вход ничего не тратит. Тратит только промах — и
+   этого достаточно против перебора, тем более что у каждой учётной
+   записи есть свой счётчик попыток и своя блокировка.
+   ============================================================ */
+const loginFails = (function () {
+  const hits = new Map();
+  const windowMs = 60000, max = 20;
+  setInterval(() => {
+    const now = Date.now();
+    for (const [ip, h] of hits) if (now - h.start > windowMs) hits.delete(ip);
+  }, 60000).unref();
+  return {
+    ok(ip) {                       // можно ли ещё пробовать
+      const h = hits.get(ip);
+      if (!h || Date.now() - h.start > windowMs) return true;
+      return h.n < max;
+    },
+    miss(ip) {                     // засчитать промах
+      const now = Date.now();
+      let h = hits.get(ip);
+      if (!h || now - h.start > windowMs) { h = { start: now, n: 0 }; hits.set(ip, h); }
+      h.n++;
+    }
+  };
+})();
+
+module.exports = { json, fail, readJson, createRouter, serveStatic, createLimiter, clientIp, securityHeaders, loginFails };

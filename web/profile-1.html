@@ -240,24 +240,66 @@ var MSV_NEXT = (function () {
 
   addBtn.addEventListener('click', function () { picker.click(); });
 
+  /* Снимки уходят на сервер сразу, а не «показываются» в браузере.
+     Раньше они просто рисовались на странице и пропадали при первом
+     обновлении: человек был уверен, что приложил документы, а в
+     карточке у модератора их не было (найдено 25.09.2026). */
+  var live = location.protocol !== 'file:';
+
+  function card(item) {
+    var box = document.createElement('div');
+    box.className = 'photo';
+    box.dataset.id = item.id || '';
+    var img = document.createElement('img');
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block';
+    img.alt = '';
+    img.src = item.url;
+    box.appendChild(img);
+    if (item.id) {
+      var del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'photo__del';
+      del.setAttribute('aria-label', 'Убрать снимок');
+      del.textContent = '×';
+      del.style.cssText = 'position:absolute;top:4px;right:4px;width:22px;height:22px;border:0;border-radius:50%;' +
+        'background:rgba(16,22,31,.6);color:#fff;font:700 14px/1 sans-serif;cursor:pointer';
+      del.addEventListener('click', function () {
+        fetch('/api/me/files/' + item.id, { method: 'DELETE', credentials: 'same-origin' })
+          .then(function (r) { if (r.status === 200) { box.remove(); sync(); } });
+      });
+      box.style.position = 'relative';
+      box.appendChild(del);
+    }
+    photos.insertBefore(box, addBtn);
+  }
+
+  if (live) {
+    fetch('/api/me/files', { credentials: 'same-origin' })
+      .then(function (r) { return r.status === 200 ? r.json() : []; })
+      .then(function (list) { (list || []).forEach(card); sync(); })
+      .catch(function () {});
+  }
+
   picker.addEventListener('change', function () {
     var files = Array.prototype.slice.call(picker.files || []);
+    picker.value = '';
     files.forEach(function (file) {
       if (photos.querySelectorAll('.photo').length >= MAX) return;
       if (file.type.indexOf('image/') !== 0) return;
-      var box = document.createElement('div');
-      box.className = 'photo';
-      var img = document.createElement('img');
-      img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block';
-      img.alt = '';
-      var url = URL.createObjectURL(file);
-      img.src = url;
-      // Освобождаем ссылку после отрисовки, иначе память течёт
-      img.addEventListener('load', function () { URL.revokeObjectURL(url); });
-      box.appendChild(img);
-      photos.insertBefore(box, addBtn);
+      if (!live) { card({ url: URL.createObjectURL(file) }); sync(); return; }
+
+      count.textContent = 'загружаю…';
+      fetch('/api/me/files?kind=photo', {
+        method: 'POST', credentials: 'same-origin',
+        headers: { 'Content-Type': file.type }, body: file
+      })
+        .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j }; }); })
+        .then(function (out) {
+          if (out.s !== 201) { count.textContent = out.j.error || 'не удалось загрузить'; return; }
+          card(out.j); sync();
+        })
+        .catch(function () { count.textContent = 'сеть не отвечает'; });
     });
-    picker.value = '';
     sync();
   });
 

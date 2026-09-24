@@ -171,7 +171,8 @@
   function lit(st) {
     var on = { 'Заявки': true };
     if (st.role === 'admin' || st.role === 'moderator') { on['Шахматка'] = true; on['Резиденты'] = true; on['Начисления'] = true; }
-    else if (st.shah) on['Шахматка'] = true;
+    /* Сотруднику шахматка открыта только на просмотр, поэтому лепесток
+       у него не горит: он означает право править (25.09.2026) */
     if (st.role === 'admin' || st.pay) on['Зарплаты'] = true;
     if (st.role === 'admin') on['Права'] = true;
     return on;
@@ -185,6 +186,7 @@
     if (st.role === 'moderator' && (name === 'Шахматка' || name === 'Резиденты' || name === 'Начисления')) {
       return 'Это уровень модератора — снимается вместе с ролью';
     }
+    if (name === 'Шахматка') return 'Править шахматку может модератор или администратор. Сотрудник её видит, но не меняет';
     return '';
   }
 
@@ -195,8 +197,6 @@
       st.role = on['Права'] ? 'moderator' : 'admin';
     } else if (name === 'Резиденты' || name === 'Начисления') {
       st.role = on[name] ? 'staff' : 'moderator';
-    } else if (name === 'Шахматка') {
-      st.shah = !st.shah;
     } else if (name === 'Зарплаты') {
       st.pay = !st.pay;
     }
@@ -207,7 +207,6 @@
   function diff(was, now) {
     var out = [];
     if (was.role !== now.role) out.push('роль: ' + ROLE[was.role][0].toLowerCase() + ' → ' + ROLE[now.role][0].toLowerCase());
-    if (was.shah !== now.shah && now.role === 'staff') out.push(now.shah ? 'сможет править шахматку' : 'не сможет править шахматку');
     if (was.pay !== now.pay && now.role !== 'admin') out.push(now.pay ? 'увидит зарплаты' : 'не увидит зарплаты');
     return out.join('; ');
   }
@@ -288,7 +287,7 @@
 
     var person = people.filter(function (x) { return x.id === editing; })[0];
     var was = stateOf(person), now = draftSt;
-    var body = { canEditShahmatka: now.shah, canPayroll: now.pay };
+    var body = { canPayroll: now.pay };
     if (was.role !== now.role) body.role = now.role;
 
     btn.disabled = true;

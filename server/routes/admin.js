@@ -216,6 +216,62 @@ module.exports = function register(route) {
     json(res, 201, { url });
   });
 
+  /* Свои документы: паспорт, студенческий, согласие родителей.
+     До сих пор их некуда было деть — в анкете кнопка «Добавить
+     фотографию» только показывала снимок в браузере и забывала его
+     при первом же обновлении страницы (найдено 25.09.2026).
+
+     Тип файла резидент выбирает сам, но из закрытого списка: иначе в
+     карточке появятся неизвестные виды, которых она не умеет
+     подписывать. */
+  route('POST', '/api/me/files', async (req, res) => {
+    const s = auth.readSession(req);
+    if (!s) return fail(res, 401, 'Не выполнен вход');
+
+    const KINDS = ['photo', 'passport', 'student_id', 'parent_consent', 'other'];
+    const url = new URL(req.url, 'http://x');
+    const kind = KINDS.indexOf(url.searchParams.get('kind')) >= 0 ? url.searchParams.get('kind') : 'other';
+
+    /* Не больше двадцати файлов на человека: случайная загрузка всей
+       галереи телефона не должна забивать диск. */
+    const n = await query(`SELECT count(*)::int n FROM resident_files WHERE user_id = $1`, [s.uid]);
+    if (n.rows[0].n >= 20) return fail(res, 400, 'Уже загружено двадцать файлов — удалите лишние');
+
+    let buf;
+    try { buf = await readRaw(req, MAX_UPLOAD); }
+    catch (e) { return fail(res, 413, 'Файл больше 8 МБ'); }
+    const type = sniff(buf);
+    if (!type) return fail(res, 400, 'Это не изображение (JPEG, PNG, WebP, GIF)');
+
+    fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+    const name = crypto.randomBytes(12).toString('hex') + TYPES[type];
+    fs.writeFileSync(path.join(UPLOAD_DIR, name), buf);
+    const link = '/uploads/' + name;
+    const r = await query(`INSERT INTO resident_files (user_id, kind, url) VALUES ($1, $2, $3) RETURNING id`,
+      [s.uid, kind, link]);
+    await audit(s.uid, 'me.file.add', 'user:' + s.uid, { kind, url: link });
+    json(res, 201, { id: String(r.rows[0].id), kind, url: link });
+  });
+
+  /* Свои файлы: посмотреть и убрать лишнее. Чужие не отдаём и не трогаем. */
+  route('GET', '/api/me/files', async (req, res) => {
+    const s = auth.readSession(req);
+    if (!s) return fail(res, 401, 'Не выполнен вход');
+    const r = await query(`SELECT id, kind, url, uploaded_at FROM resident_files
+                            WHERE user_id = $1 ORDER BY uploaded_at`, [s.uid]);
+    json(res, 200, r.rows.map((x) => ({ id: String(x.id), kind: x.kind, url: x.url, at: x.uploaded_at })));
+  });
+
+  route('DELETE', '/api/me/files/:id', async (req, res) => {
+    const s = auth.readSession(req);
+    if (!s) return fail(res, 401, 'Не выполнен вход');
+    const r = await query(`DELETE FROM resident_files WHERE id = $1 AND user_id = $2 RETURNING url`,
+      [Number(req.params.id), s.uid]);
+    if (!r.rows[0]) return fail(res, 404, 'Такого файла нет');
+    await audit(s.uid, 'me.file.remove', 'user:' + s.uid, { url: r.rows[0].url });
+    json(res, 200, { ok: true });
+  });
+
   route('DELETE', '/api/me/photo', async (req, res) => {
     const s = auth.readSession(req);
     if (!s) return fail(res, 401, 'Не выполнен вход');

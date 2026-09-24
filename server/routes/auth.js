@@ -10,7 +10,7 @@
    ============================================================ */
 
 const auth = require('../lib/auth');
-const { json, fail, readJson, clientIp } = require('../lib/http');
+const { json, fail, readJson, clientIp, loginFails } = require('../lib/http');
 const { query } = require('../lib/db');
 
 /* Запись входа: одна строка на попытку. Браузер обрезаем — нам нужен
@@ -35,7 +35,12 @@ module.exports = function register(route) {
   route('POST', '/api/auth/verify-pin', async (req, res) => {
     const body = await readJson(req);
     const r = await auth.verifyPin(body.contact, body.pin);
-    if (!r.ok) return fail(res, 401, r.error);
+    if (!r.ok) {
+      /* Промах засчитываем здесь: до проверки неизвестно, честный это
+         вход или перебор, а честный вход тратить лимит не должен */
+      loginFails.miss(clientIp(req));
+      return fail(res, 401, r.error);
+    }
 
     /* Роль приходит из учётной записи. Кнопка на первой странице
        ничего не решает — здесь и закрывается вопрос, который мы
@@ -104,7 +109,12 @@ module.exports = function register(route) {
        модератору: пени и продажа мест пока не работают (24.09.2026). */
     const mr = await query(`SELECT value FROM settings WHERE key = 'money_rules'`);
     json(res, 200, { id: u.id, role: u.role, name: u.name, residences,
-      canEditShahmatka: u.role !== 'staff' || !!u.can_edit_shahmatka,
+      /* Править шахматку может только модератор или администратор.
+         Остальные смотрят (правило заказчика 25.09.2026). Раньше право
+         можно было выдать сотруднику лично — и страница обещала ему
+         правку, которую сервер всё равно не давал: перенос брони там
+         требует уровня модератора. */
+      canEditShahmatka: u.role === 'admin' || u.role === 'moderator',
       canPayroll: u.role === 'admin' || !!u.can_payroll,
       canEditSite: !!u.can_edit_site,
       photo: u.photo_url || '',

@@ -32,12 +32,13 @@ module.exports = function register(route) {
   route('GET', '/api/staff', async (req, res) => {
     if (!adminOnly(req, res)) return;
     const r = await query(`
-      SELECT u.id, u.name, u.role, u.phone, u.email, p.position, p.place, p.birthday, p.started_at, p.salary, p.pay_to, p.relation, p.can_edit_shahmatka, p.can_payroll
+      SELECT u.id, u.name, u.role, u.phone, u.email, u.photo_url, p.position, p.place, p.birthday, p.started_at, p.salary, p.pay_to, p.relation, p.can_edit_shahmatka, p.can_payroll
       FROM users u LEFT JOIN staff_profiles p ON p.user_id = u.id
       WHERE u.role IN ('staff', 'moderator', 'admin') AND u.is_active ORDER BY u.name`);
     json(res, 200, r.rows.map((x) => ({ id: String(x.id), userId: String(x.id), name: x.name, role: x.role, phone: x.phone, email: x.email,
       position: x.position || '', place: x.place || '', birthday: iso(x.birthday), started: iso(x.started_at),
       salary: x.salary, payTo: x.pay_to || '', relation: x.relation || '',
+      photo: x.photo_url || '',
       canEditShahmatka: !!x.can_edit_shahmatka, canPayroll: !!x.can_payroll })));
   });
 

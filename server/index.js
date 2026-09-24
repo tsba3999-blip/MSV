@@ -10,13 +10,14 @@
 
 const http = require('http');
 const { config, assertConfig, query } = require('./lib/db');
-const { createRouter, serveStatic, fail, createLimiter, clientIp, securityHeaders } = require('./lib/http');
+const { createRouter, serveStatic, fail, createLimiter, clientIp, securityHeaders, loginFails } = require('./lib/http');
 
-/* Лимиты: обычные запросы — 300 в минуту с адреса; вход — 10 в минуту.
-   Второй жёстче: перебор кодов должен упираться в него, а не только
-   в блокировку по контакту. */
+/* Лимиты: обычные запросы — 300 в минуту с адреса; попытки входа —
+   60 в минуту, но промахов не больше двадцати (см. lib/http.js).
+   Считать все входы, как раньше, нельзя: общежитие выходит в сеть
+   одним адресом, и десяток честных заселяющихся запирал остальных. */
 const limitAll = createLimiter({ windowMs: 60000, max: 300 });
-const limitAuth = createLimiter({ windowMs: 60000, max: 10 });
+const limitAuth = createLimiter({ windowMs: 60000, max: 60 });
 
 const router = createRouter();
 require('./routes/auth')(router.route);
@@ -78,8 +79,11 @@ const server = http.createServer(async (req, res) => {
 
     const ip = clientIp(req);
     if (!limitAll(ip)) return fail(res, 429, 'Слишком много запросов. Подожди минуту.');
-    if (req.url.startsWith('/api/auth/verify-pin') && !limitAuth(ip)) {
-      return fail(res, 429, 'Слишком много попыток входа. Подожди минуту.');
+    if (req.url.startsWith('/api/auth/verify-pin')) {
+      if (!limitAuth(ip)) return fail(res, 429, 'Слишком много попыток входа. Подожди минуту.');
+      if (!loginFails.ok(ip)) {
+        return fail(res, 429, 'С этого адреса слишком много неверных кодов. Подожди минуту.');
+      }
     }
 
     const handled = await router.dispatch(req, res);

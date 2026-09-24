@@ -28,6 +28,16 @@
   body { --role: var(--msv-graphite); --role-ink: var(--msv-graphite); }
 </style>
 </head>
+<style>
+  /* Та же шапка, что в карточке резидента */
+  .card-top { display: flex; align-items: stretch; gap: var(--msv-s16); margin-bottom: var(--msv-s16); }
+  .card-top__ava { flex: 0 0 auto; align-self: flex-start; width: 96px; height: 96px; display: flex;
+                   align-items: center; justify-content: center; font: 700 26px/1 var(--msv-font);
+                   color: var(--msv-n500); background: var(--msv-n100); border-radius: var(--msv-r12); object-fit: cover; }
+  .card-top__t { min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+  .card-top__name { margin: 0 0 4px; }
+  .card-top__sub { margin: 0; color: var(--msv-n500); }
+</style>
 <body>
 
 <div class="shell">
@@ -140,7 +150,19 @@ MSV.ready(function (ctx) {
   function fdate(iso) { return iso ? iso.split('-').reverse().join('.') : '<span class="miss">не указано</span>'; }
   var ROLE = { admin: 'Администратор', moderator: 'Модератор', staff: 'Сотрудник' };
   box.innerHTML =
-    '<section class="set"><h2 class="msv-sub set__title">' + esc(s.name) + '</h2><div class="set__grid">' +
+    /* Шапка как в карточке резидента: лицо, имя, должность. По лицу
+       человека узнают быстрее, чем по строке в таблице (решение
+       заказчика 25.09.2026). */
+    '<section class="set"><div class="card-top">' +
+      (s.photo
+        ? '<img class="card-top__ava" src="' + esc(s.photo) + '" alt="" data-zoom>'
+        : '<span class="card-top__ava">' + esc(s.name.split(' ').map(function (w) { return w[0] || ''; }).slice(0, 2).join('').toUpperCase()) + '</span>') +
+      '<span class="card-top__t">' +
+        '<h2 class="msv-sub card-top__name">' + esc(s.name) + '</h2>' +
+        '<p class="msv-body card-top__sub">' + esc(s.position || 'должность не указана') + '</p>' +
+        '<p class="msv-body card-top__sub">' + esc(s.phone || s.email || 'контакт не указан') + '</p>' +
+      '</span></div>' +
+      '<div class="set__grid">' +
       ['Должность', esc(s.position), 'Роль в системе', ROLE[s.role] || s.role,
        'Место работы', s.place ? esc(PLACE[s.place]) : '<span class="miss">не указано</span>', 'Дата рождения', fdate(s.birthday),
        'Работает с', fdate(s.started), 'Стаж', esc(tenure(s.started)), 'Оклад', s.salary ? String(s.salary).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' руб.' : '<span class="miss">не указан</span>',
