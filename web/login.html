@@ -130,14 +130,6 @@
 
   .foot { margin-top: auto; padding-top: var(--msv-s32); }
 
-  /* Убрать вместе с DEMO_PIN */
-  .demo-hint {
-    margin-top: var(--msv-s16);
-    padding: var(--msv-s8) var(--msv-s12);
-    background: var(--msv-lavender);
-    border-radius: var(--msv-r11);
-    color: var(--msv-graphite);
-  }
 
   .sent { margin-bottom: var(--msv-s24); }
   .sent b { font-weight: 600; }
@@ -160,7 +152,7 @@
   <span class="role" id="roleBadge"><span class="role__dot"></span><span id="roleName">Резидент</span></span>
 
   <h1 class="msv-h title" id="pageTitle">Вход</h1>
-  <p class="msv-body lead" id="pageLead">Введи почту или телефон — пришлём пинкод.</p>
+  <p class="msv-body lead" id="pageLead">Введи почту или телефон и четырёхзначный код. Код выдаёт модератор.</p>
 
   <!-- Шаг 1: контакт -->
   <section class="step step--on" id="step1" aria-labelledby="pageTitle">
@@ -207,9 +199,6 @@
 
     <p class="msv-note" id="btnResend" hidden></p>
 
-    <!-- Убрать вместе с DEMO_PIN -->
-    <p class="msv-note demo-hint">Отправка кодов ещё не подключена. Для проверки введи 7777.</p>
-
     <div class="foot">
       <button class="msv-btn msv-btn--block msv-btn--primary" id="btnLogin" type="button" disabled>Войти</button>
     </div>
@@ -232,7 +221,7 @@
      Как только появятся — поставить DEMO_PIN = null и подключить
      сервер в двух местах, помеченных ЗДЕСЬ БУДЕТ ЗАПРОС К СЕРВЕРУ.
      ============================================================ */
-  var DEMO_PIN = '7777';
+  var DEMO_PIN = null;   // код проверяет сервер; в тексте страницы его быть не должно
 
   /* ---------- Роль из адреса ---------- */
 
