@@ -286,6 +286,9 @@
 /* Начало месяца — линия потемнее и поверх броней (24.09.2026) */
 .msv-sh__gridline--month { background: var(--msv-n500, #6B665E); z-index: 9; }   /* вдвое темнее обычных и поверх броней (24.09.2026) */
 
+/* Та же линия в шапке: доводим её до самого верха таблицы */
+.msv-sh__day--month { box-shadow: inset 1px 0 0 0 var(--msv-n500, #6B665E); }
+
 .msv-sh__nowline--top { z-index: 4; }
 
 .msv-sh__nowline {
@@ -713,11 +716,19 @@
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
-  cursor: grab;
+  /* Обычный курсор: пальчик на всей полосе обещал нажатие, которого нет,
+     и подталкивал сдвинуть бронь случайно (24.09.2026) */
+  cursor: default;
 }
 
-.msv-sh__bar:active { cursor: grabbing; }
-.msv-sh--readonly .msv-sh__bar { cursor: pointer; }
+/* Нажимается только фамилия — она и открывает карточку */
+.msv-sh__bar-name { cursor: pointer; }
+.msv-sh__bar-name:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+/* Взял и держишь — можно тащить */
+.msv-sh__bar--hold, .msv-sh__bar--dragging { cursor: grabbing; }
+
+.msv-sh--readonly .msv-sh__bar { cursor: default; }
 
 /* Пока тащим — сетка не перехватывает выделение, а строка-цель заметна */
 body.msv-sh-dragging .msv-sh__row { transition: none; }

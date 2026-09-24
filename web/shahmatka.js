@@ -609,7 +609,11 @@
         if (again) again.focus();
         return;
       }
-      var bar2 = e.target.closest('.msv-sh__bar');
+      /* Карточку открывает только фамилия, а не вся полоса: по полосе
+         водят курсором, когда примеряют перенос (решение заказчика
+         24.09.2026). С клавиатуры по-прежнему открывается вся полоса. */
+      var name = e.target.closest('.msv-sh__bar-name');
+      var bar2 = name && name.closest('.msv-sh__bar');
       if (!bar2) return;
       if (self._justDragged) { self._justDragged = false; return; }
       self.openBooking(bar2.dataset.id);
@@ -709,20 +713,18 @@
         shift: 0, newFrom: booking.from, newTo: booking.to
       };
 
-      /* Пальцем бронь двигается только после удержания (0,4 с): иначе при
-         прокрутке сетки бронь уезжала случайно (решение заказчика 22.09.2026).
-         Мышью — как раньше, сразу. */
-      if (e.pointerType !== 'mouse') {
-        self._drag.hold = false;
-        self._drag.holdTimer = setTimeout(function () {
-          if (!self._drag) return;
-          self._drag.hold = true;
-          bar.classList.add('msv-sh__bar--hold');
-          if (navigator.vibrate) { try { navigator.vibrate(12); } catch (err) {} }
-        }, 400);
-      } else {
+      /* Бронь двигается только после удержания кнопки — и пальцем, и мышью.
+         Пальцем 0,4 секунды, мышью 0,25: мышью случайный сдвиг заметить
+         труднее, но и ждать полсекунды перед каждым переносом незачем.
+         Раньше мышь начинала тащить сразу, и бронь уезжала от простого
+         движения по сетке (решение заказчика 24.09.2026). */
+      self._drag.hold = false;
+      self._drag.holdTimer = setTimeout(function () {
+        if (!self._drag) return;
         self._drag.hold = true;
-      }
+        bar.classList.add('msv-sh__bar--hold');
+        if (navigator.vibrate) { try { navigator.vibrate(12); } catch (err) {} }
+      }, e.pointerType === 'mouse' ? 250 : 400);
 
       // фокус ставим вручную: preventDefault выше его отменил
       bar.focus({ preventScroll: true });
@@ -1497,6 +1499,9 @@
       var cls = 'msv-sh__day';
       if (c.weekend) cls += ' msv-sh__day--weekend';
       if (today >= c.ts && today <= c.end) cls += ' msv-sh__day--today';
+      /* Первое число месяца отбиваем и в шапке: иначе тёмная линия
+         обрывается на числах и не доходит до верха (24.09.2026) */
+      if (new Date(c.ts).getUTCDate() === 1) cls += ' msv-sh__day--month';
       return '<div class="' + cls + '" style="width:' + c.w + 'px;flex:0 0 ' + c.w + 'px">' +
              '<b>' + esc(c.label) + '</b>' +
              (c.sub ? '<span>' + esc(c.sub) + '</span>' : '') + '</div>';
