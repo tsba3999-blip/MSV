@@ -176,6 +176,9 @@ MSV.ready(function (ctx) {
     var x = ALL.filter(function (y) { return y.id === btn.closest('tr').dataset.id; })[0];
     if (!x) return;
     var amount = Math.max(0, x.accrued + x.penalty - x.paid);
+    /* Деньги: спрашиваем подтверждение с суммой — промах по кнопке отменить
+       нечем (24.09.2026) */
+    if (!confirm("Отметить оплату за " + x.name + "?\nСумма: " + money(amount) + ".")) return;
     function apply() { x.paid = x.accrued + x.penalty; render(); }
     if (!ctx.live) { apply(); return; }
     ctx.api('POST', '/api/payments', { bookingId: x.id, amount: amount, method: 'cash' })
