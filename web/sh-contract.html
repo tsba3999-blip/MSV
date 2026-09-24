@@ -19,19 +19,20 @@
   .wrap { max-width: 1180px; margin: 0 auto; padding: var(--msv-s24) var(--msv-s24) var(--msv-s32); }
   .lead { max-width: 720px; margin: 0 0 var(--msv-s24); color: var(--msv-n500); }
   h1 { margin: 0 0 var(--msv-s8); }
-  h2 { margin: var(--msv-s32) 0 var(--msv-s12); }
+  h2 { margin: var(--msv-s32) 0 var(--msv-s8); }
+  .sub { max-width: 720px; margin: 0 0 var(--msv-s12); color: var(--msv-n500); }
 
-  /* --- сетка примера: день уже настоящего (24 вместо 40), чтобы два
-         месяца помещались на экран целиком --- */
-  .sh { --day: 24px; --left: 104px; background: var(--msv-white); border-radius: var(--msv-r12); box-shadow: var(--msv-e1); overflow: hidden; }
+  /* --- общая сетка для обоих видов --- */
+  .sh { background: var(--msv-white); border-radius: var(--msv-r12); box-shadow: var(--msv-e1); overflow: hidden; position: relative; }
   .sh__scroll { overflow-x: auto; }
   .sh__inner { min-width: max-content; }
 
   .sh__months, .sh__days { display: flex; }
   .sh__corner { position: sticky; left: 0; z-index: 12; flex: 0 0 var(--left); width: var(--left); background: var(--msv-white); border-right: 1px solid var(--sh-line); }
-  .sh__month { flex: 0 0 auto; padding: 8px 0 6px 8px; font-size: 12px; font-weight: 600; color: var(--sh-muted); border-left: 1px solid var(--sh-line); }
+  .sh__month { flex: 0 0 auto; padding: 8px 0 6px 8px; font-size: 12px; font-weight: 600; color: var(--sh-muted); border-left: 1px solid var(--msv-n300); }
   .sh__day { flex: 0 0 var(--day); width: var(--day); padding: 4px 0 6px; text-align: center; font-size: 10.5px; line-height: 13px; color: var(--sh-muted); border-left: 1px solid var(--sh-line-soft); }
   .sh__day--we { background: var(--sh-weekend); }
+  .sh__day--ms { border-left: 1px solid var(--msv-n300); }   /* первое число месяца — граница потемнее */
   .sh__day b { display: block; font-weight: 600; color: var(--sh-ink); }
 
   .sh__group { display: flex; align-items: center; height: 26px; padding-left: 8px; font-size: 11.5px; font-weight: 600; color: var(--sh-muted); background: var(--sh-bg-alt); border-top: 1px solid var(--sh-line); border-bottom: 1px solid var(--sh-line); position: sticky; left: 0; }
@@ -41,24 +42,25 @@
   .sh__lane { position: relative; flex: 1 1 auto; }
   .sh__lane i { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--sh-line-soft); }
   .sh__lane i.we { width: var(--day); background: var(--sh-weekend); opacity: .55; }
+  .sh__lane i.ms { width: 1px; background: var(--msv-n300); z-index: 2; }   /* граница месяца */
 
   /* --- контракт: только контур, без заливки --- */
   .bar-c {
     position: absolute; top: 5px; height: 24px;
-    border: 2px solid var(--sh-ink); border-radius: 6px;
-    background: transparent;
+    border: 1px solid var(--sh-ink); border-radius: 6px;
+    background: transparent; z-index: 3;
   }
-  .bar-c__no { position: absolute; top: -1px; left: 6px; font-size: 10px; font-weight: 700; color: var(--sh-ink); letter-spacing: .02em; }
-  /* контракт уходит за правый край экрана — обрываем без скругления */
+  /* контракт продолжается за краем видимого куска или в другой комнате —
+     на этом краю рамку не замыкаем */
   .bar-c--open-r { border-right: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; }
   .bar-c--open-l { border-left: 0; border-top-left-radius: 0; border-bottom-left-radius: 0; }
 
-  /* --- оплаченный месяц: заливка внутри контура --- */
+  /* --- оплаченный месяц: заливка внутри контура, на ней фамилия --- */
   .bar-p {
     position: absolute; top: 10px; height: 14px;
     display: flex; align-items: center; padding: 0 6px;
     font-size: 10.5px; font-weight: 600; line-height: 1;
-    border: 1px solid; border-radius: 3px; white-space: nowrap; overflow: hidden;
+    border: 1px solid; border-radius: 3px; white-space: nowrap; overflow: hidden; z-index: 4;
   }
   .bar-p--paid { background: var(--sh-active-bg); border-color: var(--sh-active-br); color: var(--sh-active-tx); }
   .bar-p--dep  { background: var(--sh-booked-bg); border-color: var(--sh-booked-br); color: var(--sh-booked-tx); }
@@ -68,26 +70,24 @@
     position: absolute; top: 10px; height: 14px;
     display: flex; align-items: center; padding: 0 6px;
     font-size: 10.5px; font-weight: 600; line-height: 1; color: var(--msv-red);
-    border: 1px dashed var(--msv-red); border-radius: 3px; white-space: nowrap;
+    border: 1px dashed var(--msv-red); border-radius: 3px; white-space: nowrap; z-index: 4;
     background: repeating-linear-gradient(135deg, rgba(251,52,74,.07) 0 6px, transparent 6px 12px);
   }
 
-  /* --- метки переезда на краях контракта --- */
-  .move { position: absolute; top: 8px; height: 18px; display: flex; align-items: center; font-size: 10px; font-weight: 600; color: var(--msv-red); white-space: nowrap; }
-  .move--out { padding-left: 4px; }
-  .move--in { padding-right: 4px; justify-content: flex-end; }
+  .move { position: absolute; top: 9px; height: 16px; display: flex; align-items: center; font-size: 10px; font-weight: 600; color: var(--msv-red); white-space: nowrap; z-index: 5; }
+  .move--out { padding-left: 6px; }
+  .move--in { padding-right: 6px; justify-content: flex-end; }
 
-  /* --- подсветка связанных строк одного контракта --- */
+  /* --- подсветка обеих частей одного контракта --- */
   .sh__row.on { background: #FFF7F8; }
   .sh__row.on .bar-c { border-color: var(--msv-red); }
-  .sh__row.on .bar-c__no { color: var(--msv-red); }
 
   .today { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--sh-today); z-index: 6; }
 
-  .legend { display: flex; flex-wrap: wrap; gap: var(--msv-s16); margin-top: var(--msv-s16); font-size: 13px; color: var(--msv-n500); }
+  .legend { display: flex; flex-wrap: wrap; gap: var(--msv-s16); margin-top: var(--msv-s12); font-size: 13px; color: var(--msv-n500); }
   .legend span { display: inline-flex; align-items: center; gap: 8px; }
   .key { display: inline-block; width: 34px; height: 16px; border-radius: 4px; }
-  .key--c { border: 2px solid var(--sh-ink); }
+  .key--c { border: 1px solid var(--sh-ink); }
   .key--p { background: var(--sh-active-bg); border: 1px solid var(--sh-active-br); }
   .key--d { background: var(--sh-booked-bg); border: 1px solid var(--sh-booked-br); }
   .key--s { border: 1px dashed var(--msv-red); background: repeating-linear-gradient(135deg, rgba(251,52,74,.07) 0 6px, transparent 6px 12px); }
@@ -101,9 +101,12 @@
 
 <div class="wrap">
   <h1 class="msv-h">Годовой контракт в шахматке</h1>
-  <p class="msv-body lead">Пример на октябре и ноябре 2026 года. Люди и договоры выдуманы. День сжат до 24 пикселей вместо сорока, чтобы два месяца поместились целиком — в рабочей шахматке клетки шире.</p>
+  <p class="msv-body lead">Люди и договоры выдуманы. Контракт у всех троих идёт с 1 октября 2026 года по 31 августа 2027-го.</p>
 
-  <div class="sh msv-sh" id="sh"></div>
+  <h2 class="msv-sub">По дням: октябрь и ноябрь</h2>
+  <p class="msv-body sub">День сжат до 24 пикселей вместо сорока, чтобы два месяца поместились целиком — в рабочей шахматке клетки шире.</p>
+
+  <div class="sh msv-sh" id="shDays" style="--day:24px;--left:104px"></div>
 
   <div class="legend">
     <span><i class="key key--c"></i> контракт до 31 августа</span>
@@ -112,12 +115,17 @@
     <span><i class="key key--s"></i> не оплачено к 15-му, место на продаже</span>
   </div>
 
+  <h2 class="msv-sub">Весь контракт: от октября до августа</h2>
+  <p class="msv-body sub">Тот же самый контракт, только клетка — месяц, а не день. Здесь видно и август, оплаченный депозитом ещё при заселении.</p>
+
+  <div class="sh msv-sh" id="shYear" style="--left:104px"></div>
+
   <h2 class="msv-sub">Что здесь видно</h2>
   <ul class="msv-body cases">
-    <li><b>Смирнов Пётр, Д-1041.</b> Контур тянется до 31 августа — это контракт. Внутри залиты октябрь и ноябрь: оплачены. Дальше контур пустой — эти месяцы ещё не оплачены, но место за человеком.</li>
-    <li><b>Иванова Мария, Д-1042.</b> Оплачен только октябрь. Ноябрь нужно было оплатить до 24:00 15 октября — не оплачен. С 16 октября система сама выставила место на продажу: штриховка. Контур контракта при этом никуда не делся — человек ещё живёт и может заплатить.</li>
-    <li><b>Козлов Артём, Д-1043.</b> Переезд. В комнате №2 контур обрывается 31 октября, в комнате №15 продолжается с 1 ноября. Связь держится не на месте, а на номере контракта: он написан на обеих частях. Наведите курсор на любую из них — подсветятся обе.</li>
-    <li><b>Август у всех троих</b> закрашен голубым: это депозит. Он и есть оплата последнего месяца контракта, система заносит его сама. В окне октября–ноября его не видно — он правее.</li>
+    <li><b>Смирнов Пётр.</b> Контур тянется до 31 августа — это контракт. Внутри залиты оплаченные месяцы. Пустая часть контура — месяцы, которые ещё не оплачены, но место закреплено за человеком.</li>
+    <li><b>Иванова Мария.</b> Оплачен только октябрь. Ноябрь нужно было оплатить до 24:00 15 октября — не оплачен. С 16 октября система сама выставила место на продажу: красная штриховка. Контур контракта при этом никуда не делся — человек живёт и ещё может заплатить.</li>
+    <li><b>Козлов Артём.</b> Переезд из комнаты №2 в комнату №15 с 1 ноября. В обеих комнатах контур оборван — в №2 справа, в №15 слева: контракт не кончился, он продолжается в другой строке. Наведите курсор на любую из двух строк — подсветятся обе.</li>
+    <li><b>Август.</b> Во втором виде он закрашен голубым у всех троих: это депозит, он же оплата последнего месяца контракта. Система заносит его сама при оплате депозита.</li>
   </ul>
 </div>
 
@@ -126,107 +134,194 @@
   'use strict';
 
   var DAY = 86400000;
-  var FROM = new Date(2026, 9, 1);      // 1 октября 2026
-  var TO   = new Date(2026, 10, 30);    // 30 ноября 2026
-  var TODAY = new Date(2026, 9, 24);    // «сегодня» для примера — 24 октября
-  var MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+  var MONTHS_NOM = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+  var MONTHS_SHORT = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
   var WD = ['вс','пн','вт','ср','чт','пт','сб'];
-
-  var days = [];
-  for (var t = FROM.getTime(); t <= TO.getTime(); t += DAY) days.push(new Date(t));
-  function idx(d) { return Math.round((d.getTime() - FROM.getTime()) / DAY); }
-  function px(n) { return n * 24; }
-
-  /* Ряды: комната → места. Контракт — отрезок, оплаты — отрезки внутри. */
-  var ROWS = [
-    { group: '№13 Шухов · 8 мест' },
-    { bed: '13.1.в', contract: { no: 'Д-1041', who: 'Смирнов Пётр', from: '2026-10-01', openRight: true },
-      paid: [ ['2026-10-01','2026-10-31','Октябрь'], ['2026-11-01','2026-11-30','Ноябрь'] ] },
-    { bed: '13.2.н', contract: { no: 'Д-1042', who: 'Иванова Мария', from: '2026-10-01', openRight: true },
-      paid: [ ['2026-10-01','2026-10-31','Октябрь'] ],
-      sale: [ '2026-10-16', '2026-11-30', 'на продаже с 16 октября' ] },
-    { group: '№2 Билибин · 4 места' },
-    { bed: '2.3.в', contract: { no: 'Д-1043', who: 'Козлов Артём', from: '2026-10-01', to: '2026-10-31', moveOut: '№15' },
-      paid: [ ['2026-10-01','2026-10-31','Октябрь'] ] },
-    { group: '№15 Питер · 4 места' },
-    { bed: '15.4.н', contract: { no: 'Д-1043', who: 'Козлов Артём', from: '2026-11-01', openRight: true, moveIn: '№2' },
-      paid: [ ['2026-11-01','2026-11-30','Ноябрь'] ] }
-  ];
 
   function d(s) { var p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
 
-  /* ---------- шапка ---------- */
-  var html = '<div class="sh__scroll"><div class="sh__inner">';
+  /* ------------------------------------------------------------
+     Данные примера. Контракт — один на человека, он же связывает
+     строки при переезде. Оплаты — отрезки внутри контракта.
+     ------------------------------------------------------------ */
+  var PEOPLE = [
+    { no: 'Д-1041', who: 'Смирнов Пётр',
+      parts: [ { bed: '13.1.в', group: '№13 Шухов · 8 мест', from: '2026-10-01', to: '2027-08-31' } ],
+      paid: [ '2026-10', '2026-11' ], deposit: '2027-08' },
+    { no: 'Д-1042', who: 'Иванова Мария',
+      parts: [ { bed: '13.2.н', group: '№13 Шухов · 8 мест', from: '2026-10-01', to: '2027-08-31' } ],
+      paid: [ '2026-10' ], deposit: '2027-08',
+      sale: { from: '2026-10-16', text: 'на продаже с 16 октября' } },
+    { no: 'Д-1043', who: 'Козлов Артём',
+      parts: [ { bed: '2.3.в',  group: '№2 Билибин · 4 места', from: '2026-10-01', to: '2026-10-31', moveOut: '№15' },
+               { bed: '15.4.н', group: '№15 Питер · 4 места',  from: '2026-11-01', to: '2027-08-31', moveIn: '№2' } ],
+      paid: [ '2026-10', '2026-11' ], deposit: '2027-08' }
+  ];
 
-  var months = [];
-  days.forEach(function (x) {
-    var key = x.getFullYear() + '-' + x.getMonth();
-    if (!months.length || months[months.length - 1].key !== key) months.push({ key: key, name: MONTHS[x.getMonth()] + ' ' + x.getFullYear(), n: 0 });
-    months[months.length - 1].n++;
+  /* Строки в порядке комнат — как в настоящей шахматке */
+  var ORDER = ['13.1.в', '13.2.н', '2.3.в', '15.4.н'];
+  var ROWS = [];
+  ORDER.forEach(function (bed) {
+    PEOPLE.forEach(function (p) {
+      p.parts.forEach(function (part) {
+        if (part.bed === bed) ROWS.push({ person: p, part: part });
+      });
+    });
   });
-  html += '<div class="sh__months"><div class="sh__corner"></div>';
-  months.forEach(function (m) { html += '<div class="sh__month" style="width:' + px(m.n) + 'px">' + m.name + '</div>'; });
-  html += '</div>';
 
-  html += '<div class="sh__days"><div class="sh__corner"></div>';
-  days.forEach(function (x) {
-    var we = x.getDay() === 0 || x.getDay() === 6;
-    html += '<div class="sh__day' + (we ? ' sh__day--we' : '') + '"><b>' + x.getDate() + '</b>' + WD[x.getDay()] + '</div>';
-  });
-  html += '</div>';
+  /* ============================================================
+     Вид первый: по дням
+     ============================================================ */
+  (function () {
+    var FROM = d('2026-10-01'), TO = d('2026-11-30'), TODAY = d('2026-10-24');
+    var W = 24;
+    var days = [];
+    for (var t = FROM.getTime(); t <= TO.getTime(); t += DAY) days.push(new Date(t));
+    function idx(x) { return Math.round((x.getTime() - FROM.getTime()) / DAY); }
+    function px(n) { return n * W; }
+    function clampL(x) { return Math.max(0, idx(x)); }
+    function clampR(x) { return Math.min(days.length - 1, idx(x)); }
 
-  /* ---------- строки ---------- */
-  ROWS.forEach(function (r) {
-    if (r.group) { html += '<div class="sh__group">' + r.group + '</div>'; return; }
+    var html = '<div class="sh__scroll"><div class="sh__inner">';
 
-    html += '<div class="sh__row" data-no="' + r.contract.no + '">' +
-              '<div class="sh__cell">' + r.bed + '</div><div class="sh__lane">';
+    var months = [];
+    days.forEach(function (x) {
+      var key = x.getFullYear() + '-' + x.getMonth();
+      if (!months.length || months[months.length - 1].key !== key) months.push({ key: key, name: MONTHS_NOM[x.getMonth()] + ' ' + x.getFullYear(), n: 0 });
+      months[months.length - 1].n++;
+    });
+    html += '<div class="sh__months"><div class="sh__corner"></div>';
+    months.forEach(function (m) { html += '<div class="sh__month" style="width:' + px(m.n) + 'px">' + m.name + '</div>'; });
+    html += '</div>';
 
-    days.forEach(function (x, i) {
-      if (x.getDay() === 0 || x.getDay() === 6) html += '<i class="we" style="left:' + px(i) + 'px"></i>';
-      else html += '<i style="left:' + px(i) + 'px"></i>';
+    html += '<div class="sh__days"><div class="sh__corner"></div>';
+    days.forEach(function (x) {
+      var we = x.getDay() === 0 || x.getDay() === 6;
+      var ms = x.getDate() === 1;
+      html += '<div class="sh__day' + (we ? ' sh__day--we' : '') + (ms ? ' sh__day--ms' : '') + '"><b>' + x.getDate() + '</b>' + WD[x.getDay()] + '</div>';
+    });
+    html += '</div>';
+
+    var lastGroup = null;
+    ROWS.forEach(function (r) {
+      if (r.part.group !== lastGroup) { html += '<div class="sh__group">' + r.part.group + '</div>'; lastGroup = r.part.group; }
+
+      html += '<div class="sh__row" data-no="' + r.person.no + '" title="Контракт ' + r.person.no + ' · ' + r.person.who + '">' +
+                '<div class="sh__cell">' + r.part.bed + '</div><div class="sh__lane">';
+
+      days.forEach(function (x, i) {
+        if (x.getDate() === 1 && i) html += '<i class="ms" style="left:' + px(i) + 'px"></i>';
+        else if (x.getDay() === 0 || x.getDay() === 6) html += '<i class="we" style="left:' + px(i) + 'px"></i>';
+        else html += '<i style="left:' + px(i) + 'px"></i>';
+      });
+
+      /* контур контракта: открыт с той стороны, где он продолжается */
+      var a = clampL(d(r.part.from)), b = clampR(d(r.part.to));
+      var openR = idx(d(r.part.to)) > days.length - 1 || r.part.moveOut;
+      var openL = idx(d(r.part.from)) < 0 || r.part.moveIn;
+      html += '<div class="bar-c' + (openR ? ' bar-c--open-r' : '') + (openL ? ' bar-c--open-l' : '') +
+              '" style="left:' + px(a) + 'px;width:' + (px(b - a + 1) - 2) + 'px"></div>';
+
+      /* оплаченные месяцы — с фамилией, как в рабочей шахматке */
+      r.person.paid.forEach(function (m) {
+        var f = d(m + '-01'), t2 = new Date(f.getFullYear(), f.getMonth() + 1, 0);
+        if (t2 < FROM || f > TO) return;
+        if (f < d(r.part.from) || f > d(r.part.to)) return;      // не его отрезок
+        var l = clampL(f), rr = clampR(t2);
+        html += '<div class="bar-p bar-p--paid" style="left:' + (px(l) + 4) + 'px;width:' + (px(rr - l + 1) - 10) + 'px">' + r.person.who + '</div>';
+      });
+
+      if (r.person.sale && !r.part.moveOut) {
+        var sf = clampL(d(r.person.sale.from));
+        html += '<div class="bar-s" style="left:' + (px(sf) + 4) + 'px;width:' + (px(days.length - sf) - 10) + 'px">' + r.person.sale.text + '</div>';
+      }
+
+      if (r.part.moveOut) html += '<div class="move move--out" style="left:' + px(b + 1) + 'px">→ переехал в ' + r.part.moveOut + '</div>';
+      if (r.part.moveIn)  html += '<div class="move move--in" style="right:' + px(days.length - a) + 'px">переехал из ' + r.part.moveIn + ' →</div>';
+
+      html += '</div></div>';
     });
 
-    var c = r.contract;
-    var a = idx(d(c.from));
-    var b = c.to ? idx(d(c.to)) : days.length - 1;
-    var cls = 'bar-c' + (c.openRight ? ' bar-c--open-r' : '') + (c.moveIn ? ' bar-c--open-l' : '');
-    html += '<div class="' + cls + '" style="left:' + px(a) + 'px;width:' + (px(b - a + 1) - 2) + 'px">' +
-              '<span class="bar-c__no">' + c.no + ' · ' + c.who + '</span></div>';
-
-    (r.paid || []).forEach(function (p) {
-      var f = idx(d(p[0])), t2 = idx(d(p[1]));
-      html += '<div class="bar-p bar-p--paid" style="left:' + (px(f) + 5) + 'px;width:' + (px(t2 - f + 1) - 12) + 'px">' + p[2] + '</div>';
-    });
-
-    if (r.sale) {
-      var sf = idx(d(r.sale[0])), st = idx(d(r.sale[1]));
-      html += '<div class="bar-s" style="left:' + (px(sf) + 5) + 'px;width:' + (px(st - sf + 1) - 12) + 'px">' + r.sale[2] + '</div>';
-    }
-
-    if (c.moveOut) html += '<div class="move move--out" style="left:' + (px(b + 1)) + 'px">→ переехал в ' + c.moveOut + '</div>';
-    if (c.moveIn)  html += '<div class="move move--in" style="right:' + (px(days.length - a)) + 'px">переехал из ' + c.moveIn + ' →</div>';
-
+    html += '<div class="today" style="left:calc(104px + ' + px(idx(TODAY)) + 'px)"></div>';
     html += '</div></div>';
-  });
+    document.getElementById('shDays').innerHTML = html;
+  })();
 
-  html += '<div class="today" style="left:calc(104px + ' + px(idx(TODAY)) + 'px)"></div>';
-  html += '</div></div>';
+  /* ============================================================
+     Вид второй: весь контракт, клетка — месяц
+     ============================================================ */
+  (function () {
+    var W = 72;
+    var list = [];
+    for (var y = 2026, m = 9; !(y === 2027 && m === 9); m++) {
+      if (m > 11) { m = 0; y++; }
+      list.push({ y: y, m: m });
+      if (y === 2027 && m === 7) break;      // по август 2027
+    }
+    function pos(key) {                       // '2026-10' → номер клетки
+      var p = key.split('-'); var yy = +p[0], mm = +p[1] - 1;
+      for (var i = 0; i < list.length; i++) if (list[i].y === yy && list[i].m === mm) return i;
+      return -1;
+    }
+    function px(n) { return n * W; }
 
-  var box = document.getElementById('sh');
-  box.style.position = 'relative';
-  box.innerHTML = html;
+    var html = '<div class="sh__scroll"><div class="sh__inner">';
+    html += '<div class="sh__days"><div class="sh__corner"></div>';
+    list.forEach(function (x, i) {
+      html += '<div class="sh__day' + (i ? ' sh__day--ms' : '') + '" style="flex:0 0 ' + W + 'px;width:' + W + 'px">' +
+              '<b>' + MONTHS_SHORT[x.m] + '</b>' + x.y + '</div>';
+    });
+    html += '</div>';
+
+    var lastGroup = null;
+    ROWS.forEach(function (r) {
+      if (r.part.group !== lastGroup) { html += '<div class="sh__group">' + r.part.group + '</div>'; lastGroup = r.part.group; }
+      html += '<div class="sh__row" data-no="' + r.person.no + '" title="Контракт ' + r.person.no + ' · ' + r.person.who + '">' +
+                '<div class="sh__cell">' + r.part.bed + '</div><div class="sh__lane">';
+      list.forEach(function (x, i) { if (i) html += '<i class="ms" style="left:' + px(i) + 'px"></i>'; });
+
+      var a = pos(r.part.from.slice(0, 7));
+      var bEnd = pos(r.part.to.slice(0, 7));
+      var openR = !!r.part.moveOut, openL = !!r.part.moveIn;
+      html += '<div class="bar-c' + (openR ? ' bar-c--open-r' : '') + (openL ? ' bar-c--open-l' : '') +
+              '" style="left:' + px(a) + 'px;width:' + (px(bEnd - a + 1) - 2) + 'px"></div>';
+
+      r.person.paid.forEach(function (key) {
+        var i = pos(key);
+        if (i < a || i > bEnd) return;
+        html += '<div class="bar-p bar-p--paid" style="left:' + (px(i) + 4) + 'px;width:' + (W - 10) + 'px">' + r.person.who.split(' ')[0] + '</div>';
+      });
+
+      if (r.person.deposit) {
+        var di = pos(r.person.deposit);
+        if (di >= a && di <= bEnd) {
+          html += '<div class="bar-p bar-p--dep" style="left:' + (px(di) + 4) + 'px;width:' + (W - 10) + 'px">депозит</div>';
+        }
+      }
+
+      if (r.person.sale && !r.part.moveOut) {
+        var si = pos('2026-11');
+        html += '<div class="bar-s" style="left:' + (px(si) + 4) + 'px;width:' + (W - 10) + 'px">на продаже</div>';
+      }
+
+      html += '</div></div>';
+    });
+    html += '</div></div>';
+    document.getElementById('shYear').innerHTML = html;
+  })();
 
   /* Подсветка обеих частей одного контракта — так видно связь при переезде */
-  box.addEventListener('mouseover', function (e) {
-    var row = e.target.closest('.sh__row'); if (!row) return;
-    var no = row.getAttribute('data-no');
-    box.querySelectorAll('.sh__row').forEach(function (x) {
-      x.classList.toggle('on', x.getAttribute('data-no') === no);
+  document.querySelectorAll('.sh').forEach(function (box) {
+    box.addEventListener('mouseover', function (e) {
+      var row = e.target.closest('.sh__row'); if (!row) return;
+      var no = row.getAttribute('data-no');
+      document.querySelectorAll('.sh__row').forEach(function (x) {
+        x.classList.toggle('on', x.getAttribute('data-no') === no);
+      });
     });
-  });
-  box.addEventListener('mouseleave', function () {
-    box.querySelectorAll('.sh__row.on').forEach(function (x) { x.classList.remove('on'); });
+    box.addEventListener('mouseleave', function () {
+      document.querySelectorAll('.sh__row.on').forEach(function (x) { x.classList.remove('on'); });
+    });
   });
 })();
 </script>
