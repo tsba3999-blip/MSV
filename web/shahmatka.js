@@ -1732,6 +1732,15 @@
 
     /* value подставляется как HTML — экранирование на стороне вызывающего.
        Это позволяет вставлять ссылки, но требует esc() для любых данных. */
+    /* Подпись и значение в одной строке — карточка помещается на экран ПК
+       целиком, без прокрутки (решение заказчика 24.09.2026). */
+    function pair(label, value) {
+      var empty = value === null || value === undefined || value === '';
+      return '<dt>' + esc(label) + '</dt>' +
+             '<dd' + (empty ? ' class="msv-sh__value--empty"' : '') + '>' +
+             (empty ? 'не указано' : value) + '</dd>';
+    }
+
     function field(label, value, cls) {
       var empty = value === null || value === undefined || value === '';
       return '<div class="msv-sh__field">' +
@@ -1857,10 +1866,22 @@
             // где живёт — под именем и статусом «проживает»
             '<div class="msv-sh__ident-place">' + esc(upFirst(placeText)) + '</div>' +
           '</a>' +
-        '</div></div>' +
+        '</div>' +
+          /* Телефон остаётся при фамилии. Если его нет — так и пишем, чтобы
+             строка не исчезала молча (24.09.2026). */
+          '<div class="msv-sh__value' + (phoneHTML(res) ? '' : ' msv-sh__value--empty') + '" style="margin-top:8px">' +
+            (phoneHTML(res) || 'телефон не указан') + '</div>' +
+        '</div>' +
 
+        /* Деньги — сразу под фамилией: это первое, что смотрит модератор */
         '<div class="msv-sh__sect">' +
-          '<div class="msv-sh__field"><div class="msv-sh__value">' + phoneHTML(res) + '</div></div>' +
+          '<dl class="msv-sh__pairs">' +
+            '<dt>Начислено за проживание</dt><dd>' + esc(money(b.accrued)) + '</dd>' +
+            '<dt>Оплачено</dt><dd>' + esc(money(b.paid)) + '</dd>' +
+            '<dt>Баланс</dt><dd class="' + (balance > 0.5 ? 'msv-sh__debt' : 'msv-sh__ok') + '">' +
+              esc(money(Math.abs(balance))) + (balance > 0.5 ? ' к оплате' : (balance < -0.5 ? ' переплата' : '')) +
+            '</dd>' +
+          '</dl>' +
         '</div>' +
 
         '<div class="msv-sh__sect">' +
@@ -1875,13 +1896,15 @@
         '</div>' +
 
         '<div class="msv-sh__sect">' +
-          field('День рождения', bdayHTML(res)) +
+          '<dl class="msv-sh__pairs">' +
+            pair('День рождения', bdayHTML(res)) +
+            pair('Город', esc(res ? res.city : '')) +
+            pair('ВУЗ', esc(vuz)) +
+            pair('Контактное лицо', esc(res ? res.contactPerson : '')) +
+            pair('Профиль в VK', res && res.vk
+              ? '<a href="' + esc(safeUrl(res.vk)) + '" target="_blank" rel="noopener noreferrer">' + esc(res.vk) + '</a>' : '') +
+          '</dl>' +
           field('Документы', docsHTML(res, pays)) +
-          field('Город', esc(res ? res.city : '')) +
-          field('ВУЗ', esc(vuz)) +
-          field('Контактное лицо', esc(res ? res.contactPerson : '')) +
-          field('Профиль в VK', res && res.vk
-            ? '<a href="' + esc(safeUrl(res.vk)) + '" target="_blank" rel="noopener noreferrer">' + esc(res.vk) + '</a>' : '') +
         '</div>' +
 
         '<div class="msv-sh__sect">' +
@@ -1901,16 +1924,7 @@
             : '<div class="msv-sh__value msv-sh__value--empty">платежей пока нет</div>') +
         '</div>' +
 
-        '<div class="msv-sh__sect">' +
-          '<dl class="msv-sh__pairs">' +
-            '<dt>Начислено за проживание</dt><dd>' + esc(money(b.accrued)) + '</dd>' +
-            '<dt>Оплачено</dt><dd>' + esc(money(b.paid)) + '</dd>' +
-            '<dt>Баланс</dt><dd class="' + (balance > 0.5 ? 'msv-sh__debt' : 'msv-sh__ok') + '">' +
-              esc(money(Math.abs(balance))) + (balance > 0.5 ? ' к оплате' : (balance < -0.5 ? ' переплата' : '')) +
-            '</dd>' +
-          '</dl>' +
-          (b.note ? '<div style="margin-top:12px">' + field('Заметка', esc(b.note)) + '</div>' : '') +
-        '</div>' +
+        (b.note ? '<div class="msv-sh__sect">' + field('Заметка', esc(b.note)) + '</div>' : '') +
 
       '</div>' +
       '<div class="msv-sh__panel-foot">' +
