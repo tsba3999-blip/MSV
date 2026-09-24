@@ -102,7 +102,9 @@ module.exports = function register(route) {
              b.source, b.tariff, b.note, b.created_at, b.release_from, b.release_auto,
              b.hold_until, b.hold_name, b.hold_contact, b.contract_id,
              c.date_from AS contract_from, c.date_to AS contract_to, c.annual, c.ended_at,
-             COALESCE(bal.accrued, 0) AS accrued, COALESCE(bal.paid, 0) AS paid
+             COALESCE(bal.accrued, 0) AS accrued, COALESCE(bal.paid, 0) AS paid,
+             EXISTS (SELECT 1 FROM charges ch WHERE ch.booking_id = b.id
+                       AND ch.kind = 'deposit' AND ch.cancelled_at IS NULL) AS has_deposit
       FROM bookings b
       LEFT JOIN contracts c ON c.id = b.contract_id
       JOIN beds bd ON bd.id = b.bed_id
@@ -177,6 +179,7 @@ module.exports = function register(route) {
         contractId: b.contract_id ? String(b.contract_id) : '',
         contractFrom: isoDate(b.contract_from), contractTo: isoDate(b.contract_to),
         contractEnded: isoDate(b.ended_at), annual: b.annual === null ? true : !!b.annual,
+        depositCharged: !!b.has_deposit,
         paidMonths: paidBy[b.id] || []
       })),
       payments: pays.rows.map((p) => ({
@@ -193,6 +196,56 @@ module.exports = function register(route) {
      занято; null убирает пометку.
      Пересечение с другой бронью отклонит сама база (EXCLUDE) —
      здесь только переводим её ошибку в понятный ответ. */
+
+  /* Депозит равен месячной плате и засчитывается оплатой августа —
+     последнего месяца годового контракта (Правила, п. 6.1).
+
+     Кнопка нужна на время переноса данных: у резидентов, заселившихся до
+     появления системы, депозит внесён давно, а в базе его нет. Для новых
+     резидентов ничего нажимать не надо — депозит приходит галочкой на
+     «Проверке данных» (решение заказчика 24.09.2026). */
+  route('POST', '/api/bookings/:id/deposit', async (req, res) => {
+    const s = requireRole(req, res, 'moderator');
+    if (!s) return;
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id)) return fail(res, 400, 'Неверный номер брони');
+
+    const r = await query(`
+      SELECT b.id, b.user_id, COALESCE(c.price, bd.price) AS price,
+             COALESCE(c.date_to, b.date_to) AS finish
+        FROM bookings b
+        JOIN beds bd ON bd.id = b.bed_id
+        LEFT JOIN contracts c ON c.id = b.contract_id
+       WHERE b.id = $1`, [id]);
+    const b = r.rows[0];
+    if (!b) return fail(res, 404, 'Бронь не найдена');
+    if (!b.user_id) return fail(res, 400, 'Это бронь без резидента');
+
+    const out = await tx(async (q) => {
+      const had = await q(`SELECT id, amount FROM charges
+                            WHERE booking_id = $1 AND kind = 'deposit' AND cancelled_at IS NULL
+                            LIMIT 1`, [id]);
+      let amount;
+      if (had.rows[0]) {
+        amount = Number(had.rows[0].amount);
+      } else {
+        amount = Number(b.price) || 0;
+        if (!amount) throw Object.assign(new Error('У места не задана цена'), { code: 'noprice' });
+        await q(`INSERT INTO charges (booking_id, kind, period, amount, note)
+                 VALUES ($1, 'deposit', make_date(EXTRACT(YEAR FROM $2::date)::int, 8, 1), $3,
+                         'Оплата августа — последнего месяца годового контракта')`,
+          [id, b.finish, amount]);
+      }
+      await q(`INSERT INTO payments (booking_id, amount, method, note)
+               VALUES ($1, $2, 'other', 'Депозит')`, [id, amount]);
+      await q(`INSERT INTO audit_log (actor_id, action, target, payload)
+               VALUES ($1, 'deposit.add', $2, $3)`,
+        [s.uid, 'booking:' + id, JSON.stringify({ amount })]);
+      return amount;
+    });
+
+    json(res, 201, { ok: true, amount: out });
+  });
 
   route('PATCH', '/api/bookings/:id', async (req, res) => {
     const s = requireRole(req, res, 'moderator');

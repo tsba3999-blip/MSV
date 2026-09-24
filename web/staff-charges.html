@@ -5,20 +5,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="favicon4.png" type="image/png">
-<meta name="theme-color" content="#7EB2DD">
-<title>Мои документы — МСВ</title>
+<meta name="theme-color" content="#34495E">
+<title>Начисления — МСВ</title>
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="cabinet.css">
-<link rel="stylesheet" href="form.css">
-<style>
-  .set { margin-bottom: var(--msv-s24); padding: var(--msv-s20); background: var(--msv-white); border-radius: var(--msv-r20); box-shadow: var(--msv-e1); }
-  .set__title { margin: 0 0 var(--msv-s8); }
-  .set__text { margin: 0 0 var(--msv-s16); color: var(--msv-n500); }
-  .set__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--msv-s12); }
-  .set .msv-field { margin-bottom: 0; }
-  .tog { display: flex; align-items: center; gap: var(--msv-s12); min-height: 44px; cursor: pointer; }
-  .tog input { width: 20px; height: 20px; accent-color: var(--msv-red); }
-</style>
 <style>
   body { --role: var(--msv-sky); --role-ink: var(--msv-graphite); }
 </style>
@@ -31,7 +21,7 @@
     <a class="side__logo-link" href="index.html" title="На главную"><img class="side__logo" src="msv-1200-white.png" width="1200" height="209"
          alt="МСВ — Москва в студентов верит!"></a>
 
-    <a class="side__who" href="staff-profile.html" title="Мои данные">
+    <a class="side__who" href="staff-profile.html" title="Мой профиль и настройки">
       <span class="side__name">Сергей Ким</span>
       <span class="side__role">Сотрудник · мастер</span>
     </a>
@@ -63,7 +53,7 @@
              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6.5a3 3 0 0 1 0 5.8"/><path d="M18 20a5.5 5.5 0 0 0-3-4.6"/></svg>
         Резиденты
       </a>
-      <a class="side__link" href="staff-charges.html">
+      <a class="side__link" href="staff-charges.html" aria-current="page">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 12h5a3.5 3.5 0 0 0 0-7H9v14"/><path d="M7 15h7"/></svg>
         Начисления
@@ -93,7 +83,7 @@
              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4h4l6 4V6l-6 4z"/><path d="M18 9a4 4 0 0 1 0 6"/></svg>
         Рассылки
       </a>
-      <a class="side__link" href="staff-documents.html" aria-current="page">
+      <a class="side__link" href="staff-documents.html">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
         Мои документы
@@ -128,54 +118,47 @@
 
   <div class="work">
     <header class="work__top">
-      <h1 class="msv-sub work__title">Мои документы</h1>
+      <h1 class="msv-sub work__title">Начисления</h1>
     </header>
 
     <main class="work__body">
-      <p class="msv-note notice">Данные вымышленные: сервер ещё не подключён.</p>
+      <p class="msv-note notice">Суммы вымышленные: сервер ещё не подключён. Пени начисляются по правилу из хендоффа — 3000 руб. после 15 числа.</p>
 
-      <h2 class="msv-sub" style="margin:0 0 var(--msv-s12)">Мои документы</h2>
-      <table class="grid" style="margin-bottom:var(--msv-s24)">
-        <thead><tr><th>Документ</th><th>Дата</th><th>Формат</th><th></th></tr></thead>
-        <tbody>
-          <tr><td><b>Трудовой договор</b><span class="msv-note sub">№ 14-ТД</span></td><td>12.03.2026</td><td>PDF</td><td class="num"><a class="msv-btn msv-btn--s msv-btn--tertiary" href="stub.html?t=Открыть">Открыть</a></td></tr>
-          <tr><td><b>Должностная инструкция</b><span class="msv-note sub">мастер по обслуживанию</span></td><td>12.03.2026</td><td>PDF</td><td class="num"><a class="msv-btn msv-btn--s msv-btn--tertiary" href="stub.html?t=Открыть">Открыть</a></td></tr>
-          <tr><td><b>Инструктаж по охране труда</b><span class="msv-note sub">подписан</span></td><td>12.03.2026</td><td>PDF</td><td class="num"><a class="msv-btn msv-btn--s msv-btn--tertiary" href="stub.html?t=Открыть">Открыть</a></td></tr>
-          <tr><td><b>Удостоверение по электробезопасности</b><span class="msv-note sub">III группа, до 15.08.2027</span></td><td>15.08.2026</td><td>JPG</td><td class="num"><a class="msv-btn msv-btn--s msv-btn--tertiary" href="stub.html?t=Открыть">Открыть</a></td></tr>
-          <tr><td><b>Справка 2-НДФЛ</b><span class="msv-note sub">за 2026 год</span></td><td>—</td><td>—</td><td class="num"><button class="msv-btn msv-btn--s msv-btn--secondary" type="button">Заказать</button></td></tr>
-        </tbody>
-      </table>
+      <div class="stats" id="stats"></div>
 
-      <div class="set" style="max-width:640px">
-        <h2 class="msv-sub set__title">Загрузить документ</h2>
-        <p class="msv-body set__text">Новое удостоверение, справка, сертификат. Проверит администратор.</p>
-        <div class="photos" id="files">
-          <button class="photo__add" type="button" id="add" aria-label="Загрузить"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg></button>
-        </div>
+      <div class="bar">
+        <input class="bar__search" id="q" type="search" placeholder="Фамилия, комната или место" aria-label="Поиск">
+        <button class="bar__chip" type="button" data-res="" aria-pressed="true">Все</button>
+        <button class="bar__chip" type="button" data-res="forma" aria-pressed="false">FORMA</button>
+        <button class="bar__chip" type="button" data-res="uyut" aria-pressed="false">Уют</button>
+        <button class="bar__chip" type="button" data-res="molod" aria-pressed="false">Молодежка</button>
+        <button class="bar__chip" type="button" data-only="debt" aria-pressed="false">Только долги</button>
+        <button class="bar__chip" type="button" data-only="penalty" aria-pressed="false">С пенями</button>
+        <span class="msv-note bar__count" id="count"></span>
       </div>
+
+      <table class="grid">
+        <thead>
+          <tr>
+            <th>Резидент</th><th>За период</th>
+            <th class="num">Начислено</th><th class="num">Оплачено</th><th class="num">Остаток</th>
+            <th>Состояние</th><th>Депозит</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
     </main>
   </div>
 
 </div>
-<script>
-(function () {
-  'use strict';
-  var picker = document.createElement('input'); picker.type = 'file'; picker.multiple = true; picker.accept = 'image/*,application/pdf'; picker.style.display = 'none';
-  document.body.appendChild(picker);
-  document.getElementById('add').addEventListener('click', function () { picker.click(); });
-  picker.addEventListener('change', function () {
-    var box = document.getElementById('files'), add = document.getElementById('add');
-    Array.prototype.forEach.call(picker.files || [], function (f) {
-      var el = document.createElement('div'); el.className = 'photo';
-      el.style.cssText = 'display:flex;align-items:center;justify-content:center;font-size:11px;padding:4px;text-align:center;color:var(--msv-n500);overflow:hidden';
-      el.textContent = f.name.length > 18 ? f.name.slice(0, 15) + '…' : f.name; el.title = f.name;
-      box.insertBefore(el, add);
-    });
-    picker.value = '';
-    // ЗДЕСЬ БУДЕТ ЗАПРОС К СЕРВЕРУ: POST /api/upload → POST /api/me/files
-  });
-})();
-</script>
+
+<script src="api.js"></script>
+<script src="residences.js"></script>
+<script src="demo-bookings.js"></script>
+<script src="residents-uyut.js"></script>
+<script src="residents-forma.js"></script>
+<script src="charges.js"></script>
+
 <script src="mark.js"></script>
 <script src="zoom.js"></script>
 <script src="edit.js"></script>
