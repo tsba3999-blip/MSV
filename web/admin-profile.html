@@ -121,7 +121,10 @@
       </section>
 
       <section class="set">
-        <h2 class="msv-sub set__title">Анкета</h2>
+        <!-- Заголовком — имя: слово «Анкета» ничего не сообщает, а имя
+             сразу говорит, чья это страница (решение заказчика 25.09.2026).
+             Само поле ФИО остаётся: здесь его и правят. -->
+        <h2 class="msv-sub set__title" id="cardName">&nbsp;</h2>
         <div class="set__grid">
           <!-- Значения приходят из учётной записи: раньше они были зашиты
                прямо в вёрстку и не менялись ни для кого (24.09.2026) -->
@@ -186,6 +189,8 @@
           var el = document.getElementById(FIELDS[k]);
           if (el) el.value = d[k] || '';
         });
+        var h = document.getElementById('cardName');
+        if (h) h.textContent = d.name || 'Анкета';
         var p = document.getElementById('pPlace');
         if (p) p.value = d.place || '';
         var s = document.getElementById('pStarted');

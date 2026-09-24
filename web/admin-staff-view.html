@@ -133,15 +133,15 @@ MSV.ready(function (ctx) {
 
   function show(s) {
   if (!s) { box.innerHTML = '<p class="msv-body" style="color:var(--msv-n500)">Сотрудник не найден. <a class="msv-link" href="admin-staff.html">К списку</a></p>'; return; }
-  document.querySelector('.work__title').textContent = s.name;
+  document.querySelector('.work__title').textContent = 'Карточка сотрудника';
   var PLACE = window.MSV_STAFF_PLACE, tenure = window.MSV_STAFF_TENURE;
   function esc(v) { return String(v == null ? '' : v).replace(/</g,'&lt;'); }
   function f(v) { return v ? esc(v) : '<span class="miss">не указано</span>'; }
   function fdate(iso) { return iso ? iso.split('-').reverse().join('.') : '<span class="miss">не указано</span>'; }
   var ROLE = { admin: 'Администратор', moderator: 'Модератор', staff: 'Сотрудник' };
   box.innerHTML =
-    '<section class="set"><h2 class="msv-sub set__title">Анкета</h2><div class="set__grid">' +
-      ['Фамилия Имя', esc(s.name), 'Должность', esc(s.position), 'Роль в системе', ROLE[s.role] || s.role,
+    '<section class="set"><h2 class="msv-sub set__title">' + esc(s.name) + '</h2><div class="set__grid">' +
+      ['Должность', esc(s.position), 'Роль в системе', ROLE[s.role] || s.role,
        'Место работы', s.place ? esc(PLACE[s.place]) : '<span class="miss">не указано</span>', 'Дата рождения', fdate(s.birthday),
        'Работает с', fdate(s.started), 'Стаж', esc(tenure(s.started)), 'Оклад', s.salary ? String(s.salary).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' руб.' : '<span class="miss">не указан</span>',
        'Куда переводить', f(s.payTo), 'Тип отношений', esc(s.relation), 'Телефон', f(s.phone), 'Почта', f(s.email)]

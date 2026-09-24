@@ -141,9 +141,8 @@
       </section>
 
       <section class="set">
-        <h2 class="msv-sub set__title">Анкета сотрудника</h2>
+        <h2 class="msv-sub set__title" id="cardName">&nbsp;</h2>
         <div class="set__grid">
-          <label class="msv-field"><span class="msv-field__label">Фамилия Имя Отчество</span><input class="msv-input" id="pName" readonly></label>
           <label class="msv-field"><span class="msv-field__label">Дата рождения</span><input class="msv-input" type="date" value="1994-06-21" readonly></label>
           <label class="msv-field"><span class="msv-field__label">Телефон</span><input class="msv-input" id="pPhone" type="tel" readonly></label>
           <label class="msv-field"><span class="msv-field__label">Рабочая почта</span><input class="msv-input" id="pEmail" type="email" readonly></label>
@@ -188,7 +187,9 @@
         .then(function (d) {
           if (!d) return;
           var set = function (id, v) { var e = document.getElementById(id); if (e) e.value = v || ''; };
-          set('pName', d.name); set('pPhone', d.phone); set('pEmail', d.email);
+          var h = document.getElementById('cardName');
+          if (h) h.textContent = d.name || 'Анкета сотрудника';
+          set('pPhone', d.phone); set('pEmail', d.email);
           set('pPosition', d.position); set('pPlace', d.place); set('pRelation', d.relation);
           var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(d.started || ''));
           set('pStarted', m ? m[3] + '.' + m[2] + '.' + m[1] : '');
