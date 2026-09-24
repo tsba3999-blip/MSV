@@ -137,12 +137,17 @@
         <span class="msv-note bar__count" id="count"></span>
       </div>
 
-      <table class="grid">
+      <table class="grid" style="table-layout:fixed">
+        <colgroup>
+          <col style="width:25%"><col style="width:11%">
+          <col style="width:13%"><col style="width:12%"><col style="width:12%">
+          <col style="width:15%"><col style="width:12%">
+        </colgroup>
         <thead>
           <tr>
             <th>Резидент</th><th>За период</th>
             <th class="num">Начислено</th><th class="num">Оплачено</th><th class="num">Остаток</th>
-            <th>Состояние</th><th>Депозит</th><th></th>
+            <th>Оплата</th><th>Депозит</th>
           </tr>
         </thead>
         <tbody id="rows"></tbody>

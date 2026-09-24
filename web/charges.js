@@ -136,15 +136,17 @@ MSV.ready(function (ctx) {
           (x.penalty ? '<span class="msv-note sub">вкл. пени ' + esc(money(x.penalty)) + '</span>' : '') + '</td>' +
         '<td class="num">' + esc(money(x.paid)) + '</td>' +
         '<td class="num">' + (r > 0.5 ? '<b>' + esc(money(r)) + '</b>' : '—') + '</td>' +
-        '<td><span class="tag ' + cls + '">' + esc(st) + '</span></td>' +
+        /* Пока деньги переносят руками, в столбце «Оплата» стоит не метка,
+           а кнопка: щёлкнул — и месяц закрыт. Закрытый месяц метку и
+           показывает (решение заказчика 24.09.2026). */
+        '<td>' + (r > 0.5
+          ? '<button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" data-act="paid" title="' + esc(st) + ', к оплате ' + esc(money(r)) + '">Внести оплату</button>'
+          : '<span class="tag ' + cls + '">' + esc(st) + '</span>') + '</td>' +
         '<td>' + (x.deposit
           ? '<span class="tag tag--ok">внесён</span>'
           : '<button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" data-act="dep" title="Депозит равен месячной плате и засчитывается оплатой августа">Внести депозит</button>') + '</td>' +
-        '<td class="num">' + (r > 0.5
-          ? '<button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" data-act="paid">Отметить оплату</button>'
-          : '') + '</td>' +
       '</tr>';
-    }).join('') : '<tr><td colspan="8" class="grid__empty">Ничего не нашлось.</td></tr>';
+    }).join('') : '<tr><td colspan="7" class="grid__empty">Ничего не нашлось.</td></tr>';
   }
 
   /* Депозит: кнопка на время переноса данных. Заводит начисление за август
