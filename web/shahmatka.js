@@ -518,6 +518,15 @@
     this.scroll = scroll;
     this.canvas = scroll.querySelector('.msv-sh__canvas');
 
+    /* Окно изменилось — пересчитываем, сколько дней показывать.
+       Ждём, пока размер устоится: иначе при плавном перетаскивании
+       рамки шахматка перерисовывается на каждый пиксель (25.09.2026). */
+    var self0 = this, tmr = null;
+    window.addEventListener('resize', function () {
+      clearTimeout(tmr);
+      tmr = setTimeout(function () { try { self0.refresh(); } catch (e) {} }, 180);
+    });
+
     var scrim = document.createElement('div');
     scrim.className = 'msv-sh__scrim';
     this.root.appendChild(scrim);
@@ -1270,7 +1279,19 @@
       }
     } else {
       var dw = ZOOM[this.opts.zoom] || ZOOM.m;
-      for (var k = 0; k < this.opts.days; k++) {
+
+      /* Дней столько, сколько влезает в окно, но не меньше заданных.
+         Раньше их всегда было ровно 35: на широком экране календарь
+         обрывался на полуслове, а справа оставалось пустое поле
+         (решение заказчика 25.09.2026). */
+      var days = this.opts.days;
+      if (this.scroll && this.scroll.clientWidth) {
+        var left = parseInt(getComputedStyle(this.root).getPropertyValue('--sh-left-w'), 10) || 84;
+        var room = this.scroll.clientWidth - left;
+        if (room > 0) days = Math.max(days, Math.ceil(room / dw) + 1);
+      }
+
+      for (var k = 0; k < days; k++) {
         var ts = this.start + k * DAY_MS;
         var d = new Date(ts);
         var wd = d.getUTCDay();

@@ -121,6 +121,31 @@ module.exports = function register(route) {
     });
   });
 
+  /* Куда и о чём писать. Выбор человека, а не настройка системы,
+     поэтому живёт в его учётной записи и доступен любой роли. */
+  route('GET', '/api/me/notify-prefs', async (req, res) => {
+    const s = auth.readSession(req);
+    if (!s) return fail(res, 401, 'Не выполнен вход');
+    const r = await query(`SELECT notify_prefs FROM users WHERE id = $1`, [s.uid]);
+    const p = (r.rows[0] && r.rows[0].notify_prefs) || {};
+    json(res, 200, {
+      tg: p.tg !== false, max: p.max === true, email: p.email !== false,
+      scope: ['all', 'mine', 'none'].indexOf(p.scope) >= 0 ? p.scope : 'all'
+    });
+  });
+
+  route('PUT', '/api/me/notify-prefs', async (req, res) => {
+    const s = auth.readSession(req);
+    if (!s) return fail(res, 401, 'Не выполнен вход');
+    const b = await readJson(req);
+    const prefs = {
+      tg: b.tg === true, max: b.max === true, email: b.email === true,
+      scope: ['all', 'mine', 'none'].indexOf(b.scope) >= 0 ? b.scope : 'all'
+    };
+    await query(`UPDATE users SET notify_prefs = $2 WHERE id = $1`, [s.uid, JSON.stringify(prefs)]);
+    json(res, 200, prefs);
+  });
+
   /* Своя действующая регистрация — для страницы «Регистрация» */
   route('GET', '/api/me/registration', async (req, res) => {
     const s = auth.readSession(req);

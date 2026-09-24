@@ -36,6 +36,32 @@ module.exports = function register(route) {
     notify.notifyAdmin('tickets', `<b>Хочу сказать · ${String(b.topic || 'Другое')}</b>\n${text.slice(0, 300)}${b.anonymous ? '\n(анонимно)' : ''}`).catch(() => {});
   });
 
+  /* Заявка от владельца общежития или отеля. Единственная форма без
+     входа: человек ещё не наш, учётной записи у него нет. Складываем
+     туда же, куда «Хочу сказать», — отдельной темой, чтобы не заводить
+     таблицу ради пяти писем в год.
+
+     Раньше страница показывала «Заявка принята», ничего никуда не
+     отправляя: человек ждал ответа, которого никто не увидел
+     (найдено 25.09.2026). */
+  route('POST', '/api/partner', async (req, res) => {
+    const b = await readJson(req);
+    const name = String(b.name || '').trim().slice(0, 200);
+    const contact = String(b.contact || '').trim().slice(0, 200);
+    if (!name) return fail(res, 400, 'Нужно название');
+    if (!contact) return fail(res, 400, 'Нужен телефон или почта для ответа');
+
+    const text = ['Объект: ' + name,
+                  b.city ? 'Город: ' + String(b.city).slice(0, 100) : '',
+                  b.person ? 'Кто обращается: ' + String(b.person).slice(0, 200) : '',
+                  'Связь: ' + contact,
+                  b.note ? String(b.note).slice(0, 1000) : ''].filter(Boolean).join('\n');
+
+    await query(`INSERT INTO feedback (user_id, topic, text) VALUES (NULL, $1, $2)`, ['Партнёр', text]);
+    json(res, 201, { ok: true });
+    notify.notifyAdmin('tickets', `<b>Заявка на подключение объекта</b>\n${text}`).catch(() => {});
+  });
+
   route('GET', '/api/requests', async (req, res) => {
     const s = auth.readSession(req);
     if (!s) return fail(res, 401, 'Не выполнен вход');

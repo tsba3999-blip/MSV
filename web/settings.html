@@ -78,9 +78,42 @@
   document.querySelectorAll('input[name="scope"]').forEach(function (r) {
     r.addEventListener('change', function () { warn.hidden = r.value !== 'none'; });
   });
+  var box = document.querySelectorAll('.rows')[0].querySelectorAll('input[type="checkbox"]');
+  var msg = document.getElementById('msg');
+  var live = location.protocol !== 'file:';
+
+  function scope() {
+    var r = document.querySelector('input[name="scope"]:checked');
+    return r ? r.value : 'all';
+  }
+  function say(text, bad) {
+    msg.textContent = text; msg.hidden = false;
+    msg.style.color = bad ? 'var(--msv-red)' : 'var(--msv-n500)';
+  }
+
+  /* Показываем то, что сохранено, а не то, что стоит в вёрстке */
+  if (live) {
+    fetch('/api/me/notify-prefs', { credentials: 'same-origin' })
+      .then(function (r) { return r.status === 200 ? r.json() : null; })
+      .then(function (p) {
+        if (!p) return;
+        box[0].checked = p.tg; box[1].checked = p.max; box[2].checked = p.email;
+        var r = document.querySelector('input[name="scope"][value="' + p.scope + '"]');
+        if (r) { r.checked = true; warn.hidden = p.scope !== 'none'; }
+      })
+      .catch(function () {});
+  }
+
   document.getElementById('save').addEventListener('click', function () {
-    // ЗДЕСЬ БУДЕТ ЗАПРОС К СЕРВЕРУ: PUT /api/me/notify-prefs
-    var m = document.getElementById('msg'); m.textContent = 'Сохранено'; m.hidden = false;
+    if (!live) { say('Сохранено'); return; }
+    say('Сохраняю…');
+    fetch('/api/me/notify-prefs', {
+      method: 'PUT', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tg: box[0].checked, max: box[1].checked, email: box[2].checked, scope: scope() })
+    })
+      .then(function (r) { say(r.status === 200 ? 'Сохранено' : 'Не удалось сохранить', r.status !== 200); })
+      .catch(function () { say('Сеть не отвечает', true); });
   });
 })();
 </script>

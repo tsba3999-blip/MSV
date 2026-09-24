@@ -41,7 +41,7 @@
          alt="МСВ — Москва в студентов верит!"></a>
 
     <a class="side__who" href="staff-profile.html" title="Мои данные">
-      <span class="side__name">Сергей Ким</span>
+      <span class="side__name">&nbsp;</span>
       <span class="side__role">Сотрудник · мастер</span>
     </a>
 
@@ -155,7 +155,7 @@ MSV.ready(function (ctx) {
 
   /* Сотрудник видит только резиденции, к которым приписан.
      Права приходят с сервера (ctx.me.residences, ctx.me.canEditShahmatka).
-     В демо: сотрудник Сергей Ким — FORMA и Уют, без права редактирования. */
+     В демо: сотрудник без права редактирования. */
   var me = ctx.me || {};
   var allowed = me.residences || ['forma', 'uyut'];
   var canEdit = !!me.canEditShahmatka;

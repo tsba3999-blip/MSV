@@ -259,6 +259,10 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS closed_by_system boolean NOT NULL DEF
 -- двум буквам (решение заказчика 25.09.2026).
 ALTER TABLE users ADD COLUMN IF NOT EXISTS photo_url text;
 
+-- Куда и о чём писать человеку. Раньше страница «Настройки уведомлений»
+-- писала «Сохранено» и ничего не сохраняла (найдено 25.09.2026).
+ALTER TABLE users ADD COLUMN IF NOT EXISTS notify_prefs jsonb;
+
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM users WHERE can_edit_site) THEN
     UPDATE users SET can_edit_site = true WHERE phone = '+79261273999';

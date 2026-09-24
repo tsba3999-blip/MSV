@@ -91,15 +91,47 @@
   var send = document.getElementById('send');
   var err = document.getElementById('err');
 
+  function done() {
+    document.getElementById('ask').style.display = 'none';
+    document.getElementById('done').classList.add('done--on');
+    window.scrollTo(0, 0);
+  }
+
   send.addEventListener('click', function () {
     var name = document.getElementById('objName').value.trim();
     var contact = document.getElementById('contact').value.trim();
     if (!name || !contact) { err.hidden = false; return; }
     err.hidden = true;
-    // ЗДЕСЬ БУДЕТ ЗАПРОС К СЕРВЕРУ: POST /api/partners { name, city, person, contact }
-    document.getElementById('ask').style.display = 'none';
-    document.getElementById('done').classList.add('done--on');
-    window.scrollTo(0, 0);
+
+    /* Заявка действительно уходит. Раньше страница отвечала «Заявка
+       принята», не отправив ничего, — человек ждал звонка, о котором
+       никто не знал (найдено 25.09.2026). */
+    if (location.protocol === 'file:') { done(); return; }
+    send.disabled = true;
+    fetch('/api/partner', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: name, contact: contact,
+        city: document.getElementById('objCity').value.trim(),
+        person: document.getElementById('person').value.trim()
+      })
+    })
+      .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j }; }); })
+      .then(function (out) {
+        send.disabled = false;
+        if (out.s !== 201) {
+          err.hidden = false;
+          err.querySelector('span').textContent = out.j.error || 'Не получилось отправить. Попробуй ещё раз.';
+          return;
+        }
+        done();
+      })
+      .catch(function () {
+        send.disabled = false;
+        err.hidden = false;
+        err.querySelector('span').textContent = 'Сеть не отвечает. Попробуй ещё раз.';
+      });
   });
 })();
 </script>
