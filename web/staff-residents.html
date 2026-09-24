@@ -5,10 +5,22 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="favicon4.png" type="image/png">
-<meta name="theme-color" content="#7EB2DD">
+<meta name="theme-color" content="#34495E">
 <title>Резиденты — МСВ</title>
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="cabinet.css">
+<link rel="stylesheet" href="form.css">
+<style>
+  .invite { margin-bottom: var(--msv-s24); padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r12); box-shadow: var(--msv-e1); }
+  .invite[hidden] { display: none; }
+  .invite__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--msv-s12); }
+  .invite .msv-field { margin-bottom: 0; }
+  .invite .msv-error { margin-top: var(--msv-s12); }
+  /* Удаление — единственное необратимое действие в списке, поэтому оно
+     красное и держится особняком, в своей колонке (24.09.2026) */
+  .del { color: var(--msv-red); }
+  .del:hover { background: rgba(251, 52, 74, .07); }
+</style>
 <style>
   body { --role: var(--msv-sky); --role-ink: var(--msv-graphite); }
 </style>
@@ -52,11 +64,6 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6.5a3 3 0 0 1 0 5.8"/><path d="M18 20a5.5 5.5 0 0 0-3-4.6"/></svg>
         Резиденты
-      </a>
-      <a class="side__link" href="staff-charges.html">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 12h5a3.5 3.5 0 0 0 0-7H9v14"/><path d="M7 15h7"/></svg>
-        Начисления
       </a>
       <a class="side__link" href="staff-salary.html">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -122,19 +129,66 @@
     </header>
 
     <main class="work__body">
-      <p class="msv-note notice">Чтобы связаться с резидентом по заявке. Оплата, документы и регистрация сотруднику не показываются — это ещё предстоит решить.</p>
+
+
+      <div class="bar" style="margin-bottom:var(--msv-s12)">
+        <button class="msv-btn msv-btn--m msv-btn--primary" type="button" id="inviteBtn">Пригласить резидента</button>
+        <button class="msv-btn msv-btn--m msv-btn--tertiary" type="button" id="wlCheck" title="Проверить свободные места и разослать всем, кто ждёт">Разослать свободные места очереди</button>
+        <span class="msv-note">Код выдаётся после собеседования. Резидент входит по телефону и коду, заполняет анкету.</span>
+      </div>
+
+      <div class="invite" id="invite" hidden>
+        <div class="invite__grid">
+          <label class="msv-field"><span class="msv-field__label">Имя</span>
+            <input class="msv-input" id="invName" placeholder="Артём Логинов"></label>
+          <label class="msv-field"><span class="msv-field__label">Телефон или почта</span>
+            <input class="msv-input" id="invContact" placeholder="+7 999 000-00-00"></label>
+          <label class="msv-field"><span class="msv-field__label">Код входа (4 цифры)</span>
+            <input class="msv-input" id="invPin" inputmode="numeric" maxlength="4" placeholder="7391"></label>
+        </div>
+        <div class="msv-error" id="invErr" hidden role="alert" style="margin-bottom:var(--msv-s12)">
+          <svg class="msv-error__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2.5 15 14H1z"/><path d="M8 6.5v3.2"/><path d="M8 12h.01"/></svg>
+          <span id="invErrText"></span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:var(--msv-s8);margin-top:var(--msv-s16);padding-top:var(--msv-s16);border-top:1px solid var(--msv-n100)">
+          <button class="msv-btn msv-btn--m msv-btn--primary" type="button" id="invSend">Создать и выдать код</button>
+          <button class="msv-btn msv-btn--m msv-btn--tertiary" type="button" id="invRand">Случайный код</button>
+          <button class="msv-btn msv-btn--m msv-btn--tertiary" type="button" id="invCancel">Отмена</button>
+        </div>
+        <p class="msv-note" style="margin:var(--msv-s12) 0 0">Код сообщи резиденту лично. Он сменит его при первом входе в настройках.</p>
+      </div>
+
+      <div class="stats" id="stats"></div>
 
       <div class="bar">
-        <input class="bar__search" id="q" type="search" placeholder="Фамилия, комната или место" aria-label="Поиск">
+        <input class="bar__search" id="q" type="search" placeholder="Фамилия, комната, вуз или телефон" aria-label="Поиск">
         <button class="bar__chip" type="button" data-res="" aria-pressed="true">Все</button>
         <button class="bar__chip" type="button" data-res="forma" aria-pressed="false">FORMA</button>
         <button class="bar__chip" type="button" data-res="uyut" aria-pressed="false">Уют</button>
         <button class="bar__chip" type="button" data-res="molod" aria-pressed="false">Молодежка</button>
+        <button class="bar__chip" type="button" data-only="debt" aria-pressed="false">С долгом</button>
+        <button class="bar__chip" type="button" data-only="penalty" aria-pressed="false">С пенями</button>
+        <button class="bar__chip" type="button" data-only="minor" aria-pressed="false">До 18 лет</button>
+        <button class="bar__chip" type="button" data-only="reg" aria-pressed="false">Регистрация истекла</button>
         <span class="msv-note bar__count" id="count"></span>
       </div>
 
-      <table class="grid">
-        <thead><tr><th>Резидент</th><th>Место</th><th>Связь</th></tr></thead>
+      <table class="grid" style="table-layout:fixed">
+        <colgroup>
+          <col style="width:21%"><col style="width:13%"><col style="width:11%">
+          <col style="width:12%"><col style="width:12%"><col style="width:11%">
+          <col style="width:12%"><col style="width:8%">
+        </colgroup>
+        <thead>
+          <tr>
+            <th><button class="sort" type="button" data-sort="name">Резидент</button> / <button class="sort" type="button" data-sort="uni">ВУЗ</button></th>
+            <th><button class="sort" type="button" data-sort="place">Место</button></th>
+            <th>Телефон</th>
+            <th>Долг</th><th>Оплата</th><th>Депозит</th>
+            <th>Регистрация</th><th></th>
+          </tr>
+        </thead>
         <tbody id="rows"></tbody>
       </table>
     </main>
@@ -147,113 +201,7 @@
 <script src="demo-bookings.js"></script>
 <script src="residents-uyut.js"></script>
 <script src="residents-forma.js"></script>
-<script>
-MSV.ready(function (ctx) {
-  'use strict';
-
-  var RES = ctx.residences;
-
-  function esc(s) {
-    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  }
-
-  function initials(name) {
-    var p = String(name).trim().split(/\s+/);
-    return p.length > 1 ? (p[0][0] + p[1][0]).toUpperCase() : p[0][0].toUpperCase();
-  }
-
-  function digits(phone) {
-    var d = String(phone || '').replace(/\D/g, '');
-    if (d.length === 11 && d.charAt(0) === '8') d = '7' + d.slice(1);
-    return d;
-  }
-
-  /* Только резиденции, к которым приписан сотрудник */
-  var allowed = (ctx.me && ctx.me.residences) || ['forma', 'uyut'];
-  document.querySelectorAll('[data-res]').forEach(function (c) { var v = c.getAttribute('data-res'); if (v && allowed.indexOf(v) === -1) c.remove(); });
-
-  var ALL = [];
-  RES.forEach(function (res) {
-    if (allowed.indexOf(res.id) === -1) return;
-    var d = ctx.bookings(res);
-    var byId = {}; d.residents.forEach(function (r) { byId[r.id] = r; });
-    var bedById = {}; res.beds.forEach(function (b) { bedById[b.id] = b; });
-    var roomById = {}; res.rooms.forEach(function (r) { roomById[r.id] = r; });
-
-    d.bookings.forEach(function (b) {
-      var p = byId[b.residentId]; if (!p) return;
-      var bed = bedById[b.bedId];
-      var room = bed ? roomById[bed.roomId] : null;
-      ALL.push({
-        res: res, name: p.name, phone: p.phone || '', messengers: p.messengers || [],
-        bed: bed ? bed.label : '', room: room ? (room.name || ('к. ' + room.number)) : ''
-      });
-    });
-  });
-  ALL.sort(function (a, b) { return a.name.localeCompare(b.name, 'ru'); });
-
-  var state = { q: '', res: '' };
-
-  try {
-    var last = sessionStorage.getItem('msv.lastResidence');
-    if (last && RES.some(function (r) { return r.id === last; })) {
-      state.res = last;
-      document.querySelectorAll('[data-res]').forEach(function (c) {
-        c.setAttribute('aria-pressed', c.getAttribute('data-res') === last ? 'true' : 'false');
-      });
-    }
-  } catch (e) { /* хранилище недоступно */ }
-
-  function render() {
-    var list = ALL.filter(function (x) {
-      if (state.res && x.res.id !== state.res) return false;
-      if (state.q) {
-        var hay = (x.name + ' ' + x.bed + ' ' + x.room).toLowerCase().replace(/ё/g, 'е');
-        if (hay.indexOf(state.q) === -1) return false;
-      }
-      return true;
-    });
-    document.getElementById('count').textContent = list.length + ' из ' + ALL.length;
-
-    document.getElementById('rows').innerHTML = list.length ? list.map(function (x) {
-      var d = digits(x.phone);
-      var links = x.phone ? '<a href="tel:+' + esc(d) + '">' + esc(x.phone) + '</a>' : '—';
-      if (x.messengers.indexOf('tg') !== -1 && d) {
-        links += ' <a class="tag tag--info" href="https://t.me/+' + esc(d) + '" target="_blank" rel="noopener noreferrer">TG</a>';
-      }
-      if (x.messengers.indexOf('max') !== -1 && d) {
-        // Формат ссылки Max проверьте — как и в шахматке
-        links += ' <a class="tag tag--mute" href="https://max.ru/+' + esc(d) + '" target="_blank" rel="noopener noreferrer">MAX</a>';
-      }
-      return '<tr>' +
-        '<td><span class="who-cell"><span class="who-cell__face">' + esc(initials(x.name)) + '</span>' +
-          '<span class="who-cell__name">' + esc(x.name) + '</span></span></td>' +
-        '<td>' + esc(x.bed) + '<span class="msv-note sub">' + esc(x.room) + ' · ' + esc(x.res.name) + '</span></td>' +
-        '<td>' + links + '</td>' +
-      '</tr>';
-    }).join('') : '<tr><td colspan="3" class="grid__empty">Никого не нашлось.</td></tr>';
-  }
-
-  var timer = null;
-  document.getElementById('q').addEventListener('input', function (e) {
-    clearTimeout(timer);
-    var v = e.target.value;
-    timer = setTimeout(function () { state.q = v.trim().toLowerCase().replace(/ё/g, 'е'); render(); }, 150);
-  });
-
-  document.querySelector('.bar').addEventListener('click', function (e) {
-    var chip = e.target.closest('.bar__chip');
-    if (!chip) return;
-    document.querySelectorAll('.bar__chip').forEach(function (c) { c.setAttribute('aria-pressed', 'false'); });
-    chip.setAttribute('aria-pressed', 'true');
-    state.res = chip.getAttribute('data-res');
-    render();
-  });
-
-  render();
-});
-</script>
+<script src="residents.js"></script>
 
 <script src="mark.js"></script>
 <script src="zoom.js"></script>

@@ -438,3 +438,7 @@ a.side__who:focus-visible { outline: 2px solid var(--msv-white); outline-offset:
 .sort[aria-pressed="true"] { color: var(--msv-graphite); font-weight: 600; }
 .sort[data-dir="up"]::after { content: ' ↑'; }
 .sort[data-dir="down"]::after { content: ' ↓'; }
+
+/* Долг в списке проживающих: сумма крупно, под ней — сколько уже
+   оплачено. Отдельного столбца «остаток» нет (24.09.2026) */
+.owe { display: block; color: var(--msv-red); font-variant-numeric: tabular-nums; }
