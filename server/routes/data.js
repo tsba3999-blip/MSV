@@ -104,7 +104,9 @@ module.exports = function register(route) {
              c.date_from AS contract_from, c.date_to AS contract_to, c.annual, c.ended_at,
              COALESCE(bal.accrued, 0) AS accrued, COALESCE(bal.paid, 0) AS paid,
              EXISTS (SELECT 1 FROM charges ch WHERE ch.booking_id = b.id
-                       AND ch.kind = 'deposit' AND ch.cancelled_at IS NULL) AS has_deposit
+                       AND ch.kind = 'deposit' AND ch.cancelled_at IS NULL) AS has_deposit,
+             COALESCE((SELECT SUM(ch.amount) FROM charges ch WHERE ch.booking_id = b.id
+                        AND ch.kind = 'penalty' AND ch.cancelled_at IS NULL), 0) AS penalty
       FROM bookings b
       LEFT JOIN contracts c ON c.id = b.contract_id
       JOIN beds bd ON bd.id = b.bed_id
@@ -179,7 +181,7 @@ module.exports = function register(route) {
         contractId: b.contract_id ? String(b.contract_id) : '',
         contractFrom: isoDate(b.contract_from), contractTo: isoDate(b.contract_to),
         contractEnded: isoDate(b.ended_at), annual: b.annual === null ? true : !!b.annual,
-        depositCharged: !!b.has_deposit,
+        depositCharged: !!b.has_deposit, penalty: Number(b.penalty),
         paidMonths: paidBy[b.id] || []
       })),
       payments: pays.rows.map((p) => ({

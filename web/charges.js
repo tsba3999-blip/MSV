@@ -45,7 +45,14 @@ MSV.ready(function (ctx) {
       var accrued = b.accrued || 0;
       var paid = b.paid || 0;
       var rest = Math.max(0, accrued - paid);
-      var penalty = (rest > 0.5 && todayDay > DUE_DAY) ? PENALTY : 0;
+      /* Пени считает сервер по Правилам — 3 000 за первые сутки просрочки
+         и 500 за каждые следующие. Своей выдумки здесь больше нет: она
+         показывала ровно 3 000 и вдобавок поверх уже начисленных
+         (24.09.2026). Они уже входят в «начислено», поэтому из него их
+         вычитаем, чтобы не сложить дважды. */
+      var penalty = Number(b.penalty) || 0;
+      accrued -= penalty;
+      rest = Math.max(0, accrued + penalty - paid);
 
       ALL.push({
         id: b.id, res: res, name: p.name,

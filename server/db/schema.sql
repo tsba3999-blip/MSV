@@ -290,6 +290,18 @@ DO $$ BEGIN
   END IF;
 END $$;
 
+-- Разово: убираем пени, начисленные до того, как в систему занесли оплаты.
+-- Люди в базе настоящие, и долгов у них не было — долг был только в наших
+-- данных. Признак, что правка уже прошла, — наличие выключателя
+-- auto_penalty, поэтому при повторном выкладывании законные пени
+-- останутся на месте (24.09.2026).
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM settings WHERE key = 'auto_penalty') THEN
+    DELETE FROM charges WHERE kind = 'penalty';
+    INSERT INTO settings (key, value) VALUES ('auto_penalty', '0');
+  END IF;
+END $$;
+
 CREATE EXTENSION IF NOT EXISTS btree_gist;
 
 -- EXCLUDE создаёт индекс, поэтому при повторе ошибка не duplicate_object,
