@@ -1209,4 +1209,7 @@ body.msv-sh-dragging .msv-sh__bar { cursor: grabbing; }
 /* Красная нить «сегодня» — поверх всех полос броней */
 .msv-sh__underlay .msv-sh__nowline { z-index: 25; pointer-events: none; }   /* поверх всех броней */
 .msv-sh__underlay .msv-sh__band, .msv-sh__underlay .msv-sh__gridline { z-index: -1; }
+/* Граница месяца — исключение: она должна читаться поверх броней, как и
+   полоса «сегодня». Правило выше прячет все линии под бруски (24.09.2026) */
+.msv-sh__underlay .msv-sh__gridline--month { z-index: 24; }
 .msv-sh__body { position: relative; isolation: isolate; }
