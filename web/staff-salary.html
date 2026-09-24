@@ -132,7 +132,9 @@
         <!-- Числа приходят с сервера. Раньше здесь стояли выдуманные
              оклад и сумма выплат, и человек видел их как свои -->
         <div class="stat"><span class="stat__label">Мой оклад</span><span class="stat__value" id="salary">—</span><span class="msv-note stat__note">в месяц, до премий</span></div>
-        <div class="stat"><span class="stat__label">Работаю дней</span><span class="stat__value" id="days">—</span><span class="msv-note stat__note" id="since"></span></div>
+        <div class="stat"><span class="stat__label">Работаю дней</span><span class="stat__value" id="days">—</span>
+          <span class="msv-note stat__note" id="tenure"></span>
+          <span class="msv-note stat__note" id="since"></span></div>
         <div class="stat"><span class="stat__label">Всего выплачено</span><span class="stat__value" id="paidTotal">—</span><span class="msv-note stat__note">по записям в системе</span></div>
       </div>
 
@@ -193,6 +195,30 @@
         if (days) days.textContent = String(n);
         var MON = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
         if (since) since.textContent = 'с ' + Number(m[3]) + ' ' + MON[+m[2] - 1] + ' ' + m[1];
+
+        /* Недели, месяцы и годы — рядом с днями: за числом 197 не видно,
+           много это или мало (решение заказчика 24.09.2026). Месяцы и
+           годы считаем по календарю, а не делением: в месяцах разное
+           число дней. */
+        function plural(k, one, few, many) {
+          var a = Math.abs(k) % 100, b = a % 10;
+          if (a > 10 && a < 20) return many;
+          if (b > 1 && b < 5) return few;
+          if (b === 1) return one;
+          return many;
+        }
+        var weeks = Math.floor(n / 7);
+        var months = (today.getFullYear() - from.getUTCFullYear()) * 12 + (today.getMonth() - from.getUTCMonth());
+        if (today.getDate() < from.getUTCDate()) months--;
+        if (months < 0) months = 0;
+        var years = Math.floor(months / 12);
+
+        var parts = [];
+        if (weeks) parts.push(weeks + ' ' + plural(weeks, 'неделя', 'недели', 'недель'));
+        if (months) parts.push(months + ' ' + plural(months, 'месяц', 'месяца', 'месяцев'));
+        if (years) parts.push(years + ' ' + plural(years, 'год', 'года', 'лет'));
+        var box = document.getElementById('tenure');
+        if (box) box.textContent = parts.join(' · ');
       })
       .catch(function () {});
   }
