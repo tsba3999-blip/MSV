@@ -357,6 +357,12 @@
     var top = anchorRect.top - box.height - gap;
 
     if (top < 8) top = anchorRect.bottom + gap;                       // не влезает сверху — вниз
+    /* Не влезает и снизу — прижимаем к нижнему краю. На невысоком окне
+       подсказка уходила за край экрана целиком (25.09.2026). */
+    if (top + box.height > window.innerHeight - 8) {
+      top = window.innerHeight - box.height - 8;
+    }
+    if (top < 8) top = 8;
     if (left + box.width > window.innerWidth - 8) {                   // не влезает справа — прижать
       left = window.innerWidth - box.width - 8;
     }
