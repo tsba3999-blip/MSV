@@ -221,7 +221,7 @@ MSV.ready(function (ctx) {
          пришлось бы считать глазами (решение заказчика 24.09.2026). */
       var pay = x.owed > 0.5
         ? '<b class="owe">' + esc(money(x.owed)) + '</b>' +
-          '<span class="msv-note sub">оплачено ' + esc(num(x.paid)) + ' из ' + esc(num(x.accrued)) + '</span>' +
+          (x.paid > 0.5 ? '<span class="msv-note sub">оплачено ' + esc(num(x.paid)) + ' из ' + esc(num(x.accrued)) + '</span>' : '') +
           (x.penalty > 0.5 ? '<span class="msv-note sub">пени ' + esc(num(x.penalty)) + '</span>' : '')
         : '<span class="tag tag--ok">без долга</span>';
 
