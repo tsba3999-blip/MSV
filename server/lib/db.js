@@ -27,6 +27,16 @@ function loadEnv() {
 
 loadEnv();
 
+/* ---------- Время ----------
+   Вся жизнь общежития считается по Москве: «оплата до 15 числа 24:00»,
+   «выехал вчера», «сегодня» в шахматке. Сервер может стоять где угодно
+   и по умолчанию живёт по Гринвичу — тогда каждую ночь с 00:00 до 03:00
+   по Москве система считает, что ещё вчера, и опаздывает на сутки.
+   Поэтому часовой пояс задаём сами, а не надеемся на настройку машины:
+   на новом сервере забыть её нельзя (найдено 25.09.2026). */
+const TZ = process.env.MSV_TZ || 'Europe/Moscow';
+process.env.TZ = TZ;
+
 const config = {
   port: Number(process.env.PORT) || 3000,
   databaseUrl: process.env.DATABASE_URL || '',
@@ -59,6 +69,8 @@ function getPool() {
   const { Pool } = require('pg');
   pool = new Pool({ connectionString: config.databaseUrl, max: 10 });
   pool.on('error', (err) => console.error('[db] ошибка соединения:', err.message));
+  /* То же время и в базе: CURRENT_DATE считает она, а не Node. */
+  pool.on('connect', (client) => { client.query("SET TIME ZONE '" + TZ + "'").catch(() => {}); });
   return pool;
 }
 
@@ -83,4 +95,4 @@ async function tx(fn) {
   }
 }
 
-module.exports = { config, assertConfig, query, tx };
+module.exports = { config, assertConfig, query, tx, TZ };

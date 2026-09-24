@@ -35,8 +35,9 @@
 <style>
   /* Предупреждение про код: не украшение, а часть смысла страницы,
      поэтому выделено красной рамкой, как плашка ошибки (24.09.2026) */
-  .warn-pin { margin: 0 0 var(--msv-s24); padding: var(--msv-s16); background: var(--msv-white);
-              border: 1px solid var(--msv-red); border-radius: var(--msv-r12); }
+  /* Без рамки: красная рамка на странице — это ошибка, а здесь обычное
+     предупреждение. Достаточно текста (решение заказчика 25.09.2026). */
+  .warn-pin { margin: 0 0 var(--msv-s24); }
   .warn-pin__title { margin: 0 0 var(--msv-s8); font-weight: 600; }
   .warn-pin__list { margin: 0; padding-left: var(--msv-s20); color: var(--msv-n500); }
   .warn-pin__list li { margin-bottom: var(--msv-s8); }

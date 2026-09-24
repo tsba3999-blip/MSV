@@ -209,6 +209,30 @@ function checkSchema() {
 }
 
 /* ============================================================
+   Время
+
+   Было: сервер стоял по Гринвичу, а общежитие живёт по Москве.
+   Каждую ночь с 00:00 до 03:00 система считала, что ещё вчера:
+   выехавший продолжал входить, а срок оплаты «до 15 числа 24:00»
+   сдвигался на сутки. Час пояса теперь задаёт сам код.
+   ============================================================ */
+function checkTime() {
+  const db = read(path.join(SRV, 'lib/db.js'));
+  check('часовой пояс задан в коде', /process\.env\.TZ\s*=/.test(db),
+    'сервер возьмёт пояс машины — на новом хостинге это Гринвич');
+  check('тот же пояс и в базе', /SET TIME ZONE/.test(db),
+    'CURRENT_DATE посчитает база по-своему');
+
+  /* Правила, которые двигают чужие деньги и доступ, включаются разом —
+     пока перенос не закончен, они молчат. */
+  for (const f of ['penalty.js', 'sale.js', 'access.js']) {
+    check('правило ' + f + ' под общим выключателем',
+      read(path.join(SRV, 'lib', f)).includes("key = 'money_rules'"),
+      'сработает на неполных данных');
+  }
+}
+
+/* ============================================================
    6. Живой сервер
    ============================================================ */
 async function checkLive() {
@@ -222,6 +246,13 @@ async function checkLive() {
 
   const health = await get(BASE + '/api/health');
   check('база доступна', health.status === 200, 'ответ ' + health.status);
+
+  /* Сверяем день базы с московским: разошлись — значит пояс не тот */
+  let today = '';
+  try { today = JSON.parse(health.body).today || ''; } catch (e) {}
+  const msk = new Date(Date.now() + 3 * 3600 * 1000).toISOString().slice(0, 10);
+  check('сервер считает дни по Москве', !today || today === msk,
+    'база думает, что сегодня ' + today + ', а в Москве ' + msk);
 
   /* Было: страница входа сама логинила под первой учётной записью */
   const login = await get(BASE + '/login.html');
@@ -242,6 +273,7 @@ async function checkLive() {
   checkNames();
   checkOrder();
   checkSchema();
+  checkTime();
   await checkLive();
 
   console.log('');

@@ -24,6 +24,13 @@
 const { query } = require('./db');
 
 async function sweepAccess() {
+  /* Тот же выключатель, что у пеней и продажи мест. Пока идёт перенос со
+     старой шахматки, контракты у части резидентов восстановлены по броням
+     и кончаются раньше, чем на самом деле. Без выключателя система в первый
+     же час заперла живущего человека — Мищенко Александра (25.09.2026). */
+  const on = await query(`SELECT value FROM settings WHERE key = 'money_rules'`);
+  if (!on.rows[0] || on.rows[0].value !== '1') return { closed: 0, opened: 0, off: true };
+
   /* Закрыть: резидент, доступ открыт, контракты были, но живого нет. */
   const closed = await query(`
     UPDATE users u SET is_active = false, closed_by_system = true

@@ -59,9 +59,12 @@ setTimeout(() => { access.sweepAccess().catch(() => {}); }, 80 * 1000);
 // Проверка живости — для nginx и для себя
 router.route('GET', '/api/health', async (req, res) => {
   try {
-    await query('SELECT 1');
+    /* Отдаём и дату базы: по ней самопроверка видит, что сервер живёт
+       по Москве, а не по Гринвичу. Из-за этого расхождения система
+       считала, что выехавший ещё живёт (найдено 25.09.2026). */
+    const d = await query('SELECT CURRENT_DATE::text AS today');
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end('{"ok":true}');
+    res.end(JSON.stringify({ ok: true, today: d.rows[0].today }));
   } catch (e) {
     res.writeHead(503, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ ok: false, error: 'база недоступна' }));
