@@ -284,7 +284,7 @@
 }
 
 /* Начало месяца — линия потемнее и поверх броней (24.09.2026) */
-.msv-sh__gridline--month { background: var(--msv-n300, #C9C1B4); z-index: 5; }
+.msv-sh__gridline--month { background: var(--msv-n500, #6B665E); z-index: 9; }   /* вдвое темнее обычных и поверх броней (24.09.2026) */
 
 .msv-sh__nowline--top { z-index: 4; }
 
