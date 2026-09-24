@@ -32,6 +32,18 @@
   .ok--on { display: block; }
 </style>
 </head>
+<style>
+  /* Предупреждение про код: не украшение, а часть смысла страницы,
+     поэтому выделено красной рамкой, как плашка ошибки (24.09.2026) */
+  .warn-pin { margin: 0 0 var(--msv-s24); padding: var(--msv-s16); background: var(--msv-white);
+              border: 1px solid var(--msv-red); border-radius: var(--msv-r12); }
+  .warn-pin__title { margin: 0 0 var(--msv-s8); font-weight: 600; }
+  .warn-pin__list { margin: 0; padding-left: var(--msv-s20); color: var(--msv-n500); }
+  .warn-pin__list li { margin-bottom: var(--msv-s8); }
+  .warn-pin__list li:last-child { margin-bottom: 0; }
+  .warn-pin__list b { color: var(--msv-graphite); }
+  .warn-pin__foot { margin: var(--msv-s12) 0 0; color: var(--msv-n500); }
+</style>
 <body>
 
 <div class="page">
@@ -45,7 +57,18 @@
 
   <div id="form">
     <p class="msv-body" style="margin:0 0 var(--msv-s4);color:var(--msv-n500)">Тайна пароля — ваша ответственность.</p>
-    <p class="msv-body" style="margin:0 0 var(--msv-s24);color:var(--msv-n500)">Код выдал модератор при заселении. Замени его на свой — четыре цифры, которые помнишь только ты.</p>
+    <p class="msv-body" style="margin:0 0 var(--msv-s16);color:var(--msv-n500)">Код выдал модератор при заселении. Замени его на свой — четыре цифры, которые помнишь только ты.</p>
+
+    <div class="warn-pin">
+      <p class="msv-body warn-pin__title">Кто знает твой код — может войти вместо тебя</p>
+      <ul class="msv-body warn-pin__list">
+        <li><b>Подписать за тебя договор, правила и согласие</b> и забронировать место — это годовое денежное обязательство на твоё имя.</li>
+        <li><b>Увидеть твои документы</b>: паспорт, студенческий, дату рождения, вуз, телефон и всю историю платежей.</li>
+        <li><b>Писать от твоего лица</b> — подавать заявки технику и отправлять сообщения администрации.</li>
+        <li><b>Сменить код</b> — и тогда доступ к кабинету потеряешь уже ты.</li>
+      </ul>
+      <p class="msv-note warn-pin__foot">Никому не говори код — ни соседу, ни сотруднику, ни нам. Показалось, что кто-то заходил, — сразу смени его здесь и скажи модератору.</p>
+    </div>
 
     <p class="msv-body" style="margin-bottom:var(--msv-s4)">Введи действующий код</p>
     <div class="pin" id="pin0">
