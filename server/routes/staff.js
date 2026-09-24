@@ -47,7 +47,12 @@ module.exports = function register(route) {
     const contact = auth.normalizeContact(b.contact);
     if (!contact) return fail(res, 400, 'Нужен телефон или почта для входа');
     const bad = auth.validPin(b.pin); if (bad) return fail(res, 400, bad);
-    const role = b.role === 'moderator' ? 'moderator' : 'staff';
+    /* Администратора тоже нужно уметь заводить: иначе единственный
+       администратор — тот, что появился при первой установке, и владелец
+       не может создать себе учётную запись. Заводить администратора может
+       только администратор (24.09.2026). */
+    const ROLES = ['staff', 'moderator', 'admin'];
+    const role = ROLES.indexOf(b.role) >= 0 ? b.role : 'staff';
     const out = await tx(async (q) => {
       const col = contact.kind === 'email' ? 'email' : 'phone';
       const u = await q(`INSERT INTO users (role, name, ${col}, invited_by, invited_at) VALUES ($1, $2, $3, $4, now()) RETURNING id`, [role, name, contact.value, s.uid]);
