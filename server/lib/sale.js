@@ -31,6 +31,13 @@ function human(dateStr) {
 }
 
 async function sweepSale() {
+  /* Пока модератор не занёс в систему оплаты и депозиты, «не оплачено»
+     означает всего лишь «ещё не внесено». Выставлять на продажу занятые
+     места по такой причине нельзя, поэтому правило включается вручную —
+     выключателем в настройках администратора (24.09.2026). */
+  const on = await query(`SELECT value FROM settings WHERE key = 'auto_sale'`);
+  if (!on.rows[0] || on.rows[0].value !== '1') return 0;
+
   /* due — месяц, который уже должен быть оплачен: следующий за текущим. */
   const info = await query(
     `SELECT (date_trunc('month', CURRENT_DATE) + interval '1 month')::date AS due,

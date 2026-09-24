@@ -276,6 +276,20 @@ UPDATE contracts c SET date_to = DATE '2027-08-31'
    AND b.date_to = DATE '2027-08-31'
    AND c.date_to = DATE '2026-10-01';
 
+-- Разово: снимаем пометки «освободится», которые система успела поставить
+-- до того, как в неё занесли оплаты — иначе занятые места выглядят
+-- свободными. Ручные пометки модератора не трогаем: у них release_auto
+-- равен false. Признак того, что правка уже была, — наличие выключателя
+-- auto_sale; поэтому при повторном выкладывании ничего не произойдёт,
+-- и законные автоматические пометки останутся на месте (24.09.2026).
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM settings WHERE key = 'auto_sale') THEN
+    UPDATE bookings SET release_from = NULL, release_auto = false, sale_period = NULL
+     WHERE release_auto = true;
+    INSERT INTO settings (key, value) VALUES ('auto_sale', '0');
+  END IF;
+END $$;
+
 CREATE EXTENSION IF NOT EXISTS btree_gist;
 
 -- EXCLUDE создаёт индекс, поэтому при повторе ошибка не duplicate_object,
