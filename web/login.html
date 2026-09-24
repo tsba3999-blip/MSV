@@ -225,24 +225,27 @@
 
   /* ---------- Роль из адреса ---------- */
 
-  var ROLES = {
-    resident: { name: 'Резидент',      title: 'Вход для резидентов',    lead: 'Введи телефон и четырёхзначный код. Код выдаёт модератор после собеседования психолога.' },
-    staff:    { name: 'Сотрудник',     title: 'Вход для сотрудников',   lead: 'Введи рабочую почту и свой код.' },
-    admin:    { name: 'Администратор', title: 'Вход для администратора', lead: 'Введи рабочую почту и свой код.' }
+  /* Вход один на всех. Кем человек войдёт — резидентом, сотрудником,
+     модератором или администратором — решает роль в его учётной записи,
+     а не то, по какой ссылке он пришёл. Раньше на первой странице были
+     отдельные буквы «С» и «А»; роль они не меняли и только путали
+     (решение заказчика 24.09.2026). */
+  var CABINET = {
+    resident: 'cabinet-resident.html',
+    staff: 'cabinet-staff.html',
+    moderator: 'cabinet-staff.html',   // модератор работает в кабинете сотрудника
+    admin: 'cabinet-admin.html'
   };
 
   var params = new URLSearchParams(location.search);
-  var role = params.get('role');
-  if (!Object.prototype.hasOwnProperty.call(ROLES, role)) role = 'resident';
-  var cfg = ROLES[role];
-  var CABINET = { resident: 'cabinet-resident.html', staff: 'cabinet-staff.html', admin: 'cabinet-admin.html' };
 
-  document.getElementById('roleName').textContent = cfg.name;
-  document.getElementById('roleBadge').className = 'role role--' + role;
-  document.getElementById('pageTitle').textContent = cfg.title;
+  var badge = document.getElementById('roleBadge');
+  if (badge) badge.hidden = true;      // роль заранее неизвестна — не обещаем её
+  document.getElementById('pageTitle').textContent = 'Вход';
   document.getElementById('headTitle').textContent = 'Вход';
-  document.getElementById('pageLead').textContent = cfg.lead;
-  document.title = cfg.title + ' — Москва в студентов верит!';
+  document.getElementById('pageLead').textContent =
+    'Введи телефон или рабочую почту и четырёхзначный код. Код выдаёт модератор.';
+  document.title = 'Вход — Москва в студентов верит!';
 
   /* Раньше страница сама входила под первой учётной записью нужной роли —
      остаток демо-режима. Из-за этого владелец, входя «под собой», попадал
@@ -389,7 +392,7 @@
     function go(serverRole, firstLogin) {
       // Роль — из учётной записи на сервере. Кнопка на первой странице
       // ничего не решает: сотрудник через кнопку резидента попадёт к себе.
-      var r = serverRole && CABINET[serverRole] ? serverRole : role;
+      var r = serverRole && CABINET[serverRole] ? serverRole : 'resident';
       // Новый порядок: сперва место, потом данные. Новичок идёт туда, куда
       // его звали, а по умолчанию — выбирать резиденцию (24.09.2026).
       if (firstLogin && r === 'resident') { location.href = safeNext || 'residences.html'; return; }

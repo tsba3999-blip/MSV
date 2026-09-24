@@ -123,7 +123,7 @@
 
   <div class="onb__head">
     <!-- Пропуск ведёт сразу к анкете -->
-    <a class="onb__skip" href="login.html?role=resident&next=residences.html">Пропустить</a>
+    <a class="onb__skip" href="login.html?next=residences.html">Пропустить</a>
   </div>
 
   <div class="screen screen--on" data-screen="1">
@@ -191,7 +191,7 @@
   next.addEventListener('click', function () {
     if (step < LAST) { show(step + 1); return; }
     // Сразу к выбору резиденции: анкету спросим перед оплатой
-    location.href = 'login.html?role=resident&next=residences.html';
+    location.href = 'login.html?next=residences.html';
   });
 
   document.addEventListener('keydown', function (e) {
