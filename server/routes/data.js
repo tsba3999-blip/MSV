@@ -99,10 +99,12 @@ module.exports = function register(route) {
 
     const bookings = await query(`
       SELECT b.id, b.bed_id, b.user_id, b.date_from, b.date_to, b.check_in, b.check_out,
-             b.source, b.tariff, b.note, b.created_at, b.release_from,
-             b.hold_until, b.hold_name, b.hold_contact,
+             b.source, b.tariff, b.note, b.created_at, b.release_from, b.release_auto,
+             b.hold_until, b.hold_name, b.hold_contact, b.contract_id,
+             c.date_from AS contract_from, c.date_to AS contract_to, c.annual, c.ended_at,
              COALESCE(bal.accrued, 0) AS accrued, COALESCE(bal.paid, 0) AS paid
       FROM bookings b
+      LEFT JOIN contracts c ON c.id = b.contract_id
       JOIN beds bd ON bd.id = b.bed_id
       JOIN rooms r ON r.id = bd.room_id
       LEFT JOIN booking_balance bal ON bal.booking_id = b.id
@@ -125,6 +127,29 @@ module.exports = function register(route) {
              WHERE b.user_id = ANY($1) ORDER BY p.paid_at DESC`, [userIds])
     ]);
 
+    /* Какие месяцы оплачены. Платежи в базе не привязаны к начислениям,
+       поэтому закрываем начисления по очереди, от старых к новым: месяц
+       считается оплаченным, когда денег хватило на него и на всё, что
+       начислено раньше (24.09.2026). */
+    const bookingIds = bookings.rows.map((b) => b.id);
+    const paidBy = {};
+    if (bookingIds.length) {
+      const cum = await query(`
+        SELECT booking_id, to_char(period, 'YYYY-MM') AS month,
+               SUM(amount) OVER (PARTITION BY booking_id ORDER BY period, id
+                                 ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS upto
+          FROM charges
+         WHERE cancelled_at IS NULL AND kind IN ('rent', 'deposit') AND period IS NOT NULL
+           AND booking_id = ANY($1)
+         ORDER BY booking_id, period, id`, [bookingIds]);
+      const money = {};
+      bookings.rows.forEach((b) => { money[b.id] = Number(b.paid); });
+      cum.rows.forEach((x) => {
+        if (Number(x.upto) > (money[x.booking_id] || 0)) return;   // денег не хватило
+        (paidBy[x.booking_id] = paidBy[x.booking_id] || []).push(x.month);
+      });
+    }
+
     const SOURCE = { site: 'Сайт', desk: 'От стойки', transfer: 'Перевод' };
 
     json(res, 200, {
@@ -146,7 +171,13 @@ module.exports = function register(route) {
         checkIn: String(b.check_in).slice(0, 5), checkOut: String(b.check_out).slice(0, 5),
         source: SOURCE[b.source] || b.source, tariff: b.tariff, note: b.note || '',
         accrued: Number(b.accrued), paid: Number(b.paid), bookedAt: isoDate(b.created_at),
-        releaseFrom: isoDate(b.release_from)
+        releaseFrom: isoDate(b.release_from), releaseAuto: !!b.release_auto,
+        /* Контракт: до какого числа человек обязался и какие месяцы оплачены.
+           По ним шахматка рисует контур и заливку внутри него. */
+        contractId: b.contract_id ? String(b.contract_id) : '',
+        contractFrom: isoDate(b.contract_from), contractTo: isoDate(b.contract_to),
+        contractEnded: isoDate(b.ended_at), annual: b.annual === null ? true : !!b.annual,
+        paidMonths: paidBy[b.id] || []
       })),
       payments: pays.rows.map((p) => ({
         id: String(p.id), residentId: String(p.user_id), bookingId: String(p.booking_id),
