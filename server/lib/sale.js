@@ -79,7 +79,7 @@ async function sweepSale() {
     // 14-е число: напоминаем, пока ещё ничего не случилось
     if (String(today) === String(warn_day) && !sameWarn) {
       await query(`UPDATE bookings SET warn_period = $1 WHERE id = $2`, [dueStr, x.id]);
-      await notify.notifyResident(x.user_id, 'payment',
+      await notify.notifyResident(x.user_id, 'pay',
         'Завтра последний день оплаты за ' + monthName(dueStr) + '. Оплатить нужно до 24:00 15 числа. ' +
         'После этого начисляются пени и место (' + x.room + ', ' + x.label + ') выставляется на продажу.')
         .catch(() => {});
@@ -94,7 +94,7 @@ async function sweepSale() {
       await query(`INSERT INTO audit_log (actor_id, action, target, payload)
                    VALUES (NULL, 'booking.sale.auto', $1, $2)`,
         ['booking:' + x.id, JSON.stringify({ period: dueStr })]);
-      await notify.notifyResident(x.user_id, 'payment',
+      await notify.notifyResident(x.user_id, 'pay',
         'Ваше место (' + x.room + ', ' + x.label + ') выставлено на продажу: оплата за ' +
         monthName(dueStr) + ' не поступила до 24:00 15 числа. ' +
         'Чтобы сохранить место, оплатите месяц и начисленные пени. ' +

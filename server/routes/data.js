@@ -189,6 +189,20 @@ module.exports = function register(route) {
           `UPDATE bookings SET ${sets.join(', ')} WHERE id = $${vals.length}
            RETURNING id, bed_id, date_from, date_to, release_from`, vals);
 
+        /* Модератор поставил дату выезда — значит, человек уходит раньше срока.
+           Контракт на этом и кончается: место с этой даты уходит в продажу, а
+           система перестаёт напоминать про следующие месяцы. Снял дату —
+           контракт снова действует (решение заказчика 24.09.2026). */
+        if (body.releaseFrom === null) {
+          await q(`UPDATE contracts c SET ended_at = NULL
+                     FROM bookings b WHERE b.contract_id = c.id AND b.id = $1`, [id]);
+          await q(`UPDATE bookings SET release_auto = false, sale_period = NULL WHERE id = $1`, [id]);
+        } else if (body.releaseFrom) {
+          await q(`UPDATE contracts c SET ended_at = $2::date
+                     FROM bookings b WHERE b.contract_id = c.id AND b.id = $1`, [id, String(body.releaseFrom).slice(0, 10)]);
+          await q(`UPDATE bookings SET release_auto = false WHERE id = $1`, [id]);
+        }
+
         await q(`INSERT INTO audit_log (actor_id, action, target, payload) VALUES ($1, 'booking.move', $2, $3)`,
           [s.uid, 'booking:' + id, JSON.stringify({ before: before.rows[0], after: upd.rows[0] })]);
 
