@@ -106,8 +106,17 @@
        администратору оно ни к чему: свой профиль они правят сами
        (решение заказчика 25.09.2026). */
     if (d.me.role && d.me.role !== 'resident') {
+      /* Правило «данные меняет модератор» — про резидента. Сотруднику и
+         администратору вместо него говорим, где он правит своё: иначе
+         выходит, что главный администратор не может себя редактировать
+         (решение заказчика 25.09.2026). */
+      var SELF = { admin: 'admin-profile.html', moderator: 'staff-profile.html', staff: 'staff-profile.html' };
       var warn = document.querySelector('.who + .msv-body');
-      if (warn) warn.remove();
+      if (warn) {
+        warn.style.border = '0';
+        warn.innerHTML = 'Это страница резидента — так свои данные видит жилец. ' +
+          'Свои вы правите в разделе <a class="msv-link" href="' + (SELF[d.me.role] || 'menu.html') + '">Мой профиль</a>.';
+      }
       var foot = document.querySelector('.foot');
       if (foot) foot.remove();
     }

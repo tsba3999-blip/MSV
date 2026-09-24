@@ -76,7 +76,7 @@
     /* значок «фильтр» перед строкой отбора */
     '.bar__ico{flex:0 0 auto;display:inline-flex;align-items:center;color:var(--msv-n500)}' +
     /* полоса «вы здесь не резидент» */
-    '.msv-role-bar{position:sticky;top:0;z-index:10030;display:flex;align-items:center;gap:12px;flex-wrap:wrap;' +
+    '.msv-role-bar{position:fixed;left:0;right:0;top:0;z-index:10030;display:flex;align-items:center;gap:12px;flex-wrap:wrap;' +
       'padding:8px 60px 8px 16px;color:#fff;font:500 13px/1.35 var(--msv-font,sans-serif)}' +
     '.msv-role-bar a{color:#fff;text-decoration:underline;text-underline-offset:2px;white-space:nowrap}' +
     '.msv-role-bar b{font-weight:700}';
@@ -134,6 +134,13 @@
         '<a href="' + (ROLE_HOME[role] || 'menu.html') + '">Мой кабинет</a>';
       document.body.insertBefore(bar, document.body.firstChild);
       document.body.classList.add('msv-has-role-bar');
+      /* Полоса закреплена сверху, а не просто стоит первой: страницы
+         прокручиваются внутри своего блока, и «прилипающая» полоса
+         уезжала вверх вместе с содержимым — человек её не видел и не
+         понимал, почему не может править свои данные (25.09.2026). */
+      var h = bar.offsetHeight;
+      document.body.style.paddingTop = h + 'px';
+      a.style.top = (14 + h) + 'px';
     }
   });
 
