@@ -30,7 +30,13 @@
 .side__logo { display: block; width: 100%; max-width: 180px; height: auto; margin-bottom: var(--msv-s32); }
 
 .side__who {
-  display: block;
+  /* Кружок с лицом (или инициалами) рядом с именем: по нему человек
+     видит, чей это кабинет. Цвет кружка — цвет роли, чтобы администратор
+     не путал свой кабинет с чужим (решение заказчика 25.09.2026). */
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: var(--msv-s12);
+  align-items: center;
   /* Справа остаётся место под кнопку «Свернуть»: иначе подсветка при
      наведении заезжает под неё (решение заказчика 24.09.2026) */
   margin: 0 40px var(--msv-s24) 0;
@@ -39,10 +45,30 @@
   color: inherit;
   text-decoration: none;
 }
+.side__who::before {
+  content: attr(data-initials);
+  grid-row: 1 / 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--face-color, rgba(255, 255, 255, .18));
+  background-image: var(--face, none);
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+  font: 700 13px var(--msv-font);
+}
+/* С фотографией буквы не нужны */
+.side__who[data-photo]::before { content: ''; }
+.side__who-text { min-width: 0; }
+
 a.side__who:hover { background: rgba(255, 255, 255, .14); }
 a.side__who:focus-visible { outline: 2px solid var(--msv-white); outline-offset: -2px; }
-.side__name { display: block; font-size: var(--msv-body-size); font-weight: 600; }
-.side__role { display: block; margin-top: 2px; font-size: var(--msv-note-size); line-height: var(--msv-note-line); opacity: .8; }
+.side__name { grid-column: 2; display: block; font-size: var(--msv-body-size); font-weight: 600; }
+.side__role { grid-column: 2; display: block; margin-top: 2px; font-size: var(--msv-note-size); line-height: var(--msv-note-line); opacity: .8; }
 
 .side__nav { display: flex; flex-direction: column; gap: var(--msv-s4); }
 
@@ -156,6 +182,7 @@ a.side__who:focus-visible { outline: 2px solid var(--msv-white); outline-offset:
   .side, .shell--folded .side { width: auto; padding: var(--msv-s12) var(--msv-s16); display: grid; grid-template-columns: auto 1fr auto; grid-template-areas: "logo who out" "nav nav nav"; align-items: center; gap: var(--msv-s8) var(--msv-s12); }
   .side__logo, .shell--folded .side__logo { display: block; grid-area: logo; max-width: 96px; margin: 0; opacity: 1; height: auto; }
   .side__who, .shell--folded .side__who { grid-area: who; display: block; margin: 0; padding: 0; }
+  .side__name, .side__role { grid-column: auto; }
   .side__who::before { display: none; }
   .side__name, .side__role, .shell--folded .side__name, .shell--folded .side__role { display: block; font-size: 12px; }
   .side__fold { display: none; }                       /* на телефоне сворачивать нечего */
@@ -431,7 +458,7 @@ a.side__who:focus-visible { outline: 2px solid var(--msv-white); outline-offset:
 .shell--folded .side__logo { display: none; }
 .shell--folded .side__who { display: flex; align-items: center; justify-content: center; padding: var(--msv-s8) 0; margin: 44px 0 var(--msv-s24); }
 .shell--folded .side__name, .shell--folded .side__role { display: none; }
-.shell--folded .side__who::before { content: attr(data-initials); width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,.18); color: #fff; font: 700 13px var(--msv-font); display: flex; align-items: center; justify-content: center; }
+.shell--folded .side__who::before { width: 36px; height: 36px; }
 .shell--folded .side__link { justify-content: center; padding: 0; width: 48px; height: 44px; margin: 0 auto; gap: 0; font-size: 0; }
 .shell--folded .side__link svg { width: 22px; height: 22px; }
 .shell--folded .side__exit { justify-content: center; padding: 0; font-size: 0; gap: 0; }

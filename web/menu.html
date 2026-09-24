@@ -169,10 +169,11 @@
       var initials = parts.length >= 2 ? (parts[1].charAt(0) + parts[0].charAt(0)) : name.slice(0, 2);
       var nm = document.querySelector('.who__name'); if (nm) nm.textContent = shown;
       var face = document.querySelector('.who__face'); if (face) face.textContent = initials.toUpperCase();
+      var ROLE = { admin: 'Администратор', moderator: 'Модератор', staff: 'Сотрудник' };
       var pl = document.querySelector('.who__place');
       if (pl) pl.textContent = d.booking
         ? d.booking.residence + ' · ' + d.booking.room + ' · ' + (d.booking.tier ? d.booking.tier + ' место' : 'место')
-        : 'место ещё не выбрано';
+        : (ROLE[d.me.role] || 'место ещё не выбрано');
     })
     .catch(function () {});
 })();

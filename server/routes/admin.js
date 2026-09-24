@@ -192,6 +192,38 @@ module.exports = function register(route) {
     json(res, 201, { url: '/uploads/' + name });
   });
 
+  /* Своё фото в кружок профиля. Единственная загрузка, доступная любому
+     вошедшему: человек меняет своё лицо, а не чужие данные. Файл проходит
+     ту же проверку, что и фото комнат, — по содержимому, а не по имени
+     (решение заказчика 25.09.2026). */
+  route('POST', '/api/me/photo', async (req, res) => {
+    const s = auth.readSession(req);
+    if (!s) return fail(res, 401, 'Не выполнен вход');
+
+    let buf;
+    try { buf = await readRaw(req, MAX_UPLOAD); }
+    catch (e) { return fail(res, 413, 'Файл больше 8 МБ'); }
+
+    const type = sniff(buf);
+    if (!type) return fail(res, 400, 'Это не изображение (JPEG, PNG, WebP, GIF)');
+
+    fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+    const name = crypto.randomBytes(12).toString('hex') + TYPES[type];
+    fs.writeFileSync(path.join(UPLOAD_DIR, name), buf);
+    const url = '/uploads/' + name;
+    await query(`UPDATE users SET photo_url = $2 WHERE id = $1`, [s.uid, url]);
+    await audit(s.uid, 'me.photo', 'user:' + s.uid, { url });
+    json(res, 201, { url });
+  });
+
+  route('DELETE', '/api/me/photo', async (req, res) => {
+    const s = auth.readSession(req);
+    if (!s) return fail(res, 401, 'Не выполнен вход');
+    await query(`UPDATE users SET photo_url = NULL WHERE id = $1`, [s.uid]);
+    await audit(s.uid, 'me.photo.clear', 'user:' + s.uid, {});
+    json(res, 200, { ok: true });
+  });
+
   route('GET', '/api/rooms/:id/photos', async (req, res) => {
     const r = await query(`SELECT id, url FROM room_photos WHERE room_id = $1 ORDER BY sort, id`, [req.params.id]);
     json(res, 200, r.rows.map((x) => ({ id: String(x.id), url: x.url })));

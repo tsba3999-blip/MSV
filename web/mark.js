@@ -15,6 +15,19 @@
 
   var page = location.pathname.split('/').pop() || 'index.html';
 
+  /* Кто вошёл — спрашиваем один раз на страницу, остальное считаем от
+     ответа. Раньше каждый кусок спрашивал сам, а «М» вообще не спрашивала
+     и вела по имени файла: администратор со страницы смены кода попадал
+     в меню резидента (решение заказчика 25.09.2026). */
+  var ROLE_NAME = { admin: 'Администратор', moderator: 'Модератор', staff: 'Сотрудник', resident: 'Резидент' };
+  var ROLE_COLOR = { admin: '#34495E', moderator: '#7EB2DD', staff: '#B8B1A5', resident: '#FB344A' };
+  var ROLE_HOME = { admin: 'cabinet-admin.html', moderator: 'staff-shahmatka.html', staff: 'cabinet-staff.html', resident: 'menu.html' };
+  var ROLE_SELF = { admin: 'admin-profile.html', moderator: 'staff-profile.html', staff: 'staff-profile.html', resident: 'mydata.html' };
+  var meReq = location.protocol === 'file:' ? Promise.resolve(null)
+    : fetch('/api/auth/me', { credentials: 'same-origin' })
+        .then(function (r) { return r.status === 200 ? r.json() : null; })
+        .catch(function () { return null; });
+
   // на первой странице, входе и правовой странице кнопке не место
   if (/^(index|login|signup|partner|legal)\.html$/.test(page)) return;
 
@@ -61,10 +74,68 @@
     '.work__top{padding-right:132px}' +
     '@media (max-width:760px){.work__top{padding-right:72px}}' +
     /* значок «фильтр» перед строкой отбора */
-    '.bar__ico{flex:0 0 auto;display:inline-flex;align-items:center;color:var(--msv-n500)}';
+    '.bar__ico{flex:0 0 auto;display:inline-flex;align-items:center;color:var(--msv-n500)}' +
+    /* полоса «вы здесь не резидент» */
+    '.msv-role-bar{position:sticky;top:0;z-index:10030;display:flex;align-items:center;gap:12px;flex-wrap:wrap;' +
+      'padding:8px 60px 8px 16px;color:#fff;font:500 13px/1.35 var(--msv-font,sans-serif)}' +
+    '.msv-role-bar a{color:#fff;text-decoration:underline;text-underline-offset:2px;white-space:nowrap}' +
+    '.msv-role-bar b{font-weight:700}';
   document.head.appendChild(css);
 
   document.body.appendChild(a);
+
+  /* ---------- Цвет роли ----------
+     Заказчик: «перекрасить кабинет в мой цвет, чтобы я видел, что я
+     админ». Красим то, что человек видит на каждой странице: кнопку «М»,
+     кружок с лицом и подпись под именем. Цвета уже были у кнопки «М» —
+     берём их, чтобы роль читалась одинаково везде (25.09.2026). */
+  meReq.then(function (me) {
+    if (!me) return;
+    var role = me.role || 'resident';
+    document.documentElement.setAttribute('data-role', role);
+
+    // «М» ведёт в свой кабинет
+    a.href = ROLE_HOME[role] || 'menu.html';
+    a.classList.remove('msv-mark-btn--staff', 'msv-mark-btn--admin');
+    if (role === 'admin') a.classList.add('msv-mark-btn--admin');
+    else if (role === 'moderator' || role === 'staff') a.classList.add('msv-mark-btn--staff');
+
+    // Кружок: фото, а без него — буквы на цвете роли
+    var face = document.querySelector('.who__face');
+    if (face) {
+      if (me.photo) {
+        face.style.backgroundImage = 'url("' + me.photo + '")';
+        face.style.backgroundSize = 'cover';
+        face.style.backgroundPosition = 'center';
+        face.textContent = '';
+      } else {
+        face.style.background = ROLE_COLOR[role] || '';
+        face.style.color = '#fff';
+      }
+    }
+
+    /* Подпись под именем. Резиденту — его место, остальным — должность:
+       «место ещё не выбрано» администратору ничего не говорит. */
+    var place = document.querySelector('.who__place');
+    if (place && role !== 'resident') place.textContent = ROLE_NAME[role] || role;
+
+    /* Кабинет резидента глазами не резидента. Не прячем страницу — она
+       нужна, чтобы посмотреть, что видит жилец, — но говорим прямо, чей
+       это кабинет и где свой. Иначе выходит, что главный администратор
+       «не может себя редактировать» (решение заказчика 25.09.2026). */
+    var residentPage = !/^(admin-|staff-|cabinet-admin|cabinet-staff)/.test(page);
+    if (residentPage && role !== 'resident') {
+      var bar = document.createElement('div');
+      bar.className = 'msv-role-bar';
+      bar.style.background = ROLE_COLOR[role] || '#34495E';
+      bar.innerHTML = '<span>Вы вошли как <b>' + (ROLE_NAME[role] || role) +
+        '</b>. Это кабинет резидента — так его видит жилец.</span>' +
+        '<a href="' + (ROLE_SELF[role] || 'menu.html') + '">Мой профиль</a>' +
+        '<a href="' + (ROLE_HOME[role] || 'menu.html') + '">Мой кабинет</a>';
+      document.body.insertBefore(bar, document.body.firstChild);
+      document.body.classList.add('msv-has-role-bar');
+    }
+  });
 
   /* Значок «фильтр» перед строкой отбора: чтобы она читалась как фильтр, а
      не как россыпь кнопок. Ставим сами на каждой странице, где такая строка
@@ -99,19 +170,23 @@
     }
     setInitials();
 
-    if (who && location.protocol !== 'file:') {
-      var ROLE = { admin: 'Администратор', moderator: 'Модератор', staff: 'Сотрудник', resident: 'Резидент' };
-      fetch('/api/auth/me', { credentials: 'same-origin' })
-        .then(function (r) { return r.status === 200 ? r.json() : null; })
-        .then(function (me) {
-          if (!me) return;
-          var n = who.querySelector('.side__name');
-          var r = who.querySelector('.side__role');
-          if (n && me.name) n.textContent = me.name;
-          if (r && me.role) r.textContent = ROLE[me.role] || me.role;
-          setInitials();
-        })
-        .catch(function () {});
+    if (who) {
+      meReq.then(function (me) {
+        if (!me) return;
+        var n = who.querySelector('.side__name');
+        var r = who.querySelector('.side__role');
+        if (n && me.name) n.textContent = me.name;
+        if (r && me.role) r.textContent = ROLE_NAME[me.role] || me.role;
+        setInitials();
+        /* Своё лицо в боковом меню. Кружок рисует ::before, картинку
+           передаём ему переменной: в CSS нельзя подставить адрес из
+           атрибута (25.09.2026). */
+        who.style.setProperty('--face-color', ROLE_COLOR[me.role] || 'rgba(255,255,255,.18)');
+        if (me.photo) {
+          who.style.setProperty('--face', 'url("' + me.photo + '")');
+          who.setAttribute('data-photo', '1');
+        }
+      });
     }
     var btn = document.createElement('button');
     btn.type = 'button'; btn.className = 'side__fold'; btn.setAttribute('aria-label', 'Свернуть меню'); btn.title = 'Свернуть меню';

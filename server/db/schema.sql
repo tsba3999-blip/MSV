@@ -254,6 +254,11 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS can_edit_site boolean NOT NULL DEFAUL
 -- не трогает (решение заказчика 25.09.2026).
 ALTER TABLE users ADD COLUMN IF NOT EXISTS closed_by_system boolean NOT NULL DEFAULT false;
 
+-- Фотография в кружке профиля. Одна на любую роль: и резидент, и
+-- сотрудник, и администратор узнают себя в кабинете по лицу, а не по
+-- двум буквам (решение заказчика 25.09.2026).
+ALTER TABLE users ADD COLUMN IF NOT EXISTS photo_url text;
+
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM users WHERE can_edit_site) THEN
     UPDATE users SET can_edit_site = true WHERE phone = '+79261273999';

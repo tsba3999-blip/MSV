@@ -77,7 +77,7 @@ module.exports = function register(route) {
     if (!s) return fail(res, 401, 'Не выполнен вход');
 
     const [u, bk, notices, tickets] = await Promise.all([
-      query(`SELECT u.id, u.name, u.phone, u.email, p.* FROM users u
+      query(`SELECT u.id, u.name, u.phone, u.email, u.role, u.photo_url, p.* FROM users u
              LEFT JOIN resident_profiles p ON p.user_id = u.id WHERE u.id = $1`, [s.uid]),
       query(`SELECT b.id, b.bed_id, b.date_from, b.date_to, bd.label, bd.price, bd.tier,
                     r.name AS room_name, r.number AS room_number, rs.title AS residence,
@@ -99,7 +99,10 @@ module.exports = function register(route) {
     const dep = b ? await query(`SELECT 1 FROM charges WHERE booking_id = $1 AND kind = 'deposit' LIMIT 1`, [b.id]) : { rows: [] };
 
     json(res, 200, {
-      me: { id: String(user.id), name: user.name, phone: user.phone, email: user.email },
+      /* Роль нужна страницам кабинета: по ней они понимают, что зашёл не
+         резидент, и не показывают ему «место ещё не выбрано» (25.09.2026) */
+      me: { id: String(user.id), name: user.name, phone: user.phone, email: user.email,
+            role: user.role, photo: user.photo_url || '' },
       profile: user.user_id ? {
         lastName: user.last_name, firstName: user.first_name, middleName: user.middle_name,
         birthday: iso(user.birthday), city: user.city, university: user.university,

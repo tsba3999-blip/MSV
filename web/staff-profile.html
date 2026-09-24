@@ -128,6 +128,19 @@
 
     <main class="work__body">
       <section class="set">
+        <h2 class="msv-sub set__title">Фотография</h2>
+        <p class="msv-body set__text">Ставится в кружок рядом с именем — в кабинете и в боковом меню. Видят её только сотрудники.</p>
+        <div class="face">
+          <span class="face__pic" id="myFace" aria-hidden="true"></span>
+          <div class="face__act">
+            <button class="msv-btn msv-btn--m msv-btn--secondary" type="button" id="facePick">Загрузить фото</button>
+            <button class="msv-btn msv-btn--m msv-btn--secondary" type="button" id="faceDrop" hidden>Убрать</button>
+            <p class="msv-note" id="faceMsg">JPEG, PNG или WebP, до 8 МБ.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="set">
         <h2 class="msv-sub set__title">Анкета сотрудника</h2>
         <div class="set__grid">
           <label class="msv-field"><span class="msv-field__label">Фамилия Имя Отчество</span><input class="msv-input" id="pName" readonly></label>
@@ -191,6 +204,7 @@
   }
 })();
 </script>
+<script src="face.js"></script>
 <script src="mark.js"></script>
 <script src="zoom.js"></script>
 <script src="edit.js"></script>
