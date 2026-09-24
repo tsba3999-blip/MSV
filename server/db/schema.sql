@@ -114,6 +114,10 @@ EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- Пол резидента — из анкеты; по нему на выборе комнаты закрываются чужие комнаты
 ALTER TABLE resident_profiles ADD COLUMN IF NOT EXISTS gender room_gender;
+-- Анкета спрашивала ник в Telegram и пояснение к оценке здоровья,
+-- а хранить их было негде — ответы пропадали (24.09.2026).
+ALTER TABLE resident_profiles ADD COLUMN IF NOT EXISTS tg_nick text;
+ALTER TABLE resident_profiles ADD COLUMN IF NOT EXISTS health_note text;
 
 CREATE TABLE IF NOT EXISTS rooms (
   id           text PRIMARY KEY,          -- 'forma-r1'

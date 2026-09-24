@@ -344,25 +344,37 @@ var MSV_NEXT = (function () {
     return many;
   }
 
-  /* ---------- Восстановление введённого при возврате на шаг ---------- */
-  try {
-    var saved1 = JSON.parse(sessionStorage.getItem('msv.profile1') || 'null');
-    if (saved1) {
-      var setv = function (id, v) { var el = document.getElementById(id); if (el && v) el.value = v; };
-      setv('fLast', saved1.lastName); setv('fFirst', saved1.firstName); setv('fMiddle', saved1.middleName);
-      setv('phone', saved1.phone); setv('school', saved1.university); setv('fFaculty', saved1.faculty);
-      if (saved1.birthday) { birth.value = saved1.birthday; touched = true; birth.dispatchEvent(new Event('change')); }
-      (saved1.messengers || []).forEach(function (m) {
-        var c = document.querySelector('[data-mess="' + m + '"]'); if (c) c.setAttribute('aria-pressed', 'true');
-        if (m === 'tg') { document.getElementById('tgField').hidden = false; }
-      });
-      if (saved1.tgNick) document.getElementById('tgNick').value = saved1.tgNick;
-      if (saved1.gender) { var gc = document.querySelector('.chip[data-group="gender"][data-gender="' + saved1.gender + '"]'); if (gc) gc.setAttribute('aria-pressed', 'true'); }
-      if (saved1.course) document.querySelectorAll('.chip[data-group="course"]').forEach(function (c) {
-        c.setAttribute('aria-pressed', c.textContent.trim() === saved1.course ? 'true' : 'false');
-      });
-    }
-  } catch (e) {}
+  /* ---------- Что уже введено или сохранено ---------- */
+  function fill1(v) {
+    var setv = function (id, s) { var el = document.getElementById(id); if (el && s) el.value = s; };
+    setv('fLast', v.lastName); setv('fFirst', v.firstName); setv('fMiddle', v.middleName);
+    setv('phone', v.phone); setv('school', v.university); setv('fFaculty', v.faculty);
+    if (v.birthday) { birth.value = v.birthday; touched = true; birth.dispatchEvent(new Event('change')); }
+    (v.messengers || []).forEach(function (m) {
+      var c = document.querySelector('[data-mess="' + m + '"]'); if (c) c.setAttribute('aria-pressed', 'true');
+      if (m === 'tg') { document.getElementById('tgField').hidden = false; }
+    });
+    if (v.tgNick) document.getElementById('tgNick').value = v.tgNick;
+    if (v.gender) document.querySelectorAll('.chip[data-group="gender"]').forEach(function (c) {
+      c.setAttribute('aria-pressed', c.getAttribute('data-gender') === v.gender ? 'true' : 'false');
+    });
+    if (v.course) document.querySelectorAll('.chip[data-group="course"]').forEach(function (c) {
+      c.setAttribute('aria-pressed', c.textContent.trim() === v.course ? 'true' : 'false');
+    });
+  }
+
+  var saved1 = null;
+  try { saved1 = JSON.parse(sessionStorage.getItem('msv.profile1') || 'null'); } catch (e) {}
+  if (saved1) {
+    fill1(saved1);                                   // вернулись со второго шага
+  } else if (location.protocol !== 'file:') {
+    /* Анкету могли заполнить раньше. Показываем сохранённое: иначе человек
+       видит пустые поля и, сохранив их, стирает свои же ответы (24.09.2026). */
+    fetch('/api/me/profile', { credentials: 'same-origin' })
+      .then(function (r) { return r.status === 200 ? r.json() : null; })
+      .then(function (d) { if (d) fill1(d); })
+      .catch(function () {});
+  }
 
   /* ---------- Дальше: собираем шаг 1 и несём во второй ----------
      Анкета живёт в sessionStorage до конца регистрации, потом уходит

@@ -255,17 +255,47 @@ var MSV_NEXT = (function () {
     return { about: document.getElementById('about').value, hobbies: hobbies, own: document.getElementById('ownHobby').value,
              rate: rate ? rate.dataset.rate : '', why: document.getElementById('why').value };
   }
-  try {
-    var saved2 = JSON.parse(sessionStorage.getItem('msv.profile2') || 'null');
-    if (saved2) {
-      document.getElementById('about').value = saved2.about || '';
-      document.getElementById('about').dispatchEvent(new Event('input'));
-      document.querySelectorAll('.petal').forEach(function (b) { if ((saved2.hobbies || []).indexOf(b.textContent.trim()) >= 0) b.setAttribute('aria-pressed', 'true'); });
-      if ((saved2.hobbies || []).indexOf('свой вариант') >= 0) { document.getElementById('ownField').hidden = false; document.getElementById('ownHobby').value = saved2.own || ''; }
-      if (saved2.rate) { var rb = document.querySelector('.rate__btn[data-rate="' + saved2.rate + '"]'); if (rb) { rb.setAttribute('aria-pressed', 'true'); document.getElementById('whyBox').hidden = false; } }
-      document.getElementById('why').value = saved2.why || '';
-    }
-  } catch (e) {}
+  function fill2(v) {
+    document.getElementById('about').value = v.about || '';
+    document.getElementById('about').dispatchEvent(new Event('input'));
+    document.querySelectorAll('.petal').forEach(function (b) { if ((v.hobbies || []).indexOf(b.textContent.trim()) >= 0) b.setAttribute('aria-pressed', 'true'); });
+    if ((v.hobbies || []).indexOf('свой вариант') >= 0) { document.getElementById('ownField').hidden = false; document.getElementById('ownHobby').value = v.own || ''; }
+    if (v.rate) { var rb = document.querySelector('.rate__btn[data-rate="' + v.rate + '"]'); if (rb) { rb.setAttribute('aria-pressed', 'true'); document.getElementById('whyBox').hidden = false; } }
+    document.getElementById('why').value = v.why || '';
+  }
+
+  /* На сервере рассказ о себе и увлечения лежат одним полем: увлечения —
+     последней строкой «Увлечения: …». Разбираем обратно (24.09.2026). */
+  function fromAbout(text) {
+    var hob = [], rest = [];
+    String(text || '').split('\n').forEach(function (l) {
+      var m = /^Увлечения:\s*(.*)$/.exec(l.trim());
+      if (m) hob = m[1].split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+      else rest.push(l);
+    });
+    var known = [].map.call(document.querySelectorAll('.petal'), function (b) { return b.textContent.trim(); });
+    var mine = [], own = [];
+    hob.forEach(function (h) { (known.indexOf(h) >= 0 ? mine : own).push(h); });
+    if (own.length) mine.push('свой вариант');
+    return { about: rest.join('\n').trim(), hobbies: mine, own: own.join(', ') };
+  }
+
+  var saved2 = null;
+  try { saved2 = JSON.parse(sessionStorage.getItem('msv.profile2') || 'null'); } catch (e) {}
+  if (saved2) {
+    fill2(saved2);
+  } else if (location.protocol !== 'file:') {
+    fetch('/api/me/profile', { credentials: 'same-origin' })
+      .then(function (r) { return r.status === 200 ? r.json() : null; })
+      .then(function (d) {
+        if (!d) return;
+        var a = fromAbout(d.about);
+        a.rate = d.healthScore ? String(d.healthScore) : '';
+        a.why = d.healthNote || '';
+        fill2(a);
+      })
+      .catch(function () {});
+  }
   window.addEventListener('pagehide', function () { try { sessionStorage.setItem('msv.profile2', JSON.stringify(collect2())); } catch (e) {} });
 
   /* ---------- Отправка анкеты ---------- */

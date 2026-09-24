@@ -136,6 +136,25 @@ module.exports = function register(route) {
 
   /* ---------- Анкета ---------- */
 
+  /* Анкета, как она сохранена. Нужна самим страницам анкеты: человек должен
+     видеть свои прежние ответы, а не пустые поля (24.09.2026). */
+  route('GET', '/api/me/profile', async (req, res) => {
+    const s = auth.readSession(req);
+    if (!s) return fail(res, 401, 'Не выполнен вход');
+    const r = await query(`SELECT u.phone, p.* FROM users u
+      LEFT JOIN resident_profiles p ON p.user_id = u.id WHERE u.id = $1`, [s.uid]);
+    const p = r.rows[0];
+    if (!p || !p.user_id) return json(res, 200, null);
+    json(res, 200, {
+      lastName: p.last_name, firstName: p.first_name, middleName: p.middle_name,
+      phone: p.phone, gender: p.gender, birthday: iso(p.birthday), city: p.city,
+      university: p.university, course: p.course, faculty: p.faculty, about: p.about,
+      messengers: p.messengers || [], tgNick: p.tg_nick,
+      healthScore: p.health_score, healthNote: p.health_note,
+      contactPerson: p.contact_person, vk: p.vk
+    });
+  });
+
   route('PUT', '/api/me/profile', async (req, res) => {
     const s = auth.readSession(req);
     if (!s) return fail(res, 401, 'Не выполнен вход');
@@ -148,18 +167,36 @@ module.exports = function register(route) {
     const gender = b.gender === 'м' || b.gender === 'ж' ? b.gender : null;
 
     await tx(async (q) => {
+      /* COALESCE, а не прямая запись: в форме анкеты нет города, контактного
+         лица и ВК — их заполняет модератор. Без этого каждое сохранение
+         анкеты стирало бы его работу. Пустая строка из формы — это осознанная
+         очистка, она проходит; отсутствие поля — нет (24.09.2026). */
       await q(`INSERT INTO resident_profiles (user_id, last_name, first_name, middle_name, birthday, city,
-                 university, course, faculty, about, health_score, contact_person, vk, messengers, gender, updated_at)
-               VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15, now())
+                 university, course, faculty, about, health_score, contact_person, vk, messengers, gender,
+                 tg_nick, health_note, updated_at)
+               VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17, now())
                ON CONFLICT (user_id) DO UPDATE SET
-                 last_name = EXCLUDED.last_name, first_name = EXCLUDED.first_name, middle_name = EXCLUDED.middle_name,
-                 birthday = EXCLUDED.birthday, city = EXCLUDED.city, university = EXCLUDED.university,
-                 course = EXCLUDED.course, faculty = EXCLUDED.faculty, about = EXCLUDED.about,
-                 health_score = EXCLUDED.health_score, contact_person = EXCLUDED.contact_person,
-                 vk = EXCLUDED.vk, messengers = EXCLUDED.messengers, gender = EXCLUDED.gender, updated_at = now()`,
+                 last_name = COALESCE(EXCLUDED.last_name, resident_profiles.last_name),
+                 first_name = COALESCE(EXCLUDED.first_name, resident_profiles.first_name),
+                 middle_name = COALESCE(EXCLUDED.middle_name, resident_profiles.middle_name),
+                 birthday = COALESCE(EXCLUDED.birthday, resident_profiles.birthday),
+                 city = COALESCE(EXCLUDED.city, resident_profiles.city),
+                 university = COALESCE(EXCLUDED.university, resident_profiles.university),
+                 course = COALESCE(EXCLUDED.course, resident_profiles.course),
+                 faculty = COALESCE(EXCLUDED.faculty, resident_profiles.faculty),
+                 about = COALESCE(EXCLUDED.about, resident_profiles.about),
+                 health_score = COALESCE(EXCLUDED.health_score, resident_profiles.health_score),
+                 contact_person = COALESCE(EXCLUDED.contact_person, resident_profiles.contact_person),
+                 vk = COALESCE(EXCLUDED.vk, resident_profiles.vk),
+                 messengers = EXCLUDED.messengers,
+                 gender = COALESCE(EXCLUDED.gender, resident_profiles.gender),
+                 tg_nick = COALESCE(EXCLUDED.tg_nick, resident_profiles.tg_nick),
+                 health_note = COALESCE(EXCLUDED.health_note, resident_profiles.health_note),
+                 updated_at = now()`,
         [s.uid, str(b.lastName, 100), str(b.firstName, 100), str(b.middleName, 100), bday, str(b.city, 100),
          str(b.university, 200), str(b.course, 20), str(b.faculty, 200), str(b.about, 600), health,
-         str(b.contactPerson, 200), str(b.vk, 200), mess, gender]);
+         str(b.contactPerson, 200), str(b.vk, 200), mess, gender,
+         str(b.tgNick, 100), str(b.healthNote, 300)]);
 
       // Имя в учётной записи — из анкеты
       const full = [b.lastName, b.firstName, b.middleName].filter(Boolean).join(' ').trim();
