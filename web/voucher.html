@@ -55,16 +55,18 @@
       <img class="paper__logo" src="msv-1200-white.png" alt="МСВ — Москва в студентов верит!">
     </div>
     <h1 class="msv-sub paper__title">Ваучер на заселение</h1>
-    <p class="msv-note paper__no" id="vNo">№ 2026-0412 · выдан 08.07.2026</p>
+    <!-- Бланк пустой: заполняет его сервер. Раньше здесь стоял чужой
+         ваучер целиком, и без брони человек видел его как свой (25.09.2026) -->
+    <p class="msv-note paper__no" id="vNo">&nbsp;</p>
     <dl>
       <div><dt>Резидент</dt><dd id="vName">—</dd></div>
-      <div><dt>Телефон</dt><dd id="vPhone">+7 926 127-39-11</dd></div>
-      <div><dt>Резиденция</dt><dd id="vRes">Уют</dd></div>
-      <div><dt>Адрес</dt><dd id="vAddr">Москва, Варшавское шоссе — уточняется</dd></div>
-      <div><dt>Комната и место</dt><dd id="vRoom">№1 Иваново · 1.3.в, верхнее</dd></div>
-      <div><dt>Оплачено с</dt><dd id="vPaid">1 сентября 2026</dd></div>
-      <div><dt>Дата заезда</dt><dd id="vIn">1 сентября 2026, с 14:00</dd></div>
-      <div><dt>Куратор</dt><dd id="vCur">Павел Дроздов · +7 916 300-40-50</dd></div>
+      <div><dt>Телефон</dt><dd id="vPhone">—</dd></div>
+      <div><dt>Резиденция</dt><dd id="vRes">—</dd></div>
+      <div><dt>Адрес</dt><dd id="vAddr">—</dd></div>
+      <div><dt>Комната и место</dt><dd id="vRoom">—</dd></div>
+      <div><dt>Оплачено с</dt><dd id="vPaid">—</dd></div>
+      <div><dt>Дата заезда</dt><dd id="vIn">—</dd></div>
+      <div><dt>Куратор</dt><dd id="vCur">назначается при заезде</dd></div>
     </dl>
     <div class="paper__foot">
       <span class="paper__stamp" aria-hidden="true"><img src="stamp.png" alt=""></span>
@@ -107,7 +109,14 @@
   'use strict';
   if (location.protocol === 'file:') return;
   fetch('/api/me/home', { credentials: 'same-origin' }).then(function (r) { return r.status === 200 ? r.json() : null; }).then(function (d) {
-    if (!d || !d.booking) return;
+    if (!d) return;
+    /* Брони нет — ваучера нет. Молчать нельзя: пустой бланк с печатью
+       выглядит как настоящий документ (25.09.2026). */
+    if (!d.booking) {
+      var p = document.getElementById('voucher');
+      if (p) p.innerHTML = '<p class="msv-body" style="margin:0">Ваучер появится, когда место будет выбрано и оплачено.</p>';
+      return;
+    }
     var set = function (id, v) { if (v) document.getElementById(id).textContent = v; };
     var fmt = function (iso) { if (!iso) return ''; var p = iso.split('-'); var M = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря']; return Number(p[2]) + ' ' + M[Number(p[1]) - 1] + ' ' + p[0]; };
     set('vName', d.me.name); set('vPhone', d.me.phone); set('vRes', d.booking.residence);
