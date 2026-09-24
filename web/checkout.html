@@ -333,6 +333,7 @@
     fetch('/api/bookings', { method: 'POST', credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ bedId: bedId, from: from, deposit: deposit.checked,
+        months: params.get('months') || '',
         docs: { contract: true, rules: true, consent: true } }) })
       .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j || {} }; }, function () { return { s: r.status, j: {} }; }); })
       .then(function (r) {

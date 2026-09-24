@@ -144,14 +144,20 @@
 
   go.addEventListener('click', function () {
     if (!picked.length) return;
-    var first = picked[0], last = picked[picked.length - 1];
+    /* Месяцы могли отметить в любом порядке — раскладываем по времени,
+       иначе подпись выходит «Декабрь — Октябрь». Полный список несём
+       дальше: начисление нужно за каждый месяц, а не только за первый
+       (24.09.2026). */
+    var ms = picked.slice().sort(function (a, b) { return (a.y - b.y) || (a.m - b.m); });
+    var first = ms[0], last = ms[ms.length - 1];
     var from = first.y + '-' + String(first.m + 1).padStart(2, '0') + '-01';
-    var label = picked.length === 1 ? MONTHS[first.m]
+    var list = ms.map(function (p) { return p.y + '-' + String(p.m + 1).padStart(2, '0'); }).join(',');
+    var label = ms.length === 1 ? MONTHS[first.m]
       : MONTHS[first.m] + (first.y !== last.y ? ' ' + first.y : '') + ' — ' + MONTHS[last.m];
     location.href = 'checkout.html?room=' + encodeURIComponent(room) +
                     '&size=' + encodeURIComponent(size) +
                     '&month=' + encodeURIComponent(label) +
-                    '&year=' + last.y + '&count=' + picked.length +
+                    '&year=' + last.y + '&count=' + ms.length + '&months=' + encodeURIComponent(list) +
                     '&bed=' + encodeURIComponent(params.get('bed') || '') +
                     '&kind=' + encodeURIComponent(params.get('kind') || '') +
                     '&price=' + encodeURIComponent(params.get('price') || '') +

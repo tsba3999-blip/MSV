@@ -236,11 +236,29 @@ module.exports = function register(route) {
            RETURNING id, date_from, date_to`, [s.uid, b.bedId, from, to]);
         const id = ins.rows[0].id;
 
-        // Первое начисление — за месяц заезда; депозит — если попросили
+        /* Начисление за каждый выбранный месяц, а не только за первый:
+           человек мог оплатить сразу несколько, и «Проверка данных» уже
+           показала ему сумму за все.
+
+           Срок — 15 число ПРЕДЫДУЩЕГО месяца: платят всегда за месяц вперёд
+           (правило заказчика, подтверждено 24.09.2026). Раньше срок ставился
+           на 15 число самого оплачиваемого месяца, то есть на месяц позже,
+           и просрочки не возникало никогда.
+
+           GREATEST с сегодняшним днём — чтобы начисление не родилось уже
+           просроченным: новичок, который заселяется в конце сентября, не
+           виноват, что 15 сентября он ещё не был резидентом. */
         const price = bed.rows[0].price;
-        await q(`INSERT INTO charges (booking_id, kind, period, amount, due_date)
-                 VALUES ($1, 'rent', date_trunc('month', $2::date)::date, $3, date_trunc('month', $2::date)::date + 14)`,
-          [id, from, price]);
+        const asked = String(b.months || '').split(',').map((s) => s.trim())
+          .filter((s) => /^\d{4}-(0[1-9]|1[0-2])$/.test(s));
+        const months = asked.length ? Array.from(new Set(asked)).sort().slice(0, 24)
+                                    : [String(from).slice(0, 7)];
+        for (const period of months) {
+          await q(`INSERT INTO charges (booking_id, kind, period, amount, due_date)
+                   VALUES ($1, 'rent', $2::date, $3,
+                           GREATEST(($2::date - interval '1 month')::date + 14, CURRENT_DATE))`,
+            [id, period + '-01', price]);
+        }
         if (b.deposit) {
           await q(`INSERT INTO charges (booking_id, kind, amount) VALUES ($1, 'deposit', $2)`, [id, price]);
         }
