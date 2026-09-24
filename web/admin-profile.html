@@ -112,18 +112,20 @@
       <section class="set">
         <h2 class="msv-sub set__title">Анкета</h2>
         <div class="set__grid">
+          <!-- Значения приходят из учётной записи: раньше они были зашиты
+               прямо в вёрстку и не менялись ни для кого (24.09.2026) -->
           <label class="msv-field"><span class="msv-field__label">Фамилия Имя Отчество</span>
-            <input class="msv-input" value="Соколова Ирина Андреевна"></label>
+            <input class="msv-input" id="pName"></label>
           <label class="msv-field"><span class="msv-field__label">Должность</span>
-            <input class="msv-input" value="Администратор сети"></label>
+            <input class="msv-input" id="pPosition"></label>
           <label class="msv-field"><span class="msv-field__label">Телефон</span>
-            <input class="msv-input" value="+7 926 127-39-00" type="tel"></label>
+            <input class="msv-input" id="pPhone" type="tel"></label>
           <label class="msv-field"><span class="msv-field__label">Рабочая почта</span>
-            <input class="msv-input" value="admin@msv.ru" type="email"></label>
+            <input class="msv-input" id="pEmail" type="email"></label>
           <label class="msv-field"><span class="msv-field__label">Резиденции</span>
-            <input class="msv-input" value="FORMA, Уют, Молодежка" readonly></label>
+            <input class="msv-input" id="pPlace" readonly></label>
           <label class="msv-field"><span class="msv-field__label">В команде с</span>
-            <input class="msv-input" value="01.02.2026" readonly></label>
+            <input class="msv-input" id="pStarted" readonly></label>
         </div>
         <button class="msv-btn msv-btn--m msv-btn--primary" type="button" style="margin-top:var(--msv-s16)" id="saveProfile">Сохранить</button>
         <span class="msv-note" id="saveMsg" hidden style="margin-left:var(--msv-s12)"></span>
@@ -155,10 +157,57 @@
 <script>
 (function () {
   'use strict';
+  /* Анкета: читаем своё и сохраняем по-настоящему. Раньше кнопка писала
+     «Сохранено», не отправляя никуда ни байта (24.09.2026). */
+  var FIELDS = { name: 'pName', position: 'pPosition', phone: 'pPhone', email: 'pEmail' };
+
+  function fmtDay(v) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(v || ''));
+    return m ? m[3] + '.' + m[2] + '.' + m[1] : '';
+  }
+
+  if (location.protocol !== 'file:') {
+    fetch('/api/me/staff', { credentials: 'same-origin' })
+      .then(function (r) { return r.status === 200 ? r.json() : null; })
+      .then(function (d) {
+        if (!d) return;
+        Object.keys(FIELDS).forEach(function (k) {
+          var el = document.getElementById(FIELDS[k]);
+          if (el) el.value = d[k] || '';
+        });
+        var p = document.getElementById('pPlace');
+        if (p) p.value = d.place || '';
+        var s = document.getElementById('pStarted');
+        if (s) s.value = fmtDay(d.started);
+      })
+      .catch(function () {});
+  }
+
   document.getElementById('saveProfile').addEventListener('click', function () {
     var m = document.getElementById('saveMsg');
-    // ЗДЕСЬ БУДЕТ ЗАПРОС К СЕРВЕРУ: PATCH /api/me { name, phone, email, position }
-    m.textContent = 'Сохранено'; m.hidden = false;
+    var body = {};
+    Object.keys(FIELDS).forEach(function (k) {
+      var el = document.getElementById(FIELDS[k]);
+      body[k] = el ? el.value.trim() : '';
+    });
+    if (location.protocol === 'file:') { m.textContent = 'Без сервера не сохранить'; m.hidden = false; return; }
+    m.textContent = 'Сохраняю…'; m.hidden = false;
+    fetch('/api/me/staff', { method: 'PUT', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      .then(function (r) {
+        return r.json().then(function (j) { return { s: r.status, j: j || {} }; },
+                             function () { return { s: r.status, j: {} }; });
+      })
+      .then(function (r) {
+        if (r.s === 200) {
+          m.textContent = 'Сохранено';
+          var n = document.querySelector('.side__name');
+          if (n && body.name) n.textContent = body.name;
+        } else {
+          m.textContent = r.j.error || 'Не удалось сохранить';
+        }
+      })
+      .catch(function () { m.textContent = 'Сервер не отвечает'; });
   });
 })();
 </script>
