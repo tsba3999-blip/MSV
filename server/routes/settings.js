@@ -27,7 +27,11 @@ const ALLOWED = {
   notify_admin_debts: (v) => v === '0' || v === '1',
   notify_resident_pay: (v) => v === '0' || v === '1',
   notify_resident_tickets: (v) => v === '0' || v === '1',
-  notify_resident_news: (v) => v === '0' || v === '1'
+  notify_resident_news: (v) => v === '0' || v === '1',
+  /* Денежные правила включаются, когда в системе есть все оплаты и
+     депозиты: до этого «не оплачено» означает «ещё не внесли» (24.09.2026) */
+  auto_penalty: (v) => v === '0' || v === '1',
+  auto_sale: (v) => v === '0' || v === '1'
 };
 
 module.exports = function register(route) {
