@@ -145,7 +145,7 @@ MSV.ready(function (ctx) {
   if (ctx.live && ctx.me && ctx.me.role !== 'admin') {
     document.querySelector('.work__body').innerHTML = '<p class="msv-body" style="padding:var(--msv-s48);text-align:center;color:var(--msv-n500)">Зарплаты сотрудников видны администратору и тому, кому это поручено.</p>'; return;
   }
-  var STAFF = window.MSV_STAFF.slice(), PLACE = window.MSV_STAFF_PLACE, tenure = window.MSV_STAFF_TENURE;
+  var STAFF = [], PLACE = window.MSV_STAFF_PLACE, tenure = window.MSV_STAFF_TENURE;
   var log = [];
   var filter = '';
   function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -202,15 +202,32 @@ MSV.ready(function (ctx) {
     document.querySelectorAll('.bar__chip').forEach(function (x) { x.setAttribute('aria-pressed', 'false'); }); c.setAttribute('aria-pressed', 'true');
     filter = c.dataset.place; render();
   });
+  /* Новый сотрудник заводится сразу с учётной записью: без телефона и
+     кода войти ему нечем, а «добавили в список» без входа — это тот же
+     второй список, только на день позже (25.09.2026). */
   document.getElementById('addStaff').addEventListener('click', function () {
-    var name = prompt('Фамилия Имя:'); if (!name) return;
+    var name = prompt('Фамилия Имя Отчество:'); if (!name) return;
+    var contact = prompt('Телефон или почта — по ним он будет входить:'); if (!contact) return;
     var position = prompt('Должность:', 'Горничная-администратор') || '';
     var salary = Number(String(prompt('Оклад, руб. (пусто — уточнить):', '') || '').replace(/\D/g, '')) || null;
-    STAFF.push({ id: 'new' + Date.now(), name: name.trim(), role: 'staff', position: position, birthday: '', started: new Date().toISOString().slice(0,10), place: '', salary: salary, payTo: '', relation: 'уточнить' });
-    render();
-    // ЗДЕСЬ БУДЕТ ЗАПРОС К СЕРВЕРУ: POST /api/staff { name, position, salary } — создаёт учётную запись и код входа
+    var pin = String(prompt('Код входа — четыре цифры. Продиктуйте их человеку:', '') || '').replace(/\D/g, '');
+    if (pin.length !== 4) { alert('Нужны четыре цифры'); return; }
+
+    if (!ctx.live) { alert('Без сервера завести сотрудника нельзя'); return; }
+    ctx.api('POST', '/api/staff', { name: name.trim(), contact: contact.trim(), position: position,
+                                    salary: salary, role: 'staff', pin: pin })
+      .then(function (r) {
+        if (r.status !== 201) { alert(r.body && r.body.error || 'Не удалось завести'); return; }
+        alert(name.trim() + ' заведён. Код входа: ' + pin + ' — продиктуйте и скажите сменить его в кабинете.');
+        load();
+      })
+      .catch(function () { alert('Сервер не отвечает'); });
   });
-  render();
+
+  function load() {
+    window.MSV_STAFF_LOAD().then(function (list) { STAFF = list.slice(); render(); });
+  }
+  load();
 });
 </script>
 <script src="mark.js"></script>

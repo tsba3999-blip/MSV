@@ -1,24 +1,27 @@
 /* © 2026 МСВ. Все права защищены. Подробнее: /legal.html */
 /* ============================================================
-   МСВ — сотрудники (реальные, от заказчика 16.09.2026)
+   МСВ — сотрудники
+
+   Список живёт в базе, а не здесь. Раньше он был записан прямо в этом
+   файле: завели человека в кабинете — на странице он не появлялся,
+   уволили — оставался. Два списка вместо одного, и какой верный,
+   понять было нельзя (решение заказчика 25.09.2026).
 
    Место работы: forma — Шаболовская («Шаб.»), uyut — Варшавское («Варш.»),
-   all — все резиденции. Пустое поле — заказчик не сообщил, уточнить.
-   Данные для сервера — server/db/seed-staff.sql.
+   all — все резиденции. Пустое — ещё не заполнено.
    ============================================================ */
 
-window.MSV_STAFF = [
-  { id: 'st1', name: 'Чупахина Юлия',   role: 'moderator', position: 'Модератор',
-    birthday: '1972-12-13', started: '2025-01-15', place: 'all',   salary: null,  payTo: '', relation: 'уточнить' },
-  { id: 'st2', name: 'Зорина Марина',   role: 'staff',     position: 'Горничная-администратор',
-    birthday: '1977-07-04', started: '2023-09-01', place: '',      salary: null, payTo: '', relation: 'уточнить' },
-  { id: 'st3', name: 'Мирзоева Фарогат', role: 'staff',    position: 'Горничная-администратор',
-    birthday: '1990-01-15', started: '2026-08-25', place: '',      salary: null, payTo: '', relation: 'уточнить' },
-  { id: 'st4', name: 'Лэкэтуш Наталья', role: 'staff',     position: 'Горничная-администратор',
-    birthday: '1983-05-14', started: '2025-10-01', place: '',      salary: null, payTo: '', relation: 'уточнить' },
-  { id: 'st5', name: 'Харина Елена',    role: 'staff',     position: 'Ассистент',
-    birthday: '',           started: '',           place: '',      salary: null,  payTo: '', relation: 'уточнить' }
-];
+window.MSV_STAFF = [];
+
+/* Спросить сервер. Отдаёт обещание со списком; без сервера (открыт
+   файл с диска) — пустой список, чтобы страница не падала. */
+window.MSV_STAFF_LOAD = function () {
+  if (location.protocol === 'file:') return Promise.resolve([]);
+  return fetch('/api/staff', { credentials: 'same-origin' })
+    .then(function (r) { return r.status === 200 ? r.json() : []; })
+    .then(function (list) { window.MSV_STAFF = list || []; return window.MSV_STAFF; })
+    .catch(function () { return []; });
+};
 
 window.MSV_STAFF_PLACE = { forma: 'Шаб.', uyut: 'Варш.', molod: 'Мол.', all: 'Все', '': '—' };
 

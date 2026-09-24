@@ -125,8 +125,13 @@
 MSV.ready(function (ctx) {
   'use strict';
   var id = new URLSearchParams(location.search).get('id');
-  var s = window.MSV_STAFF.filter(function (x) { return x.id === id; })[0];
   var box = document.getElementById('card');
+  /* Карточку берём из того же списка, что и страница «Сотрудники», —
+     из базы. Раньше список был записан в файле, и карточка показывала
+     то, чего в базе уже не было (25.09.2026). */
+  window.MSV_STAFF_LOAD().then(function (list) { show(list.filter(function (x) { return x.id === id; })[0]); });
+
+  function show(s) {
   if (!s) { box.innerHTML = '<p class="msv-body" style="color:var(--msv-n500)">Сотрудник не найден. <a class="msv-link" href="admin-staff.html">К списку</a></p>'; return; }
   document.querySelector('.work__title').textContent = s.name;
   var PLACE = window.MSV_STAFF_PLACE, tenure = window.MSV_STAFF_TENURE;
@@ -149,16 +154,26 @@ MSV.ready(function (ctx) {
       '<a class="msv-btn msv-btn--m msv-btn--tertiary" href="admin-rights.html">Права доступа</a>' +
       '<button class="msv-btn msv-btn--m msv-btn--tertiary" type="button" id="resetPin">Выдать новый код входа</button>' +
     '</div></section>';
+  /* Новый код выдаёт сервер — кнопка больше не показывает цифры,
+     которые никуда не записаны (25.09.2026) */
   document.getElementById('resetPin').addEventListener('click', function () {
-    var pin = String(Math.floor(1000 + Math.random() * 9000));
-    // ЗДЕСЬ БУДЕТ ЗАПРОС К СЕРВЕРУ: POST /api/users/:id/pin { pin }
-    alert('Новый код входа для ' + s.name + ': ' + pin + '. Сообщите лично.');
+    var pin = String(prompt('Новый код входа — четыре цифры:', String(Math.floor(1000 + Math.random() * 9000))) || '').replace(/\D/g, '');
+    if (pin.length !== 4) { if (pin) alert('Нужны четыре цифры'); return; }
+    if (!ctx.live) { alert('Без сервера код не выдать'); return; }
+    ctx.api('POST', '/api/users/' + (s.userId || s.id) + '/pin', { pin: pin })
+      .then(function (r) {
+        alert(r.status === 200
+          ? 'Новый код для ' + s.name + ': ' + pin + '. Сообщите лично и попросите сменить.'
+          : (r.body && r.body.error || 'Не удалось выдать код'));
+      })
+      .catch(function () { alert('Сервер не отвечает'); });
   });
   if (ctx.live && s.userId) {
     ctx.api('GET', '/api/users/' + s.userId + '/files').then(function (r) {
       if (r.status !== 200 || !r.body.length) return;
       document.getElementById('docs').innerHTML = r.body.map(function (d) { return '<img src="' + d.url + '" alt="' + esc(d.kind) + '" data-zoom style="width:120px;height:90px;object-fit:cover;border-radius:var(--msv-r11)">'; }).join('');
     }).catch(function () {});
+  }
   }
 });
 </script>

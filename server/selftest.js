@@ -73,12 +73,25 @@ function checkPlaceholders() {
     ['a.loginov@mail.ru', 'почта из макета'],
     ['artem_loginov', 'ник из макета'],
     ['+7 926 127-39-11', 'телефон из макета'],
-    ['комната 412', 'комната из макета']
+    ['комната 412', 'комната из макета'],
+    ['admin@msv.ru', 'почта из макета'],
+    ['Администратор сети', 'должность из макета']
   ];
+
+  /* Имя ищем в обоих порядках слов. «Соколову Ирину» мы вычистили, а
+     «Ирина Соколова» на странице прав осталась: проверка искала строку
+     буква в букву (найдено 25.09.2026). */
+  const needles = [];
+  for (const [needle, why] of FORBIDDEN) {
+    needles.push([needle, why]);
+    const w = needle.split(' ');
+    if (w.length === 2 && /^[А-ЯЁ]/.test(w[0]) && /^[А-ЯЁ]/.test(w[1])) needles.push([w[1] + ' ' + w[0], why]);
+  }
+
   const hits = [];
   for (const file of webFiles('.html').concat(webFiles('.js'))) {
     const text = read(file);
-    for (const [needle, why] of FORBIDDEN) {
+    for (const [needle, why] of needles) {
       if (text.includes(needle)) hits.push(path.basename(file) + ': ' + needle + ' (' + why + ')');
     }
   }
