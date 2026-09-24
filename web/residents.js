@@ -82,7 +82,7 @@ MSV.ready(function (ctx) {
         res: res, userId: person.id, bookingId: b.id,
         name: person.name,
         university: person.university || '',
-        phone: person.phone || '',
+        phone: person.phone || '', messengers: person.messengers || [],
         bed: bed ? bed.label : '',
         room: room ? (room.name || ('к. ' + room.number)) : '',
         owed: owed,
@@ -126,6 +126,34 @@ MSV.ready(function (ctx) {
       if (hay.replace(/ё/g, 'е').indexOf(state.q) === -1) return false;
     }
     return true;
+  }
+
+  /* Телефон в цифрах, с восьмёрки — на семёрку: ссылки мессенджеров ждут
+     международный вид. */
+  function digits(phone) {
+    var d = String(phone || '').replace(/\D/g, '');
+    if (d.length === 11 && d.charAt(0) === '8') d = '7' + d.slice(1);
+    return d;
+  }
+
+  /* Мессенджеры кружками после телефона: «Т» — Telegram, «М» — Max.
+     Указан в анкете — кружок графитовый и открывает чат; не указан —
+     бледный, без ссылки (решение заказчика 24.09.2026). */
+  function mess(x) {
+    var d = digits(x.phone);
+    var have = {};
+    (x.messengers || []).forEach(function (k) { have[String(k).toLowerCase()] = true; });
+    var out = ['tg', 'max'].map(function (k) {
+      var letter = k === 'tg' ? 'Т' : 'М';
+      var name = k === 'tg' ? 'Telegram' : 'Max';
+      if (have[k] && d) {
+        var url = k === 'tg' ? 'https://t.me/+' + d : 'https://max.ru/+' + d;
+        return '<a class="mess-dot mess-dot--on" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer" ' +
+               'title="Написать в ' + name + '">' + letter + '</a>';
+      }
+      return '<span class="mess-dot mess-dot--off" title="' + name + ' не указан в анкете">' + letter + '</span>';
+    }).join('');
+    return '<span class="mess-dots">' + out + '</span>';
   }
 
   function initials(name) {
@@ -253,7 +281,7 @@ MSV.ready(function (ctx) {
         '</a></td>' +
         '<td><a href="' + SHAHMATKA + '?res=' + encodeURIComponent(x.res.id) + '">' +
           esc(x.bed) + '</a><span class="msv-note sub">' + esc(x.room) + ' · ' + esc(x.res.name) + '</span></td>' +
-        '<td>' + (x.phone ? '<a href="tel:+' + esc(x.phone.replace(/\D/g, '')) + '">' + esc(x.phone) + '</a>' : '—') + '</td>' +
+        '<td>' + (x.phone ? '<a href="tel:+' + esc(digits(x.phone)) + '">' + esc(x.phone) + '</a>' : '—') + mess(x) + '</td>' +
         '<td>' + pay + '</td><td>' + payBtn + '</td><td>' + depBtn + '</td>' +
         '<td>' + reg + ' <button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" data-reg title="Загрузить регистрацию">Загрузить</button></td>' +
         '<td class="num"><button class="msv-btn msv-btn--s msv-btn--tertiary del" type="button" data-del title="Удалить резидента из базы">Удалить</button></td>' +

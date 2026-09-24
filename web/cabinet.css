@@ -446,3 +446,12 @@ a.side__who:focus-visible { outline: 2px solid var(--msv-white); outline-offset:
 /* Долг в списке проживающих: сумма крупно, под ней — сколько уже
    оплачено. Отдельного столбца «остаток» нет (24.09.2026) */
 .owe { display: block; color: var(--msv-red); font-variant-numeric: tabular-nums; }
+
+/* Мессенджеры после телефона: «Т» — Telegram, «М» — Max. Указан в
+   анкете — графитовый кружок со ссылкой, не указан — бледный (24.09.2026) */
+.mess-dots { display: inline-flex; gap: 4px; margin-left: 6px; vertical-align: middle; }
+.mess-dot { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px;
+  border-radius: 50%; font: 700 11px/1 var(--msv-font); text-decoration: none; }
+.mess-dot--on { background: var(--msv-graphite); color: var(--msv-white); }
+.mess-dot--on:hover { background: #2B3D50; }
+.mess-dot--off { background: var(--msv-n100); color: var(--msv-n300); cursor: default; }
