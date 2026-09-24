@@ -44,6 +44,12 @@ const penalty = require('./lib/penalty');
 setInterval(() => { penalty.sweepPenalties().catch((e) => console.error('[penalty]', e.message)); }, 60 * 60 * 1000);
 setTimeout(() => { penalty.sweepPenalties().catch(() => {}); }, 40 * 1000);
 
+/* Неоплаченное место уходит в продажу само: 14-го предупреждение,
+   16-го — на продажу и письмо резиденту (решение заказчика 24.09.2026) */
+const sale = require('./lib/sale');
+setInterval(() => { sale.sweepSale().catch((e) => console.error('[sale]', e.message)); }, 60 * 60 * 1000);
+setTimeout(() => { sale.sweepSale().catch(() => {}); }, 60 * 1000);
+
 // Проверка живости — для nginx и для себя
 router.route('GET', '/api/health', async (req, res) => {
   try {

@@ -194,6 +194,13 @@ CREATE INDEX IF NOT EXISTS bookings_hold_idx ON bookings(hold_until) WHERE hold_
 -- В этой колонке дата, с которой можно заезжать следующему (решение
 -- заказчика 23.09.2026). Пусто — место просто занято.
 ALTER TABLE bookings ADD COLUMN IF NOT EXISTS release_from date;
+-- Пометку «освободится» может поставить и модератор руками, и система,
+-- когда месяц не оплачен к 15 числу. Свою система потом снимет сама,
+-- чужую не тронет — отсюда флаг и два месяца-отметки, за какой месяц
+-- резиденту уже написали (24.09.2026).
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS release_auto boolean NOT NULL DEFAULT false;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS warn_period date;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS sale_period date;
 CREATE INDEX IF NOT EXISTS bookings_release_idx ON bookings(release_from) WHERE release_from IS NOT NULL;
 
 CREATE INDEX IF NOT EXISTS bookings_bed_idx  ON bookings(bed_id, date_from, date_to);
@@ -202,6 +209,30 @@ CREATE INDEX IF NOT EXISTS bookings_user_idx ON bookings(user_id);
 -- Две брони на одном месте не могут пересекаться по датам.
 -- Стык день в день допускается: выезд в 12:00, заезд в 14:00 —
 -- ровно то правило, по которому шахматка разрешает переселение.
+-- ------------------------------------------------------------
+--  Контракт: обязательство жить и платить до конца августа
+--
+--  Бронь отвечает на вопрос «кто занимает это место и когда»,
+--  контракт — «до какого числа человек обязался и по какой цене».
+--  Они разные: при переезде бронь закрывается и открывается новая,
+--  в другой комнате, а контракт остаётся тот же. Этим и держится
+--  связь между строками шахматки (решение заказчика 24.09.2026).
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS contracts (
+  id          bigserial PRIMARY KEY,
+  user_id     bigint NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  date_from   date NOT NULL,
+  date_to     date NOT NULL,             -- 31 августа: конец годового контракта
+  annual      boolean NOT NULL DEFAULT true,   -- отказался от годового — цена без скидки
+  price       integer,                   -- цена месяца, по которой считаем начисления
+  ended_at    date,                      -- досрочное расторжение
+  created_at  timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS contracts_user_idx ON contracts(user_id);
+
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS contract_id bigint REFERENCES contracts(id) ON DELETE SET NULL;
+CREATE INDEX IF NOT EXISTS bookings_contract_idx ON bookings(contract_id);
+
 CREATE EXTENSION IF NOT EXISTS btree_gist;
 
 -- EXCLUDE создаёт индекс, поэтому при повторе ошибка не duplicate_object,

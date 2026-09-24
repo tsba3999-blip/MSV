@@ -222,18 +222,42 @@ module.exports = function register(route) {
       return fail(res, 400, 'Сначала прими договор, правила и согласие на обработку данных');
     }
     const from = b.from;
-    // Годовой контракт: выезд через год минус день, если не задано иначе
     const to = /^\d{4}-\d{2}-\d{2}$/.test(String(b.to || '')) ? b.to : null;
+    /* Годовой контракт по прайсу идёт с 1 сентября по конец августа. Кто
+       заехал в середине года — живёт до ближайшего августа. Если до августа
+       осталось меньше двух месяцев, берём август следующего года: контракт
+       длиной в три недели смысла не имеет (24.09.2026). */
+    const annual = b.annual !== false;
+    function augustAfter(day) {
+      const d0 = new Date(day + 'T00:00:00Z');
+      let y = d0.getUTCFullYear();
+      if (d0.getUTCMonth() > 7) y += 1;                       // сентябрь и позже — август следующего
+      let end = new Date(Date.UTC(y, 7, 31));                 // 31 августа
+      if ((end - d0) / 86400000 < 60) end = new Date(Date.UTC(y + 1, 7, 31));
+      return end.toISOString().slice(0, 10);
+    }
+    const contractTo = to || augustAfter(from);
 
     try {
       const out = await tx(async (q) => {
         const bed = await q(`SELECT price FROM beds WHERE id = $1`, [b.bedId]);
         if (!bed.rows[0]) throw Object.assign(new Error('Такого места нет'), { code: 'nobed' });
 
+        const price = bed.rows[0].price;
+
+        /* Контракт заводим до брони: бронь на него ссылается, и при переезде
+           новая бронь встанет под тот же контракт. */
+        const ct = await q(
+          `INSERT INTO contracts (user_id, date_from, date_to, annual, price)
+           VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+          [s.uid, from, contractTo, annual, price]);
+        const contractId = ct.rows[0].id;
+
         const ins = await q(
-          `INSERT INTO bookings (user_id, bed_id, date_from, date_to, source)
-           VALUES ($1, $2, $3, COALESCE($4::date, $3::date + interval '1 year' - interval '1 day'), 'site')
-           RETURNING id, date_from, date_to`, [s.uid, b.bedId, from, to]);
+          `INSERT INTO bookings (user_id, bed_id, date_from, date_to, source, contract_id, tariff)
+           VALUES ($1, $2, $3, $4, 'site', $5, $6)
+           RETURNING id, date_from, date_to`,
+          [s.uid, b.bedId, from, contractTo, contractId, annual ? 'Годовой контракт' : 'Помесячно']);
         const id = ins.rows[0].id;
 
         /* Начисление за каждый выбранный месяц, а не только за первый:
@@ -248,7 +272,6 @@ module.exports = function register(route) {
            GREATEST с сегодняшним днём — чтобы начисление не родилось уже
            просроченным: новичок, который заселяется в конце сентября, не
            виноват, что 15 сентября он ещё не был резидентом. */
-        const price = bed.rows[0].price;
         const asked = String(b.months || '').split(',').map((s) => s.trim())
           .filter((s) => /^\d{4}-(0[1-9]|1[0-2])$/.test(s));
         const months = asked.length ? Array.from(new Set(asked)).sort().slice(0, 24)
@@ -265,9 +288,9 @@ module.exports = function register(route) {
            потом не начислили второй раз (24.09.2026). */
         if (b.deposit) {
           await q(`INSERT INTO charges (booking_id, kind, period, amount, note)
-                   VALUES ($1, 'deposit',
-                           make_date(EXTRACT(YEAR FROM ($2::date + interval '1 year' - interval '1 day'))::int, 8, 1),
-                           $3, 'Оплата августа — последнего месяца годового контракта')`, [id, from, price]);
+                   VALUES ($1, 'deposit', date_trunc('month', $2::date)::date, $3,
+                           'Оплата августа — последнего месяца годового контракта')`,
+            [id, contractTo, price]);
         }
         /* Подписи документов: отдельная запись на каждый документ и каждую оплату */
         for (const kind of ['contract', 'rules', 'consent']) {
