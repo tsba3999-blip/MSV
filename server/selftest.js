@@ -134,7 +134,7 @@ function checkPlaceholders() {
      оставшийся с поры, когда сайт был макетом. Разом его не закрыть,
      поэтому считаем: новые появляться не должны, а старые убывают.
      Починили страницу — уменьшите число, и оно больше не вырастет. */
-  const DEAD_MAX = 7;
+  const DEAD_MAX = 3;
   const dead = [];
   for (const file of webFiles('.html')) {
     if (read(file).includes('ЗДЕСЬ БУДЕТ ЗАПРОС К СЕРВЕРУ')) dead.push(path.basename(file));
