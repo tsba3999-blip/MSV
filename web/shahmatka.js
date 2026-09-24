@@ -1824,6 +1824,24 @@
         }).join('') + '</tbody></table>';
     }
 
+    /* Документы одной строкой: подписывают их всегда разом, и держать под
+       это отдельный список из двух пунктов — впустую занятая высота
+       (решение заказчика 24.09.2026). */
+    function docsLine(r, list) {
+      var signed = r && r.signedAt ? parseDay(r.signedAt) : null;
+      if (signed === null && list && list.length) {
+        var first = null;
+        list.forEach(function (p) {
+          if (p.date === null) return;
+          if (first === null || p.date < first) first = p.date;
+        });
+        signed = first;
+      }
+      if (!r || r.docsSigned === false) return '';          // покажется «не указано»
+      if (signed === null) return 'подписаны';
+      return 'Договор и Правила подписаны ' + esc(fmtDateFull(signed));
+    }
+
     /* Дата подписи равна дате первой оплаты — так заведено у заказчика. */
     function docsHTML(r, list) {
       var DOCS = ['Договор-оферта', 'Правила проживания'];
@@ -1886,8 +1904,8 @@
 
         '<div class="msv-sh__sect">' +
           '<dl class="msv-sh__pairs">' +
-            '<dt>Заезд</dt><dd>' + esc(fmtDate(b.from)) + ', ' + esc(b.checkIn) + '</dd>' +
-            '<dt>Выезд</dt><dd>' + esc(fmtDate(b.to)) + ', ' + esc(b.checkOut) + '</dd>' +
+            '<dt>Проживание</dt><dd>' + esc(fmtDate(b.from)) + ', ' + esc(b.checkIn) +
+              ' — ' + esc(fmtDate(b.to)) + ', ' + esc(b.checkOut) + '</dd>' +
             '<dt>Ночей</dt><dd>' + nights + '</dd>' +
             (b.bookedAt !== null ? '<dt>Дата бронирования</dt><dd>' + esc(fmtDate(b.bookedAt)) + '</dd>' : '') +
             (b.tariff ? '<dt>Тариф</dt><dd>' + esc(b.tariff) + '</dd>' : '') +
@@ -1903,16 +1921,22 @@
             pair('Контактное лицо', esc(res ? res.contactPerson : '')) +
             pair('Профиль в VK', res && res.vk
               ? '<a href="' + esc(safeUrl(res.vk)) + '" target="_blank" rel="noopener noreferrer">' + esc(res.vk) + '</a>' : '') +
+            pair('Документы', docsLine(res, pays)) +
+            (res && res.registrations && res.registrations.length ? '' : pair('Миграционный учёт', '')) +
+            (pays.length ? '' : pair('История платежей', '')) +
           '</dl>' +
-          field('Документы', docsHTML(res, pays)) +
         '</div>' +
 
-        '<div class="msv-sh__sect">' +
-          '<div class="msv-sh__sect-head"><span class="msv-sh__sect-title">Миграционный учёт</span></div>' +
-          migrationHTML(res) +
-        '</div>' +
+        /* Пока регистраций нет, отдельный раздел с заголовком — впустую
+           занятая высота: пишем строкой, как остальные поля (24.09.2026). */
+        (res && res.registrations && res.registrations.length
+          ? '<div class="msv-sh__sect">' +
+              '<div class="msv-sh__sect-head"><span class="msv-sh__sect-title">Миграционный учёт</span></div>' +
+              migrationHTML(res) +
+            '</div>'
+          : '') +
 
-        '<div class="msv-sh__sect">' +
+        (pays.length ? '<div class="msv-sh__sect">' +
           '<div class="msv-sh__sect-head"><span class="msv-sh__sect-title">История платежей</span></div>' +
           (pays.length
             ? '<table class="msv-sh__pay"><thead><tr><th>Период</th><th>Сумма</th><th>Дата платежа</th></tr></thead><tbody>' +
@@ -1921,8 +1945,8 @@
                   '<td>' + esc(money(p.amount)) + '</td>' +
                   '<td>' + esc(p.date !== null ? fmtDateFull(p.date) : '—') + '</td></tr>';
               }).join('') + '</tbody></table>'
-            : '<div class="msv-sh__value msv-sh__value--empty">платежей пока нет</div>') +
-        '</div>' +
+            : '') +
+        '</div>' : '') +
 
         (b.note ? '<div class="msv-sh__sect">' + field('Заметка', esc(b.note)) + '</div>' : '') +
 
