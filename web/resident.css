@@ -24,11 +24,10 @@
   gap: var(--msv-s12);
   height: var(--msv-header);
   margin: 0 calc(var(--msv-s24) * -1) 0 0;
-  /* кнопка «Вернуться» начинается со значка 24 px — сам значок встаёт на линию 16 */
-  padding: 0 calc(var(--msv-s24) - 10px) 0 var(--msv-s16);
+  /* слева — ничего: шапка стоит на той же линии, что и всё остальное */
+  padding: 0 calc(var(--msv-s24) - 10px) 0 0;
 }
-.group__title, .page > p, .page > h2, .page > .msv-body, .page > .msv-note,
-.who, .page .msv-field__label, .page > section > p, .page > section > h2 { padding-left: var(--msv-s16); }
+/* Текст стоит на краю колонки, без собственного отступа (24.09.2026) */
 
 .head__back {
   display: flex;
@@ -415,7 +414,7 @@
 @media (min-width: 768px) {
   /* Ширина колонки на ПК одна для всех страниц — как у проверки заказа (form.css) */
   .page { max-width: 640px; padding-left: var(--msv-s32); padding-right: var(--msv-s32); }
-  .head { margin-left: 0; margin-right: calc(var(--msv-s32) * -1); padding-left: var(--msv-s16); padding-right: calc(var(--msv-s32) - 10px); }
+  .head { margin-left: 0; margin-right: calc(var(--msv-s32) * -1); padding-left: 0; padding-right: calc(var(--msv-s32) - 10px); }
   /* Таббар — ровно по ширине содержимого колонки */
   .tabbar { max-width: 576px; }
 
@@ -432,6 +431,7 @@
 /* Шапка: стрелка с подписью «Вернуться» в первой строке, заголовок раздела — строкой ниже */
 .head { flex-wrap: wrap; height: auto; min-height: var(--msv-header); padding-top: var(--msv-s8); padding-bottom: var(--msv-s12); }   /* под заголовком раздела — 12 px, как под подзаголовками (.group__title) */
 .head__back:has(.head__back-label) { width: auto; padding-right: var(--msv-s8); border-radius: 22px; gap: 2px; }
+.head__back:not(:has(.head__back-label)) { margin-left: -10px; }   /* значок в круге — на линию встаёт значок */
 .head__back-label { font-size: var(--msv-note-size); line-height: var(--msv-note-line); color: var(--msv-n500); }
 .head__title { flex: 1 1 100%; order: 3; margin-top: var(--msv-s4); }
 .head__title-link { color: inherit; text-decoration: none; }

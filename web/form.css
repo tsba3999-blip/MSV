@@ -21,7 +21,7 @@
   gap: var(--msv-s12);
   height: var(--msv-header);
   margin: 0 calc(var(--msv-s24) * -1) 0 0;
-  padding: 0 var(--msv-s16);   /* кнопка «Вернуться» начинается со значка — он встаёт на линию 16, как текст в карточках */
+  padding: 0 var(--msv-s16) 0 0;   /* слева — ничего: шапка стоит на той же линии, что и всё остальное */
 }
 
 .form__back {
@@ -353,8 +353,9 @@
 /* Шапка: стрелка с подписью «Вернуться» в первой строке, заголовок раздела — строкой ниже */
 .form__head { flex-wrap: wrap; height: auto; min-height: var(--msv-header); padding-top: var(--msv-s8); padding-bottom: var(--msv-s12); }   /* под заголовком — 12 px, как под подзаголовками; над ним — тот же отступ, что в шапке кабинета */
 .form__back:has(.form__back-label) { width: auto; height: var(--msv-tap); padding-right: var(--msv-s8); border-radius: 22px; gap: 2px; }
+.form__back:not(:has(.form__back-label)) { margin-left: -10px; }   /* значок в круге — на линию встаёт значок */
 .form__back-label { font-size: var(--msv-note-size); line-height: var(--msv-note-line); color: var(--msv-n500); }
 .form__title-link { flex: 1 1 100%; margin: var(--msv-s4) 0 0; color: var(--msv-graphite); text-decoration: none; }   /* заголовок раздела — не ссылка (решение заказчика 22.09.2026) */
-.form > p, .form > .msv-body, .form > .msv-note, .sect__title, .filters__label, .form .msv-field__label { padding-left: var(--msv-s16); }
+/* Текст стоит на краю колонки, без собственного отступа (24.09.2026) */
 .form__title-link:hover { color: var(--msv-n500); }
 .form__title-link:focus-visible { outline: 2px solid var(--msv-violet); outline-offset: 2px; border-radius: 4px; }
