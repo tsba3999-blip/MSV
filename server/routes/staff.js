@@ -40,6 +40,66 @@ module.exports = function register(route) {
       salary: x.salary, payTo: x.pay_to || '', relation: x.relation || '', canEditShahmatka: !!x.can_edit_shahmatka })));
   });
 
+  /* Своя анкета сотрудника. Раньше данные в ней были зашиты в вёрстку —
+     у администратора всегда «Соколова Ирина Андреевна», у сотрудника
+     «Ким Сергей Владимирович», кто бы ни вошёл, — а кнопка «Сохранить»
+     только писала «Сохранено» и ничего не сохраняла (24.09.2026). */
+  route('GET', '/api/me/staff', async (req, res) => {
+    const s = auth.readSession(req);
+    if (!s) return fail(res, 401, 'Не выполнен вход');
+    const r = await query(`
+      SELECT u.name, u.role, u.phone, u.email,
+             p.position, p.place, p.started_at, p.relation
+        FROM users u LEFT JOIN staff_profiles p ON p.user_id = u.id
+       WHERE u.id = $1`, [s.uid]);
+    const x = r.rows[0];
+    if (!x) return fail(res, 404, 'Нет учётной записи');
+
+    /* «Резиденции» показываем словами, а не кодом */
+    let place = '';
+    if (x.place === 'all' || x.role === 'admin' || x.role === 'moderator') {
+      const all = await query(`SELECT title, name FROM residences ORDER BY id`);
+      place = all.rows.map((y) => y.title || y.name).join(', ');
+    } else if (x.place) {
+      const one = await query(`SELECT title, name FROM residences WHERE id = $1`, [x.place]);
+      place = one.rows[0] ? (one.rows[0].title || one.rows[0].name) : x.place;
+    }
+
+    json(res, 200, {
+      name: x.name || '', role: x.role, phone: x.phone || '', email: x.email || '',
+      position: x.position || '', place, started: iso(x.started_at), relation: x.relation || ''
+    });
+  });
+
+  /* Правит сотрудник сам: имя, телефон, почту и должность. Остальное —
+     резиденции, дата выхода, зарплата — меняет администратор. */
+  route('PUT', '/api/me/staff', async (req, res) => {
+    const s = auth.readSession(req);
+    if (!s) return fail(res, 401, 'Не выполнен вход');
+    const b = await readJson(req);
+    const name = String(b.name || '').trim();
+    if (!name) return fail(res, 400, 'Нужны фамилия и имя');
+
+    const phone = String(b.phone || '').trim();
+    const email = String(b.email || '').trim();
+    if (phone && !auth.normalizeContact(phone)) return fail(res, 400, 'Проверь телефон');
+    if (email && !auth.normalizeContact(email)) return fail(res, 400, 'Проверь почту');
+
+    try {
+      await query(`UPDATE users SET name = $1, phone = NULLIF($2, ''), email = NULLIF($3, '') WHERE id = $4`,
+        [name.slice(0, 200), phone.slice(0, 30), email.slice(0, 200), s.uid]);
+    } catch (e) {
+      if (e.code === '23505') return fail(res, 409, 'Такой телефон или почта уже заняты');
+      throw e;
+    }
+    await query(`INSERT INTO staff_profiles (user_id, position, updated_at) VALUES ($1, $2, now())
+                 ON CONFLICT (user_id) DO UPDATE SET position = EXCLUDED.position, updated_at = now()`,
+      [s.uid, String(b.position || '').slice(0, 100)]);
+    await query(`INSERT INTO audit_log (actor_id, action, target, payload) VALUES ($1, 'staff.self', $2, $3)`,
+      [s.uid, 'user:' + s.uid, JSON.stringify({ name, position: b.position || '' })]);
+    json(res, 200, { ok: true });
+  });
+
   route('POST', '/api/staff', async (req, res) => {
     const s = adminOnly(req, res); if (!s) return;
     const b = await readJson(req);

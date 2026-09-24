@@ -244,24 +244,10 @@
   document.getElementById('pageLead').textContent = cfg.lead;
   document.title = cfg.title + ' — Москва в студентов верит!';
 
-  /* ---------- ВРЕМЕННО: открытый вход ----------
-     Пока на сервере DEMO_MODE=1, страница сама входит под ролью из
-     адреса и открывает кабинет — код вводить не нужно. Если сервер
-     отказал (демо-режим выключен) или не отвечает, остаётся обычная
-     форма ниже. Открыть форму принудительно: login.html?form=1.
-     Убрать вместе с DEMO_PIN. */
-  (function openEntry() {
-    if (location.protocol === 'file:' || params.get('form') === '1') return;
-    var next = params.get('next');
-    var safeNext = (next && /^[\w-]+\.html$/.test(next)) ? next : null;
-    fetch('/api/auth/demo-login', {
-      method: 'POST', credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ role: role })
-    }).then(function (r) { return r.status === 200 ? r.json() : null; })
-      .then(function (j) { if (j && CABINET[j.role]) location.href = safeNext || CABINET[j.role]; })
-      .catch(function () {});
-  })();
+  /* Раньше страница сама входила под первой учётной записью нужной роли —
+     остаток демо-режима. Из-за этого владелец, входя «под собой», попадал
+     в чужой кабинет и видел чужое имя. Убрано: вход только по своему
+     контакту и коду (решение заказчика 24.09.2026). */
 
   /* ---------- Элементы ---------- */
 
