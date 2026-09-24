@@ -11,11 +11,11 @@ window.MSV_STAFF = [
   { id: 'st1', name: 'Чупахина Юлия',   role: 'moderator', position: 'Модератор',
     birthday: '1972-12-13', started: '2025-01-15', place: 'all',   salary: null,  payTo: '', relation: 'уточнить' },
   { id: 'st2', name: 'Зорина Марина',   role: 'staff',     position: 'Горничная-администратор',
-    birthday: '1977-07-04', started: '2023-09-01', place: '',      salary: 60000, payTo: '', relation: 'уточнить' },
+    birthday: '1977-07-04', started: '2023-09-01', place: '',      salary: null, payTo: '', relation: 'уточнить' },
   { id: 'st3', name: 'Мирзоева Фарогат', role: 'staff',    position: 'Горничная-администратор',
-    birthday: '1990-01-15', started: '2026-08-25', place: '',      salary: 80000, payTo: '', relation: 'уточнить' },
+    birthday: '1990-01-15', started: '2026-08-25', place: '',      salary: null, payTo: '', relation: 'уточнить' },
   { id: 'st4', name: 'Лэкэтуш Наталья', role: 'staff',     position: 'Горничная-администратор',
-    birthday: '1983-05-14', started: '2025-10-01', place: '',      salary: 60000, payTo: '', relation: 'уточнить' },
+    birthday: '1983-05-14', started: '2025-10-01', place: '',      salary: null, payTo: '', relation: 'уточнить' },
   { id: 'st5', name: 'Харина Елена',    role: 'staff',     position: 'Ассистент',
     birthday: '',           started: '',           place: '',      salary: null,  payTo: '', relation: 'уточнить' }
 ];

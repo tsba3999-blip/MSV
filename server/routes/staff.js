@@ -159,11 +159,14 @@ module.exports = function register(route) {
       ON CONFLICT (user_id) DO UPDATE SET
         position = COALESCE(EXCLUDED.position, staff_profiles.position), place = COALESCE(EXCLUDED.place, staff_profiles.place),
         birthday = COALESCE(EXCLUDED.birthday, staff_profiles.birthday), started_at = COALESCE(EXCLUDED.started_at, staff_profiles.started_at),
-        salary = COALESCE(EXCLUDED.salary, staff_profiles.salary), pay_to = COALESCE(EXCLUDED.pay_to, staff_profiles.pay_to),
+        /* Пустое значение стирает зарплату, а не сохраняет прежнюю:
+           иначе выдуманное число невозможно убрать (24.09.2026) */
+        salary = CASE WHEN $10 THEN EXCLUDED.salary ELSE COALESCE(EXCLUDED.salary, staff_profiles.salary) END, pay_to = COALESCE(EXCLUDED.pay_to, staff_profiles.pay_to),
         relation = COALESCE(EXCLUDED.relation, staff_profiles.relation),
         can_edit_shahmatka = COALESCE($9, staff_profiles.can_edit_shahmatka), updated_at = now()`,
       [uid, b.position ?? null, b.place ?? null, b.birthday ?? null, b.started ?? null, Number.isInteger(b.salary) ? b.salary : null,
-       b.payTo ?? null, b.relation ?? null, typeof b.canEditShahmatka === 'boolean' ? b.canEditShahmatka : null]);
+       b.payTo ?? null, b.relation ?? null, typeof b.canEditShahmatka === 'boolean' ? b.canEditShahmatka : null,
+       Object.prototype.hasOwnProperty.call(b, 'salary')]);
     await query(`INSERT INTO audit_log (actor_id, action, target, payload) VALUES ($1, 'staff.update', $2, $3)`, [s.uid, 'user:' + uid, JSON.stringify(b)]);
     json(res, 200, { ok: true });
   });
@@ -175,6 +178,38 @@ module.exports = function register(route) {
   });
 
   /* ---------- Зарплата ---------- */
+
+  /* Выдать новый код входа. Своего кода человек не помнит — сменить его
+     самому нечем: смена требует действующий. До сих пор забывший код
+     терял доступ насовсем (24.09.2026).
+
+     Кто кому может: модератор — резидентам и сотрудникам, администратор —
+     всем. Сколько угодно раз: код не ценность, ценность — учётная запись.
+     Каждая выдача попадает в журнал. */
+  route('POST', '/api/users/:id/pin', async (req, res) => {
+    const s = auth.readSession(req);
+    if (!s) return fail(res, 401, 'Не выполнен вход');
+    if (!auth.atLeast(s, 'moderator')) return fail(res, 403, 'Выдать код может модератор или администратор');
+
+    const uid = Number(req.params.id);
+    if (!Number.isInteger(uid)) return fail(res, 400, 'Неверный номер');
+    const b = await readJson(req);
+    const bad = auth.validPin(b.pin);
+    if (bad) return fail(res, 400, bad);
+
+    const r = await query(`SELECT id, name, role FROM users WHERE id = $1 AND is_active`, [uid]);
+    const who = r.rows[0];
+    if (!who) return fail(res, 404, 'Учётная запись не найдена');
+    if (s.role !== 'admin' && (who.role === 'admin' || who.role === 'moderator')) {
+      return fail(res, 403, 'Код модератору и администратору выдаёт администратор');
+    }
+
+    const out = await auth.setPin(uid, b.pin, null, true);
+    if (!out.ok) return fail(res, 400, out.error);
+    await query(`INSERT INTO audit_log (actor_id, action, target, payload) VALUES ($1, 'pin.issue', $2, $3)`,
+      [s.uid, 'user:' + uid, JSON.stringify({ name: who.name, role: who.role })]);
+    json(res, 200, { ok: true, name: who.name });
+  });
 
   route('GET', '/api/payroll', async (req, res) => {
     const s = auth.readSession(req);

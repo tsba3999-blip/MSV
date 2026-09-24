@@ -230,11 +230,14 @@
      а не то, по какой ссылке он пришёл. Раньше на первой странице были
      отдельные буквы «С» и «А»; роль они не меняли и только путали
      (решение заказчика 24.09.2026). */
+  /* Куда попадает человек сразу после входа. У администратора и модератора
+     это шахматка: с неё начинается рабочий день (решение заказчика
+     24.09.2026). Остальные — на свою главную. */
   var CABINET = {
     resident: 'cabinet-resident.html',
     staff: 'cabinet-staff.html',
-    moderator: 'cabinet-staff.html',   // модератор работает в кабинете сотрудника
-    admin: 'cabinet-admin.html'
+    moderator: 'staff-shahmatka.html',
+    admin: 'admin-shahmatka.html'
   };
 
   var params = new URLSearchParams(location.search);

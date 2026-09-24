@@ -173,12 +173,15 @@ function validPin(pin) {
 /* Смена кода: сначала подтверждаем действующий (решение заказчика 22.09.2026).
    current обязателен, если код уже установлен: иначе чужой человек за
    разблокированным телефоном сменил бы код в два касания. */
-async function setPin(userId, pin, current) {
+/* force — выдача кода со стороны: администратор или модератор задаёт код
+   человеку, который свой забыл. Действующий код при этом не спрашивается,
+   потому что его и не знают. Право проверяет вызывающий (24.09.2026). */
+async function setPin(userId, pin, current, force) {
   const bad = validPin(pin);
   if (bad) return { ok: false, error: bad };
   const cur = await query(`SELECT pin_hash FROM users WHERE id = $1`, [userId]);
   const row = cur.rows[0];
-  if (row && row.pin_hash) {
+  if (row && row.pin_hash && !force) {
     if (!/^\d{4}$/.test(String(current || ""))) return { ok: false, error: "Введи действующий код" };
     /* ВРЕМЕННО, пока DEMO_MODE=1: демо-код принимается и как действующий.
        Иначе тот, кто вошёл по нему, не может задать себе свой собственный —
