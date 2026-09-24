@@ -61,11 +61,29 @@
 </nav>
 
 <script>
+/* Раньше кнопка писала «Отправлено» и стирала текст, никуда его не
+   отправив: человек был уверен, что мы читаем его сообщение
+   (найдено 25.09.2026). */
 document.getElementById('send').addEventListener('click', function () {
+  var btn = this;
   var t = document.getElementById('text');
   if (!t.value.trim()) { t.focus(); return; }
-  // ЗДЕСЬ БУДЕТ ЗАПРОС: POST /api/feedback { kind: 'support', text }
-  t.value = ''; this.textContent = 'Отправлено'; this.disabled = true;
+  if (location.protocol === 'file:') { t.value = ''; btn.textContent = 'Отправлено'; btn.disabled = true; return; }
+
+  btn.disabled = true;
+  var was = btn.textContent;
+  btn.textContent = 'Отправляю…';
+  fetch('/api/feedback', {
+    method: 'POST', credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ topic: 'Поддержка', text: t.value.trim() })
+  })
+    .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j }; }); })
+    .then(function (out) {
+      if (out.s !== 201) { btn.disabled = false; btn.textContent = was; alert(out.j.error || 'Не удалось отправить'); return; }
+      t.value = ''; btn.textContent = 'Отправлено';
+    })
+    .catch(function () { btn.disabled = false; btn.textContent = was; alert('Сеть не отвечает'); });
 });
 </script>
 <script src="mark.js"></script>
