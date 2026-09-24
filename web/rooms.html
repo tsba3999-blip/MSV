@@ -269,7 +269,7 @@ MSV.ready(function (ctx) {
           /* Место занято, но уже в продаже. Кнопка другая — с обводкой и с
              датой: иначе человек выбирает его, не заметив, что въехать
              сможет только с этого числа (решение заказчика 24.09.2026). */
-          btn = '<button class="msv-btn msv-btn--s room__take" type="button" data-pick="' + esc(r.id) + '" data-tier="' + ti + '">Занять с ' + esc(dayMonth(b.soonFrom)) + '</button>';
+          btn = '<button class="msv-btn msv-btn--s room__take" type="button" data-pick="' + esc(r.id) + '" data-tier="' + ti + '">С ' + esc(dayMonth(b.soonFrom)) + '</button>';
         } else {
           btn = '<button class="msv-btn msv-btn--s msv-btn--primary" type="button" data-pick="' + esc(r.id) + '" data-tier="' + ti + '">Выбрать</button>';
         }
