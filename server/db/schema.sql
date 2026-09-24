@@ -233,81 +233,6 @@ CREATE INDEX IF NOT EXISTS contracts_user_idx ON contracts(user_id);
 ALTER TABLE bookings ADD COLUMN IF NOT EXISTS contract_id bigint REFERENCES contracts(id) ON DELETE SET NULL;
 CREATE INDEX IF NOT EXISTS bookings_contract_idx ON bookings(contract_id);
 
--- Брони, заведённые до появления контрактов, остались бы без него, и
--- шахматке нечего было бы рисовать контуром. Заводим каждой свой контракт
--- с её же сроком. Повторный запуск ничего не делает: берём только те, у
--- которых контракта ещё нет (24.09.2026).
-DO $$
-DECLARE r RECORD; cid bigint;
-BEGIN
-  FOR r IN SELECT b.id, b.user_id, b.date_from, b.date_to, bd.price
-             FROM bookings b JOIN beds bd ON bd.id = b.bed_id
-            WHERE b.contract_id IS NULL AND b.user_id IS NOT NULL
-  LOOP
-    INSERT INTO contracts (user_id, date_from, date_to, annual, price)
-    VALUES (r.user_id, r.date_from, r.date_to, true, r.price)
-    RETURNING id INTO cid;
-    UPDATE bookings SET contract_id = cid WHERE id = r.id;
-  END LOOP;
-END $$;
-
--- Разовая правка демонстрационных данных (решение заказчика 24.09.2026).
--- У выдуманных жильцов договор кончался 1 октября 2026 — при том, что в
--- нём написано «Годовой контракт». Из-за этого система считала, что
--- первого октября пустеет вся сеть, и «Освободятся скоро» показывал
--- целые резиденции. Годовой контракт идёт до конца августа.
---
--- Места, где на новые даты уже стоит чужая бронь, пропускаем: иначе
--- сработает запрет на двойную продажу и выкладывание встанет.
--- Повторный запуск ничего не делает: таких дат в базе больше нет.
-UPDATE bookings b SET date_to = DATE '2027-08-31'
- WHERE b.date_to = DATE '2026-10-01'
-   AND b.user_id IS NOT NULL
-   AND NOT EXISTS (
-     SELECT 1 FROM bookings o
-      WHERE o.bed_id = b.bed_id AND o.id <> b.id
-        AND daterange(o.date_from, o.date_to, '[)')
-         && daterange(b.date_from, DATE '2027-08-31', '[)')
-   );
-
-UPDATE contracts c SET date_to = DATE '2027-08-31'
-  FROM bookings b
- WHERE b.contract_id = c.id
-   AND b.date_to = DATE '2027-08-31'
-   AND c.date_to = DATE '2026-10-01';
-
--- Разово: снимаем пометки «освободится», которые система успела поставить
--- до того, как в неё занесли оплаты — иначе занятые места выглядят
--- свободными. Ручные пометки модератора не трогаем: у них release_auto
--- равен false. Признак того, что правка уже была, — наличие выключателя
--- auto_sale; поэтому при повторном выкладывании ничего не произойдёт,
--- и законные автоматические пометки останутся на месте (24.09.2026).
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM settings WHERE key = 'auto_sale') THEN
-    UPDATE bookings SET release_from = NULL, release_auto = false, sale_period = NULL
-     WHERE release_auto = true;
-    INSERT INTO settings (key, value) VALUES ('auto_sale', '0');
-  END IF;
-END $$;
-
--- Разово: убираем пени, начисленные до того, как в систему занесли оплаты.
--- Люди в базе настоящие, и долгов у них не было — долг был только в наших
--- данных. Признак, что правка уже прошла, — наличие выключателя
--- auto_penalty, поэтому при повторном выкладывании законные пени
--- останутся на месте (24.09.2026).
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM settings WHERE key = 'auto_penalty') THEN
-    DELETE FROM charges WHERE kind = 'penalty';
-    INSERT INTO settings (key, value) VALUES ('auto_penalty', '0');
-  END IF;
-END $$;
-
--- Денежные правила — пени и автоматическая продажа неоплаченных мест —
--- ждут одной команды: её даёт администратор, когда перенос данных со
--- старой шахматки закончен (решение заказчика 24.09.2026).
-INSERT INTO settings (key, value) VALUES ('money_rules', '0')
-ON CONFLICT (key) DO NOTHING;
-
 CREATE EXTENSION IF NOT EXISTS btree_gist;
 
 -- EXCLUDE создаёт индекс, поэтому при повторе ошибка не duplicate_object,
@@ -722,5 +647,89 @@ CREATE TABLE IF NOT EXISTS doc_signatures (
   signed_at   timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS doc_signatures_user_idx ON doc_signatures (user_id, signed_at DESC);
+
+-- ============================================================
+--  Разовые правки данных
+--
+--  Идут последними: они опираются на таблицы, созданные выше,
+--  в том числе на settings. Каждая защищена от повтора, поэтому
+--  при повторном выкладывании ничего не делают (24.09.2026).
+-- ============================================================
+
+-- Брони, заведённые до появления контрактов, остались бы без него, и
+-- шахматке нечего было бы рисовать контуром. Заводим каждой свой контракт
+-- с её же сроком. Повторный запуск ничего не делает: берём только те, у
+-- которых контракта ещё нет (24.09.2026).
+DO $$
+DECLARE r RECORD; cid bigint;
+BEGIN
+  FOR r IN SELECT b.id, b.user_id, b.date_from, b.date_to, bd.price
+             FROM bookings b JOIN beds bd ON bd.id = b.bed_id
+            WHERE b.contract_id IS NULL AND b.user_id IS NOT NULL
+  LOOP
+    INSERT INTO contracts (user_id, date_from, date_to, annual, price)
+    VALUES (r.user_id, r.date_from, r.date_to, true, r.price)
+    RETURNING id INTO cid;
+    UPDATE bookings SET contract_id = cid WHERE id = r.id;
+  END LOOP;
+END $$;
+
+-- Разовая правка демонстрационных данных (решение заказчика 24.09.2026).
+-- У выдуманных жильцов договор кончался 1 октября 2026 — при том, что в
+-- нём написано «Годовой контракт». Из-за этого система считала, что
+-- первого октября пустеет вся сеть, и «Освободятся скоро» показывал
+-- целые резиденции. Годовой контракт идёт до конца августа.
+--
+-- Места, где на новые даты уже стоит чужая бронь, пропускаем: иначе
+-- сработает запрет на двойную продажу и выкладывание встанет.
+-- Повторный запуск ничего не делает: таких дат в базе больше нет.
+UPDATE bookings b SET date_to = DATE '2027-08-31'
+ WHERE b.date_to = DATE '2026-10-01'
+   AND b.user_id IS NOT NULL
+   AND NOT EXISTS (
+     SELECT 1 FROM bookings o
+      WHERE o.bed_id = b.bed_id AND o.id <> b.id
+        AND daterange(o.date_from, o.date_to, '[)')
+         && daterange(b.date_from, DATE '2027-08-31', '[)')
+   );
+
+UPDATE contracts c SET date_to = DATE '2027-08-31'
+  FROM bookings b
+ WHERE b.contract_id = c.id
+   AND b.date_to = DATE '2027-08-31'
+   AND c.date_to = DATE '2026-10-01';
+
+-- Разово: снимаем пометки «освободится», которые система успела поставить
+-- до того, как в неё занесли оплаты — иначе занятые места выглядят
+-- свободными. Ручные пометки модератора не трогаем: у них release_auto
+-- равен false. Признак того, что правка уже была, — наличие выключателя
+-- auto_sale; поэтому при повторном выкладывании ничего не произойдёт,
+-- и законные автоматические пометки останутся на месте (24.09.2026).
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM settings WHERE key = 'auto_sale') THEN
+    UPDATE bookings SET release_from = NULL, release_auto = false, sale_period = NULL
+     WHERE release_auto = true;
+    INSERT INTO settings (key, value) VALUES ('auto_sale', '0');
+  END IF;
+END $$;
+
+-- Разово: убираем пени, начисленные до того, как в систему занесли оплаты.
+-- Люди в базе настоящие, и долгов у них не было — долг был только в наших
+-- данных. Признак, что правка уже прошла, — наличие выключателя
+-- auto_penalty, поэтому при повторном выкладывании законные пени
+-- останутся на месте (24.09.2026).
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM settings WHERE key = 'auto_penalty') THEN
+    DELETE FROM charges WHERE kind = 'penalty';
+    INSERT INTO settings (key, value) VALUES ('auto_penalty', '0');
+  END IF;
+END $$;
+
+-- Денежные правила — пени и автоматическая продажа неоплаченных мест —
+-- ждут одной команды: её даёт администратор, когда перенос данных со
+-- старой шахматки закончен (решение заказчика 24.09.2026).
+INSERT INTO settings (key, value) VALUES ('money_rules', '0')
+ON CONFLICT (key) DO NOTHING;
+
 
 COMMIT;
