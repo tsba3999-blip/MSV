@@ -262,11 +262,18 @@ MSV.ready(function (ctx) {
         ? '<span class="tag tag--ok">внесён</span>'
         : '<button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" data-act="dep" title="Депозит равен месячной плате и засчитывается оплатой августа">Внести</button>';
 
+      /* Нет регистрации — кнопка «Загрузить», есть — метка со сроком. Метка
+         тоже нажимается: так заменяют просроченную (24.09.2026) */
       var reg;
-      if (x.regUntil === null) reg = '<span class="tag tag--mute">нет</span>';
-      else if (x.regUntil < today) reg = '<span class="tag tag--bad">истекла ' + esc(fmt(x.regUntil)) + '</span>';
-      else if (x.regUntil - today <= 30 * DAY) reg = '<span class="tag tag--warn">до ' + esc(fmt(x.regUntil)) + '</span>';
-      else reg = '<span class="tag tag--ok">до ' + esc(fmt(x.regUntil)) + '</span>';
+      if (x.regUntil === null) {
+        reg = '<button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" data-reg title="Загрузить регистрацию">Загрузить</button>';
+      } else {
+        var rc = x.regUntil < today ? 'tag--bad'
+               : (x.regUntil - today <= 30 * DAY ? 'tag--warn' : 'tag--ok');
+        var rt = x.regUntil < today ? 'истекла ' : 'до ';
+        reg = '<button class="tag ' + rc + ' tag-btn" type="button" data-reg title="Заменить регистрацию">' +
+              rt + esc(fmt(x.regUntil)) + '</button>';
+      }
 
       var minor = (x.age !== null && x.age < 18)
         ? ' <span class="tag tag--bad">до 18</span>' : '';
@@ -283,7 +290,7 @@ MSV.ready(function (ctx) {
           esc(x.bed) + '</a><span class="msv-note sub">' + esc(x.room) + ' · ' + esc(x.res.name) + '</span></td>' +
         '<td>' + (x.phone ? '<a href="tel:+' + esc(digits(x.phone)) + '">' + esc(x.phone) + '</a>' : '—') + mess(x) + '</td>' +
         '<td>' + pay + '</td><td>' + payBtn + '</td><td>' + depBtn + '</td>' +
-        '<td>' + reg + ' <button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" data-reg title="Загрузить регистрацию">Загрузить</button></td>' +
+        '<td>' + reg + '</td>' +
         '<td class="num"><button class="msv-btn msv-btn--s msv-btn--tertiary del" type="button" data-del title="Удалить резидента из базы">Удалить</button></td>' +
       '</tr>';
     }).join('');

@@ -455,3 +455,7 @@ a.side__who:focus-visible { outline: 2px solid var(--msv-white); outline-offset:
 .mess-dot--on { background: var(--msv-graphite); color: var(--msv-white); }
 .mess-dot--on:hover { background: #2B3D50; }
 .mess-dot--off { background: var(--msv-n100); color: var(--msv-n300); cursor: default; }
+
+/* Метка, которая нажимается: тот же вид, но это кнопка (24.09.2026) */
+.tag-btn { font: inherit; border: 0; cursor: pointer; }
+.tag-btn:hover { filter: brightness(.95); }
