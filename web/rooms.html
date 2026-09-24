@@ -265,10 +265,16 @@ MSV.ready(function (ctx) {
         var btn;
         if (out) {
           btn = '<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" disabled>Продано</button>';
+        } else if (soon) {
+          /* Место занято, но уже в продаже. Кнопка другая — с обводкой и с
+             датой: иначе человек выбирает его, не заметив, что въехать
+             сможет только с этого числа (решение заказчика 24.09.2026). */
+          btn = '<button class="msv-btn msv-btn--s room__take" type="button" data-pick="' + esc(r.id) + '" data-tier="' + ti + '">Занять с ' + esc(dayMonth(b.soonFrom)) + '</button>';
         } else {
           btn = '<button class="msv-btn msv-btn--s msv-btn--primary" type="button" data-pick="' + esc(r.id) + '" data-tier="' + ti + '">Выбрать</button>';
         }
-        var label = esc(b.kind) + (soon ? '<span class="room__soon">освободится ' + esc(dayMonth(b.soonFrom)) + '</span>' : '');
+        /* Дата теперь стоит на самой кнопке — второй раз её не повторяем */
+        var label = esc(b.kind);
         return '<div class="room__price' + (out ? ' room__price--out' : '') + (soon ? ' room__price--soon' : '') + '"' + (out ? '' : ' role="button" tabindex="0" data-pick="' + esc(r.id) + '" data-tier="' + ti + '"') + '>' +
           '<span>' + label + '</span>' +
           '<b>' + money(b.price) + '</b>' + btn + '</div>';

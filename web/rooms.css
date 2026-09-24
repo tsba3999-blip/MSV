@@ -323,6 +323,10 @@
 
 /* Строка места, которое скоро освободится: дата под названием места */
 .room__soon { display: block; font-size: var(--msv-note-size); line-height: var(--msv-note-line); color: var(--msv-red); }
+/* Место, которое ещё занято: кнопка с обводкой, а не залитая — чтобы её
+   не путали с местом, свободным сегодня (24.09.2026) */
+.room__take { color: var(--msv-red); background: transparent; border: 1px solid var(--msv-red); }
+.room__take:hover { background: rgba(251, 52, 74, .07); }
 .room__price--soon b { font-weight: 600; }
 
 /* Чип другого пола на выборе комнаты — недоступен */
