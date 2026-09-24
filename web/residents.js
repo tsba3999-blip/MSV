@@ -6,6 +6,11 @@
 MSV.ready(function (ctx) {
   'use strict';
 
+  /* Страница общая для двух кабинетов — ссылку на шахматку берём по своей
+     же странице, чтобы модератор не уходил в кабинет администратора. */
+  var SHAHMATKA = /^staff-/.test(location.pathname.split('/').pop() || '')
+    ? 'staff-shahmatka.html' : 'admin-shahmatka.html';
+
   var RES = ctx.residences;
   var DAY = 86400000;
   var now = new Date();
@@ -239,12 +244,14 @@ MSV.ready(function (ctx) {
         ? ' <span class="tag tag--bad">до 18</span>' : '';
 
       return '<tr data-name="' + esc(x.name) + '" data-user="' + esc(x.userId) + '" data-booking="' + esc(x.bookingId) + '">' +
-        '<td><span class="who-cell">' +
+        /* Щелчок по имени открывает карточку резидента — так же, как в
+           шахматке (решение заказчика 24.09.2026) */
+        '<td><a class="who-cell who-cell--link" href="resident-card.html?id=' + esc(x.userId) + '" title="Открыть карточку резидента">' +
           '<span class="who-cell__face">' + esc(initials(x.name)) + '</span>' +
           '<span><span class="who-cell__name">' + esc(x.name) + minor + '</span>' +
           '<span class="msv-note sub">' + esc(x.university) + '</span></span>' +
-        '</span></td>' +
-        '<td><a href="admin-shahmatka.html?res=' + encodeURIComponent(x.res.id) + '">' +
+        '</a></td>' +
+        '<td><a href="' + SHAHMATKA + '?res=' + encodeURIComponent(x.res.id) + '">' +
           esc(x.bed) + '</a><span class="msv-note sub">' + esc(x.room) + ' · ' + esc(x.res.name) + '</span></td>' +
         '<td>' + (x.phone ? '<a href="tel:+' + esc(x.phone.replace(/\D/g, '')) + '">' + esc(x.phone) + '</a>' : '—') + '</td>' +
         '<td>' + pay + '</td><td>' + payBtn + '</td><td>' + depBtn + '</td>' +
