@@ -76,7 +76,15 @@ function createRouter() {
   }
 
   async function dispatch(req, res) {
-    const url = new URL(req.url, 'http://localhost');
+    /* Адрес вида «//» разбирается как ссылка без узла и роняет разбор.
+       Такое приходит от кривых ссылок и от роботов — отвечаем отказом,
+       а не пятисоткой (24.09.2026). */
+    let url;
+    try {
+      url = new URL(req.url, 'http://localhost');
+    } catch (e) {
+      return fail(res, 400, 'Неверный адрес');
+    }
     req.path = url.pathname;
     req.query = Object.fromEntries(url.searchParams.entries());
 
