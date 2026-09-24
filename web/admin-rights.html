@@ -129,141 +129,182 @@
 
 
 <style>
-  /* Окно правки прав */
-  .rights-edit { position: fixed; inset: 0; z-index: 10050; display: flex; align-items: center;
-                 justify-content: center; padding: 16px; background: rgba(16,22,31,.55); }
-  .rights-edit__box { width: 100%; max-width: 440px; padding: 24px; background: var(--msv-white);
-                      border-radius: 16px; box-shadow: 0 12px 40px rgba(16,22,31,.3); }
+  /* Лепестки прав в строке правятся прямо на месте: отдельного окна
+     не нужно, права и так видны таблицей (решение заказчика 25.09.2026) */
+  .perm__item[data-p] { border: 0; font: inherit; font-size: var(--msv-note-size); cursor: pointer; }
+  .perm__item[data-p]:hover { box-shadow: inset 0 0 0 1.5px var(--msv-n300); }
+  .perm__item[data-p][disabled] { cursor: not-allowed; opacity: .6; box-shadow: none; }
+  .rights-note { margin: var(--msv-s8) 0 0; color: var(--msv-n500); }
+  .rights-act { display: flex; gap: var(--msv-s8); justify-content: flex-end; }
 </style>
 <script src="staff.js"></script>
 <script>
 (function () {
   'use strict';
+
+  /* ============================================================
+     Кто и что может
+
+     Права видны таблицей, и правятся они там же: нажал «Изменить» —
+     лепестки в строке стали переключателями. Отдельное окно повторяло
+     бы то, что и так на экране (решение заказчика 25.09.2026).
+
+     Под лепестками лежат три настоящие вещи, которыми проверяет доступ
+     сервер: роль, право править шахматку и право видеть зарплаты.
+     Поэтому часть лепестков ходит парами — «Резиденты» и «Начисления»
+     это и есть уровень модератора. Мы этого не прячем, а пишем прямо
+     под строкой, что изменится.
+     ============================================================ */
+
   var ROLE = { admin: ['Администратор', 'role-pill--admin'], moderator: ['Модератор', 'role-pill--moderator'], staff: ['Сотрудник', 'role-pill--staff'] };
   var PERMS = ['Шахматка', 'Резиденты', 'Заявки', 'Начисления', 'Зарплаты', 'Права'];
 
-  /* Что человеку открыто — считаем так же, как решает сервер, а не по
-     заранее записанному списку: два разрешения выдаются лично, помимо
-     роли (решение заказчика 25.09.2026). */
-  function allowed(p) {
-    var on = ['Заявки'];
-    if (p.role === 'admin' || p.role === 'moderator') on.push('Шахматка', 'Резиденты', 'Начисления');
-    else if (p.canEditShahmatka) on.push('Шахматка');
-    if (p.role === 'admin' || p.canPayroll) on.push('Зарплаты');
-    if (p.role === 'admin') on.push('Права');
-    return on;
-  }
-  /* Люди — из базы. Первой строкой стоял выдуманный «администратор
-     сети», которого нет ни в одном списке (найдено 25.09.2026). */
   function esc(v) { return String(v == null ? '' : v).replace(/</g, '&lt;'); }
   function ini(n) { var p = n.split(' '); return (p[0][0] + (p[1] ? p[1][0] : '')).toUpperCase(); }
 
-  window.MSV_STAFF_LOAD().then(draw);
-
-  function draw(list) {
-  var people = (list || []).map(function (s) {
-    return { id: s.id, name: s.name, role: s.role, position: s.position,
-             contact: s.phone || s.email || '',
-             canEditShahmatka: s.canEditShahmatka, canPayroll: s.canPayroll };
-  });
-  document.getElementById('people').innerHTML = people.map(function (p) {
-    var on = allowed(p);
-    return '<tr><td>' + (p.id === 'admin' ? '<span class="who-cell">' : '<a class="who-link" href="admin-staff-view.html?id=' + esc(p.id) + '" title="Открыть кабинет сотрудника"><span class="who-cell">') +
-      '<span class="who-cell__face">' + esc(ini(p.name)) + '</span><span><span class="who-cell__name">' + esc(p.name) + '</span><span class="msv-note">' + esc(p.position) + (p.contact ? ' · ' + esc(p.contact) : '') + '</span></span></span>' + (p.id === 'admin' ? '' : '</a>') + '</td>' +
-      '<td><span class="role-pill ' + ROLE[p.role][1] + '">' + ROLE[p.role][0] + '</span></td>' +
-      '<td><span class="perm">' + PERMS.map(function (x) { return '<span class="perm__item' + (on.indexOf(x) >= 0 ? ' perm__item--on' : '') + '">' + x + '</span>'; }).join('') + '</span></td>' +
-      '<td><button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" data-edit="' + esc(p.id) + '">Изменить</button></td></tr>';
-  }).join('');
-
-  /* Кнопка «Изменить» открывает настоящее окно. Раньше она только
-     обещала: «права распределим позднее» (решение заказчика 25.09.2026). */
-  document.getElementById('people').onclick = function (e) {
-    var b = e.target.closest('[data-edit]'); if (!b) return;
-    var p = people.filter(function (x) { return String(x.id) === b.dataset.edit; })[0];
-    if (p) openEdit(p);
-  };
+  /* Состояние строки: три настоящие вещи, а не шесть лепестков */
+  function stateOf(p) {
+    return { role: p.role, shah: !!p.canEditShahmatka, pay: !!p.canPayroll };
   }
 
+  /* Лепестки из состояния — теми же правилами, что и у сервера */
+  function lit(st) {
+    var on = { 'Заявки': true };
+    if (st.role === 'admin' || st.role === 'moderator') { on['Шахматка'] = true; on['Резиденты'] = true; on['Начисления'] = true; }
+    else if (st.shah) on['Шахматка'] = true;
+    if (st.role === 'admin' || st.pay) on['Зарплаты'] = true;
+    if (st.role === 'admin') on['Права'] = true;
+    return on;
+  }
+
+  /* Какие лепестки нажимаются, а какие держит роль */
+  function locked(st, name, self) {
+    if (name === 'Заявки') return 'Заявки открыты всем';
+    if (name === 'Права' && self) return 'Свои права снять нельзя — вы запрёте себя снаружи';
+    if (st.role === 'admin' && name !== 'Права') return 'У администратора открыто всё';
+    if (st.role === 'moderator' && (name === 'Шахматка' || name === 'Резиденты' || name === 'Начисления')) {
+      return 'Это уровень модератора — снимается вместе с ролью';
+    }
+    return '';
+  }
+
+  /* Нажали лепесток — меняем то, что за ним стоит */
+  function toggle(st, name) {
+    var on = lit(st);
+    if (name === 'Права') {
+      st.role = on['Права'] ? 'moderator' : 'admin';
+    } else if (name === 'Резиденты' || name === 'Начисления') {
+      st.role = on[name] ? 'staff' : 'moderator';
+    } else if (name === 'Шахматка') {
+      st.shah = !st.shah;
+    } else if (name === 'Зарплаты') {
+      st.pay = !st.pay;
+    }
+    return st;
+  }
+
+  /* Что изменится — словами, до нажатия «Сохранить» */
+  function diff(was, now) {
+    var out = [];
+    if (was.role !== now.role) out.push('роль: ' + ROLE[was.role][0].toLowerCase() + ' → ' + ROLE[now.role][0].toLowerCase());
+    if (was.shah !== now.shah && now.role === 'staff') out.push(now.shah ? 'сможет править шахматку' : 'не сможет править шахматку');
+    if (was.pay !== now.pay && now.role !== 'admin') out.push(now.pay ? 'увидит зарплаты' : 'не увидит зарплаты');
+    return out.join('; ');
+  }
+
+  var people = [];
   var meId = null;
+  var editing = null;     // id строки, которую правят
+  var draftSt = null;     // её состояние до сохранения
+
   fetch('/api/auth/me', { credentials: 'same-origin' })
     .then(function (r) { return r.status === 200 ? r.json() : null; })
-    .then(function (m) { if (m) meId = String(m.id); })
+    .then(function (m) { if (m) meId = String(m.id); render(); })
     .catch(function () {});
 
-  function openEdit(p) {
-    var self = meId && String(p.id) === meId;
-    var box = document.createElement('div');
-    box.className = 'rights-edit';
-    box.innerHTML =
-      '<div class="rights-edit__box" role="dialog" aria-modal="true">' +
-        '<h3 class="msv-sub" style="margin:0 0 4px">' + esc(p.name) + '</h3>' +
-        '<p class="msv-note" style="margin:0 0 16px;color:var(--msv-n500)">' + esc(p.position || '') + '</p>' +
-
-        '<p class="msv-note" style="margin:0 0 6px">Роль — это права</p>' +
-        '<label class="msv-field" style="margin-bottom:16px">' +
-          '<select class="msv-input" id="reRole"' + (self ? ' disabled' : '') + '>' +
-            '<option value="staff">Сотрудник — заявки</option>' +
-            '<option value="moderator">Модератор — шахматка, резиденты, заявки, начисления</option>' +
-            '<option value="admin">Администратор — всё, включая права и зарплаты</option>' +
-          '</select>' +
-        '</label>' +
-
-        '<p class="msv-note" style="margin:0 0 6px">Что можно сверх роли</p>' +
-        '<label class="tog" style="display:flex;gap:8px;align-items:center;margin-bottom:8px">' +
-          '<input type="checkbox" id="reSh"> <span class="msv-body">Править шахматку</span></label>' +
-        '<label class="tog" style="display:flex;gap:8px;align-items:center;margin-bottom:16px">' +
-          '<input type="checkbox" id="rePay"> <span class="msv-body">Видеть зарплаты сотрудников</span></label>' +
-
-        (self ? '<p class="msv-note" style="margin:0 0 16px;color:var(--msv-red)">Свою роль менять нельзя: сняв её с себя, вы запрёте себя снаружи.</p>' : '') +
-
-        '<p class="msv-note" id="reMsg" hidden style="margin:0 0 12px"></p>' +
-        '<div style="display:flex;gap:8px;justify-content:flex-end">' +
-          '<button class="msv-btn msv-btn--m msv-btn--secondary" type="button" data-act="cancel">Отмена</button>' +
-          '<button class="msv-btn msv-btn--m msv-btn--primary" type="button" data-act="save">Сохранить</button>' +
-        '</div>' +
-      '</div>';
-    document.body.appendChild(box);
-
-    var role = box.querySelector('#reRole');
-    var sh = box.querySelector('#reSh');
-    var pay = box.querySelector('#rePay');
-    var msg = box.querySelector('#reMsg');
-    role.value = p.role;
-    sh.checked = !!p.canEditShahmatka;
-    pay.checked = !!p.canPayroll;
-
-    /* У модератора и администратора эти права есть по роли — галочка
-       ничего не решает, и включённой её показывать честнее выключенной */
-    function sync() {
-      var big = role.value === 'admin' || role.value === 'moderator';
-      sh.disabled = big; if (big) sh.checked = true;
-      pay.disabled = role.value === 'admin'; if (role.value === 'admin') pay.checked = true;
-    }
-    sync();
-    role.addEventListener('change', sync);
-
-    box.addEventListener('click', function (e) {
-      var btn = e.target.closest('[data-act]');
-      if (e.target === box || (btn && btn.dataset.act === 'cancel')) { box.remove(); return; }
-      if (!btn || btn.dataset.act !== 'save') return;
-
-      var body = { canEditShahmatka: sh.checked, canPayroll: pay.checked };
-      if (!self && role.value !== p.role) body.role = role.value;
-
-      msg.hidden = false; msg.style.color = 'var(--msv-n500)'; msg.textContent = 'Сохраняю…';
-      fetch('/api/staff/' + p.id, {
-        method: 'PATCH', credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
-      })
-        .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j }; }); })
-        .then(function (out) {
-          if (out.s !== 200) { msg.style.color = 'var(--msv-red)'; msg.textContent = out.j.error || 'Не удалось сохранить'; return; }
-          box.remove();
-          window.MSV_STAFF_LOAD().then(draw);
-        })
-        .catch(function () { msg.style.color = 'var(--msv-red)'; msg.textContent = 'Сеть не отвечает'; });
+  function load() {
+    return window.MSV_STAFF_LOAD().then(function (list) {
+      people = (list || []).map(function (s) {
+        return { id: String(s.id), name: s.name, role: s.role, position: s.position,
+                 contact: s.phone || s.email || '',
+                 canEditShahmatka: s.canEditShahmatka, canPayroll: s.canPayroll };
+      });
+      render();
     });
   }
+  load();
+
+  function render() {
+    var box = document.getElementById('people');
+    if (!box) return;
+    box.innerHTML = people.map(function (p) {
+      var edit = editing === p.id;
+      var st = edit ? draftSt : stateOf(p);
+      var self = meId === p.id;
+      var on = lit(st);
+
+      var pills = PERMS.map(function (x) {
+        var cls = 'perm__item' + (on[x] ? ' perm__item--on' : '');
+        if (!edit) return '<span class="' + cls + '">' + x + '</span>';
+        var why = locked(st, x, self);
+        return '<button type="button" class="' + cls + '" data-p="' + x + '"' +
+          (why ? ' disabled title="' + esc(why) + '"' : ' title="Нажмите, чтобы ' + (on[x] ? 'закрыть' : 'открыть') + '"') +
+          ' aria-pressed="' + (on[x] ? 'true' : 'false') + '">' + x + '</button>';
+      }).join('');
+
+      var what = edit ? diff(stateOf(p), st) : '';
+
+      return '<tr' + (edit ? ' class="is-edit"' : '') + '><td>' +
+          '<a class="who-link" href="admin-staff-view.html?id=' + esc(p.id) + '" title="Открыть карточку сотрудника"><span class="who-cell">' +
+          '<span class="who-cell__face">' + esc(ini(p.name)) + '</span><span><span class="who-cell__name">' + esc(p.name) + '</span>' +
+          '<span class="msv-note">' + esc(p.position) + (p.contact ? ' · ' + esc(p.contact) : '') + '</span></span></span></a></td>' +
+        '<td><span class="role-pill ' + ROLE[st.role][1] + '">' + ROLE[st.role][0] + '</span></td>' +
+        '<td><span class="perm">' + pills + '</span>' +
+          (what ? '<p class="msv-note rights-note">' + esc(what) + '</p>' : '') + '</td>' +
+        '<td>' + (edit
+          ? '<span class="rights-act">' +
+              '<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-act="cancel">Отмена</button>' +
+              '<button class="msv-btn msv-btn--s msv-btn--primary" type="button" data-act="save">Сохранить</button>' +
+            '</span>'
+          : '<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-act="edit" data-id="' + esc(p.id) + '">Изменить</button>') +
+        '</td></tr>';
+    }).join('');
+  }
+
+  document.getElementById('people').addEventListener('click', function (e) {
+    var pill = e.target.closest('[data-p]');
+    if (pill && !pill.disabled) { toggle(draftSt, pill.dataset.p); render(); return; }
+
+    var btn = e.target.closest('[data-act]');
+    if (!btn) return;
+
+    if (btn.dataset.act === 'edit') {
+      var p = people.filter(function (x) { return x.id === btn.dataset.id; })[0];
+      if (!p) return;
+      editing = p.id; draftSt = stateOf(p); render(); return;
+    }
+    if (btn.dataset.act === 'cancel') { editing = null; draftSt = null; render(); return; }
+    if (btn.dataset.act !== 'save') return;
+
+    var person = people.filter(function (x) { return x.id === editing; })[0];
+    var was = stateOf(person), now = draftSt;
+    var body = { canEditShahmatka: now.shah, canPayroll: now.pay };
+    if (was.role !== now.role) body.role = now.role;
+
+    btn.disabled = true;
+    fetch('/api/staff/' + person.id, {
+      method: 'PATCH', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+    })
+      .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j }; }); })
+      .then(function (out) {
+        btn.disabled = false;
+        if (out.s !== 200) { alert(out.j.error || 'Не удалось сохранить'); return; }
+        editing = null; draftSt = null;
+        load();
+      })
+      .catch(function () { btn.disabled = false; alert('Сервер не отвечает'); });
+  });
 })();
 </script>
 <script src="mark.js"></script>
