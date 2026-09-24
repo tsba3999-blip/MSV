@@ -156,6 +156,23 @@ module.exports = function register(route) {
         throw e;
       }
     }
+    /* Роль — это права. Меняет её только администратор и только чужую:
+       сняв роль с себя, человек запер бы сам себя снаружи. Последнего
+       администратора понизить нельзя по той же причине — иначе права
+       менять станет некому (решение заказчика 25.09.2026). */
+    if (b.role !== undefined) {
+      const ROLES = ['staff', 'moderator', 'admin'];
+      if (ROLES.indexOf(b.role) < 0) return fail(res, 400, 'Неизвестная роль');
+      if (uid === Number(s.uid)) return fail(res, 400, 'Свою роль менять нельзя — попросите второго администратора');
+      const cur = await query(`SELECT role FROM users WHERE id = $1`, [uid]);
+      if (!cur.rows[0]) return fail(res, 404, 'Учётная запись не найдена');
+      if (cur.rows[0].role === 'admin' && b.role !== 'admin') {
+        const n = await query(`SELECT count(*)::int n FROM users WHERE role = 'admin' AND is_active`);
+        if (n.rows[0].n <= 1) return fail(res, 400, 'Это последний администратор — менять роль некому будет');
+      }
+      await query(`UPDATE users SET role = $2 WHERE id = $1`, [uid, b.role]);
+    }
+
     await query(`INSERT INTO staff_profiles (user_id, position, place, birthday, started_at, salary, pay_to, relation, can_edit_shahmatka, can_payroll, updated_at)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, COALESCE($9, false), COALESCE($11, false), now())
       ON CONFLICT (user_id) DO UPDATE SET

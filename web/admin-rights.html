@@ -128,13 +128,31 @@
 </div>
 
 
+<style>
+  /* Окно правки прав */
+  .rights-edit { position: fixed; inset: 0; z-index: 10050; display: flex; align-items: center;
+                 justify-content: center; padding: 16px; background: rgba(16,22,31,.55); }
+  .rights-edit__box { width: 100%; max-width: 440px; padding: 24px; background: var(--msv-white);
+                      border-radius: 16px; box-shadow: 0 12px 40px rgba(16,22,31,.3); }
+</style>
 <script src="staff.js"></script>
 <script>
 (function () {
   'use strict';
   var ROLE = { admin: ['Администратор', 'role-pill--admin'], moderator: ['Модератор', 'role-pill--moderator'], staff: ['Сотрудник', 'role-pill--staff'] };
   var PERMS = ['Шахматка', 'Резиденты', 'Заявки', 'Начисления', 'Зарплаты', 'Права'];
-  var ON = { admin: PERMS, moderator: ['Шахматка', 'Резиденты', 'Заявки', 'Начисления'], staff: ['Заявки'] };
+
+  /* Что человеку открыто — считаем так же, как решает сервер, а не по
+     заранее записанному списку: два разрешения выдаются лично, помимо
+     роли (решение заказчика 25.09.2026). */
+  function allowed(p) {
+    var on = ['Заявки'];
+    if (p.role === 'admin' || p.role === 'moderator') on.push('Шахматка', 'Резиденты', 'Начисления');
+    else if (p.canEditShahmatka) on.push('Шахматка');
+    if (p.role === 'admin' || p.canPayroll) on.push('Зарплаты');
+    if (p.role === 'admin') on.push('Права');
+    return on;
+  }
   /* Люди — из базы. Первой строкой стоял выдуманный «администратор
      сети», которого нет ни в одном списке (найдено 25.09.2026). */
   function esc(v) { return String(v == null ? '' : v).replace(/</g, '&lt;'); }
@@ -143,15 +161,108 @@
   window.MSV_STAFF_LOAD().then(draw);
 
   function draw(list) {
-  var people = (list || []).map(function (s) { return { id: s.id, name: s.name, role: s.role, position: s.position, contact: s.phone || s.email || '' }; });
+  var people = (list || []).map(function (s) {
+    return { id: s.id, name: s.name, role: s.role, position: s.position,
+             contact: s.phone || s.email || '',
+             canEditShahmatka: s.canEditShahmatka, canPayroll: s.canPayroll };
+  });
   document.getElementById('people').innerHTML = people.map(function (p) {
-    var on = ON[p.role] || [];
+    var on = allowed(p);
     return '<tr><td>' + (p.id === 'admin' ? '<span class="who-cell">' : '<a class="who-link" href="admin-staff-view.html?id=' + esc(p.id) + '" title="Открыть кабинет сотрудника"><span class="who-cell">') +
       '<span class="who-cell__face">' + esc(ini(p.name)) + '</span><span><span class="who-cell__name">' + esc(p.name) + '</span><span class="msv-note">' + esc(p.position) + (p.contact ? ' · ' + esc(p.contact) : '') + '</span></span></span>' + (p.id === 'admin' ? '' : '</a>') + '</td>' +
       '<td><span class="role-pill ' + ROLE[p.role][1] + '">' + ROLE[p.role][0] + '</span></td>' +
       '<td><span class="perm">' + PERMS.map(function (x) { return '<span class="perm__item' + (on.indexOf(x) >= 0 ? ' perm__item--on' : '') + '">' + x + '</span>'; }).join('') + '</span></td>' +
-      '<td><button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" title="Права распределим позднее">Изменить</button></td></tr>';
+      '<td><button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" data-edit="' + esc(p.id) + '">Изменить</button></td></tr>';
   }).join('');
+
+  /* Кнопка «Изменить» открывает настоящее окно. Раньше она только
+     обещала: «права распределим позднее» (решение заказчика 25.09.2026). */
+  document.getElementById('people').onclick = function (e) {
+    var b = e.target.closest('[data-edit]'); if (!b) return;
+    var p = people.filter(function (x) { return String(x.id) === b.dataset.edit; })[0];
+    if (p) openEdit(p);
+  };
+  }
+
+  var meId = null;
+  fetch('/api/auth/me', { credentials: 'same-origin' })
+    .then(function (r) { return r.status === 200 ? r.json() : null; })
+    .then(function (m) { if (m) meId = String(m.id); })
+    .catch(function () {});
+
+  function openEdit(p) {
+    var self = meId && String(p.id) === meId;
+    var box = document.createElement('div');
+    box.className = 'rights-edit';
+    box.innerHTML =
+      '<div class="rights-edit__box" role="dialog" aria-modal="true">' +
+        '<h3 class="msv-sub" style="margin:0 0 4px">' + esc(p.name) + '</h3>' +
+        '<p class="msv-note" style="margin:0 0 16px;color:var(--msv-n500)">' + esc(p.position || '') + '</p>' +
+
+        '<p class="msv-note" style="margin:0 0 6px">Роль — это права</p>' +
+        '<label class="msv-field" style="margin-bottom:16px">' +
+          '<select class="msv-input" id="reRole"' + (self ? ' disabled' : '') + '>' +
+            '<option value="staff">Сотрудник — заявки</option>' +
+            '<option value="moderator">Модератор — шахматка, резиденты, заявки, начисления</option>' +
+            '<option value="admin">Администратор — всё, включая права и зарплаты</option>' +
+          '</select>' +
+        '</label>' +
+
+        '<p class="msv-note" style="margin:0 0 6px">Что можно сверх роли</p>' +
+        '<label class="tog" style="display:flex;gap:8px;align-items:center;margin-bottom:8px">' +
+          '<input type="checkbox" id="reSh"> <span class="msv-body">Править шахматку</span></label>' +
+        '<label class="tog" style="display:flex;gap:8px;align-items:center;margin-bottom:16px">' +
+          '<input type="checkbox" id="rePay"> <span class="msv-body">Видеть зарплаты сотрудников</span></label>' +
+
+        (self ? '<p class="msv-note" style="margin:0 0 16px;color:var(--msv-red)">Свою роль менять нельзя: сняв её с себя, вы запрёте себя снаружи.</p>' : '') +
+
+        '<p class="msv-note" id="reMsg" hidden style="margin:0 0 12px"></p>' +
+        '<div style="display:flex;gap:8px;justify-content:flex-end">' +
+          '<button class="msv-btn msv-btn--m msv-btn--secondary" type="button" data-act="cancel">Отмена</button>' +
+          '<button class="msv-btn msv-btn--m msv-btn--primary" type="button" data-act="save">Сохранить</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(box);
+
+    var role = box.querySelector('#reRole');
+    var sh = box.querySelector('#reSh');
+    var pay = box.querySelector('#rePay');
+    var msg = box.querySelector('#reMsg');
+    role.value = p.role;
+    sh.checked = !!p.canEditShahmatka;
+    pay.checked = !!p.canPayroll;
+
+    /* У модератора и администратора эти права есть по роли — галочка
+       ничего не решает, и включённой её показывать честнее выключенной */
+    function sync() {
+      var big = role.value === 'admin' || role.value === 'moderator';
+      sh.disabled = big; if (big) sh.checked = true;
+      pay.disabled = role.value === 'admin'; if (role.value === 'admin') pay.checked = true;
+    }
+    sync();
+    role.addEventListener('change', sync);
+
+    box.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-act]');
+      if (e.target === box || (btn && btn.dataset.act === 'cancel')) { box.remove(); return; }
+      if (!btn || btn.dataset.act !== 'save') return;
+
+      var body = { canEditShahmatka: sh.checked, canPayroll: pay.checked };
+      if (!self && role.value !== p.role) body.role = role.value;
+
+      msg.hidden = false; msg.style.color = 'var(--msv-n500)'; msg.textContent = 'Сохраняю…';
+      fetch('/api/staff/' + p.id, {
+        method: 'PATCH', credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+      })
+        .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j }; }); })
+        .then(function (out) {
+          if (out.s !== 200) { msg.style.color = 'var(--msv-red)'; msg.textContent = out.j.error || 'Не удалось сохранить'; return; }
+          box.remove();
+          window.MSV_STAFF_LOAD().then(draw);
+        })
+        .catch(function () { msg.style.color = 'var(--msv-red)'; msg.textContent = 'Сеть не отвечает'; });
+    });
   }
 })();
 </script>
