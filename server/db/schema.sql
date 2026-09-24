@@ -238,6 +238,23 @@ CREATE INDEX IF NOT EXISTS bookings_contract_idx ON bookings(contract_id);
 -- значит, к записи кто-то ещё имеет доступ (решение заказчика 24.09.2026).
 ALTER TABLE users ADD COLUMN IF NOT EXISTS pin_changes integer NOT NULL DEFAULT 0;
 
+-- Доступ к зарплатам сотрудников даётся человеку, а не роли: заказчик
+-- хочет, чтобы один из модераторов вёл начисления, оставаясь модератором
+-- во всём остальном. Так же, как уже сделано с правкой шахматки
+-- (решение заказчика 24.09.2026).
+ALTER TABLE staff_profiles ADD COLUMN IF NOT EXISTS can_payroll boolean NOT NULL DEFAULT false;
+
+-- Править сам сайт — текст на страницах — может только владелец. Ни
+-- модератор, ни другой администратор. Правило снимает сам владелец,
+-- назвав кодовое слово (решение заказчика 24.09.2026).
+ALTER TABLE users ADD COLUMN IF NOT EXISTS can_edit_site boolean NOT NULL DEFAULT false;
+
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM users WHERE can_edit_site) THEN
+    UPDATE users SET can_edit_site = true WHERE phone = '+79261273999';
+  END IF;
+END $$;
+
 CREATE EXTENSION IF NOT EXISTS btree_gist;
 
 -- EXCLUDE создаёт индекс, поэтому при повторе ошибка не duplicate_object,

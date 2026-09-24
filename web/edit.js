@@ -247,22 +247,18 @@
   /* Без сервера (страница открыта с диска) карандаш показываем в
      кабинетах администратора и сотрудника — чтобы было видно, как это
      работает. Сохранить нельзя: некуда. Об этом скажет сама кнопка. */
+  /* Карандаш видит только владелец. Раньше его показывали всякому
+     администратору и модератору, а на служебных страницах — вообще
+     без проверки входа, по одному лишь имени файла. Править сам сайт —
+     не работа модератора (решение заказчика 24.09.2026). */
   var DEMO = location.protocol === 'file:';
-  var adminPage = /^(admin-|cabinet-admin|staff-|cabinet-staff)/.test(PAGE);
 
-  if (DEMO) {
-    if (adminPage) {
-      buildBar('admin');
-      var meta = bar.querySelector('[data-edit="meta"]');
-      meta.innerHTML = 'Ознакомительный режим: правки <b>не сохраняются</b> без сервера';
-      meta.hidden = false;
-    }
-  } else {
+  if (!DEMO) {
     applySaved().then(function () {
       return api('GET', '/api/auth/me');
     }).then(function (r) {
-      var role = r && r.status === 200 ? r.body.role : null;
-      if (role === 'admin' || role === 'moderator') { buildBar(role); loadMeta(); }
+      var me = r && r.status === 200 ? r.body : null;
+      if (me && me.canEditSite) { buildBar(me.role); loadMeta(); }
     }).catch(function () {});
   }
 })();

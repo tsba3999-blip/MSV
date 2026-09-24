@@ -143,7 +143,7 @@
 MSV.ready(function (ctx) {
   'use strict';
   if (ctx.live && ctx.me && ctx.me.role !== 'admin') {
-    document.querySelector('.work__body').innerHTML = '<p class="msv-body" style="padding:var(--msv-s48);text-align:center;color:var(--msv-n500)">Зарплаты сотрудников видит только администратор.</p>'; return;
+    document.querySelector('.work__body').innerHTML = '<p class="msv-body" style="padding:var(--msv-s48);text-align:center;color:var(--msv-n500)">Зарплаты сотрудников видны администратору и тому, кому это поручено.</p>'; return;
   }
   var STAFF = window.MSV_STAFF.slice(), PLACE = window.MSV_STAFF_PLACE, tenure = window.MSV_STAFF_TENURE;
   var log = [];

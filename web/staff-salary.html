@@ -126,30 +126,23 @@
     </header>
 
     <main class="work__body">
-      <p class="msv-note notice">Данные вымышленные: сервер ещё не подключён.</p>
+
 
       <div class="stats">
-        <div class="stat"><span class="stat__label">Мой оклад</span><span class="stat__value">45&#8201;000 руб.</span><span class="msv-note stat__note">в месяц, до премий</span></div>
-        <div class="stat"><span class="stat__label">Работаю дней</span><span class="stat__value" id="days">—</span><span class="msv-note stat__note">с 12 марта 2026</span></div>
-        <div class="stat"><span class="stat__label">Всего выплачено</span><span class="stat__value">152&#8201;700 руб.</span><span class="msv-note stat__note">за июнь — август</span></div>
+        <!-- Числа приходят с сервера. Раньше здесь стояли выдуманные
+             оклад и сумма выплат, и человек видел их как свои -->
+        <div class="stat"><span class="stat__label">Мой оклад</span><span class="stat__value" id="salary">—</span><span class="msv-note stat__note">в месяц, до премий</span></div>
+        <div class="stat"><span class="stat__label">Работаю дней</span><span class="stat__value" id="days">—</span><span class="msv-note stat__note" id="since"></span></div>
+        <div class="stat"><span class="stat__label">Всего выплачено</span><span class="stat__value" id="paidTotal">—</span><span class="msv-note stat__note">по записям в системе</span></div>
       </div>
 
       <h2 class="msv-sub" style="margin:0 0 var(--msv-s12)">Мои выплаты</h2>
       <table class="grid" id="pay">
         <thead><tr><th>За период</th><th class="num">Аванс</th><th class="num">Зарплата</th><th class="num">Премия</th><th class="num">Итого в мес.</th><th>Выплачено</th><th>Получил</th></tr></thead>
+        <!-- Строки приходят с сервера. Раньше здесь стояли выдуманные
+             выплаты, и при отказе сервера человек видел их как свои
+             (решение заказчика 24.09.2026) -->
         <tbody>
-          <tr data-row><td>Сентябрь 2026</td><td class="num">20&#8201;000</td><td class="num">32&#8201;400</td><td class="num">6&#8201;000</td><td class="num"><b>58&#8201;400</b></td>
-            <td><span class="tag tag--mute" data-paid>ждёт</span></td>
-            <td><button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" data-got disabled>Получил</button></td></tr>
-          <tr data-row><td>Август 2026</td><td class="num">20&#8201;000</td><td class="num">32&#8201;000</td><td class="num">0</td><td class="num"><b>52&#8201;000</b></td>
-            <td><span class="tag tag--ok" data-paid>05.09.26</span></td>
-            <td><button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-got>Получил</button></td></tr>
-          <tr data-row><td>Июль 2026</td><td class="num">20&#8201;000</td><td class="num">31&#8201;700</td><td class="num">4&#8201;000</td><td class="num"><b>55&#8201;700</b></td>
-            <td><span class="tag tag--ok" data-paid>05.08.26</span></td>
-            <td><span class="tag tag--ok">06.08.26</span></td></tr>
-          <tr data-row><td>Июнь 2026</td><td class="num">20&#8201;000</td><td class="num">25&#8201;000</td><td class="num">0</td><td class="num"><b>45&#8201;000</b></td>
-            <td><span class="tag tag--ok" data-paid>05.07.26</span></td>
-            <td><span class="tag tag--ok">05.07.26</span></td></tr>
         </tbody>
       </table>
       <p class="msv-note" style="margin-top:var(--msv-s12)">«Выплачено» отмечает администратор после перевода. «Получил» нажимает сотрудник, когда деньги пришли — так обе стороны видят, что расчёт закрыт.</p>
@@ -176,9 +169,32 @@
           '<td><span class="tag tag--ok">' + f(x.paidAt) + '</span></td><td>' + (x.receivedAt ? '<span class="tag tag--ok">' + f(x.receivedAt) + '</span>' : '<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-got="' + x.id + '">Получил</button>') + '</td></tr>';
       }).join('') : '<tr><td colspan="7" class="grid__empty">Начислений пока нет.</td></tr>';
       var total = rows.reduce(function (a, x) { return a + x.total; }, 0);
-      var stat = document.querySelectorAll('.stat__value')[2]; if (stat) stat.textContent = money(total) + ' руб.';
+      var stat = document.getElementById('paidTotal');
+      if (stat) stat.textContent = rows.length ? money(total) + ' руб.' : 'нет выплат';
       var note = document.querySelector('.notice'); if (note) note.remove();
     }).catch(function () {});
+
+    /* Оклад и дата выхода — из своей же анкеты, а не из вёрстки */
+    fetch('/api/me/staff', { credentials: 'same-origin' })
+      .then(function (r) { return r.status === 200 ? r.json() : null; })
+      .then(function (d) {
+        if (!d) return;
+        var money = function (n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u2009'); };
+        var sal = document.getElementById('salary');
+        if (sal) sal.textContent = d.salary ? money(d.salary) + ' руб.' : 'не задан';
+
+        var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(d.started || ''));
+        var since = document.getElementById('since');
+        var days = document.getElementById('days');
+        if (!m) { if (since) since.textContent = 'дата выхода не задана'; if (days) days.textContent = '—'; return; }
+        var from = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+        var today = new Date();
+        var n = Math.max(0, Math.round((Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()) - from) / 86400000));
+        if (days) days.textContent = String(n);
+        var MON = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+        if (since) since.textContent = 'с ' + Number(m[3]) + ' ' + MON[+m[2] - 1] + ' ' + m[1];
+      })
+      .catch(function () {});
   }
 
   document.getElementById('pay').addEventListener('click', function (e) {
