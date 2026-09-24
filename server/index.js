@@ -53,6 +53,13 @@ setTimeout(() => { sale.sweepSale().catch(() => {}); }, 60 * 1000);
 
 /* Выехал — на следующий день доступ в кабинет закрывается. Данные
    остаются: отключаем запись, а не удаляем (решение заказчика 25.09.2026) */
+/* Начисления за месяц. Раньше их не создавал никто, кроме самой
+   брони, — и правило «оплата до 15 числа» работать не могло
+   (найдено на прогоне 25.09.2026). */
+const accrual = require('./lib/accrual');
+setInterval(() => { accrual.sweepAccrual().catch((e) => console.error('[accrual]', e.message)); }, 60 * 60 * 1000);
+setTimeout(() => { accrual.sweepAccrual().catch(() => {}); }, 40 * 1000);
+
 const access = require('./lib/access');
 setInterval(() => { access.sweepAccess().catch((e) => console.error('[access]', e.message)); }, 60 * 60 * 1000);
 setTimeout(() => { access.sweepAccess().catch(() => {}); }, 80 * 1000);

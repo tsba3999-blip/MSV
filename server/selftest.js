@@ -275,7 +275,7 @@ function checkTime() {
 
   /* Правила, которые двигают чужие деньги и доступ, включаются разом —
      пока перенос не закончен, они молчат. */
-  for (const f of ['penalty.js', 'sale.js', 'access.js']) {
+  for (const f of ['penalty.js', 'sale.js', 'access.js', 'accrual.js']) {
     check('правило ' + f + ' под общим выключателем',
       read(path.join(SRV, 'lib', f)).includes("key = 'money_rules'"),
       'сработает на неполных данных');
@@ -290,6 +290,16 @@ function checkTime() {
    из репозитория с удалением лишнего, то есть стёрла бы все загруженные
    фото при первом же обновлении сайта.
    ============================================================ */
+function checkMoney() {
+  /* Было: начисление за месяц появлялось только при брони. Человек с
+     годовым контрактом, оплативший сентябрь, за октябрь счёта не
+     получал никогда — и пени, и продажа места, и долг в шахматке
+     держатся на начислении, которого нет (найдено 25.09.2026). */
+  const ix = read(path.join(SRV, 'index.js'));
+  check('начисления за месяц кто-то создаёт', /accrual\.sweepAccrual\(\)/.test(ix),
+    'обход не запущен — долгов не возникнет никогда');
+}
+
 function checkUploads() {
   const db = read(path.join(SRV, 'lib/db.js'));
   check('папка загрузок настраивается', /UPLOAD_DIR/.test(db),
@@ -346,6 +356,7 @@ async function checkLive() {
   checkSchema();
   checkTime();
   checkUploads();
+  checkMoney();
   await checkLive();
 
   console.log('');
