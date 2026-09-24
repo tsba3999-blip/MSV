@@ -259,6 +259,18 @@ module.exports = function register(route) {
     if (!Number.isInteger(id)) return fail(res, 400, 'Неверный номер брони');
     const body = await readJson(req);
 
+    /* Выехать раньше, чем заехал, нельзя. Без этой проверки бронь
+       получала дату освобождения 2020 года при заезде в 2027-м:
+       в шахматке она рисовалась задом наперёд, а доступ закрывался
+       сразу (найдено на прогоне 25.09.2026). */
+    if (body.releaseFrom) {
+      const cur = await query(`SELECT date_from::text AS f FROM bookings WHERE id = $1`, [id]);
+      if (!cur.rows[0]) return fail(res, 404, 'Брони нет');
+      if (String(body.releaseFrom) < cur.rows[0].f) {
+        return fail(res, 400, 'Выезд раньше заезда: человек заехал ' + cur.rows[0].f.split('-').reverse().join('.'));
+      }
+    }
+
     const sets = [], vals = [];
     if (body.bedId) { vals.push(String(body.bedId)); sets.push(`bed_id = $${vals.length}`); }
     if (body.from)  { vals.push(String(body.from).slice(0, 10)); sets.push(`date_from = $${vals.length}`); }

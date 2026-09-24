@@ -191,7 +191,16 @@ module.exports = function register(route) {
     const b = await readJson(req);
 
     const str = (v, n) => v === undefined || v === null ? null : String(v).slice(0, n);
-    const bday = /^\d{4}-\d{2}-\d{2}$/.test(String(b.birthday || '')) ? b.birthday : null;
+    let bday = /^\d{4}-\d{2}-\d{2}$/.test(String(b.birthday || '')) ? b.birthday : null;
+    /* Человек не мог родиться завтра и вряд ли сто лет назад. Без
+       проверки в анкету попадал 2099 год, а от даты рождения зависит,
+       нужно ли согласие родителей (найдено на прогоне 25.09.2026). */
+    if (bday) {
+      const y = Number(bday.slice(0, 4));
+      const now = new Date().getUTCFullYear();
+      if (y > now || y < now - 100) return fail(res, 400, 'Проверьте дату рождения');
+      if (new Date(bday + 'T00:00:00Z') > new Date()) return fail(res, 400, 'Дата рождения не может быть в будущем');
+    }
     const health = Number.isInteger(b.healthScore) && b.healthScore >= 1 && b.healthScore <= 5 ? b.healthScore : null;
     const mess = Array.isArray(b.messengers) ? b.messengers.filter((m) => m === 'tg' || m === 'max') : [];
     const gender = b.gender === 'м' || b.gender === 'ж' ? b.gender : null;
@@ -352,6 +361,11 @@ module.exports = function register(route) {
 
     const bookingId = Number(b.bookingId), amount = Number(b.amount);
     if (!Number.isInteger(bookingId) || !Number.isInteger(amount) || amount <= 0) return fail(res, 400, 'Нужны бронь и сумма');
+    /* Потолок на один платёж. Месяц стоит десятки тысяч, год — сотни;
+       миллион — это уже опечатка, лишний ноль или два. Принимать её
+       нельзя: в шахматке у человека появится переплата на годы вперёд,
+       а найти её потом трудно (найдено на прогоне 25.09.2026). */
+    if (amount > 1000000) return fail(res, 400, 'Больше миллиона за раз — проверьте, не лишний ли ноль');
     const METHODS = ['sbp', 'card', 'cash', 'transfer', 'other'];
     const method = METHODS.indexOf(b.method) >= 0 ? b.method : 'other';
 
