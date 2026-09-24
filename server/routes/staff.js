@@ -190,6 +190,27 @@ module.exports = function register(route) {
      Кто кому может: модератор — резидентам и сотрудникам, администратор —
      всем. Сколько угодно раз: код не ценность, ценность — учётная запись.
      Каждая выдача попадает в журнал. */
+  /* Отключить учётную запись сотрудника. Не удалить: журнал действий
+     должен остаться связным — кто что делал, видно и через год. Отключённый
+     не может войти, и из списков пропадает (решение заказчика 24.09.2026). */
+  route('POST', '/api/staff/:id/active', async (req, res) => {
+    const s = adminOnly(req, res); if (!s) return;
+    const uid = Number(req.params.id);
+    if (!Number.isInteger(uid)) return fail(res, 400, 'Неверный номер');
+    if (uid === Number(s.uid)) return fail(res, 400, 'Себя отключить нельзя');
+
+    const b = await readJson(req);
+    const active = b.active === true;
+    const r = await query(`UPDATE users SET is_active = $2 WHERE id = $1 RETURNING name, role`, [uid, active]);
+    const who = r.rows[0];
+    if (!who) return fail(res, 404, 'Учётная запись не найдена');
+
+    await query(`INSERT INTO audit_log (actor_id, action, target, payload) VALUES ($1, $2, $3, $4)`,
+      [s.uid, active ? 'user.enable' : 'user.disable', 'user:' + uid,
+       JSON.stringify({ name: who.name, role: who.role })]);
+    json(res, 200, { ok: true, name: who.name, active });
+  });
+
   route('POST', '/api/users/:id/pin', async (req, res) => {
     const s = auth.readSession(req);
     if (!s) return fail(res, 401, 'Не выполнен вход');
