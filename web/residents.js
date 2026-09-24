@@ -16,6 +16,11 @@ MSV.ready(function (ctx) {
     return m ? Date.UTC(+m[1], +m[2] - 1, +m[3]) : null;
   }
 
+  /* Число без «руб.»: в подстрочнике единица уже названа в сумме над ним */
+  function num(n) {
+    return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '\u2009');
+  }
+
   function money(n) {
     return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '\u2009') + '\u2009руб.';
   }
@@ -211,18 +216,18 @@ MSV.ready(function (ctx) {
          пришлось бы считать глазами (решение заказчика 24.09.2026). */
       var pay = x.owed > 0.5
         ? '<b class="owe">' + esc(money(x.owed)) + '</b>' +
-          '<span class="msv-note sub">оплачено ' + esc(money(x.paid)) + ' из ' + esc(money(x.accrued)) + '</span>' +
-          (x.penalty > 0.5 ? '<span class="msv-note sub">в том числе пени ' + esc(money(x.penalty)) + '</span>' : '')
+          '<span class="msv-note sub">оплачено ' + esc(num(x.paid)) + ' из ' + esc(num(x.accrued)) + '</span>' +
+          (x.penalty > 0.5 ? '<span class="msv-note sub">пени ' + esc(num(x.penalty)) + '</span>' : '')
         : '<span class="tag tag--ok">без долга</span>';
 
       /* Кнопки на время переноса данных: оплату и депозит за тех, кто
          заселился до появления системы, заносит модератор. */
       var payBtn = x.owed > 0.5
-        ? '<button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" data-act="paid">Внести оплату</button>'
+        ? '<button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" data-act="paid" title="Отметить оплату за месяц">Внести</button>'
         : '<span class="tag tag--ok">оплачено</span>';
       var depBtn = x.deposit
         ? '<span class="tag tag--ok">внесён</span>'
-        : '<button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" data-act="dep" title="Депозит равен месячной плате и засчитывается оплатой августа">Внести депозит</button>';
+        : '<button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" data-act="dep" title="Депозит равен месячной плате и засчитывается оплатой августа">Внести</button>';
 
       var reg;
       if (x.regUntil === null) reg = '<span class="tag tag--mute">нет</span>';
