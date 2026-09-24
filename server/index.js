@@ -38,6 +38,12 @@ const holds = require('./routes/holds');
 setInterval(() => { holds.sweepHolds().catch((e) => console.error('[holds]', e.message)); }, 10 * 60 * 1000);
 setTimeout(() => { holds.sweepHolds().catch(() => {}); }, 20 * 1000);
 
+/* Пени за просрочку оплаты. Пересчёт идемпотентный — можно гонять часто,
+   лишнего не начислит (правило заказчика, 24.09.2026) */
+const penalty = require('./lib/penalty');
+setInterval(() => { penalty.sweepPenalties().catch((e) => console.error('[penalty]', e.message)); }, 60 * 60 * 1000);
+setTimeout(() => { penalty.sweepPenalties().catch(() => {}); }, 40 * 1000);
+
 // Проверка живости — для nginx и для себя
 router.route('GET', '/api/health', async (req, res) => {
   try {

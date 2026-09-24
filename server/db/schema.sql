@@ -241,6 +241,12 @@ CREATE TABLE IF NOT EXISTS charges (
 
 CREATE INDEX IF NOT EXISTS charges_booking_idx ON charges(booking_id, period);
 
+-- Снятое начисление. Пени начисляет система, а отменить их может только
+-- модератор или администратор — снятое в долг не идёт и заново не
+-- начисляется (правило заказчика, 24.09.2026).
+ALTER TABLE charges ADD COLUMN IF NOT EXISTS cancelled_at timestamptz;
+ALTER TABLE charges ADD COLUMN IF NOT EXISTS cancelled_by bigint REFERENCES users(id) ON DELETE SET NULL;
+
 -- Платёж: сколько и когда пришло. Может закрывать несколько
 -- начислений, поэтому не привязан к одному из них.
 DO $$ BEGIN
@@ -585,7 +591,7 @@ SELECT
   COALESCE(SUM(c.amount), 0)
     - COALESCE((SELECT SUM(p.amount) FROM payments p WHERE p.booking_id = b.id), 0) AS balance
 FROM bookings b
-LEFT JOIN charges c ON c.booking_id = b.id
+LEFT JOIN charges c ON c.booking_id = b.id AND c.cancelled_at IS NULL
 GROUP BY b.id;
 
 -- Кто живёт сейчас: одна строка на занятое место

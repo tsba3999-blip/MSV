@@ -94,7 +94,7 @@ module.exports = function register(route) {
     const bookingIds = bookings.rows.map((b) => b.id);
     const [charges, payments] = bookingIds.length
       ? await Promise.all([
-          query(`SELECT id, booking_id, kind, period, amount, due_date, note, created_at
+          query(`SELECT id, booking_id, kind, period, amount, due_date, note, created_at, cancelled_at
                  FROM charges WHERE booking_id = ANY($1) ORDER BY COALESCE(period, created_at::date) DESC`, [bookingIds]),
           query(`SELECT id, booking_id, amount, paid_at, method, period, note
                  FROM payments WHERE booking_id = ANY($1) ORDER BY paid_at DESC`, [bookingIds])
@@ -129,7 +129,8 @@ module.exports = function register(route) {
       })),
       charges: charges.rows.map((c) => ({
         id: String(c.id), kind: c.kind, period: iso(c.period), amount: c.amount,
-        due: iso(c.due_date), note: c.note || '', at: c.created_at
+        due: iso(c.due_date), note: c.note || '', at: c.created_at,
+        cancelled: c.cancelled_at ? c.cancelled_at : null
       })),
       payments: payments.rows.map((p) => ({
         id: String(p.id), amount: p.amount, at: p.paid_at, method: p.method,
@@ -161,6 +162,25 @@ module.exports = function register(route) {
   /* ---------- Правка анкеты за резидента ----------
      Поля те же, что резидент заполняет сам (PUT /api/me/profile).
      Каждая правка попадает в журнал: видно, кто и что менял. */
+
+  /* Снять начисленные пени. Система начисляет их сама, отменяет только
+     человек — модератор или администратор (правило заказчика, 24.09.2026). */
+  route('POST', '/api/charges/:id/cancel', async (req, res) => {
+    const s = staffOnly(req, res);
+    if (!s) return;
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id)) return fail(res, 400, 'Неверный номер начисления');
+    const r = await query(`SELECT kind, cancelled_at FROM charges WHERE id = $1`, [id]);
+    const c = r.rows[0];
+    if (!c) return fail(res, 404, 'Начисление не найдено');
+    if (c.kind !== 'penalty') return fail(res, 400, 'Снять можно только пени');
+    if (c.cancelled_at) return json(res, 200, { ok: true });
+    await query(`UPDATE charges SET cancelled_at = now(), cancelled_by = $1 WHERE id = $2`, [s.uid, id]);
+    await query(`INSERT INTO audit_log (actor_id, action, target, payload)
+                 VALUES ($1, 'charge.cancel', $2, $3)`,
+      [s.uid, 'charge:' + id, JSON.stringify({ kind: 'penalty' })]);
+    json(res, 200, { ok: true });
+  });
 
   route('PUT', '/api/residents/:id/profile', async (req, res) => {
     const s = staffOnly(req, res);

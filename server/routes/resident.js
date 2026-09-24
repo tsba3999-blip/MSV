@@ -259,8 +259,15 @@ module.exports = function register(route) {
                            GREATEST(($2::date - interval '1 month')::date + 14, CURRENT_DATE))`,
             [id, period + '-01', price]);
         }
+        /* Депозит — не залог, а оплата последнего месяца годового контракта,
+           то есть августа следующего года (Правила, п. 6.1). Проставляем ему
+           этот месяц, чтобы деньги были видны на своём месте и чтобы за август
+           потом не начислили второй раз (24.09.2026). */
         if (b.deposit) {
-          await q(`INSERT INTO charges (booking_id, kind, amount) VALUES ($1, 'deposit', $2)`, [id, price]);
+          await q(`INSERT INTO charges (booking_id, kind, period, amount, note)
+                   VALUES ($1, 'deposit',
+                           make_date(EXTRACT(YEAR FROM ($2::date + interval '1 year' - interval '1 day'))::int, 8, 1),
+                           $3, 'Оплата августа — последнего месяца годового контракта')`, [id, from, price]);
         }
         /* Подписи документов: отдельная запись на каждый документ и каждую оплату */
         for (const kind of ['contract', 'rules', 'consent']) {
