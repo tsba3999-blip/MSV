@@ -251,6 +251,31 @@ BEGIN
   END LOOP;
 END $$;
 
+-- Разовая правка демонстрационных данных (решение заказчика 24.09.2026).
+-- У выдуманных жильцов договор кончался 1 октября 2026 — при том, что в
+-- нём написано «Годовой контракт». Из-за этого система считала, что
+-- первого октября пустеет вся сеть, и «Освободятся скоро» показывал
+-- целые резиденции. Годовой контракт идёт до конца августа.
+--
+-- Места, где на новые даты уже стоит чужая бронь, пропускаем: иначе
+-- сработает запрет на двойную продажу и выкладывание встанет.
+-- Повторный запуск ничего не делает: таких дат в базе больше нет.
+UPDATE bookings b SET date_to = DATE '2027-08-31'
+ WHERE b.date_to = DATE '2026-10-01'
+   AND b.user_id IS NOT NULL
+   AND NOT EXISTS (
+     SELECT 1 FROM bookings o
+      WHERE o.bed_id = b.bed_id AND o.id <> b.id
+        AND daterange(o.date_from, o.date_to, '[)')
+         && daterange(b.date_from, DATE '2027-08-31', '[)')
+   );
+
+UPDATE contracts c SET date_to = DATE '2027-08-31'
+  FROM bookings b
+ WHERE b.contract_id = c.id
+   AND b.date_to = DATE '2027-08-31'
+   AND c.date_to = DATE '2026-10-01';
+
 CREATE EXTENSION IF NOT EXISTS btree_gist;
 
 -- EXCLUDE создаёт индекс, поэтому при повторе ошибка не duplicate_object,
