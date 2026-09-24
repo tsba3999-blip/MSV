@@ -109,7 +109,7 @@
 }
 
 .filters { margin-bottom: var(--msv-s24); }
-.filters__label { display: block; margin-bottom: var(--msv-s8); font-size: var(--msv-body-size); line-height: var(--msv-body-line); font-weight: 600; color: var(--msv-graphite); }
+.filters__label { display: block; margin-bottom: var(--msv-s4); font-size: var(--msv-body-size); line-height: var(--msv-body-line); font-weight: 600; color: var(--msv-graphite); }
 .filters__row { margin-bottom: var(--msv-s16); }
 .filters__row:last-child { margin-bottom: 0; }
 
