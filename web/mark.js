@@ -86,8 +86,33 @@
     var shell = document.querySelector('.shell'), side = document.querySelector('.side');
     if (!shell || !side) return;
     var who = side.querySelector('.side__who');
-    var name = who && who.querySelector('.side__name') ? who.querySelector('.side__name').textContent.trim() : '';
-    if (who) who.setAttribute('data-initials', name.split(/\s+/).map(function (w) { return w[0] || ''; }).slice(0, 2).join('').toUpperCase());
+
+    /* Имя в боковом меню было зашито в вёрстку — у всех стояла «Ирина
+       Соколова», кто бы ни вошёл. Берём настоящее из учётной записи
+       (решение заказчика 24.09.2026). */
+    function setInitials() {
+      if (!who) return;
+      var n = who.querySelector('.side__name');
+      var nm = n ? n.textContent.trim() : '';
+      who.setAttribute('data-initials',
+        nm.split(/\s+/).map(function (w) { return w[0] || ''; }).slice(0, 2).join('').toUpperCase());
+    }
+    setInitials();
+
+    if (who && location.protocol !== 'file:') {
+      var ROLE = { admin: 'Администратор', moderator: 'Модератор', staff: 'Сотрудник', resident: 'Резидент' };
+      fetch('/api/auth/me', { credentials: 'same-origin' })
+        .then(function (r) { return r.status === 200 ? r.json() : null; })
+        .then(function (me) {
+          if (!me) return;
+          var n = who.querySelector('.side__name');
+          var r = who.querySelector('.side__role');
+          if (n && me.name) n.textContent = me.name;
+          if (r && me.role) r.textContent = ROLE[me.role] || me.role;
+          setInitials();
+        })
+        .catch(function () {});
+    }
     var btn = document.createElement('button');
     btn.type = 'button'; btn.className = 'side__fold'; btn.setAttribute('aria-label', 'Свернуть меню'); btn.title = 'Свернуть меню';
     btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 6l-6 6 6 6"/><path d="M18 6l-6 6 6 6"/></svg>';
