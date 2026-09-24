@@ -16,6 +16,10 @@
   .invite__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--msv-s12); }
   .invite .msv-field { margin-bottom: 0; }
   .invite .msv-error { margin-top: var(--msv-s12); }
+  /* Удаление — единственное необратимое действие в списке, поэтому оно
+     красное и держится особняком, в своей колонке (24.09.2026) */
+  .del { color: var(--msv-red); }
+  .del:hover { background: rgba(251, 52, 74, .07); }
 </style>
 <style>
   body { --role: var(--msv-graphite); --role-ink: var(--msv-graphite); }
@@ -156,7 +160,7 @@
         <thead>
           <tr>
             <th>Резидент</th><th>Место</th><th>Телефон</th>
-            <th class="num">Оплата</th><th>Регистрация</th>
+            <th class="num">Оплата</th><th>Регистрация</th><th></th>
           </tr>
         </thead>
         <tbody id="rows"></tbody>
@@ -294,7 +298,7 @@ MSV.ready(function (ctx) {
     countBox.textContent = list.length + ' из ' + ALL.length;
 
     if (!list.length) {
-      rowsBox.innerHTML = '<tr><td colspan="5" class="grid__empty">Никого не нашлось. Снимите фильтр или измените запрос.</td></tr>';
+      rowsBox.innerHTML = '<tr><td colspan="6" class="grid__empty">Никого не нашлось. Снимите фильтр или измените запрос.</td></tr>';
       return;
     }
 
@@ -312,7 +316,7 @@ MSV.ready(function (ctx) {
       var minor = (x.age !== null && x.age < 18)
         ? ' <span class="tag tag--bad">до 18</span>' : '';
 
-      return '<tr data-name="' + esc(x.name) + '">' +
+      return '<tr data-name="' + esc(x.name) + '" data-user="' + esc(x.userId) + '">' +
         '<td><span class="who-cell">' +
           '<span class="who-cell__face">' + esc(initials(x.name)) + '</span>' +
           '<span><span class="who-cell__name">' + esc(x.name) + minor + '</span>' +
@@ -323,6 +327,7 @@ MSV.ready(function (ctx) {
         '<td>' + (x.phone ? '<a href="tel:+' + esc(x.phone.replace(/\D/g, '')) + '">' + esc(x.phone) + '</a>' : '—') + '</td>' +
         '<td class="num">' + pay + '</td>' +
         '<td>' + reg + ' <button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" data-reg title="Загрузить регистрацию">Загрузить</button></td>' +
+        '<td class="num"><button class="msv-btn msv-btn--s msv-btn--tertiary del" type="button" data-del title="Удалить резидента из базы">Удалить</button></td>' +
       '</tr>';
     }).join('');
   }
@@ -367,6 +372,40 @@ MSV.ready(function (ctx) {
   regPicker.type = 'file'; regPicker.accept = 'image/*,application/pdf'; regPicker.style.display = 'none';
   document.body.appendChild(regPicker);
   var regFor = null;
+
+  /* Удаление резидента: двойное согласие. Сперва человек соглашается с тем,
+     что именно исчезнет, потом набирает имя руками. Одного промаха по кнопке
+     мало (решение заказчика 24.09.2026). */
+  rowsBox.addEventListener('click', function (e) {
+    var d = e.target.closest('[data-del]'); if (!d) return;
+    var tr = d.closest('tr');
+    var name = tr.dataset.name;
+    var id = tr.dataset.user;
+
+    var rows = ALL.filter(function (x) { return String(x.userId) === String(id); }).length;
+    var first = 'Удалить резидента ' + name + ' из базы?\n\n' +
+      'Исчезнут: ' + rows + ' ' + (rows === 1 ? 'бронь' : (rows < 5 ? 'брони' : 'броней')) +
+      ', все начисления и платежи, заявки, документы и анкета.\n' +
+      'Вернуть удалённое будет нельзя.';
+    if (!confirm(first)) return;
+
+    var typed = prompt('Второе подтверждение.\nНабери имя резидента точно так, как оно записано:\n\n' + name);
+    if (typed === null) return;
+    if (typed.trim().replace(/\s+/g, ' ').toLowerCase() !== name.trim().replace(/\s+/g, ' ').toLowerCase()) {
+      alert('Имя набрано иначе. Ничего не удалено.');
+      return;
+    }
+
+    if (!ctx.live) { alert('Без сервера: ' + name + ' был бы удалён из базы.'); return; }
+    d.disabled = true;
+    ctx.api('POST', '/api/residents/' + encodeURIComponent(id) + '/delete', { confirm: true, name: typed })
+      .then(function (r) {
+        if (r.status === 200) { alert('Резидент ' + name + ' удалён.'); location.reload(); return; }
+        d.disabled = false;
+        alert(r.body && r.body.error || 'Не удалось удалить');
+      })
+      .catch(function () { d.disabled = false; alert('Сервер не отвечает.'); });
+  });
 
   rowsBox.addEventListener('click', function (e) {
     var b = e.target.closest('[data-reg]'); if (!b) return;

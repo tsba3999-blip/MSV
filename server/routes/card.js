@@ -163,6 +163,44 @@ module.exports = function register(route) {
      Поля те же, что резидент заполняет сам (PUT /api/me/profile).
      Каждая правка попадает в журнал: видно, кто и что менял. */
 
+  /* Удалить резидента целиком — вместе с бронями, начислениями, платежами,
+     заявками и документами. Нужно для выдуманных записей, которыми набивали
+     базу: настоящего резидента так не убирают.
+
+     Двойное согласие: мало нажать кнопку — нужно ещё прислать имя резидента,
+     набранное руками. Промах по кнопке ничего не удалит. Брони и заявки
+     снимаем явно: база держит их на RESTRICT, и молча они бы не ушли.
+     (решение заказчика 24.09.2026) */
+  route('POST', '/api/residents/:id/delete', async (req, res) => {
+    const s = staffOnly(req, res);
+    if (!s) return;
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id)) return fail(res, 400, 'Неверный номер резидента');
+    if (id === Number(s.uid)) return fail(res, 400, 'Нельзя удалить самого себя');
+
+    const b = await readJson(req);
+    const u = await query(`SELECT id, name, role FROM users WHERE id = $1`, [id]);
+    const user = u.rows[0];
+    if (!user) return fail(res, 404, 'Резидент не найден');
+    if (user.role !== 'resident') return fail(res, 400, 'Удалять можно только резидентов');
+
+    const plain = (v) => String(v || '').trim().replace(/\s+/g, ' ').toLowerCase();
+    if (b.confirm !== true) return fail(res, 400, 'Нужно подтверждение');
+    if (!plain(b.name) || plain(b.name) !== plain(user.name)) {
+      return fail(res, 400, 'Имя набрано не так, как записано у резидента');
+    }
+
+    await tx(async (q) => {
+      await q(`INSERT INTO audit_log (actor_id, action, target, payload)
+               VALUES ($1, 'user.delete', $2, $3)`,
+        [s.uid, 'user:' + id, JSON.stringify({ name: user.name })]);
+      await q(`DELETE FROM tickets WHERE user_id = $1`, [id]);
+      await q(`DELETE FROM bookings WHERE user_id = $1`, [id]);
+      await q(`DELETE FROM users WHERE id = $1`, [id]);
+    });
+    json(res, 200, { ok: true });
+  });
+
   /* Снять начисленные пени. Система начисляет их сама, отменяет только
      человек — модератор или администратор (правило заказчика, 24.09.2026). */
   route('POST', '/api/charges/:id/cancel', async (req, res) => {
