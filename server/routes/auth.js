@@ -100,6 +100,11 @@ module.exports = function register(route) {
     if (!u || !u.is_active) return fail(res, 401, 'Учётная запись отключена');
     // сотруднику — его резиденции и право редактировать шахматку
     const residences = u.place === 'all' || u.role === 'admin' || u.role === 'moderator' ? ['forma', 'uyut', 'molod'] : (u.place ? [u.place] : []);
-    json(res, 200, { id: u.id, role: u.role, name: u.name, residences, canEditShahmatka: u.role !== 'staff' || !!u.can_edit_shahmatka });
+    /* Ведёт ли система деньги сама. Нужно кабинетам, чтобы честно сказать
+       модератору: пени и продажа мест пока не работают (24.09.2026). */
+    const mr = await query(`SELECT value FROM settings WHERE key = 'money_rules'`);
+    json(res, 200, { id: u.id, role: u.role, name: u.name, residences,
+      canEditShahmatka: u.role !== 'staff' || !!u.can_edit_shahmatka,
+      moneyRules: !!(mr.rows[0] && mr.rows[0].value === '1') });
   });
 };

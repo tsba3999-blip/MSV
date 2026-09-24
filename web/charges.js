@@ -6,6 +6,21 @@
 MSV.ready(function (ctx) {
   'use strict';
 
+  /* Пока перенос данных не закончен, система не считает пени и не
+     выставляет места на продажу. Говорим об этом прямо там, где человек
+     вносит оплаты, — иначе легко забыть дать команду (24.09.2026). */
+  (function () {
+    if (!ctx.live || !ctx.me || ctx.me.moneyRules) return;
+    var box = document.querySelector('.work__body');
+    if (!box) return;
+    var p = document.createElement('p');
+    p.className = 'msv-note notice';
+    p.textContent = 'Идёт перенос данных: пени и автоматическая продажа неоплаченных мест пока выключены. ' +
+      'Когда все оплаты и депозиты будут в системе, администратор включает их в настройках — одной галочкой ' +
+      '«Перешли на новую шахматку».';
+    box.insertBefore(p, box.firstChild);
+  })();
+
   var RES = ctx.residences;
   var PENALTY = 3000;               // пени за первый день просрочки — из хендоффа
   var DUE_DAY = 15;                 // оплата до 15 числа

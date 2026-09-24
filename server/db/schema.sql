@@ -302,6 +302,12 @@ DO $$ BEGIN
   END IF;
 END $$;
 
+-- Денежные правила — пени и автоматическая продажа неоплаченных мест —
+-- ждут одной команды: её даёт администратор, когда перенос данных со
+-- старой шахматки закончен (решение заказчика 24.09.2026).
+INSERT INTO settings (key, value) VALUES ('money_rules', '0')
+ON CONFLICT (key) DO NOTHING;
+
 CREATE EXTENSION IF NOT EXISTS btree_gist;
 
 -- EXCLUDE создаёт индекс, поэтому при повторе ошибка не duplicate_object,
