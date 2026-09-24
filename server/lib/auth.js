@@ -180,7 +180,12 @@ async function setPin(userId, pin, current) {
   const row = cur.rows[0];
   if (row && row.pin_hash) {
     if (!/^\d{4}$/.test(String(current || ""))) return { ok: false, error: "Введи действующий код" };
-    const same = crypto.timingSafeEqual(Buffer.from(row.pin_hash, "hex"), Buffer.from(hashPin(current, userId), "hex"));
+    /* ВРЕМЕННО, пока DEMO_MODE=1: демо-код принимается и как действующий.
+       Иначе тот, кто вошёл по нему, не может задать себе свой собственный —
+       вход есть, а смены нет. Уйдёт вместе с демо-режимом. */
+    const demo = config.demoMode && String(current) === config.demoPin;
+    const same = demo || crypto.timingSafeEqual(
+      Buffer.from(row.pin_hash, "hex"), Buffer.from(hashPin(current, userId), "hex"));
     if (!same) return { ok: false, error: "Действующий код не подошёл" };
   }
   await query(`UPDATE users SET pin_hash = $1, pin_expires = NULL, pin_attempts = 0 WHERE id = $2`,
