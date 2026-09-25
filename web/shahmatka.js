@@ -627,10 +627,10 @@
       /* Карточку открывает только фамилия, а не вся полоса: по полосе
          водят курсором, когда примеряют перенос (решение заказчика
          24.09.2026). С клавиатуры по-прежнему открывается вся полоса. */
+      if (self._justDragged) { self._justDragged = false; return; }
       var name = e.target.closest('.msv-sh__bar-name');
       var bar2 = name && name.closest('.msv-sh__bar');
       if (!bar2) return;
-      if (self._justDragged) { self._justDragged = false; return; }
       self.openBooking(bar2.dataset.id);
     });
 
@@ -706,12 +706,6 @@
       /* Гасим выделение текста: браузер начинал выделять подпись внутри
          полосы и присылал pointercancel, обрывая перенос до начала. */
       e.preventDefault();
-
-      /* Захват указателя: дальше все события идут этой полосе, даже
-         когда курсор уходит с неё или за край окна. */
-      if (bar.setPointerCapture) {
-        try { bar.setPointerCapture(e.pointerId); } catch (err) { /* не поддержано — работаем без захвата */ }
-      }
 
       var track = bar.parentNode;
       var axis = self._axis();
@@ -895,6 +889,10 @@
 
   Shahmatka.prototype._dragStart = function () {
     var g = this._drag;
+    // Capture only after dragging starts; ordinary clicks must target the surname.
+    if (g.bar.setPointerCapture) {
+      try { g.bar.setPointerCapture(g.pointerId); } catch (err) { /* optional */ }
+    }
     g.active = true;
 
     var res = this.data.residentById[(this._bookingById(g.id) || {}).residentId];
