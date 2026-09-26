@@ -238,12 +238,6 @@ CREATE INDEX IF NOT EXISTS bookings_contract_idx ON bookings(contract_id);
 -- значит, к записи кто-то ещё имеет доступ (решение заказчика 24.09.2026).
 ALTER TABLE users ADD COLUMN IF NOT EXISTS pin_changes integer NOT NULL DEFAULT 0;
 
--- Доступ к зарплатам сотрудников даётся человеку, а не роли: заказчик
--- хочет, чтобы один из модераторов вёл начисления, оставаясь модератором
--- во всём остальном. Так же, как уже сделано с правкой шахматки
--- (решение заказчика 24.09.2026).
-ALTER TABLE staff_profiles ADD COLUMN IF NOT EXISTS can_payroll boolean NOT NULL DEFAULT false;
-
 -- Править сам сайт — текст на страницах — может только владелец. Ни
 -- модератор, ни другой администратор. Правило снимает сам владелец,
 -- назвав кодовое слово (решение заказчика 24.09.2026).
@@ -628,6 +622,14 @@ CREATE TABLE IF NOT EXISTS staff_profiles (
   can_edit_shahmatka boolean NOT NULL DEFAULT false,
   updated_at   timestamptz NOT NULL DEFAULT now()
 );
+
+-- Доступ к зарплатам сотрудников даётся человеку, а не роли: заказчик
+-- хочет, чтобы один из модераторов вёл начисления, оставаясь модератором
+-- во всём остальном. Так же, как уже сделано с правкой шахматки
+-- (решение заказчика 24.09.2026).
+-- Важно: эта миграция должна идти после CREATE TABLE staff_profiles,
+-- иначе чистая база не собирается.
+ALTER TABLE staff_profiles ADD COLUMN IF NOT EXISTS can_payroll boolean NOT NULL DEFAULT false;
 
 CREATE TABLE IF NOT EXISTS payroll (
   id           bigserial PRIMARY KEY,
