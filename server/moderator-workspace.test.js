@@ -28,6 +28,16 @@ const assert = require('node:assert/strict');
       assert.equal(links[taskIndex + 1], 'contracts-preview.html');
       assert.equal(await page.locator('a[href="contracts-preview.html"] svg').count(), 1);
       assert.equal(await page.locator('.side__nav a[href="cabinet-admin.html"] svg').count(), 1);
+      const originalStaff = fs.readFileSync(path.join(__dirname, '../web/cabinet-staff.html'), 'utf8');
+      for (const href of ['staff-salary.html', 'staff-documents.html', 'staff-profile.html', 'staff-exams.html', 'staff-say.html', 'staff-repair.html', 'staff-settings.html', 'staff-mailings.html', 'cabinet-staff.html']) {
+        const original = await page.evaluate(({html,href}) => {
+          const doc = new DOMParser().parseFromString(html, 'text/html');
+          return doc.querySelector('a[href="'+href+'"] svg').outerHTML.replace(/\s+/g,' ');
+        }, {html: originalStaff, href});
+        const actual = await page.locator('.side__nav a[href="'+href+'"] svg').evaluate(svg => svg.outerHTML.replace(/\s+/g,' '));
+        assert.equal(actual, original, 'Original icon retained: ' + file + ' / ' + href);
+      }
+      assert(await page.locator('.side__nav a[href="cabinet-admin.html"] path').getAttribute('d').then(d=>d.includes('M4 21v-3M9 21v-6')));
       assert.equal(await page.locator('.msv-mark-btn').getAttribute('href'), 'admin-shahmatka.html');
       assert.equal(await page.locator('.side__who').getAttribute('href'), 'staff-profile.html');
     }

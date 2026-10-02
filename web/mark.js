@@ -132,6 +132,33 @@
           ['staff-settings.html', 'Настройки'],
           ['pin.html', 'Сменить код входа']
         ];
+        // Original menu SVGs, preserved across pages with different navigation.
+        var originalIcons = {
+  "cabinet-staff.html": "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"4\" y=\"5\" width=\"16\" height=\"16\" rx=\"3\"/><path d=\"M8 3v4\"/><path d=\"M16 3v4\"/><path d=\"M9 14l2 2 4-4\"/></svg>",
+  "http://104.171.138.117:3456/": "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9 5H5v14h14v-4\"/><path d=\"M14 4h6v6\"/><path d=\"M20 4l-9 9\"/><path d=\"M6 15l2 2 4-4\"/></svg>",
+  "staff-tickets.html": "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 6h16\"/><path d=\"M4 12h16\"/><path d=\"M4 18h10\"/></svg>",
+  "staff-shahmatka.html": "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"/><path d=\"M3 10h18\"/><path d=\"M9 10v9\"/></svg>",
+  "staff-residents.html": "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"9\" cy=\"8\" r=\"3\"/><path d=\"M3 20a6 6 0 0 1 12 0\"/><path d=\"M16 6.5a3 3 0 0 1 0 5.8\"/><path d=\"M18 20a5.5 5.5 0 0 0-3-4.6\"/></svg>",
+  "staff-salary.html": "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3\" y=\"7\" width=\"18\" height=\"13\" rx=\"3\"/><path d=\"M3 10h18\"/><path d=\"M16 14.5h.01\"/><path d=\"M6 7V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1\"/></svg>",
+  "staff-reputation.html": "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 4l2.4 5 5.6.8-4 3.9 1 5.5-5-2.7-5 2.7 1-5.5-4-3.9 5.6-.8z\"/></svg>",
+  "staff-say.html": "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 5H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3v4l5-4h8a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z\"/></svg>",
+  "staff-repair.html": "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 4a5 5 0 0 0-6.6 6.2L4 14.6V20h5.4l4.4-4.4A5 5 0 0 0 20 9l-3 3-3-3 3-3a5 5 0 0 0-2-2z\"/></svg>",
+  "staff-mailings.html": "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 10v4h4l6 4V6l-6 4z\"/><path d=\"M18 9a4 4 0 0 1 0 6\"/></svg>",
+  "staff-documents.html": "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z\"/><path d=\"M14 3v5h5\"/></svg>",
+  "staff-profile.html": "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"8\" r=\"3.5\"/><path d=\"M5 20a7 7 0 0 1 14 0\"/></svg>",
+  "staff-exams.html": "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 9l9-4 9 4-9 4z\"/><path d=\"M7 11v5c0 1.4 2.2 2.5 5 2.5s5-1.1 5-2.5v-5\"/></svg>",
+  "staff-settings.html": "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M12 3v2\"/><path d=\"M12 19v2\"/><path d=\"M4.5 7.5l1.7 1\"/><path d=\"M17.8 15.5l1.7 1\"/><path d=\"M4.5 16.5l1.7-1\"/><path d=\"M17.8 8.5l1.7-1\"/></svg>",
+  "cabinet-admin.html": "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"4\" y=\"4\" width=\"7\" height=\"7\" rx=\"2\"/><rect x=\"13\" y=\"4\" width=\"7\" height=\"7\" rx=\"2\"/><rect x=\"4\" y=\"13\" width=\"7\" height=\"7\" rx=\"2\"/><rect x=\"13\" y=\"13\" width=\"7\" height=\"7\" rx=\"2\"/></svg>",
+  "admin-staff.html": "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"9\" cy=\"8\" r=\"3\"/><path d=\"M3 20a6 6 0 0 1 12 0\"/><path d=\"M16 6.5a3 3 0 0 1 0 5.8\"/><path d=\"M18 20a5.5 5.5 0 0 0-3-4.6\"/></svg>",
+  "admin-residences.html": "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 21h18\"/><path d=\"M5 21V8l7-4 7 4v13\"/><path d=\"M9 21v-6h6v6\"/><path d=\"M9 11h.01\"/><path d=\"M15 11h.01\"/></svg>",
+  "admin-shahmatka.html": "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"/><path d=\"M3 10h18\"/><path d=\"M9 10v9\"/></svg>",
+  "admin-residents.html": "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"9\" cy=\"8\" r=\"3\"/><path d=\"M3 20a6 6 0 0 1 12 0\"/><path d=\"M16 6.5a3 3 0 0 1 0 5.8\"/><path d=\"M18 20a5.5 5.5 0 0 0-3-4.6\"/></svg>",
+  "admin-tickets.html": "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"4\" y=\"5\" width=\"16\" height=\"16\" rx=\"3\"/><path d=\"M8 3v4\"/><path d=\"M16 3v4\"/><path d=\"M9 14l2 2 4-4\"/></svg>",
+  "admin-reputation.html": "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 4l2.4 5 5.6.8-4 3.9 1 5.5-5-2.7-5 2.7 1-5.5-4-3.9 5.6-.8z\"/></svg>",
+  "admin-rights.html": "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"8\" cy=\"15\" r=\"4\"/><path d=\"M11 12l8-8\"/><path d=\"M17 6l2 2\"/></svg>",
+  "admin-settings.html": "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M12 3v2\"/><path d=\"M12 19v2\"/><path d=\"M4.5 7.5l1.7 1\"/><path d=\"M17.8 15.5l1.7 1\"/><path d=\"M4.5 16.5l1.7-1\"/><path d=\"M17.8 8.5l1.7-1\"/></svg>",
+  "pin.html": "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"8\" cy=\"15\" r=\"4\"/><path d=\"M11 12l8-8\"/><path d=\"M17 6l2 2\"/></svg>"
+};
         var icons = {};
         var taskLink = nav.querySelector('a[target="_blank"]');
         if (taskLink) items.splice(4, 0, [taskLink.getAttribute('href'), taskLink.textContent.trim()]);
@@ -147,7 +174,7 @@
           if (page === item[0]) link.setAttribute('aria-current', 'page');
           var icon = icons[item[0]] || icons[item[0].replace('admin-', 'staff-')];
           if (icon) link.appendChild(icon);
-          else link.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9h8M8 15h8"/></svg>';
+          else if (originalIcons[item[0]]) link.innerHTML = originalIcons[item[0]];
           link.appendChild(document.createTextNode(item[1]));
           if (document.querySelector('.shell--folded')) link.title = item[1];
           nav.appendChild(link);
@@ -176,7 +203,7 @@
       var oldIcon = link.querySelector('svg');
       var path = handshake
         ? '<path d="m2 12 4-7 4 2 3-2 5 2 4 6-3 3-4 4-3-1-3-2-3-3z"/><path d="m10 7-3 4 2 2 4-3 6 6M6 14l3-3M9 17l2-3M12 19l2-3"/>'
-        : '<path d="M4 3v17h17M7 15l5-5 4 3 5-8M16 5h5v5"/>';
+        : '<path d="M4 21v-3M9 21v-6M14 21v-4M19 21v-9M3 12l6-6 5 4 7-8M16 2h5v5"/>';
       var svg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + path + '</svg>';
       if (oldIcon) oldIcon.outerHTML = svg; else link.insertAdjacentHTML('afterbegin', svg);
     });
