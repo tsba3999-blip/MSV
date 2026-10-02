@@ -106,6 +106,8 @@
       if (aliases[page]) { location.replace(aliases[page] + location.search + location.hash); return; }
       document.body.style.setProperty('--role', 'var(--msv-sky)');
       document.body.style.setProperty('--role-ink', 'var(--msv-graphite)');
+      var moderatorSide = document.querySelector('.side');
+      if (moderatorSide) moderatorSide.style.background = 'linear-gradient(160deg, var(--msv-graphite) 0%, var(--msv-sky) 100%)';
       var nav = document.querySelector('.side__nav');
       if (nav) {
         var items = [
@@ -126,6 +128,8 @@
           ['pin.html', 'Сменить код входа']
         ];
         var icons = {};
+        var taskLink = nav.querySelector('a[target="_blank"]');
+        if (taskLink) items.splice(4, 0, [taskLink.getAttribute('href'), taskLink.textContent.trim()]);
         nav.querySelectorAll('a').forEach(function (link) {
           var icon = link.querySelector('svg');
           if (icon) icons[link.getAttribute('href')] = icon.cloneNode(true);
@@ -134,6 +138,7 @@
         items.forEach(function (item) {
           var link = document.createElement('a');
           link.className = 'side__link'; link.href = item[0];
+          if (/^https?:/.test(item[0])) { link.target = '_blank'; link.rel = 'noopener'; }
           if (page === item[0]) link.setAttribute('aria-current', 'page');
           var icon = icons[item[0]] || icons[item[0].replace('admin-', 'staff-')];
           if (icon) link.appendChild(icon);
