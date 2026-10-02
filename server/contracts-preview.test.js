@@ -15,6 +15,13 @@ const fs=require('fs'), path=require('path'), assert=require('node:assert/strict
  await page.goto('https://msv.test/contracts-preview.html');
  await page.locator('main').waitFor({state:'visible'});
  assert.equal(await page.locator('tbody tr').count(),23);
+ for(const design of ['classic','chess','quarters','ledger','groups']) {
+  await page.locator('[data-design='+design+']').click();
+  assert.equal(await page.locator('tbody tr').count(),23);
+  assert.equal(await page.locator('[data-design='+design+']').getAttribute('aria-pressed'),'true');
+  await page.screenshot({path:'contracts-'+design+'.png'});
+ }
+ await page.locator('[data-design=chess]').click();
  await page.locator('[data-view=cards]').click();assert.equal(await page.locator('.card').count(),23);
  await page.locator('[data-view=table]').click();assert.equal(await page.locator('tbody tr').count(),23);
  await page.locator('#search').fill('Бухгалтерия');assert.equal(await page.locator('tbody tr').count(),1);

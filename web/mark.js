@@ -162,10 +162,24 @@
       if (contractNav && !contractNav.querySelector('a[href="contracts-preview.html"]')) {
         var contractsLink = document.createElement('a');
         contractsLink.className = 'side__link'; contractsLink.href = 'contracts-preview.html';
-        contractsLink.textContent = 'Подряды · варианты';
-        contractNav.appendChild(contractsLink);
+        contractsLink.textContent = 'Подряды';
+        var tasksLink = Array.from(contractNav.querySelectorAll('a')).find(function (link) { return /Задачи\s*M[²2]/.test(link.textContent); });
+        if (tasksLink) tasksLink.after(contractsLink); else contractNav.appendChild(contractsLink);
       }
     }
+    // One icon for each section, including role-specific and legacy menus.
+    document.querySelectorAll('a').forEach(function (link) {
+      var href = (link.getAttribute('href') || '').split('?')[0];
+      var handshake = href === 'contracts-preview.html';
+      var statistics = href === 'cabinet-admin.html' && /Статистика|Обзор/.test(link.textContent);
+      if (!handshake && !statistics) return;
+      var oldIcon = link.querySelector('svg');
+      var path = handshake
+        ? '<path d="m2 12 4-7 4 2 3-2 5 2 4 6-3 3-4 4-3-1-3-2-3-3z"/><path d="m10 7-3 4 2 2 4-3 6 6M6 14l3-3M9 17l2-3M12 19l2-3"/>'
+        : '<path d="M4 3v17h17M7 15l5-5 4 3 5-8M16 5h5v5"/>';
+      var svg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + path + '</svg>';
+      if (oldIcon) oldIcon.outerHTML = svg; else link.insertAdjacentHTML('afterbegin', svg);
+    });
     // «М» ведёт в свой кабинет
     a.href = ROLE_HOME[role] || 'menu.html';
     if (role === 'moderator' && !me.canPayroll) a.href = 'admin-shahmatka.html';

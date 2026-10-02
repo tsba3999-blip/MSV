@@ -2,7 +2,7 @@
   'use strict';
   var groups = ['Шаболовка', 'Варшавка', 'Тверская', 'Общие', 'Не распределено'];
   var titles = ['Руслетелематика','Интернет МТС Шаболовка','Таском','Атол','Скала Шаболовка','Скала Варшавка','Эколайн ТБО','ЭЦП','Сертификаты','Аренда Шаболовская','Аренда Варшавка','Аренда Тверская','Коммуналка Шаболовская','Коммуналка Варшавка','Коммуналка Тверская','Налоги','Расходники','ЕТЦ ВО','Барьер рус','Шахматка Тл','ЭДО Контур','Персоналкин','Бухгалтерия'];
-  var key = 'msv.contracts.preview.v1', data, editing = null, view = 'calendar', dragged = null;
+  var key = 'msv.contracts.preview.v1', data, editing = null, view = 'calendar', design = 'chess', dragged = null;
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
   var money = function (v) { return Number(v).toLocaleString('ru-RU') + ' ₽'; };
@@ -31,6 +31,8 @@
   function render() {
     var list = data.filter(function(c) { return ($('group').value === 'Все' || c.group === $('group').value) && (c.name+' '+c.contact).toLowerCase().includes($('search').value.toLowerCase()); });
     $('yearLabel').hidden = view !== 'calendar';
+    $('tableDesigns').hidden = view !== 'calendar';
+    document.querySelectorAll('[data-design]').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.design===design);});
     $('explain').textContent = {calendar:'Рекомендуемый вариант: вся история года перед глазами. Лучше всего заметны пропуски регулярных оплат.',table:'Компактный реестр: удобно искать контакты, проверять сроки договоров и работать со списком.',cards:'Для ежедневной работы и телефона: крупные карточки с ближайшими сроками. Для истории откройте договор.'}[view];
     document.querySelectorAll('[data-view]').forEach(function(b) { b.setAttribute('aria-pressed', b.dataset.view === view); });
     if (!list.length) { $('board').innerHTML='<p class="empty">Договоров по этим условиям нет.</p>'; return; }
@@ -38,8 +40,22 @@
       $('board').innerHTML='<div class="cards">'+list.map(function(c){return '<article class="card" data-row="'+esc(c.id)+'"><div>'+controls(c)+'</div><h3>'+name(c)+'</h3><p>'+esc(c.status)+' · '+esc(c.due || 'Срок не задан')+'</p><div class="money">'+money(c.amount)+'</div><div class="cardfoot">'+badge(c,(c.due || today).slice(0,7))+'</div></article>';}).join('')+'</div>';return;
     }
     var year=Number($('year').value)||2026, months=Array.from({length:12},function(_,i){return year+'-'+String(i+1).padStart(2,'0');});
+    if (view === 'calendar' && design !== 'classic') { renderDesign(list, months); return; }
     var heads=view==='calendar'?months.map(function(m){return '<th>'+new Date(m+'-02').toLocaleDateString('ru-RU',{month:'short'})+'</th>';}).join(''):'<th>Статус</th><th>Заключён</th><th>Следующая оплата</th><th>Сумма</th><th>Всего оплачено</th><th>Контакт</th>';
     $('board').innerHTML='<div class="scroll"><table class="'+view+'"><thead><tr><th>Договор / объект</th>'+heads+'</tr></thead><tbody>'+list.map(function(c){return '<tr data-row="'+esc(c.id)+'"><td>'+controls(c)+name(c)+'</td>'+(view==='calendar'?months.map(function(m){return '<td>'+badge(c,m)+'</td>';}).join(''):'<td>'+esc(c.status)+'</td><td>'+esc(c.signed||'Не указано')+'</td><td>'+esc(c.due||'Не задана')+'</td><td>'+money(c.amount)+'</td><td>'+money(c.payments.reduce(function(n,p){return n+Number(p.sum);},0))+'</td><td>'+esc(c.contact||'Не указан')+'</td>')+'</tr>';}).join('')+'</tbody></table></div>';
+  }
+  function renderDesign(list, months) {
+    var descriptions={chess:'Шахматка: договор слева, оплаченные периоды залиты, плановые — контуром. Нажмите на месяц, чтобы открыть договор. Рекомендую этот вариант.',quarters:'Квартальные блоки: четыре крупных периода вместо двенадцати узких колонок. Удобно оценивать расходы по сезонам.',ledger:'Финансовая таблица: план и факт за выбранный год, остаток к оплате и ближайший срок. Подходит для сверки с бухгалтером.',groups:'Отдельная таблица на каждый объект: группы можно свернуть. Удобно обсуждать расходы Шаболовки, Варшавки и Тверской отдельно.'};
+    $('explain').textContent=descriptions[design];
+    function label(c){return '<td>'+controls(c)+name(c)+'</td>';}
+    function plan(c){return months.filter(function(m){return dueIn(c,m);}).reduce(function(n,m){return n+c.amount;},0);}
+    function actual(c){return months.reduce(function(n,m){return n+sum(c,m);},0);}
+    function cell(c,m){var paid=sum(c,m),planned=dueIn(c,m),state=paid>=c.amount&&paid>0?'paid':paid>0?'partial':planned?'planned':'blank';return '<td><button class="period '+state+'" data-open="'+esc(c.id)+'" title="'+esc(c.name+' · '+m)+'">'+(paid>0?money(paid):planned?money(c.amount):'—')+'<small>'+(state==='paid'?'Оплачено':state==='partial'?'Частично':state==='planned'?'План':'')+'</small></button></td>';}
+    function grid(rows){return '<div class="scroll"><table class="calendar chess"><thead><tr><th>Договор / объект</th>'+months.map(function(m){return '<th>'+new Date(m+'-02').toLocaleDateString('ru-RU',{month:'short'})+'</th>';}).join('')+'</tr></thead><tbody>'+rows.map(function(c){return '<tr data-row="'+esc(c.id)+'">'+label(c)+months.map(function(m){return cell(c,m);}).join('')+'</tr>';}).join('')+'</tbody></table></div>';}
+    if(design==='chess'){$('board').innerHTML=grid(list);return;}
+    if(design==='groups'){$('board').innerHTML=groups.map(function(g){var rows=list.filter(function(c){return c.group===g;});return rows.length?'<details class="contract-group" open><summary>'+esc(g)+' <span>'+rows.length+' договоров</span></summary>'+grid(rows)+'</details>':'';}).join('');return;}
+    if(design==='quarters'){$('board').innerHTML='<div class="scroll"><table class="quarters"><thead><tr><th>Договор</th>'+[1,2,3,4].map(function(q){return '<th>'+q+' квартал</th>';}).join('')+'</tr></thead><tbody>'+list.map(function(c){return '<tr data-row="'+esc(c.id)+'">'+label(c)+[0,3,6,9].map(function(start){var part=months.slice(start,start+3),p=part.reduce(function(n,m){return n+(dueIn(c,m)?c.amount:0);},0),a=part.reduce(function(n,m){return n+sum(c,m);},0);return '<td><div class="quarter-total">'+money(p)+'<small>План · оплачено '+money(a)+'</small></div>'+part.map(function(m){return '<div class="quarter-month"><span>'+m.slice(5)+'</span>'+badge(c,m)+'</div>';}).join('')+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div>';return;}
+    $('board').innerHTML='<div class="scroll"><table class="ledger"><thead><tr><th>Договор</th><th>План за год</th><th>Оплачено за год</th><th>Осталось по плану</th><th>Ближайший срок</th><th>Действует до</th></tr></thead><tbody>'+list.map(function(c){var remaining=months.reduce(function(n,m){return n+(dueIn(c,m)?Math.max(0,c.amount-sum(c,m)):0);},0);return '<tr data-row="'+esc(c.id)+'">'+label(c)+'<td>'+money(plan(c))+'</td><td class="ledger-paid">'+money(actual(c))+'</td><td>'+money(remaining)+'</td><td>'+esc(c.due||'Не задан')+'</td><td>'+esc(c.until||'Не указан')+'</td></tr>';}).join('')+'</tbody></table></div>';
   }
   function history(c) { $('total').textContent='Всего оплачено: '+money(c.payments.reduce(function(n,p){return n+Number(p.sum);},0)); $('history').innerHTML=c.payments.map(function(p){return '<p>'+esc(p.paid)+' · '+money(p.sum)+' · за '+esc(p.period)+'</p>';}).join('')||'<p>Оплат пока нет.</p>'; }
   function open(id) {
@@ -57,6 +73,7 @@
     $('reset').onclick=function(){if(confirm('Сбросить только демонстрационные договоры в этом браузере?')){data=seed();save();render();}};
     ['group','search','year'].forEach(function(id){$(id).addEventListener('input',render);});
     document.querySelectorAll('[data-view]').forEach(function(b){b.onclick=function(){view=b.dataset.view;render();};});
+    document.querySelectorAll('[data-design]').forEach(function(b){b.onclick=function(){design=b.dataset.design;render();};});
     $('board').onclick=function(e){var b=e.target.closest('[data-open]');if(b){open(b.dataset.open);return;}b=e.target.closest('[data-move]');if(b){var i=data.findIndex(function(c){return c.id===b.dataset.id;}),j=i+Number(b.dataset.move);if(j>=0&&j<data.length){var c=data.splice(i,1)[0];data.splice(j,0,c);save();render();}}};
     $('board').ondragstart=function(e){var grip=e.target.closest('[data-drag]');if(!grip)return;dragged=grip.dataset.drag;e.dataTransfer.setData('text/plain',dragged);};
     $('board').ondragover=function(e){if(dragged)e.preventDefault();};

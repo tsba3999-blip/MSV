@@ -24,6 +24,10 @@ const assert = require('node:assert/strict');
       if (!expected) expected = links; else assert.deepEqual(links, expected);
       assert(links.includes('staff-salary.html') && links.includes('admin-residents.html'));
       assert(!links.includes('admin-rights.html') && !links.includes('admin-staff.html'));
+      const taskIndex = links.findIndex(href => href.includes(':3456'));
+      assert.equal(links[taskIndex + 1], 'contracts-preview.html');
+      assert.equal(await page.locator('a[href="contracts-preview.html"] svg').count(), 1);
+      assert.equal(await page.locator('.side__nav a[href="cabinet-admin.html"] svg').count(), 1);
       assert.equal(await page.locator('.msv-mark-btn').getAttribute('href'), 'admin-shahmatka.html');
       assert.equal(await page.locator('.side__who').getAttribute('href'), 'staff-profile.html');
     }
