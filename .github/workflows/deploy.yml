@@ -82,6 +82,7 @@ jobs:
             sleep 1
           done
           node server/selftest.js http://127.0.0.1:3031
+          node server/shahmatka-months.test.js
 
   deploy:
     needs: check

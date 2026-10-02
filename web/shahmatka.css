@@ -538,6 +538,7 @@
   overflow: hidden;
   pointer-events: none;
 }
+.msv-sh__paid .msv-sh__bar-name { pointer-events: auto; }
 .msv-sh__paid--booked  { background: var(--sh-booked-bg);  border-color: var(--sh-booked-br);  color: var(--sh-booked-tx); }
 .msv-sh__paid--active  { background: var(--sh-active-bg);  border-color: var(--sh-active-br);  color: var(--sh-active-tx); }
 .msv-sh__paid--debt    { background: var(--sh-debt-bg);    border-color: var(--sh-debt-br);    color: var(--sh-debt-tx); }

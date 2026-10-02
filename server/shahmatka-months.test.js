@@ -1,0 +1,12 @@
+'use strict';
+const assert = require('node:assert/strict');
+const { _utils } = require('../web/shahmatka');
+const source = { bookings: [{ id: 'test', from: '2026-09-01', to: '2027-08-31', paidMonths: ['2026-09', '2027-08'] }] };
+const normalized = _utils.normalize(source);
+assert.deepEqual(normalized.bookings[0].paidMonths, ['2026-09', '2027-08']);
+assert.deepEqual(_utils.normalize(normalized).bookings[0].paidMonths, ['2026-09', '2027-08']);
+source.bookings[0].paidMonths = ['2027-13', 'invalid', '2027-08'];
+assert.deepEqual(_utils.normalize(source).bookings[0].paidMonths, ['2027-08']);
+delete source.bookings[0].paidMonths;
+assert.deepEqual(_utils.normalize(source).bookings[0].paidMonths, []);
+console.log('PASS: paid months survive normalization and refresh; invalid/missing months handled');

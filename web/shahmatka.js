@@ -260,6 +260,9 @@
         tariff: firstDefined(b.tariff, '') || '',
         accrued: Number(firstDefined(b.accrued, b.amount, b.total, 0)) || 0,
         paid: Number(firstDefined(b.paid, 0)) || 0,
+        paidMonths: Array.isArray(b.paidMonths) ? b.paidMonths.filter(function (month) {
+          return /^\d{4}-(0[1-9]|1[0-2])$/.test(month);
+        }) : [],
         note: firstDefined(b.note, '') || '',
         bookedAt: parseDay(firstDefined(b.bookedAt, b.created, null)),
         // бесплатная бронь: срок в часах, имя и контакт человека со стороны
@@ -629,14 +632,14 @@
          24.09.2026). С клавиатуры по-прежнему открывается вся полоса. */
       if (self._justDragged) { self._justDragged = false; return; }
       var name = e.target.closest('.msv-sh__bar-name');
-      var bar2 = name && name.closest('.msv-sh__bar');
+      var bar2 = name && name.closest('.msv-sh__bar, .msv-sh__paid');
       if (!bar2) return;
       self.openBooking(bar2.dataset.id);
     });
 
     this._on(this.canvas, 'keydown', function (e) {
       if (e.key !== 'Enter' && e.key !== ' ') return;
-      var bar2 = e.target.closest('.msv-sh__bar');
+      var bar2 = e.target.closest('.msv-sh__bar, .msv-sh__paid');
       if (!bar2) return;
       e.preventDefault();
       self.openBooking(bar2.dataset.id);
@@ -1664,8 +1667,8 @@
           var fw = fr - fl;
           if (fw < 4) fw = 4;
           if (fl + fw > trackW) fw = trackW - fl;
-          fills += '<div class="msv-sh__paid msv-sh__paid--' + st + '" style="left:' + fl.toFixed(1) +
-            'px;width:' + fw.toFixed(1) + 'px;top:' + (top + 4) + 'px">' + esc(name) + '</div>';
+          fills += '<div class="msv-sh__paid msv-sh__paid--' + st + '" data-id="' + esc(b.id) + '" tabindex="0" role="button" style="left:' + fl.toFixed(1) +
+            'px;width:' + fw.toFixed(1) + 'px;top:' + (top + 4) + 'px"><span class="msv-sh__bar-name">' + esc(name) + '</span></div>';
         });
       }
       if (isContract) cls += ' msv-sh__bar--contract';
