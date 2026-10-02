@@ -93,6 +93,11 @@
     if (!me) return;
     var role = me.role || 'resident';
     document.documentElement.setAttribute('data-role', role);
+    if (role === 'admin') {
+      var adminSide = document.querySelector('.side');
+      if (adminSide) adminSide.style.background = 'linear-gradient(160deg, var(--msv-graphite) 0%, var(--msv-n500) 100%)';
+    }
+    if (role === 'resident' && page === 'menu.html') document.body.classList.add('resident-menu-gradient');
 
     // One workspace for moderators without the separate payroll administrator role.
     if (role === 'moderator' && !me.canPayroll) {
@@ -152,6 +157,15 @@
       }
     }
 
+    if (role === 'admin' || role === 'moderator') {
+      var contractNav = document.querySelector('.side__nav');
+      if (contractNav && !contractNav.querySelector('a[href="contracts-preview.html"]')) {
+        var contractsLink = document.createElement('a');
+        contractsLink.className = 'side__link'; contractsLink.href = 'contracts-preview.html';
+        contractsLink.textContent = 'Подряды · варианты';
+        contractNav.appendChild(contractsLink);
+      }
+    }
     // «М» ведёт в свой кабинет
     a.href = ROLE_HOME[role] || 'menu.html';
     if (role === 'moderator' && !me.canPayroll) a.href = 'admin-shahmatka.html';
