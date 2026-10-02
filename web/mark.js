@@ -94,8 +94,62 @@
     var role = me.role || 'resident';
     document.documentElement.setAttribute('data-role', role);
 
+    // One workspace for moderators without the separate payroll administrator role.
+    if (role === 'moderator' && !me.canPayroll) {
+      var aliases = {
+        'staff-shahmatka.html': 'admin-shahmatka.html',
+        'staff-residents.html': 'admin-residents.html',
+        'staff-tickets.html': 'admin-tickets.html',
+        'staff-reputation.html': 'admin-reputation.html',
+        'admin-profile.html': 'staff-profile.html'
+      };
+      if (aliases[page]) { location.replace(aliases[page] + location.search + location.hash); return; }
+      document.body.style.setProperty('--role', 'var(--msv-sky)');
+      document.body.style.setProperty('--role-ink', 'var(--msv-graphite)');
+      var nav = document.querySelector('.side__nav');
+      if (nav) {
+        var items = [
+          ['admin-shahmatka.html', 'Шахматка'],
+          ['admin-residents.html', 'Резиденты'],
+          ['admin-tickets.html', 'Все заявки'],
+          ['cabinet-staff.html', 'Мои задачи'],
+          ['cabinet-admin.html', 'Статистика'],
+          ['admin-reputation.html', 'Репутация'],
+          ['staff-mailings.html', 'Рассылки'],
+          ['staff-salary.html', 'Моя зарплата'],
+          ['staff-documents.html', 'Мои документы'],
+          ['staff-profile.html', 'Мои данные'],
+          ['staff-exams.html', 'Экзамены'],
+          ['staff-say.html', 'Хочу сказать'],
+          ['staff-repair.html', 'Заявка технику'],
+          ['staff-settings.html', 'Настройки'],
+          ['pin.html', 'Сменить код входа']
+        ];
+        var icons = {};
+        nav.querySelectorAll('a').forEach(function (link) {
+          var icon = link.querySelector('svg');
+          if (icon) icons[link.getAttribute('href')] = icon.cloneNode(true);
+        });
+        nav.replaceChildren();
+        items.forEach(function (item) {
+          var link = document.createElement('a');
+          link.className = 'side__link'; link.href = item[0];
+          if (page === item[0]) link.setAttribute('aria-current', 'page');
+          var icon = icons[item[0]] || icons[item[0].replace('admin-', 'staff-')];
+          if (icon) link.appendChild(icon);
+          else link.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9h8M8 15h8"/></svg>';
+          link.appendChild(document.createTextNode(item[1]));
+          if (document.querySelector('.shell--folded')) link.title = item[1];
+          nav.appendChild(link);
+        });
+        var identity = document.querySelector('.side__who');
+        if (identity) { identity.href = 'staff-profile.html'; identity.title = 'Мои данные'; }
+      }
+    }
+
     // «М» ведёт в свой кабинет
     a.href = ROLE_HOME[role] || 'menu.html';
+    if (role === 'moderator' && !me.canPayroll) a.href = 'admin-shahmatka.html';
     a.classList.remove('msv-mark-btn--staff', 'msv-mark-btn--admin');
     if (role === 'admin') a.classList.add('msv-mark-btn--admin');
     else if (role === 'moderator' || role === 'staff') a.classList.add('msv-mark-btn--staff');
