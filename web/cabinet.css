@@ -488,3 +488,10 @@ a.side__who:focus-visible { outline: 2px solid var(--msv-white); outline-offset:
 /* Метка, которая нажимается: тот же вид, но это кнопка (24.09.2026) */
 .tag-btn { font: inherit; border: 0; cursor: pointer; }
 .tag-btn:hover { filter: brightness(.95); }
+/* Personal sections are disclosed together in staff/moderator navigation. */
+.side__personal-toggle { width: 100%; border: 0; background: transparent; font: inherit; text-align: left; cursor: pointer; }
+.side__personal-arrow { margin-left: auto; transition: transform .15s; }
+.side__personal-toggle[aria-expanded="true"] .side__personal-arrow { transform: rotate(180deg); }
+.side__personal-menu { margin-left: 16px; padding-left: 8px; border-left: 1px solid rgba(255,255,255,.3); }
+.side__personal-menu[hidden] { display: none; }
+.shell--folded .side__personal-menu { display: none; }

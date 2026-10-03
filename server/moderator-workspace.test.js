@@ -40,6 +40,14 @@ const assert = require('node:assert/strict');
       assert(await page.locator('.side__nav a[href="cabinet-admin.html"] path').getAttribute('d').then(d=>d.includes('M4 21v-3M9 21v-6')));
       assert.equal(await page.locator('.msv-mark-btn').getAttribute('href'), 'admin-shahmatka.html');
       assert.equal(await page.locator('.side__who').getAttribute('href'), 'staff-profile.html');
+      assert.equal(await page.locator('.side__nav a[href="pin.html"]').count(), 0);
+      assert.equal(await page.locator('#staffPersonalMenu a').count(), 4);
+      const toggle = page.locator('.side__personal-toggle');
+      const before = await toggle.getAttribute('aria-expanded');
+      await toggle.click();
+      assert.notEqual(await toggle.getAttribute('aria-expanded'), before);
+      await toggle.click();
+      assert.equal(await toggle.getAttribute('aria-expanded'), before);
     }
     await page.goto('https://msv.test/staff-shahmatka.html?res=uyut');
     await page.waitForURL('**/admin-shahmatka.html?res=uyut');
