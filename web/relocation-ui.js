@@ -8,14 +8,11 @@
     var date=dialog.querySelector('input'),summary=dialog.querySelector('[data-summary]'),error=dialog.querySelector('[data-error]'),ok=dialog.querySelector('[data-confirm]');
     var quote=null,version=0,busy=false;
     date.value=since;document.body.appendChild(dialog);dialog.showModal();
-    function money(n){return Number(n).toLocaleString('ru-RU')+' ₽';}
     function preview(){
       var current=++version;quote=null;ok.disabled=true;error.textContent='';summary.textContent='Проверяем место и рассчитываем стоимость…';
       api('/api/bookings/'+encodeURIComponent(id)+'/relocation/preview',{bedId:bedId,since:date.value}).then(function(q){
         if(current!==version||!dialog.isConnected)return;quote=q;summary.replaceChildren();
         var person=document.createElement('p');person.textContent=(q.resident||'')+': '+(q.oldPlace||'')+' → '+(q.newPlace||'');summary.appendChild(person);
-        var lead=document.createElement('p');lead.textContent='Цена в месяц: '+money(q.oldPrice)+' → '+money(q.newPrice)+'. Новое место проверено до '+q.until+'.';summary.appendChild(lead);
-        q.months.forEach(function(m){var row=document.createElement('p');row.textContent=m.period.slice(0,7)+(m.period.slice(5,7)==='08'?' · август / депозит':'')+': '+money(q.newPrice)+' ÷ '+m.days+' × '+m.count+' = '+money(m.newAmount)+'. Изменение: '+(m.delta>0?'+':'')+money(m.delta)+(m.revised===null?' (учтётся при начислении).':'. Начисление за месяц: '+money(m.accrued)+' → '+money(m.revised)+'.');summary.appendChild(row);});
         ok.disabled=false;
       }).catch(function(e){if(current===version){summary.textContent='';error.textContent=e.message;}});
     }

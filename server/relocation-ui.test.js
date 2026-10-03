@@ -11,11 +11,11 @@ const {chromium}=require('playwright'),fs=require('fs'),assert=require('node:ass
  await page.goto('https://msv.test/');await page.addScriptTag({content:fs.readFileSync('web/relocation-ui.js','utf8')});
  await page.evaluate(()=>MSVRelocate.open('1','new-bed','2026-10-16'));
  await page.waitForFunction(()=>!document.querySelector('[data-confirm]').disabled);
- assert.match(await page.locator('[data-summary]').innerText(),/август \/ депозит/);
+ assert.doesNotMatch(await page.locator('[data-summary]').innerText(),/август \/ депозит|Цена в месяц|Изменение:/);
  await page.locator('input').fill('2026-11-01');await page.locator('input').dispatchEvent('change');
  await page.waitForFunction(()=>!document.querySelector('[data-confirm]').disabled);
  await page.locator('[data-confirm]').click();await page.waitForFunction(()=>document.querySelector('[data-error]').textContent.includes('Место занято'));
  assert.equal(commits.length,1);assert.equal(commits[0].since,'2026-11-01');assert.equal(commits[0].token,'2026-11-01');
  await page.locator('[data-cancel]').click();await page.locator('dialog').waitFor({state:'detached'});assert.equal(await page.locator('dialog').count(),0);
- assert(previews.length>=2);console.log('PASS: date change rechecks quote, August shown, exact confirmed date/token, conflict and cancellation');
+ assert(previews.length>=2);console.log('PASS: date change rechecks quote, price breakdown hidden, exact confirmed date/token, conflict and cancellation');
 }finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1;});
