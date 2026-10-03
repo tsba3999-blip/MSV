@@ -81,7 +81,7 @@ module.exports = function register(route) {
                     (SELECT position FROM staff_profiles WHERE user_id = u.id) AS position,
                     p.* FROM users u
              LEFT JOIN resident_profiles p ON p.user_id = u.id WHERE u.id = $1`, [s.uid]),
-      query(`SELECT b.id, b.bed_id, b.date_from, b.date_to, bd.label, bd.price, bd.tier,
+      query(`SELECT b.id, b.bed_id, b.contract_id, b.date_from, b.date_to, bd.label, COALESCE(b.monthly_price,bd.price) AS price, bd.tier,
                     r.name AS room_name, r.number AS room_number, rs.title AS residence,
                     COALESCE(bal.accrued, 0) AS accrued, COALESCE(bal.paid, 0) AS paid
              FROM bookings b
@@ -98,7 +98,7 @@ module.exports = function register(route) {
     const user = u.rows[0];
     if (!user) return fail(res, 404, 'Нет пользователя');
     const b = bk.rows[0] || null;
-    const dep = b ? await query(`SELECT 1 FROM charges WHERE booking_id = $1 AND kind = 'deposit' LIMIT 1`, [b.id]) : { rows: [] };
+    const dep = b ? await query(`SELECT 1 FROM charges ch JOIN bookings x ON x.id=ch.booking_id WHERE (x.id=$1 OR x.contract_id=$2) AND ch.kind='deposit' AND ch.cancelled_at IS NULL LIMIT 1`, [b.id,b.contract_id]) : { rows: [] };
 
     json(res, 200, {
       /* Роль нужна страницам кабинета: по ней они понимают, что зашёл не

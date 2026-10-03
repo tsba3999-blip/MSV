@@ -27,6 +27,7 @@
    ============================================================ */
 
 const { query } = require('./db');
+const { monthAmount } = require('./relocation');
 
 function monthKey(d) { return d.toISOString().slice(0, 7); }
 
@@ -53,6 +54,8 @@ async function sweepAccrual() {
   let added = 0;
   for (const c of live.rows) {
     if (!c.booking_id || !c.price) continue;
+    const segments = await query(`SELECT b.date_from::text AS start,b.date_to::text AS finish,b.moved_to,
+      COALESCE(b.monthly_price,$2) AS price FROM bookings b WHERE b.contract_id=$1 ORDER BY b.date_from`,[c.id,c.price]);
 
     for (const period of [thisMonth, nextMonth]) {
       /* Месяц должен попадать внутрь контракта */
@@ -73,7 +76,7 @@ async function sweepAccrual() {
         INSERT INTO charges (booking_id, kind, period, amount, due_date)
         VALUES ($1, 'rent', ($2 || '-01')::date, $3,
                 GREATEST((($2 || '-01')::date - interval '1 month')::date + 14, CURRENT_DATE))`,
-        [c.booking_id, period, c.price]);
+        [c.booking_id, period, segments.rows.some(b=>b.moved_to) ? monthAmount(period+'-01',segments.rows) : c.price]);
       added++;
     }
   }

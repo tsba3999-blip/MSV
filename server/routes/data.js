@@ -100,10 +100,10 @@ module.exports = function register(route) {
     const bookings = await query(`
       SELECT b.id, b.bed_id, b.user_id, b.date_from, b.date_to, b.check_in, b.check_out,
              b.source, b.tariff, b.note, b.created_at, b.release_from, b.release_auto,
-             b.hold_until, b.hold_name, b.hold_contact, b.contract_id,
+             b.hold_until, b.hold_name, b.hold_contact, b.contract_id, b.moved_to, b.history_finance,
              c.date_from AS contract_from, c.date_to AS contract_to, c.annual, c.ended_at,
              COALESCE(bal.accrued, 0) AS accrued, COALESCE(bal.paid, 0) AS paid,
-             EXISTS (SELECT 1 FROM charges ch WHERE ch.booking_id = b.id
+             EXISTS (SELECT 1 FROM charges ch JOIN bookings cb ON cb.id=ch.booking_id WHERE (cb.id=b.id OR cb.contract_id=b.contract_id)
                        AND ch.kind = 'deposit' AND ch.cancelled_at IS NULL) AS has_deposit,
              COALESCE((SELECT SUM(ch.amount) FROM charges ch WHERE ch.booking_id = b.id
                         AND ch.kind = 'penalty' AND ch.cancelled_at IS NULL), 0) AS penalty
@@ -141,13 +141,12 @@ module.exports = function register(route) {
     const paidBy = {};
     if (bookingIds.length) {
       const cum = await query(`
-        SELECT booking_id, to_char(period, 'YYYY-MM') AS month,
-               SUM(amount) OVER (PARTITION BY booking_id ORDER BY period, id
-                                 ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS upto
-          FROM charges
-         WHERE cancelled_at IS NULL AND kind IN ('rent', 'deposit') AND period IS NOT NULL
-           AND booking_id = ANY($1)
-         ORDER BY booking_id, period, id`, [bookingIds]);
+        SELECT b.id AS booking_id, to_char(ch.period,'YYYY-MM') AS month,
+          SUM(SUM(ch.amount)) OVER(PARTITION BY b.id ORDER BY ch.period) AS upto
+        FROM bookings b JOIN bookings x ON x.id=b.id OR (b.contract_id IS NOT NULL AND x.contract_id=b.contract_id)
+        JOIN charges ch ON ch.booking_id=x.id
+        WHERE ch.cancelled_at IS NULL AND ch.kind IN ('rent','deposit') AND ch.period IS NOT NULL AND b.id=ANY($1)
+        GROUP BY b.id,ch.period ORDER BY b.id,ch.period`, [bookingIds]);
       const money = {};
       bookings.rows.forEach((b) => { money[b.id] = Number(b.paid); });
       cum.rows.forEach((x) => {
@@ -173,10 +172,11 @@ module.exports = function register(route) {
       bookings: bookings.rows.map((b) => ({
         id: String(b.id), bedId: b.bed_id, residentId: b.user_id ? String(b.user_id) : '',
         holdUntil: b.hold_until, holdName: b.hold_name || '', holdContact: b.hold_contact || '',
-        from: isoDate(b.date_from), to: isoDate(b.date_to),
+        movedTo: b.moved_to ? String(b.moved_to) : '',
+        from: isoDate(b.date_from), to: b.moved_to ? isoDate(new Date(new Date(b.date_to).getTime()-86400000)) : isoDate(b.date_to),
         checkIn: String(b.check_in).slice(0, 5), checkOut: String(b.check_out).slice(0, 5),
         source: SOURCE[b.source] || b.source, tariff: b.tariff, note: b.note || '',
-        accrued: Number(b.accrued), paid: Number(b.paid), bookedAt: isoDate(b.created_at),
+        accrued: Number(b.history_finance ? b.history_finance.accrued : b.accrued), paid: Number(b.history_finance ? b.history_finance.paid : b.paid), bookedAt: isoDate(b.created_at),
         releaseFrom: isoDate(b.release_from), releaseAuto: !!b.release_auto,
         /* Контракт: до какого числа человек обязался и какие месяцы оплачены.
            По ним шахматка рисует контур и заливку внутри него. */
@@ -184,7 +184,7 @@ module.exports = function register(route) {
         contractFrom: isoDate(b.contract_from), contractTo: isoDate(b.contract_to),
         contractEnded: isoDate(b.ended_at), annual: b.annual === null ? true : !!b.annual,
         depositCharged: !!b.has_deposit, penalty: Number(b.penalty),
-        paidMonths: paidBy[b.id] || []
+        paidMonths: b.history_finance ? b.history_finance.paidMonths : paidBy[b.id] || []
       })),
       payments: pays.rows.map((p) => ({
         id: String(p.id), residentId: String(p.user_id), bookingId: String(p.booking_id),
@@ -215,7 +215,7 @@ module.exports = function register(route) {
     if (!Number.isInteger(id)) return fail(res, 400, 'Неверный номер брони');
 
     const r = await query(`
-      SELECT b.id, b.user_id, COALESCE(c.price, bd.price) AS price,
+      SELECT b.id, b.user_id, COALESCE(b.monthly_price, c.price, bd.price) AS price,
              COALESCE(c.date_to, b.date_to) AS finish
         FROM bookings b
         JOIN beds bd ON bd.id = b.bed_id
@@ -258,6 +258,11 @@ module.exports = function register(route) {
     const id = Number(req.params.id);
     if (!Number.isInteger(id)) return fail(res, 400, 'Неверный номер брони');
     const body = await readJson(req);
+    const current = await query('SELECT moved_to,bed_id,contract_id,user_id FROM bookings WHERE id=$1',[id]);
+    if (current.rows[0] && current.rows[0].moved_to) return fail(res,409,'Это история проживания. Меняйте текущую бронь');
+    if (current.rows[0] && current.rows[0].contract_id && current.rows[0].user_id && body.bedId && body.bedId !== current.rows[0].bed_id) {
+      return fail(res,409,'Для переселения перетащите бронь на новое место и подтвердите дату и перерасчёт');
+    }
 
     /* Выехать раньше, чем заехал, нельзя. Без этой проверки бронь
        получала дату освобождения 2020 года при заезде в 2027-м:
@@ -282,8 +287,9 @@ module.exports = function register(route) {
 
     try {
       const out = await tx(async (q) => {
-        const before = await q(`SELECT bed_id, date_from, date_to, release_from FROM bookings WHERE id = $1 FOR UPDATE`, [id]);
+        const before = await q(`SELECT bed_id, date_from, date_to, release_from, moved_to FROM bookings WHERE id = $1 FOR UPDATE`, [id]);
         if (!before.rows[0]) return null;
+        if (before.rows[0].moved_to) throw Object.assign(new Error('Бронь уже переселена. Обновите шахматку'), {status:409});
 
         const upd = await q(
           `UPDATE bookings SET ${sets.join(', ')} WHERE id = $${vals.length}
@@ -314,6 +320,7 @@ module.exports = function register(route) {
       // переселение освобождает место — сообщаем всем в очереди
       waitlist.checkAndNotify().catch(() => {});
     } catch (err) {
+      if (err.status) return fail(res,err.status,err.message);
       // 23P01 — нарушение EXCLUDE: место занято на эти даты
       if (err.code === '23P01') return fail(res, 409, 'Место занято на эти даты');
       if (err.code === '23503') return fail(res, 400, 'Такого места нет');

@@ -41,19 +41,19 @@ async function sweepPenalties() {
   /* Начисления за проживание и депозит — в порядке, в котором их закрывают
      деньги. Пени сюда не берём. */
   const r = await query(`
-    SELECT c.id, c.booking_id, c.kind, c.period, c.amount, c.due_date,
+    SELECT c.id, c.booking_id, COALESCE('contract:'||b.contract_id,'booking:'||b.id) AS ledger, c.kind, c.period, c.amount, c.due_date,
            (CURRENT_DATE - c.due_date) AS days_late,
-           COALESCE((SELECT SUM(p.amount) FROM payments p WHERE p.booking_id = c.booking_id), 0) AS paid
-      FROM charges c
+           COALESCE((SELECT SUM(p.amount) FROM payments p JOIN bookings x ON x.id=p.booking_id WHERE x.id=b.id OR x.contract_id=b.contract_id), 0) AS paid
+      FROM charges c JOIN bookings b ON b.id=c.booking_id
      WHERE c.kind IN ('rent', 'deposit') AND c.cancelled_at IS NULL
-     ORDER BY c.booking_id, COALESCE(c.period, c.created_at::date), c.id`);
+     ORDER BY ledger, COALESCE(c.period, c.created_at::date), c.id`);
 
   let bookingId = null;
   let left = 0;                        // сколько денег ещё не разнесено
   let touched = 0;
 
   for (const c of r.rows) {
-    if (c.booking_id !== bookingId) { bookingId = c.booking_id; left = Number(c.paid); }
+    if (c.ledger !== bookingId) { bookingId = c.ledger; left = Number(c.paid); }
     const amount = Number(c.amount);
     const covered = Math.min(left, amount);
     left -= covered;
@@ -65,8 +65,8 @@ async function sweepPenalties() {
     if (due <= 0) continue;
 
     const has = await query(
-      `SELECT id, amount, cancelled_at FROM charges
-        WHERE booking_id = $1 AND kind = 'penalty' AND period = $2 LIMIT 1`,
+      `SELECT ch.id, ch.amount, ch.cancelled_at FROM charges ch JOIN bookings x ON x.id=ch.booking_id
+        WHERE (x.id=$1 OR x.contract_id=(SELECT contract_id FROM bookings WHERE id=$1)) AND ch.kind='penalty' AND ch.period=$2 LIMIT 1`,
       [c.booking_id, c.period]);
     const row = has.rows[0];
 

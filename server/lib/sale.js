@@ -48,18 +48,19 @@ async function sweepSale() {
   const r = await query(`
     SELECT b.id, b.user_id, b.release_from, b.release_auto, b.warn_period, b.sale_period,
            bd.label, rm.name AS room,
-           COALESCE((SELECT SUM(p.amount) FROM payments p WHERE p.booking_id = b.id), 0) AS paid,
-           COALESCE((SELECT SUM(ch.amount) FROM charges ch
-                      WHERE ch.booking_id = b.id AND ch.cancelled_at IS NULL
+           COALESCE((SELECT SUM(p.amount) FROM payments p JOIN bookings x ON x.id=p.booking_id WHERE x.id=b.id OR x.contract_id=b.contract_id), 0) AS paid,
+           COALESCE((SELECT SUM(ch.amount) FROM charges ch JOIN bookings x ON x.id=ch.booking_id
+                      WHERE (x.id=b.id OR x.contract_id=b.contract_id) AND ch.cancelled_at IS NULL
                         AND ch.kind IN ('rent', 'deposit')
                         AND ch.period IS NOT NULL AND ch.period <= $1), 0) AS owed,
-           EXISTS (SELECT 1 FROM charges ch WHERE ch.booking_id = b.id AND ch.cancelled_at IS NULL
+           EXISTS (SELECT 1 FROM charges ch JOIN bookings x ON x.id=ch.booking_id WHERE (x.id=b.id OR x.contract_id=b.contract_id) AND ch.cancelled_at IS NULL
                      AND ch.kind IN ('rent', 'deposit') AND ch.period = $1) AS billed
       FROM bookings b
       JOIN contracts c ON c.id = b.contract_id
       JOIN beds bd ON bd.id = b.bed_id
       JOIN rooms rm ON rm.id = bd.room_id
      WHERE b.user_id IS NOT NULL
+       AND b.moved_to IS NULL
        AND c.ended_at IS NULL
        AND c.date_to >= $1
        AND b.date_to >= CURRENT_DATE`, [dueStr]);

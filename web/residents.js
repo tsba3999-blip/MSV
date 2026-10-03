@@ -66,6 +66,7 @@ MSV.ready(function (ctx) {
     var roomById = {}; res.rooms.forEach(function (r) { roomById[r.id] = r; });
 
     d.bookings.forEach(function (b) {
+      if (b.movedTo) return; // Earlier residence segments remain in the chart/history.
       var person = byId[b.residentId];
       if (!person) return;
       var bed = bedById[b.bedId];

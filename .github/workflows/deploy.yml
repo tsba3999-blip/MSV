@@ -83,6 +83,7 @@ jobs:
           done
           node server/selftest.js http://127.0.0.1:3031
           node server/shahmatka-months.test.js
+          PGHOST=127.0.0.1 PGUSER=postgres PGPASSWORD=probe RELOCATION_TEST_DB=msv node server/relocation.test.js
 
   deploy:
     needs: check

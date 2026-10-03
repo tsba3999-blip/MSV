@@ -32,6 +32,7 @@ require('./routes/waitlist')(router.route);
 require('./routes/staff')(router.route);
 require('./routes/card')(router.route);
 require('./routes/holds')(router.route);
+require('./routes/relocation')(router.route);
 
 /* Бесплатные брони: раз в десять минут гасим сгоревшие и предупреждаем
    тех, у кого до конца меньше четырёх часов (решение заказчика 24.09.2026) */

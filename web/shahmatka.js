@@ -260,6 +260,7 @@
         tariff: firstDefined(b.tariff, '') || '',
         accrued: Number(firstDefined(b.accrued, b.amount, b.total, 0)) || 0,
         paid: Number(firstDefined(b.paid, 0)) || 0,
+        movedTo: b.movedTo || '',
         paidMonths: Array.isArray(b.paidMonths) ? b.paidMonths.filter(function (month) {
           return /^\d{4}-(0[1-9]|1[0-2])$/.test(month);
         }) : [],
@@ -711,7 +712,7 @@
       if (!bar || !self.canvas.contains(bar)) return;
 
       var booking = self._bookingById(bar.dataset.id);
-      if (!booking) return;
+      if (!booking || booking.movedTo) return;
 
       /* Гасим выделение текста: браузер начинал выделять подпись внутри
          полосы и присылал pointercancel, обрывая перенос до начала. */
@@ -870,6 +871,10 @@
 
     g.newFrom = b.from + g.shift * DAY_MS;
     g.newTo = b.to + g.shift * DAY_MS;
+    if (!sameBed && b.residentId && !b.holdUntil) {
+      g.newFrom = Math.max(this.today, Math.floor(g.axis.tsAt(g.xRel0) / DAY_MS) * DAY_MS + g.shift * DAY_MS, b.from + DAY_MS);
+      g.newTo = b.to;
+    }
 
     var bed = this.data.bedById[bedId];
     var room = bed ? this.data.roomById[bed.roomId] : null;
@@ -884,7 +889,7 @@
       return;
     }
 
-    g.ok = this._canPlace(g.id, bedId, g.newFrom, g.newTo);
+    g.ok = g.newFrom < g.newTo && this._canPlace(g.id, bedId, g.newFrom, g.newTo);
     this._dropPreview(row);
 
     var what;
@@ -1010,6 +1015,10 @@
   };
 
   Shahmatka.prototype._confirmMove = function (p) {
+    if (p.booking.residentId && !p.booking.holdUntil && p.toBed !== p.booking.bedId && global.MSVRelocate) {
+      global.MSVRelocate.open(p.booking.id, p.toBed, new Date(p.from).toISOString().slice(0,10));
+      return;
+    }
     var self = this;
     var r = this._recalc(p);
     var d = this.data;
@@ -1992,7 +2001,7 @@
       '<div class="msv-sh__panel-foot">' +
         (b.holdUntil
           ? '<button type="button" class="msv-sh__btn msv-sh__btn--primary" data-act="unhold">Снять бронь</button>'
-          : '<button type="button" class="msv-sh__btn msv-sh__btn--primary" data-act="edit">Изменить бронь</button>' +
+          : (b.movedTo ? '' : '<button type="button" class="msv-sh__btn msv-sh__btn--primary" data-act="edit">Изменить бронь</button>') +
             '<button type="button" class="msv-sh__btn" data-act="profile">Профиль</button>') +
       '</div>';
 

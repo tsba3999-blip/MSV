@@ -650,18 +650,27 @@ CREATE INDEX IF NOT EXISTS payroll_user_idx ON payroll(user_id, paid_at DESC);
 
 -- Баланс по брони: начислено, оплачено, остаток. Именно эти три
 -- числа показывают шахматка, «Начисления» и кабинет резидента.
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS monthly_price integer CHECK (monthly_price > 0);
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS moved_to bigint REFERENCES bookings(id);
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS history_finance jsonb;
+
 CREATE OR REPLACE VIEW booking_balance AS
+-- A relocation retains all original ledger rows. Only the final segment carries
+-- the contract balance, so totals do not count the same money twice.
 SELECT
   b.id                                        AS booking_id,
   b.user_id,
   b.bed_id,
-  COALESCE(SUM(c.amount), 0)                  AS accrued,
-  COALESCE((SELECT SUM(p.amount) FROM payments p WHERE p.booking_id = b.id), 0) AS paid,
-  COALESCE(SUM(c.amount), 0)
-    - COALESCE((SELECT SUM(p.amount) FROM payments p WHERE p.booking_id = b.id), 0) AS balance
+  CASE WHEN b.moved_to IS NULL THEN totals.accrued ELSE 0::bigint END AS accrued,
+  CASE WHEN b.moved_to IS NULL THEN totals.paid ELSE 0::bigint END AS paid,
+  CASE WHEN b.moved_to IS NULL THEN totals.accrued-totals.paid ELSE 0::bigint END AS balance
 FROM bookings b
-LEFT JOIN charges c ON c.booking_id = b.id AND c.cancelled_at IS NULL
-GROUP BY b.id;
+CROSS JOIN LATERAL (
+  SELECT COALESCE((SELECT SUM(ch.amount) FROM charges ch JOIN bookings x ON x.id=ch.booking_id
+    WHERE ch.cancelled_at IS NULL AND (x.id=b.id OR (b.contract_id IS NOT NULL AND x.contract_id=b.contract_id))),0) AS accrued,
+    COALESCE((SELECT SUM(p.amount) FROM payments p JOIN bookings x ON x.id=p.booking_id
+    WHERE x.id=b.id OR (b.contract_id IS NOT NULL AND x.contract_id=b.contract_id)),0) AS paid
+) totals;
 
 -- Кто живёт сейчас: одна строка на занятое место
 CREATE OR REPLACE VIEW occupancy_today AS
