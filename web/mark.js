@@ -195,6 +195,17 @@
         if (tasksLink) tasksLink.after(contractsLink); else contractNav.appendChild(contractsLink);
       }
     }
+    if (role === 'admin') {
+      var ownerNav = document.querySelector('.side__nav');
+      if (ownerNav && !ownerNav.querySelector('[data-resident-cabinet]')) {
+        var residentCabinet = document.createElement('a');
+        residentCabinet.className = 'side__link';
+        residentCabinet.href = 'cabinet-resident.html';
+        residentCabinet.setAttribute('data-resident-cabinet', '');
+        residentCabinet.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>Кабинет резидента';
+        ownerNav.appendChild(residentCabinet);
+      }
+    }
     // One icon for each section, including role-specific and legacy menus.
     document.querySelectorAll('a').forEach(function (link) {
       var href = (link.getAttribute('href') || '').split('?')[0];
