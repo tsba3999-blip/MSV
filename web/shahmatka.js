@@ -700,7 +700,14 @@
     this._on(this.canvas, 'pointerdown', function (e) {
       if (self.opts.readOnly) return;                       // просмотр без переселений
       if (e.pointerType === 'mouse' && e.button !== 0) return;
-      var bar = e.target.closest('.msv-sh__bar');
+      var hit = e.target.closest('.msv-sh__bar, .msv-sh__paid');
+      var bar = hit;
+      // Paid-month labels are siblings of the full booking bar.
+      if (hit && hit.classList.contains('msv-sh__paid')) {
+        bar = Array.prototype.find.call(hit.parentNode.querySelectorAll('.msv-sh__bar'), function (candidate) {
+          return candidate.dataset.id === hit.dataset.id;
+        });
+      }
       if (!bar || !self.canvas.contains(bar)) return;
 
       var booking = self._bookingById(bar.dataset.id);
