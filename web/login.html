@@ -2,6 +2,8 @@
 <!-- © 2026 МСВ. Все права защищены. Сайт и его программное обеспечение охраняются ГК РФ (ст. 1259, 1261). Копирование без разрешения правообладателя запрещено. Подробнее: /legal.html -->
 <html lang="ru">
 <head>
+<script>document.documentElement.classList.add('entry-checking');</script>
+<style>.entry-checking .page{visibility:hidden}.entry-check-note{display:none}.entry-checking .entry-check-note{display:block;position:fixed;top:40%;left:0;right:0;text-align:center;color:#34495E;font:16px sans-serif}</style>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="icon" href="favicon4.png" type="image/png">
@@ -147,6 +149,7 @@
  </style>
 </head>
 <body>
+<p class="entry-check-note" role="status">Проверяем сохранённый вход…</p>
 
 <main class="page">
 
@@ -491,6 +494,7 @@
 </script>
 
 
+<script src="entry-session.js" onerror="document.documentElement.classList.remove('entry-checking')"></script>
 <script src="mark.js"></script>
 <script src="zoom.js"></script>
 <script src="edit.js"></script>

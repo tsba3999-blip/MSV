@@ -199,6 +199,14 @@
     .start__brand, .start__entry { max-width: 420px; }
     .start__logo { max-width: none; }
   }
+  .entry-session { margin-bottom: 16px; padding: 16px; border-radius: 20px; background: var(--msv-graphite); color: #fff; text-align: left; }
+  .entry-session[hidden] { display: none; }
+  .entry-session__title { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+  .entry-session__dot { flex: 0 0 10px; height: 10px; border-radius: 50%; background: var(--msv-lime); }
+  .entry-session__name { margin-top: 8px; overflow-wrap: anywhere; }
+  .entry-session__note { margin: 8px 0 12px; font-size: 14px; line-height: 1.4; }
+  .entry-session__error { margin: 8px 0 0; font-size: 14px; }
+  .entry-session__error:empty { display: none; }
 </style>
 </head>
 <body>
@@ -214,6 +222,13 @@
     </div>
 
     <div class="start__entry">
+      <section class="entry-session" id="entrySession" aria-label="Текущий аккаунт" data-no-edit hidden>
+        <div class="entry-session__title"><span class="entry-session__dot" aria-hidden="true"></span><span data-session-role></span></div>
+        <div class="entry-session__name" data-session-name></div>
+        <p class="entry-session__note" data-session-note></p>
+        <button class="msv-btn msv-btn--block msv-btn--on-red-fill" type="button">Выйти из аккаунта</button>
+        <p class="entry-session__error" data-session-error role="alert"></p>
+      </section>
       <nav class="start__actions" aria-label="Вход в личный кабинет">
         <!-- Дверь одна на всех: и резидент, и сотрудник, и администратор
              (решение заказчика 24.09.2026) -->
@@ -288,6 +303,7 @@
 })();
 </script>
 
+<script src="entry-session.js"></script>
 <script src="mark.js"></script>
 <script src="zoom.js"></script>
 <script src="edit.js"></script>

@@ -92,6 +92,7 @@
   /* ---------- Панель ---------- */
 
   function buildBar(role) {
+    if(bar){bar.hidden=false;return;}
     bar = document.createElement('div');
     bar.className = 'edit-bar';
     bar.innerHTML =
@@ -141,6 +142,7 @@
       'body.editing [contenteditable="true"]:hover{outline-color:#FB344A;background:rgba(251,52,74,.04)}' +
       'body.editing [contenteditable="true"]:focus{outline:2px solid #FB344A;background:#fff}' +
       'body.editing .edit-changed{outline-color:#C8F03C!important}';
+    css.textContent += '.edit-bar[hidden]{display:none!important}';
     document.head.appendChild(css);
   }
 
@@ -270,9 +272,10 @@
   var DEMO = location.protocol === 'file:';
 
   if (!DEMO) {
+    document.addEventListener('msv:entry-session',function(e){var me=e.detail;if(me&&me.canEditSite){if(!bar){buildBar(me.role);loadMeta();}bar.hidden=false;}else if(bar){if(state.on)cancel();bar.hidden=true;}});
     document.addEventListener('msv:menu-ready',applySaved);
     applySaved().then(function () {
-      return api('GET', '/api/auth/me');
+      return window.MSV_ENTRY_SESSION?window.MSV_ENTRY_SESSION.then(function(me){return {status:200,body:me};}):api('GET', '/api/auth/me');
     }).then(function (r) {
       var me = r && r.status === 200 ? r.body : null;
       if (me && me.canEditSite) { buildBar(me.role); loadMeta(); }
