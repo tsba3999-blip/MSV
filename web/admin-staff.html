@@ -23,6 +23,7 @@
   .tri[aria-expanded="true"] svg { transform: rotate(180deg); }
   .miss { color: var(--msv-red); font-weight: 600; }
   .who-link { color: inherit; text-decoration: none; } .who-link:hover .who-cell__name { text-decoration: underline; }
+.grid:first-of-type{table-layout:fixed}.grid:first-of-type th:first-child{width:28%}.grid:first-of-type th:last-child{width:5%}.grid:first-of-type th:nth-child(5){width:24%}th[data-sort]{cursor:pointer}.grid [data-pay],.grid [data-bonus]{margin:2px}
 </style>
 <style>
   body { --role: var(--msv-graphite); --role-ink: var(--msv-graphite); }
@@ -112,18 +113,18 @@
     </header>
 
     <main class="work__body">
-      <p class="msv-note notice" id="note">Раздел виден только администратору — модератору сервер откажет. Начисление: нажмите «Начислено», укажите сумму и премию — сотрудник получит уведомление в кабинет и в Telegram. Стаж считается от даты выхода на сегодня.</p>
+      <p class="msv-note notice" id="note">Раздел доступен сотрудникам с правом просмотра начислений. «Начислить» — зарплата, «Премировать» — отдельная премия. Стаж считается от даты выхода на сегодня.</p>
 
       <div class="bar">
         <button class="bar__chip" type="button" data-place="" aria-pressed="true">Все</button>
         <button class="bar__chip" type="button" data-place="forma" aria-pressed="false">Шаб.</button>
         <button class="bar__chip" type="button" data-place="uyut" aria-pressed="false">Варш.</button>
-        <span class="msv-note bar__count" id="count"></span>
+        <button class="bar__chip" type="button" data-place="all" aria-pressed="false">Администрация</button><span class="msv-note bar__count" id="count"></span>
         <button class="msv-btn msv-btn--m msv-btn--primary" type="button" id="addStaff">Добавить сотрудника</button>
       </div>
 
       <table class="grid">
-        <thead><tr><th>Фамилия Имя</th><th>Место работы</th><th>Должность</th><th>Стаж</th><th class="num">Оклад</th><th class="num">Начислить</th><th></th></tr></thead>
+        <thead><tr><th data-sort="name">Фамилия Имя / Должность</th><th data-sort="place">Место работы</th><th data-sort="started">Стаж</th><th class="num" data-sort="salary">Оклад</th><th>Действия</th><th></th></tr></thead>
         <tbody id="rows"></tbody>
       </table>
 
@@ -142,31 +143,32 @@
 <script>
 MSV.ready(function (ctx) {
   'use strict';
-  if (ctx.live && ctx.me && ctx.me.role !== 'admin') {
+  if (ctx.live && ctx.me && !ctx.me.canPayroll) {
     document.querySelector('.work__body').innerHTML = '<p class="msv-body" style="padding:var(--msv-s48);text-align:center;color:var(--msv-n500)">Зарплаты сотрудников видны администратору и тому, кому это поручено.</p>'; return;
   }
   var STAFF = [], PLACE = window.MSV_STAFF_PLACE, tenure = window.MSV_STAFF_TENURE;
   var log = [];
-  var filter = '';
+  var filter = '', sortKey='name', sortDir=1;
   function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   function money(n) { return n == null ? '<span class="miss">уточнить</span>' : String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '\u2009') + '\u2009руб.'; }
   function fdate(iso) { return iso ? iso.split('-').reverse().join('.') : '<span class="miss">уточнить</span>'; }
   function initials(n) { var p = n.split(' '); return (p[0][0] + (p[1] ? p[1][0] : '')).toUpperCase(); }
 
   function render() {
-    var list = STAFF.filter(function (s) { return !filter || s.place === filter || s.place === 'all'; });
+    var list = STAFF.filter(function (s) { return !filter || s.place === filter; });
+    list.sort(function(a,b){var x=a[sortKey],y=b[sortKey];return sortDir*(sortKey==='salary'?(Number(x)||0)-(Number(y)||0):String(x||'').localeCompare(String(y||''),'ru',{numeric:true}));});
     document.getElementById('count').textContent = list.length + ' из ' + STAFF.length;
     document.getElementById('rows').innerHTML = list.map(function (s) {
       return '<tr data-id="' + esc(s.id) + '">' +
-        '<td><a class="who-link" href="admin-staff-view.html?id=' + esc(s.id) + '" title="Открыть кабинет сотрудника"><span class="who-cell"><span class="who-cell__face">' + esc(initials(s.name)) + '</span><span><span class="who-cell__name">' + esc(s.name) + '</span></span></span></a></td>' +
+        '<td><a class="who-link" href="admin-staff-view.html?id=' + esc(s.id) + '" title="Открыть кабинет сотрудника"><span class="who-cell"><span class="who-cell__face">' + (s.photo?'<img src="'+esc(s.photo)+'" alt="Фото сотрудника" data-zoom style="width:48px;height:48px;object-fit:cover;border-radius:50%">':esc(initials(s.name))) + '</span><span><span class="who-cell__name">' + esc(s.name) + '</span><span class="msv-note" style="display:block">'+esc(s.position)+'</span></span></span></a></td>' +
         '<td>' + (s.place ? esc(PLACE[s.place]) : '<span class="miss">уточнить</span>') + '</td>' +
-        '<td>' + esc(s.position) + '</td>' +
+
         '<td>' + esc(tenure(s.started)) + '</td>' +
         '<td class="num">' + money(s.salary) + '</td>' +
-        '<td class="num"><button class="msv-btn msv-btn--s msv-btn--primary" type="button" data-pay>Начислено</button></td>' +
+        '<td class="num"><button class="msv-btn msv-btn--s msv-btn--primary" type="button" data-pay>Начислить</button><button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-bonus>Премировать</button></td>' +
         '<td class="num"><button class="tri" type="button" data-more aria-expanded="false" aria-label="Подробнее"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></td>' +
       '</tr>' +
-      '<tr class="more" data-more-of="' + esc(s.id) + '" hidden><td colspan="7"><dl class="more__grid">' +
+      '<tr class="more" data-more-of="' + esc(s.id) + '" hidden><td colspan="6"><dl class="more__grid">' +
         '<div><dt>Дата рождения</dt><dd>' + fdate(s.birthday) + '</dd></div>' +
         '<div><dt>Куда переводить</dt><dd>' + (s.payTo ? esc(s.payTo) : '<span class="miss">уточнить</span>') + '</dd></div>' +
         '<div><dt>Работает с</dt><dd>' + fdate(s.started) + '</dd></div>' +
@@ -178,8 +180,9 @@ MSV.ready(function (ctx) {
   document.getElementById('rows').addEventListener('click', function (e) {
     var t = e.target.closest('[data-more]');
     if (t) { var tr = t.closest('tr'), more = document.querySelector('[data-more-of="' + tr.dataset.id + '"]'); var on = t.getAttribute('aria-expanded') === 'true'; t.setAttribute('aria-expanded', on ? 'false' : 'true'); more.hidden = on; return; }
-    var p = e.target.closest('[data-pay]'); if (!p) return;
+    var p = e.target.closest('[data-pay], [data-bonus]'); if (!p) return;
     var s = STAFF.filter(function (x) { return x.id === p.closest('tr').dataset.id; })[0];
+    if(p.hasAttribute('data-bonus')){var amount=Number(prompt('Премия для '+s.name+'. Сумма, руб.:',''));if(!Number.isInteger(amount)||amount<=0)return;var reason=prompt('За что премия?','');if(reason===null)return;p.disabled=true;ctx.api('POST','/api/payroll',{userId:s.userId||s.id,period:'Премия: '+reason,amount:0,bonus:amount}).then(function(r){p.disabled=false;alert(r.status===201?'Премия начислена':r.body.error||'Не удалось начислить');}).catch(function(){p.disabled=false;alert('Сервер не отвечает');});return;}
     var d = new Date(), half = d.getDate() <= 15 ? 'аванс' : 'зарплата';
     var period = half + ' за ' + ['январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь'][d.getMonth()] + ' ' + d.getFullYear();
     var sum = prompt(s.name + ' — ' + period + '.\nСумма, руб.:', s.salary ? (half === 'аванс' ? Math.round(s.salary * 0.4) : Math.round(s.salary * 0.6)) : '');
@@ -190,7 +193,7 @@ MSV.ready(function (ctx) {
       document.getElementById('log').innerHTML = log.map(function (x) {
         return '<tr><td>' + x.at.toLocaleDateString('ru-RU') + '</td><td>' + esc(x.name) + '</td><td>' + esc(x.period) + '</td><td class="num">' + money(x.sum) + '</td><td class="num">' + (x.bonus ? money(x.bonus) : '—') + '</td><td class="num"><b>' + money(x.sum + x.bonus) + '</b></td><td><span class="tag tag--mute">ждёт</span></td></tr>';
       }).join('');
-      alert('Начислено. ' + s.name + ' получит уведомление в кабинет и в Telegram.');
+      alert('Начисление сохранено для ' + s.name + '.');
     }
     if (!ctx.live) { ok(); return; }
     ctx.api('POST', '/api/payroll', { userId: s.userId || s.id, period: period, amount: sum, bonus: bonus })
@@ -224,6 +227,7 @@ MSV.ready(function (ctx) {
       .catch(function () { alert('Сервер не отвечает'); });
   });
 
+  document.querySelector('.grid thead').addEventListener('click',function(e){var th=e.target.closest('[data-sort]');if(!th)return;sortDir=sortKey===th.dataset.sort?-sortDir:1;sortKey=th.dataset.sort;render();});
   function load() {
     window.MSV_STAFF_LOAD().then(function (list) { STAFF = list.slice(); render(); });
   }

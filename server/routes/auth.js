@@ -39,7 +39,7 @@ module.exports = function register(route) {
       /* Промах засчитываем здесь: до проверки неизвестно, честный это
          вход или перебор, а честный вход тратить лимит не должен */
       loginFails.miss(clientIp(req));
-      return fail(res, 401, r.error);
+      return json(res,r.lockedUntil?429:401,{error:r.error,attemptsRemaining:r.attemptsRemaining,lockedUntil:r.lockedUntil});
     }
 
     /* Роль приходит из учётной записи. Кнопка на первой странице
@@ -87,6 +87,7 @@ module.exports = function register(route) {
     if (!s) return fail(res, 401, 'Не выполнен вход');
     if (!auth.atLeast(s, 'moderator')) return fail(res, 403, 'Приглашать может модератор или администратор');
     const body = await readJson(req);
+    if (!require('../lib/names')(body)) return fail(res,400,'Необходимо вводить данные по-русски');
     const r = await auth.invite(s.uid, body.contact, body.name, body.pin);
     if (!r.ok) return fail(res, 400, r.error);
     json(res, 201, { ok: true, id: String(r.id) });
@@ -99,7 +100,7 @@ module.exports = function register(route) {
   route('GET', '/api/auth/me', async (req, res) => {
     const s = auth.readSession(req);
     if (!s) return fail(res, 401, 'Не выполнен вход');
-    const r = await query(`SELECT u.id, u.role, u.name, u.is_active, u.can_edit_site, u.photo_url, p.position, p.place, p.can_edit_shahmatka, p.can_payroll
+    const r = await query(`SELECT u.id, u.role, u.name, u.is_active, u.can_edit_site, u.section_access, u.photo_url, p.position, p.place, p.can_edit_shahmatka, p.can_payroll
                            FROM users u LEFT JOIN staff_profiles p ON p.user_id = u.id WHERE u.id = $1`, [s.uid]);
     const u = r.rows[0];
     if (!u || !u.is_active) return fail(res, 401, 'Учётная запись отключена');
@@ -114,8 +115,9 @@ module.exports = function register(route) {
          можно было выдать сотруднику лично — и страница обещала ему
          правку, которую сервер всё равно не давал: перенос брони там
          требует уровня модератора. */
-      canEditShahmatka: u.role === 'admin' || u.role === 'moderator',
-      canPayroll: u.role === 'admin' || !!u.can_payroll,
+      sectionAccess: {...require('../lib/section-access').defaults(u.role,u.can_payroll),...u.section_access},
+      canEditShahmatka: u.section_access.chart === false ? false : u.role === 'admin' || u.role === 'moderator',
+      canPayroll: u.role === 'admin' || (u.section_access.payroll ?? !!u.can_payroll),
       canEditSite: !!u.can_edit_site,
       photo: u.photo_url || '',
       /* Как человек подписан в кабинете. Роль — это права, должность —

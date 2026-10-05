@@ -81,7 +81,7 @@ MSV.ready(function (ctx) {
 
       ALL.push({
         res: res, userId: person.id, bookingId: b.id,
-        name: person.name,
+        name: person.name, photo: person.photo || '',
         university: person.university || '',
         phone: person.phone || '', messengers: person.messengers || [],
         bed: bed ? bed.label : '',
@@ -283,7 +283,7 @@ MSV.ready(function (ctx) {
         /* Щелчок по имени открывает карточку резидента — так же, как в
            шахматке (решение заказчика 24.09.2026) */
         '<td><a class="who-cell who-cell--link" href="resident-card.html?id=' + esc(x.userId) + '" title="Открыть карточку резидента">' +
-          '<span class="who-cell__face">' + esc(initials(x.name)) + '</span>' +
+          (x.photo ? '<img class="who-cell__face" src="' + esc(x.photo) + '" alt="Фото резидента" data-zoom style="width:56px;height:56px;object-fit:cover">' : '<span class="who-cell__face">' + esc(initials(x.name)) + '</span>') +
           '<span><span class="who-cell__name">' + esc(x.name) + minor + '</span>' +
           '<span class="msv-note sub">' + esc(x.university) + '</span></span>' +
         '</a></td>' +

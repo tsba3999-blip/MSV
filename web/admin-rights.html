@@ -99,7 +99,7 @@
     </header>
 
     <main class="work__body">
-      <p class="msv-note notice">Раздел показывает, как будет устроена выдача прав. Кнопки пока не сохраняют: сервера нет.</p>
+      <p class="msv-note notice">Нажмите «Изменить», включите или отключите отдельные разделы и сохраните. Роль сотрудника при этом не меняется.</p>
 
       <h2 class="msv-sub" style="margin:0 0 var(--msv-s12)">Кто и что может</h2>
 
@@ -110,18 +110,7 @@
         <tbody id="people"></tbody>
       </table>
 
-      <section class="empty" style="margin-top:var(--msv-s32)">
-        <h2 class="msv-sub empty__title">Что нужно решить до подключения</h2>
-        <p class="msv-body empty__text">Сотруднику можно выдать отдельное право «Редактировать шахматку» — тогда он переселяет резидентов своей резиденции. Без него шахматка у сотрудника только для просмотра. Резиденции сотрудника задаются здесь же: он видит только их.</p>
-        <p class="msv-body empty__text">Четыре роли уже намечены. Прежде чем писать серверную часть, стоит договориться:</p>
-        <ul class="empty__list">
-          <li>чем модератор отличается от администратора — сейчас только правами доступа</li>
-          <li>может ли сотрудник видеть телефоны и документы резидентов</li>
-          <li>кто заводит новых сотрудников: только администратор или и модератор</li>
-          <li>нужен ли журнал: кто, когда и какие права выдал</li>
-          <li>что происходит с доступом, когда сотрудник увольняется</li>
-        </ul>
-      </section>
+
     </main>
   </div>
 
@@ -163,53 +152,12 @@
   function ini(n) { var p = n.split(' '); return (p[0][0] + (p[1] ? p[1][0] : '')).toUpperCase(); }
 
   /* Состояние строки: три настоящие вещи, а не шесть лепестков */
-  function stateOf(p) {
-    return { role: p.role, shah: !!p.canEditShahmatka, pay: !!p.canPayroll };
-  }
-
-  /* Лепестки из состояния — теми же правилами, что и у сервера */
-  function lit(st) {
-    var on = { 'Заявки': true };
-    if (st.role === 'admin' || st.role === 'moderator') { on['Шахматка'] = true; on['Резиденты'] = true; on['Начисления'] = true; }
-    /* Сотруднику шахматка открыта только на просмотр, поэтому лепесток
-       у него не горит: он означает право править (25.09.2026) */
-    if (st.role === 'admin' || st.pay) on['Зарплаты'] = true;
-    if (st.role === 'admin') on['Права'] = true;
-    return on;
-  }
-
-  /* Какие лепестки нажимаются, а какие держит роль */
-  function locked(st, name, self) {
-    if (name === 'Заявки') return 'Заявки открыты всем';
-    if (name === 'Права' && self) return 'Свои права снять нельзя — вы запрёте себя снаружи';
-    if (st.role === 'admin' && name !== 'Права') return 'У администратора открыто всё';
-    if (st.role === 'moderator' && (name === 'Шахматка' || name === 'Резиденты' || name === 'Начисления')) {
-      return 'Это уровень модератора — снимается вместе с ролью';
-    }
-    if (name === 'Шахматка') return 'Править шахматку может модератор или администратор. Сотрудник её видит, но не меняет';
-    return '';
-  }
-
-  /* Нажали лепесток — меняем то, что за ним стоит */
-  function toggle(st, name) {
-    var on = lit(st);
-    if (name === 'Права') {
-      st.role = on['Права'] ? 'moderator' : 'admin';
-    } else if (name === 'Резиденты' || name === 'Начисления') {
-      st.role = on[name] ? 'staff' : 'moderator';
-    } else if (name === 'Зарплаты') {
-      st.pay = !st.pay;
-    }
-    return st;
-  }
-
-  /* Что изменится — словами, до нажатия «Сохранить» */
-  function diff(was, now) {
-    var out = [];
-    if (was.role !== now.role) out.push('роль: ' + ROLE[was.role][0].toLowerCase() + ' → ' + ROLE[now.role][0].toLowerCase());
-    if (was.pay !== now.pay && now.role !== 'admin') out.push(now.pay ? 'увидит зарплаты' : 'не увидит зарплаты');
-    return out.join('; ');
-  }
+  var KEYS={'Шахматка':'chart','Резиденты':'residents','Заявки':'tickets','Начисления':'charges','Зарплаты':'payroll'};
+  function stateOf(p){return {role:p.role,sections:Object.assign({},p.sectionAccess)};}
+  function lit(st){var on={};PERMS.forEach(function(name){on[name]=name==='Права'?st.role==='admin':!!st.sections[KEYS[name]];});return on;}
+  function locked(st,name,self){if(st.role==='admin'||self)return 'Полные права администратора не изменяются';if(name==='Права')return 'Управление правами остаётся у владельца';return '';}
+  function toggle(st,name){var key=KEYS[name];if(key)st.sections[key]=!st.sections[key];}
+  function diff(was,now){return PERMS.filter(function(n){return lit(was)[n]!==lit(now)[n];}).map(function(n){return n+': '+(lit(now)[n]?'открыть':'закрыть');}).join('; ');}
 
   var people = [];
   var meId = null;
@@ -226,7 +174,7 @@
       people = (list || []).map(function (s) {
         return { id: String(s.id), name: s.name, role: s.role, position: s.position,
                  contact: s.phone || s.email || '',
-                 canEditShahmatka: s.canEditShahmatka, canPayroll: s.canPayroll };
+                 sectionAccess:s.sectionAccess, photo:s.photo, canEditShahmatka: s.canEditShahmatka, canPayroll: s.canPayroll };
       });
       render();
     });
@@ -287,12 +235,11 @@
 
     var person = people.filter(function (x) { return x.id === editing; })[0];
     var was = stateOf(person), now = draftSt;
-    var body = { canPayroll: now.pay };
-    if (was.role !== now.role) body.role = now.role;
+    var body = now.sections;
 
     btn.disabled = true;
-    fetch('/api/staff/' + person.id, {
-      method: 'PATCH', credentials: 'same-origin',
+    fetch('/api/staff/' + person.id + '/sections', {
+      method: 'PUT', credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
     })
       .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j }; }); })

@@ -23,9 +23,9 @@
   --sh-booked-br: var(--msv-sky, #7EB2DD);
   --sh-booked-tx: #1B4C7A;
 
-  --sh-active-bg: #EEF9D8;
-  --sh-active-br: var(--msv-lime, #C8F03C);
-  --sh-active-tx: #4A6B12;
+  --sh-active-bg: var(--msv-lavender, #CBB6FF);
+  --sh-active-br: var(--msv-violet, #6E3BFF);
+  --sh-active-tx: var(--msv-graphite, #34495E);
 
   --sh-debt-bg: #FFE7EB;
   --sh-debt-br: #FFB3BF;
@@ -519,7 +519,7 @@
 
 /* Контракт: только контур, цвет берётся из состояния брони.
    Правило идёт после цветов состояний, иначе заливка его перебьёт. */
-.msv-sh__bar--contract { background: transparent; }
+.msv-sh__bar--contract { background: rgba(203,182,255,.25); }
 
 /* Оплаченный месяц: заливка внутри контура, на ней фамилия.
    Щелчки пропускает насквозь — нажимается сам контур (24.09.2026) */
@@ -1238,3 +1238,4 @@ body.msv-sh-dragging .msv-sh__bar { cursor: grabbing; }
    полоса «сегодня». Правило выше прячет все линии под бруски (24.09.2026) */
 .msv-sh__underlay .msv-sh__gridline--month { z-index: 24; }
 .msv-sh__body { position: relative; isolation: isolate; }
+.msv-sh .msv-sh__paid{background:var(--msv-lavender,#CBB6FF);border-color:var(--msv-violet,#6E3BFF);color:var(--msv-graphite,#34495E)}

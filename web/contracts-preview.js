@@ -2,7 +2,7 @@
   'use strict';
   var groups = ['Шаболовка', 'Варшавка', 'Тверская', 'Общие', 'Не распределено'];
   var titles = ['Руслетелематика','Интернет МТС Шаболовка','Таском','Атол','Скала Шаболовка','Скала Варшавка','Эколайн ТБО','ЭЦП','Сертификаты','Аренда Шаболовская','Аренда Варшавка','Аренда Тверская','Коммуналка Шаболовская','Коммуналка Варшавка','Коммуналка Тверская','Налоги','Расходники','ЕТЦ ВО','Барьер рус','Шахматка Тл','ЭДО Контур','Персоналкин','Бухгалтерия'];
-  var key = 'msv.contracts.preview.v1', data, editing = null, view = 'calendar', design = 'chess', dragged = null;
+  var key = 'msv.contracts.preview.v1', data, editing = null, view = 'calendar', design = 'groups', dragged = null, configuring=false;
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
   var money = function (v) { return Number(v).toLocaleString('ru-RU') + ' ₽'; };
@@ -26,8 +26,8 @@
     var date = month + c.due.slice(7), late = date < today;
     return '<span class="badge ' + (late?'late':'soon') + '">' + (late?'Просрочено':'К оплате') + '<br>' + money(c.amount) + '</span>';
   }
-  function controls(c) { return '<span class="grip" draggable="true" data-drag="'+esc(c.id)+'" title="Перетащить">⠿</span><button class="move" data-move="-1" data-id="'+esc(c.id)+'" aria-label="Поднять договор">↑</button><button class="move" data-move="1" data-id="'+esc(c.id)+'" aria-label="Опустить договор">↓</button>'; }
-  function name(c) { return '<button class="name" data-open="'+esc(c.id)+'">'+esc(c.name)+'</button><div class="sub">'+esc(c.group)+'</div>'; }
+  function controls(c) { if(!configuring)return '';return '<span class="grip" draggable="true" data-drag="'+esc(c.id)+'" title="Перетащить">⠿</span><button class="move" data-move="-1" data-id="'+esc(c.id)+'" aria-label="Поднять договор">↑</button><button class="move" data-move="1" data-id="'+esc(c.id)+'" aria-label="Опустить договор">↓</button>'; }
+  function name(c) { return '<details class="contract-details"><summary>Детали</summary><p>Ответственный: '+esc(c.responsible||'—')+'</p><p>Исполнитель: '+esc(c.executor||'—')+'</p><p>'+esc(c.notes||'')+'</p></details>'+ '<button class="name" data-open="'+esc(c.id)+'">'+esc(c.name)+'</button><div class="sub">'+esc(c.group)+'</div>'; }
   function render() {
     var list = data.filter(function(c) { return ($('group').value === 'Все' || c.group === $('group').value) && (c.name+' '+c.contact).toLowerCase().includes($('search').value.toLowerCase()); });
     $('yearLabel').hidden = view !== 'calendar';
@@ -39,9 +39,9 @@
     if (view === 'cards') {
       $('board').innerHTML='<div class="cards">'+list.map(function(c){return '<article class="card" data-row="'+esc(c.id)+'"><div>'+controls(c)+'</div><h3>'+name(c)+'</h3><p>'+esc(c.status)+' · '+esc(c.due || 'Срок не задан')+'</p><div class="money">'+money(c.amount)+'</div><div class="cardfoot">'+badge(c,(c.due || today).slice(0,7))+'</div></article>';}).join('')+'</div>';return;
     }
-    var year=Number($('year').value)||2026, months=Array.from({length:12},function(_,i){return year+'-'+String(i+1).padStart(2,'0');});
+    var center=$('year').value||today.slice(0,7),parts=center.split('-'),months=Array.from({length:12},function(_,i){var d=new Date(Number(parts[0]),Number(parts[1])-1+i-5,1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');});
     if (view === 'calendar' && design !== 'classic') { renderDesign(list, months); return; }
-    var heads=view==='calendar'?months.map(function(m){return '<th>'+new Date(m+'-02').toLocaleDateString('ru-RU',{month:'short'})+'</th>';}).join(''):'<th>Статус</th><th>Заключён</th><th>Следующая оплата</th><th>Сумма</th><th>Всего оплачено</th><th>Контакт</th>';
+    var heads=view==='calendar'?months.map(function(m){return '<th>'+new Date(m+'-02').toLocaleDateString('ru-RU',{month:'short',year:'2-digit'})+'</th>';}).join(''):'<th>Статус</th><th>Заключён</th><th>Следующая оплата</th><th>Сумма</th><th>Всего оплачено</th><th>Контакт</th>';
     $('board').innerHTML='<div class="scroll"><table class="'+view+'"><thead><tr><th>Договор / объект</th>'+heads+'</tr></thead><tbody>'+list.map(function(c){return '<tr data-row="'+esc(c.id)+'"><td>'+controls(c)+name(c)+'</td>'+(view==='calendar'?months.map(function(m){return '<td>'+badge(c,m)+'</td>';}).join(''):'<td>'+esc(c.status)+'</td><td>'+esc(c.signed||'Не указано')+'</td><td>'+esc(c.due||'Не задана')+'</td><td>'+money(c.amount)+'</td><td>'+money(c.payments.reduce(function(n,p){return n+Number(p.sum);},0))+'</td><td>'+esc(c.contact||'Не указан')+'</td>')+'</tr>';}).join('')+'</tbody></table></div>';
   }
   function renderDesign(list, months) {
@@ -51,7 +51,7 @@
     function plan(c){return months.filter(function(m){return dueIn(c,m);}).reduce(function(n,m){return n+c.amount;},0);}
     function actual(c){return months.reduce(function(n,m){return n+sum(c,m);},0);}
     function cell(c,m){var paid=sum(c,m),planned=dueIn(c,m),state=paid>=c.amount&&paid>0?'paid':paid>0?'partial':planned?'planned':'blank';return '<td><button class="period '+state+'" data-open="'+esc(c.id)+'" title="'+esc(c.name+' · '+m)+'">'+(paid>0?money(paid):planned?money(c.amount):'—')+'<small>'+(state==='paid'?'Оплачено':state==='partial'?'Частично':state==='planned'?'План':'')+'</small></button></td>';}
-    function grid(rows){return '<div class="scroll"><table class="calendar chess"><thead><tr><th>Договор / объект</th>'+months.map(function(m){return '<th>'+new Date(m+'-02').toLocaleDateString('ru-RU',{month:'short'})+'</th>';}).join('')+'</tr></thead><tbody>'+rows.map(function(c){return '<tr data-row="'+esc(c.id)+'">'+label(c)+months.map(function(m){return cell(c,m);}).join('')+'</tr>';}).join('')+'</tbody></table></div>';}
+    function grid(rows){return '<div class="scroll"><table class="calendar chess"><thead><tr><th>Договор / объект</th>'+months.map(function(m){return '<th>'+new Date(m+'-02').toLocaleDateString('ru-RU',{month:'short',year:'2-digit'})+'</th>';}).join('')+'</tr></thead><tbody>'+rows.map(function(c){return '<tr data-row="'+esc(c.id)+'">'+label(c)+months.map(function(m){return cell(c,m);}).join('')+'</tr>';}).join('')+'</tbody></table></div>';}
     if(design==='chess'){$('board').innerHTML=grid(list);return;}
     if(design==='groups'){$('board').innerHTML=groups.map(function(g){var rows=list.filter(function(c){return c.group===g;});return rows.length?'<details class="contract-group" open><summary>'+esc(g)+' <span>'+rows.length+' договоров</span></summary>'+grid(rows)+'</details>':'';}).join('');return;}
     if(design==='quarters'){$('board').innerHTML='<div class="scroll"><table class="quarters"><thead><tr><th>Договор</th>'+[1,2,3,4].map(function(q){return '<th>'+q+' квартал</th>';}).join('')+'</tr></thead><tbody>'+list.map(function(c){return '<tr data-row="'+esc(c.id)+'">'+label(c)+[0,3,6,9].map(function(start){var part=months.slice(start,start+3),p=part.reduce(function(n,m){return n+(dueIn(c,m)?c.amount:0);},0),a=part.reduce(function(n,m){return n+sum(c,m);},0);return '<td><div class="quarter-total">'+money(p)+'<small>План · оплачено '+money(a)+'</small></div>'+part.map(function(m){return '<div class="quarter-month"><span>'+m.slice(5)+'</span>'+badge(c,m)+'</div>';}).join('')+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div>';return;}
@@ -64,18 +64,21 @@
     Array.from($('contractForm').elements).forEach(function(el){if(el.name)el.value=c[el.name] == null?'':c[el.name];});
     $('payments').hidden=!id;
     if(id){history(c); $('paymentForm').elements.sum.value=c.amount;$('paymentForm').elements.period.value=(c.due||today).slice(0,7);$('paymentForm').elements.paid.value=today;}
+    Array.from($('contractForm').elements).forEach(function(el){if(el.id!=='close')el.disabled=!configuring;});$('payments').hidden=!configuring||!id;
     $('detail').showModal();
   }
   function init() {
     try{data=JSON.parse(localStorage.getItem(key));}catch(_){} if(!Array.isArray(data))data=seed();
     groups.forEach(function(g){$('group').add(new Option(g,g));$('contractForm').elements.group.add(new Option(g,g));});
+    $('year').value=today.slice(0,7);$('add').hidden=true;
+    $('configure').onclick=function(){configuring=!configuring;this.setAttribute('aria-pressed',String(configuring));$('add').hidden=!configuring;render();};
     $('add').onclick=function(){open(null);};$('close').onclick=function(){$('detail').close();};
     $('reset').onclick=function(){if(confirm('Сбросить только демонстрационные договоры в этом браузере?')){data=seed();save();render();}};
     ['group','search','year'].forEach(function(id){$(id).addEventListener('input',render);});
     document.querySelectorAll('[data-view]').forEach(function(b){b.onclick=function(){view=b.dataset.view;render();};});
     document.querySelectorAll('[data-design]').forEach(function(b){b.onclick=function(){design=b.dataset.design;render();};});
     $('board').onclick=function(e){var b=e.target.closest('[data-open]');if(b){open(b.dataset.open);return;}b=e.target.closest('[data-move]');if(b){var i=data.findIndex(function(c){return c.id===b.dataset.id;}),j=i+Number(b.dataset.move);if(j>=0&&j<data.length){var c=data.splice(i,1)[0];data.splice(j,0,c);save();render();}}};
-    $('board').ondragstart=function(e){var grip=e.target.closest('[data-drag]');if(!grip)return;dragged=grip.dataset.drag;e.dataTransfer.setData('text/plain',dragged);};
+    $('board').ondragstart=function(e){var grip=e.target.closest('[data-drag]');if(!grip||!configuring)return;dragged=grip.dataset.drag;e.dataTransfer.setData('text/plain',dragged);};
     $('board').ondragover=function(e){if(dragged)e.preventDefault();};
     $('board').ondragend=function(){dragged=null;};
     $('board').ondrop=function(e){e.preventDefault();var row=e.target.closest('[data-row]');if(!row||!dragged||row.dataset.row===dragged)return;var i=data.findIndex(function(c){return c.id===dragged;}),c=data.splice(i,1)[0],j=data.findIndex(function(c){return c.id===row.dataset.row;});data.splice(j,0,c);dragged=null;save();render();};

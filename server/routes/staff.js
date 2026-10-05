@@ -32,15 +32,16 @@ const iso = (d) => d ? (typeof d === 'string' ? d.slice(0, 10) : d.toISOString()
 module.exports = function register(route) {
 
   route('GET', '/api/staff', async (req, res) => {
-    if (!adminOnly(req, res)) return;
+    const session=auth.readSession(req);
+    if(!session || !(await seesAllPayroll(session)))return fail(res,403,'Нет доступа к сотрудникам и зарплатам');
     const r = await query(`
-      SELECT u.id, u.name, u.role, u.phone, u.email, u.photo_url, p.position, p.place, p.birthday, p.started_at, p.salary, p.pay_to, p.relation, p.can_edit_shahmatka, p.can_payroll
+      SELECT u.id, u.name, u.role, u.phone, u.email, u.photo_url, u.section_access, p.position, p.place, p.birthday, p.started_at, p.salary, p.pay_to, p.relation, p.can_edit_shahmatka, p.can_payroll
       FROM users u LEFT JOIN staff_profiles p ON p.user_id = u.id
       WHERE u.role IN ('staff', 'moderator', 'admin') AND u.is_active ORDER BY u.name`);
     json(res, 200, r.rows.map((x) => ({ id: String(x.id), userId: String(x.id), name: x.name, role: x.role, phone: x.phone, email: x.email,
       position: x.position || '', place: x.place || '', birthday: iso(x.birthday), started: iso(x.started_at),
       salary: x.salary, payTo: x.pay_to || '', relation: x.relation || '',
-      photo: x.photo_url || '',
+      photo: x.photo_url || '', sectionAccess: {...require('../lib/section-access').defaults(x.role,x.can_payroll),...x.section_access},
       canEditShahmatka: !!x.can_edit_shahmatka, canPayroll: !!x.can_payroll })));
   });
 
@@ -82,6 +83,7 @@ module.exports = function register(route) {
     const s = auth.readSession(req);
     if (!s) return fail(res, 401, 'Не выполнен вход');
     const b = await readJson(req);
+    if (!require('../lib/names')(b)) return fail(res,400,'Необходимо вводить данные по-русски');
     const name = String(b.name || '').trim();
     if (!name) return fail(res, 400, 'Нужны фамилия и имя');
 
@@ -108,6 +110,7 @@ module.exports = function register(route) {
   route('POST', '/api/staff', async (req, res) => {
     const s = adminOnly(req, res); if (!s) return;
     const b = await readJson(req);
+    if (!require('../lib/names')(b)) return fail(res,400,'Необходимо вводить данные по-русски');
     const name = String(b.name || '').trim(); if (!name) return fail(res, 400, 'Нужны фамилия и имя');
     const contact = auth.normalizeContact(b.contact);
     if (!contact) return fail(res, 400, 'Нужен телефон или почта для входа');
@@ -136,6 +139,7 @@ module.exports = function register(route) {
   route('PATCH', '/api/staff/:id', async (req, res) => {
     const s = adminOnly(req, res); if (!s) return;
     const uid = Number(req.params.id); const b = await readJson(req);
+    if (!require('../lib/names')(b)) return fail(res,400,'Необходимо вводить данные по-русски');
 
     /* Имя и контакт для входа тоже правит администратор: при заведении
        сотрудника контакт мог быть временным, а сменить его было нечем
@@ -143,11 +147,11 @@ module.exports = function register(route) {
        занятость. */
     if (b.name !== undefined || b.phone !== undefined || b.email !== undefined) {
       const name = b.name === undefined ? null : String(b.name).trim().slice(0, 200);
-      const phone = b.phone === undefined ? null : String(b.phone).trim();
-      const email = b.email === undefined ? null : String(b.email).trim();
+      let phone = b.phone === undefined ? null : String(b.phone).trim();
+      let email = b.email === undefined ? null : String(b.email).trim();
       if (name !== null && !name) return fail(res, 400, 'Нужны фамилия и имя');
-      if (phone) { const c = auth.normalizeContact(phone); if (!c) return fail(res, 400, 'Проверь телефон'); }
-      if (email) { const c = auth.normalizeContact(email); if (!c) return fail(res, 400, 'Проверь почту'); }
+      if (phone) { const c = auth.normalizeContact(phone); if (!c || c.kind!=='phone') return fail(res, 400, 'Проверь телефон');phone=c.value; }
+      if (email) { const c = auth.normalizeContact(email); if (!c || c.kind!=='email') return fail(res, 400, 'Проверь почту');email=c.value; }
       try {
         await query(`UPDATE users SET
                        name  = COALESCE($2, name),
@@ -196,7 +200,8 @@ module.exports = function register(route) {
   });
 
   route('GET', '/api/users/:id/files', async (req, res) => {
-    if (!adminOnly(req, res)) return;
+    const session=auth.readSession(req);
+    if(!session || !(await seesAllPayroll(session)))return fail(res,403,'Нет доступа к сотрудникам и зарплатам');
     const r = await query(`SELECT id, kind, url, uploaded_at FROM resident_files WHERE user_id = $1 ORDER BY uploaded_at DESC`, [Number(req.params.id)]);
     json(res, 200, r.rows.map((x) => ({ id: String(x.id), kind: x.kind, url: x.url, at: x.uploaded_at })));
   });
@@ -220,6 +225,7 @@ module.exports = function register(route) {
     if (uid === Number(s.uid)) return fail(res, 400, 'Себя отключить нельзя');
 
     const b = await readJson(req);
+    if (!require('../lib/names')(b)) return fail(res,400,'Необходимо вводить данные по-русски');
     const active = b.active === true;
     const r = await query(`UPDATE users SET is_active = $2 WHERE id = $1 RETURNING name, role`, [uid, active]);
     const who = r.rows[0];
@@ -239,6 +245,7 @@ module.exports = function register(route) {
     const uid = Number(req.params.id);
     if (!Number.isInteger(uid)) return fail(res, 400, 'Неверный номер');
     const b = await readJson(req);
+    if (!require('../lib/names')(b)) return fail(res,400,'Необходимо вводить данные по-русски');
     const bad = auth.validPin(b.pin);
     if (bad) return fail(res, 400, bad);
 
@@ -262,7 +269,7 @@ module.exports = function register(route) {
      24.09.2026). */
   async function seesAllPayroll(s) {
     if (s.role === 'admin') return true;
-    const r = await query(`SELECT can_payroll FROM staff_profiles WHERE user_id = $1`, [s.uid]);
+    const r = await query(`SELECT COALESCE((u.section_access->>'payroll')::boolean,p.can_payroll,false) AS can_payroll FROM users u LEFT JOIN staff_profiles p ON p.user_id=u.id WHERE u.id=$1`, [s.uid]);
     return !!(r.rows[0] && r.rows[0].can_payroll);
   }
 
@@ -281,8 +288,9 @@ module.exports = function register(route) {
     if (!s) return fail(res, 401, 'Не выполнен вход');
     if (!(await seesAllPayroll(s))) return fail(res, 403, 'Начислять зарплату может администратор или тот, кому это поручено');
     const b = await readJson(req);
+    if (!require('../lib/names')(b)) return fail(res,400,'Необходимо вводить данные по-русски');
     const uid = Number(b.userId), amount = Number(b.amount), bonus = Number(b.bonus) || 0;
-    if (!Number.isInteger(uid) || !Number.isInteger(amount) || amount <= 0 || bonus < 0) return fail(res, 400, 'Нужны сотрудник и сумма');
+    if (!Number.isInteger(uid) || !Number.isInteger(amount) || !Number.isInteger(bonus) || amount < 0 || bonus < 0 || amount + bonus <= 0) return fail(res, 400, 'Нужны сотрудник и сумма');
     const period = String(b.period || '').trim().slice(0, 80); if (!period) return fail(res, 400, 'Укажи период');
     const r = await query(`INSERT INTO payroll (user_id, period, amount, bonus, paid_by) VALUES ($1, $2, $3, $4, $5) RETURNING id`, [uid, period, amount, bonus, s.uid]);
     await query(`INSERT INTO audit_log (actor_id, action, target, payload) VALUES ($1, 'payroll.add', $2, $3)`, [s.uid, 'user:' + uid, JSON.stringify({ period, amount, bonus })]);

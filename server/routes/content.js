@@ -27,14 +27,14 @@ function sanitize(html) {
 }
 
 function validPage(p) { return /^[\w.-]+\.html$/.test(String(p || '')); }
-function validKey(k) { return /^[a-z0-9]+:\d+(\/[a-z0-9]+:\d+)*$/.test(String(k || '')) && k.length < 400; }
+function validKey(k) { return (/^[a-z0-9]+:\d+(\/[a-z0-9]+:\d+)*$/.test(String(k || '')) || /^menu:[\w-]+\.html$/.test(String(k||''))) && k.length < 400; }
 
 module.exports = function register(route) {
 
   route('GET', '/api/content', async (req, res) => {
     const page = req.query.page;
     if (!validPage(page)) return fail(res, 400, 'Укажи страницу');
-    const r = await query(`SELECT key, html FROM content_overrides WHERE page = $1`, [page]);
+    const r = await query(`SELECT key, html FROM content_overrides WHERE page = $1 OR page='_menu.html'`, [page]);
     json(res, 200, r.rows, { 'Cache-Control': 'no-cache' });
   });
 
@@ -55,7 +55,8 @@ module.exports = function register(route) {
   route('POST', '/api/content', async (req, res) => {
     const s = auth.readSession(req);
     if (!s) return fail(res, 401, 'Не выполнен вход');
-    if (!auth.atLeast(s, 'moderator')) return fail(res, 403, 'Правка содержимого — для администратора и модератора');
+    const editor = await query('SELECT can_edit_site FROM users WHERE id=$1 AND is_active', [s.uid]);
+    if (!editor.rows[0]?.can_edit_site) return fail(res, 403, 'Правка содержимого доступна владельцу');
 
     const b = await readJson(req);
     if (!validPage(b.page)) return fail(res, 400, 'Неверная страница');
@@ -65,12 +66,18 @@ module.exports = function register(route) {
     for (const c of changes) if (!validKey(c.key)) return fail(res, 400, 'Неверный ключ элемента');
 
     await tx(async (q) => {
+      await q('SELECT pg_advisory_xact_lock(hashtext($1))', ['_menu.html']);
+      await q('SELECT pg_advisory_xact_lock(hashtext($1))', [b.page]);
       for (const c of changes) {
+        const page=c.key.startsWith('menu:')?'_menu.html':b.page;
+        const previous = await q('SELECT html FROM content_overrides WHERE page=$1 AND key=$2', [page,c.key]);
+        await q('INSERT INTO content_history(page,key,before_html,after_html,actor_id) VALUES($1,$2,$3,$4,$5)',
+          [page,c.key,previous.rows[0]?.html ?? (c.original === undefined ? null : sanitize(c.original)),sanitize(c.html),s.uid]);
         await q(`INSERT INTO content_overrides (page, key, html, updated_by)
                  VALUES ($1, $2, $3, $4)
                  ON CONFLICT (page, key) DO UPDATE SET html = EXCLUDED.html,
                    updated_by = EXCLUDED.updated_by, updated_at = now()`,
-          [b.page, c.key, sanitize(c.html), s.uid]);
+          [page, c.key, sanitize(c.html), s.uid]);
       }
       await q(`INSERT INTO audit_log (actor_id, action, target, payload) VALUES ($1, 'content.edit', $2, $3)`,
         [s.uid, 'page:' + b.page, JSON.stringify({ count: changes.length })]);

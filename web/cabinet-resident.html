@@ -98,6 +98,9 @@
   }
 
   .tile--pay .tile__label { color: var(--msv-white); opacity: .82; }
+  .tile--pay { background: linear-gradient(120deg,var(--msv-red),#ff7857,var(--msv-red));background-size:250% 250%;animation:resident-pay-glow 12s ease-in-out infinite; }
+  @keyframes resident-pay-glow { 0%,100% { background-position:0% 50%; } 50% { background-position:100% 50%; } }
+  @media(prefers-reduced-motion:reduce) { .tile--pay { animation:none; } }
 
   .tile__label {
     font-size: 11px;

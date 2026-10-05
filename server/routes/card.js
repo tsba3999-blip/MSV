@@ -35,7 +35,7 @@ const REQ_KIND = {
   residence_cert: 'Справка о проживании',
   guardian_contract: 'Договор для опекуна',
   fix: 'Исправление данных',
-  relocation: 'Переселение'
+  departure: 'Заявка на выезд', relocation: 'Переселение'
 };
 const REQ_STATUS = { accepted: 'Принят', in_progress: 'В работе', done: 'Готов', rejected: 'Отклонён' };
 const FILE_KIND = {
@@ -57,7 +57,7 @@ module.exports = function register(route) {
       SELECT u.id, u.name, u.role, u.phone, u.email, u.is_active, u.created_at, u.first_login, u.invited_at,
              p.last_name, p.first_name, p.middle_name, p.birthday, p.city, p.university, p.course,
              p.faculty, p.about, p.health_score, p.contact_person, p.vk, p.messengers,
-             COALESCE(u.photo_url, p.photo_url) AS photo_url,
+             COALESCE(u.photo_url, p.photo_url, (SELECT f.url FROM resident_files f WHERE f.user_id=u.id AND f.kind='photo' ORDER BY f.uploaded_at DESC LIMIT 1)) AS photo_url,
              p.gender, p.docs_signed_at, p.updated_at
       FROM users u LEFT JOIN resident_profiles p ON p.user_id = u.id
       WHERE u.id = $1`, [id]);
@@ -180,6 +180,7 @@ module.exports = function register(route) {
     if (id === Number(s.uid)) return fail(res, 400, 'Нельзя удалить самого себя');
 
     const b = await readJson(req);
+    if (!require('../lib/names')(b)) return fail(res,400,'Необходимо вводить данные по-русски');
     const u = await query(`SELECT id, name, role FROM users WHERE id = $1`, [id]);
     const user = u.rows[0];
     if (!user) return fail(res, 404, 'Резидент не найден');
@@ -228,6 +229,7 @@ module.exports = function register(route) {
     const id = Number(req.params.id);
     if (!Number.isInteger(id)) return fail(res, 400, 'Неверный номер резидента');
     const b = await readJson(req);
+    if (!require('../lib/names')(b)) return fail(res,400,'Необходимо вводить данные по-русски');
 
     const str = (v, n) => v === undefined || v === null ? null : String(v).slice(0, n);
     const bday = /^\d{4}-\d{2}-\d{2}$/.test(String(b.birthday || '')) ? b.birthday : null;

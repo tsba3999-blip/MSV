@@ -38,13 +38,13 @@ module.exports = function register(route) {
     const row = r.rows[0] || {};
 
     const sg = await query(
-      `SELECT kind, signed_at FROM doc_signatures WHERE user_id = $1 ORDER BY signed_at DESC`, [s.uid]);
-    const list = sg.rows.map((x) => ({ kind: x.kind, at: x.signed_at, exact: true }));
+      `SELECT kind, signed_at, version_id FROM doc_signatures WHERE user_id = $1 ORDER BY signed_at DESC`, [s.uid]);
+    const list = sg.rows.map((x) => ({ kind: x.kind, at: x.signed_at, exact: true, versionId: x.version_id }));
 
     // Резиденты, подписавшие до появления журнала: одна запись по каждому документу
-    if (!list.length && (row.first_paid || row.docs_signed_at)) {
-      const at = row.first_paid || row.docs_signed_at;
-      ['contract', 'rules', 'consent'].forEach((k) => list.push({ kind: k, at, exact: !!row.first_paid }));
+    if (!list.length && row.docs_signed_at) {
+      const at = row.docs_signed_at;
+      ['contract', 'rules', 'consent'].forEach((k) => list.push({ kind: k, at, exact: false }));
     }
 
     json(res, 200, {
@@ -140,6 +140,7 @@ module.exports = function register(route) {
     const s = auth.readSession(req);
     if (!s) return fail(res, 401, 'Не выполнен вход');
     const b = await readJson(req);
+    if (!require('../lib/names')(b)) return fail(res,400,'Необходимо вводить данные по-русски');
     const prefs = {
       tg: b.tg === true, max: b.max === true, email: b.email === true,
       scope: ['all', 'mine', 'none'].indexOf(b.scope) >= 0 ? b.scope : 'all'
@@ -189,6 +190,7 @@ module.exports = function register(route) {
     const s = auth.readSession(req);
     if (!s) return fail(res, 401, 'Не выполнен вход');
     const b = await readJson(req);
+    if (!require('../lib/names')(b)) return fail(res,400,'Необходимо вводить данные по-русски');
 
     const str = (v, n) => v === undefined || v === null ? null : String(v).slice(0, n);
     let bday = /^\d{4}-\d{2}-\d{2}$/.test(String(b.birthday || '')) ? b.birthday : null;
@@ -252,6 +254,7 @@ module.exports = function register(route) {
     const s = auth.readSession(req);
     if (!s) return fail(res, 401, 'Не выполнен вход');
     const b = await readJson(req);
+    if (!require('../lib/names')(b)) return fail(res,400,'Необходимо вводить данные по-русски');
 
     if (!b.bedId || !/^\d{4}-\d{2}-\d{2}$/.test(String(b.from || ''))) return fail(res, 400, 'Нужны место и дата заезда');
     /* Документы подписываются галочками на «Проверке данных» — без них
@@ -356,7 +359,9 @@ module.exports = function register(route) {
         }
         /* Подписи документов: отдельная запись на каждый документ и каждую оплату */
         for (const kind of ['contract', 'rules', 'consent']) {
-          await q(`INSERT INTO doc_signatures (user_id, kind, booking_id) VALUES ($1, $2, $3)`, [s.uid, kind, id]);
+          const version = await require('../lib/document-versions').snapshot(q,kind);
+          if(!b.docVersions || String(b.docVersions[kind])!==String(version))throw Object.assign(new Error('Редакция документов обновилась. Обновите страницу и прочитайте документы перед подтверждением.'),{code:'docversion'});
+          await q(`INSERT INTO doc_signatures (user_id, kind, booking_id,version_id) VALUES ($1, $2, $3,$4)`, [s.uid, kind, id,version]);
         }
         await q(`UPDATE resident_profiles SET docs_signed_at = COALESCE(docs_signed_at, CURRENT_DATE) WHERE user_id = $1`, [s.uid]);
         await q(`INSERT INTO audit_log (actor_id, action, target, payload)
@@ -368,6 +373,7 @@ module.exports = function register(route) {
     } catch (e) {
       if (e.code === '23P01') return fail(res, 409, 'Место уже занято на эти даты');
       if (e.code === 'nobed') return fail(res, 400, e.message);
+      if (e.code === 'docversion') return fail(res, 409, e.message);
       throw e;
     }
   });
@@ -379,6 +385,7 @@ module.exports = function register(route) {
     if (!s) return fail(res, 401, 'Не выполнен вход');
     if (!auth.atLeast(s, 'moderator')) return fail(res, 403, 'Отмечать оплату может модератор или администратор');
     const b = await readJson(req);
+    if (!require('../lib/names')(b)) return fail(res,400,'Необходимо вводить данные по-русски');
 
     const bookingId = Number(b.bookingId), amount = Number(b.amount);
     if (!Number.isInteger(bookingId) || !Number.isInteger(amount) || amount <= 0) return fail(res, 400, 'Нужны бронь и сумма');

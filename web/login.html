@@ -139,7 +139,12 @@
 
   .sent { margin-bottom: var(--msv-s24); }
   .sent b { font-weight: 600; }
-</style>
+.pin--success{--pin-glow:#75ac32}.pin--failure{--pin-glow:var(--msv-red)}
+ .pin--success .pin__cell,.pin--failure .pin__cell{animation:pin-run .48s ease both}
+ .pin__cell:nth-child(2){animation-delay:.1s}.pin__cell:nth-child(3){animation-delay:.2s}.pin__cell:nth-child(4){animation-delay:.3s}
+ @keyframes pin-run{0%{box-shadow:0 0 0 0 transparent}50%,100%{border-color:var(--pin-glow);box-shadow:0 0 0 3px color-mix(in srgb,var(--pin-glow) 35%,transparent)}}
+ @media(prefers-reduced-motion:reduce){.pin--success .pin__cell,.pin--failure .pin__cell{animation-duration:.01s;animation-delay:0s}}
+ </style>
 </head>
 <body>
 
@@ -175,7 +180,7 @@
       <input class="msv-input" id="contact" type="text" inputmode="email"
              autocomplete="username" placeholder="ivan@mail.ru или +7 999 000-00-00">
     </label>
-    <p class="msv-note msv-field__hint">После трёх неверных кодов вход с этого номера закрывается на полчаса.</p>
+    <p class="msv-note msv-field__hint">После четырёх неверных кодов вход с этого номера закрывается на полчаса.</p>
 
     <div class="foot">
       <button class="msv-btn msv-btn--block msv-btn--primary" id="btnSend" type="button">Дальше</button>
@@ -336,6 +341,7 @@
   });
 
   btnChange.addEventListener('click', function () {
+    lockUntil=0;cancelAnimationFrame(lockFrame);cells.forEach(function(c){c.disabled=false;});
     step2.classList.remove('step--on');
     step1.classList.add('step--on');
     clearError(2);
@@ -356,7 +362,8 @@
   }
 
   function syncLoginButton() {
-    btnLogin.disabled = pinValue().length !== 4;
+    btnLogin.disabled = pinValue().length !== 4 || loginBusy || Date.now()<lockUntil;
+    if(!btnLogin.disabled)btnLogin.click();
   }
 
   cells.forEach(function (cell, i) {
@@ -366,7 +373,7 @@
       clearError(2);
       if (cell.value && i < cells.length - 1) cells[i + 1].focus();
       syncLoginButton();
-      if (pinValue().length === 4) btnLogin.focus();
+
     });
 
     cell.addEventListener('keydown', function (e) {
@@ -393,9 +400,14 @@
 
   /* ---------- Вход ---------- */
 
+  var loginBusy=false,lockUntil=0,lockFrame=0;
+  function glow(kind){pin.classList.remove('pin--success','pin--failure');void pin.offsetWidth;pin.classList.add('pin--'+kind);}
+  function countdown(until){lockUntil=new Date(until).getTime();cancelAnimationFrame(lockFrame);cells.forEach(function(c){c.disabled=true;});btnLogin.disabled=true;
+    function tick(){var left=Math.max(0,lockUntil-Date.now());showError(2,'Вход заблокирован. Осталось '+String(Math.floor(left/60000)).padStart(2,'0')+':'+String(Math.floor(left/1000)%60).padStart(2,'0')+'.'+String(left%1000).padStart(3,'0'));if(left)lockFrame=requestAnimationFrame(tick);else{cells.forEach(function(c){c.disabled=false;});clearError(2);cells[0].focus();}}tick();}
   btnLogin.addEventListener('click', function () {
     var code = pinValue();
-    if (code.length !== 4) return;
+    if (code.length !== 4 || loginBusy || Date.now()<lockUntil) return;
+    loginBusy=true;cells.forEach(function(c){c.disabled=true;});
     clearError(2);
     setBusy(btnLogin, true);
 
@@ -418,12 +430,15 @@
       location.href = safeNext || CABINET[r];
     }
 
-    function refuse(text) {
+    function refuse(text,details) {
+      clearPin();
+      loginBusy=false;cells.forEach(function(c){c.disabled=false;});
       setBusy(btnLogin, false);
       pin.classList.add('pin--error');
-      clearPin();
+      clearPin();glow('failure');
       cells[0].focus();
-      showError(2, text || 'Код не подошёл. Проверь цифры и введи ещё раз.');
+      showError(2,details && details.attemptsRemaining>0?'Упс!… Осталось ещё '+details.attemptsRemaining+(details.attemptsRemaining===1?' попытка. Затем':' попытки. Затем')+' вход будет заблокирован на 30 минут.':text || 'Код не подошёл.');
+      if(details && details.lockedUntil)countdown(details.lockedUntil);
     }
 
     // Страница открыта с диска — сервера заведомо нет
@@ -442,8 +457,8 @@
     }).then(function (r) {
       return r.json().then(function (j) { return { status: r.status, body: j || {} }; }, function () { return { status: r.status, body: {} }; });
     }).then(function (r) {
-      if (r.status === 200) { go(r.body.role, r.body.firstLogin); return; }
-      refuse(r.body.error);
+      if (r.status === 200) { glow('success');setTimeout(function(){go(r.body.role,r.body.firstLogin);},800);return; }
+      refuse(r.body.error,r.body);
     }).catch(function () {
       // Сервер не отвечает — работаем как без него, чтобы демонстрация не встала
       if (DEMO_PIN && code === DEMO_PIN) { go(role, false); return; }
@@ -474,6 +489,7 @@
 
 })();
 </script>
+
 
 <script src="mark.js"></script>
 <script src="zoom.js"></script>

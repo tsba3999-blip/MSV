@@ -317,28 +317,7 @@
 </div>
 
 <script src="signdate.js"></script>
-<script>
-/* Подпись документа: берём последнюю подпись именно этого документа.
-   Если подписей несколько (документы принимаются заново при каждой оплате),
-   рядом говорим сколько их и куда смотреть весь список. */
-(function () {
-  'use strict';
-  var KIND = 'rules';
-  MSV_SIGN.load(function (d) {
-    var mine = (d.signatures || []).filter(function (s) { return s.kind === KIND; });
-    if (!mine.length) return;
-    var last = mine[0];
-    var when = MSV_SIGN.human(last.at, last.exact);
-    if (!when) return;
-    var name = MSV_SIGN.who(d.name);
-    document.getElementById('signWho').textContent = name ? 'Принято резидентом: ' + name : 'Документ принят';
-    document.getElementById('signWhen').textContent = when
-      + (last.exact ? '' : ' (время не сохранилось)')
-      + (mine.length > 1 ? ' · всего подписей: ' + mine.length : '');
-    document.getElementById('sign').hidden = false;
-  });
-})();
-</script>
+
 <script>
 /* Текст документов не выделяется и не копируется обычным способом
    (решение заказчика 23.09.2026). Честно: это неудобство для случайного
@@ -357,7 +336,7 @@
   doc.addEventListener('dragstart', function (e) { e.preventDefault(); });
 })();
 </script>
-<script src="mark.js"></script>
+<script src="edit.js"></script><script src="document-signatures.js"></script><script src="mark.js"></script>
 <script src="protect.js"></script>
 
 </body>

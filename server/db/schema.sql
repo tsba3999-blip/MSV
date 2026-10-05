@@ -453,6 +453,17 @@ CREATE INDEX IF NOT EXISTS login_log_user_idx ON login_log(user_id, created_at D
 --  Ключ — путь элемента в разметке. Одна правка на элемент.
 -- ------------------------------------------------------------
 
+CREATE TABLE IF NOT EXISTS content_history (
+  id bigserial PRIMARY KEY,
+  page text NOT NULL,
+  key text NOT NULL,
+  before_html text,
+  after_html text,
+  actor_id bigint REFERENCES users(id) ON DELETE SET NULL,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS content_history_page_date ON content_history(page,created_at DESC);
+
 CREATE TABLE IF NOT EXISTS content_overrides (
   page        text NOT NULL,              -- 'index.html'
   key         text NOT NULL,              -- 'div:0/main:1/p:2'
@@ -780,3 +791,22 @@ ON CONFLICT (key) DO NOTHING;
 
 
 COMMIT;
+
+CREATE TABLE IF NOT EXISTS document_versions (
+ id bigserial PRIMARY KEY,kind text NOT NULL,digest text NOT NULL,html text NOT NULL,
+ overrides jsonb NOT NULL DEFAULT '[]',created_at timestamptz NOT NULL DEFAULT now(),UNIQUE(kind,digest)
+);
+ALTER TABLE doc_signatures ADD COLUMN IF NOT EXISTS version_id bigint REFERENCES document_versions(id);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS section_access jsonb NOT NULL DEFAULT '{}';
+CREATE TABLE IF NOT EXISTS support_threads (
+ id bigserial PRIMARY KEY,user_id bigint NOT NULL REFERENCES users(id) ON DELETE CASCADE,residence_id text NOT NULL REFERENCES residences(id),
+ text text NOT NULL,created_at timestamptz NOT NULL DEFAULT now(),updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS support_messages (
+ id bigserial PRIMARY KEY,thread_id bigint NOT NULL REFERENCES support_threads(id) ON DELETE CASCADE,author_id bigint REFERENCES users(id) ON DELETE SET NULL,
+ text text NOT NULL,created_at timestamptz NOT NULL DEFAULT now()
+);
+WITH old AS (
+ DELETE FROM content_overrides WHERE html='Статистика' AND key='div:0/aside:0/nav:2/a:0' AND page='cabinet-admin.html' RETURNING *
+) INSERT INTO content_history(page,key,before_html,after_html,actor_id) SELECT page,key,html,NULL,updated_by FROM old;
+ALTER TYPE request_kind ADD VALUE IF NOT EXISTS 'departure';

@@ -16,12 +16,16 @@ const { json, fail, readJson } = require('../lib/http');
 const { query } = require('../lib/db');
 
 const KIND_NAME = { registration: 'Регистрация', residence_cert: 'Справка о проживании',
-  guardian_contract: 'Договор для опеки', fix: 'Исправление данных', relocation: 'Переселение' };
+  guardian_contract: 'Договор для опеки', fix: 'Исправление данных', relocation: 'Переселение', departure:'Заявка на выезд' };
 const STATUS_NAME = { accepted: 'Принят', in_progress: 'В работе', done: 'Готово', rejected: 'Отклонён' };
 
 function fmt(d) { const x = new Date(d); return String(x.getDate()).padStart(2, '0') + '.' + String(x.getMonth() + 1).padStart(2, '0') + '.' + x.getFullYear(); }
 
 module.exports = function register(route) {
+  route('GET','/api/requests/inbox',async(req,res)=>{
+    const s=auth.readSession(req);if(!s||!auth.atLeast(s,'moderator'))return fail(res,403,'Доступно администрации');
+    const r=await query("SELECT d.id,d.user_id,d.note,d.status,d.created_at,u.name FROM doc_requests d JOIN users u ON u.id=d.user_id WHERE d.kind='departure' ORDER BY d.created_at DESC");json(res,200,r.rows);
+  });
 
   route('POST', '/api/feedback', async (req, res) => {
     const s = auth.readSession(req);
@@ -74,8 +78,15 @@ module.exports = function register(route) {
     if (!s) return fail(res, 401, 'Не выполнен вход');
     const b = await readJson(req);
     if (!KIND_NAME[b.kind]) return fail(res, 400, 'Неизвестный вид запроса');
+    if(b.kind==='departure'){
+      if(s.role!=='resident')return fail(res,403,'Заявку подаёт резидент');
+      const date=String(b.date||''),stamp=new Date(date+'T00:00:00Z');
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Number.isFinite(stamp.getTime())||stamp.toISOString().slice(0,10)!==date)return fail(res,400,'Укажите дату выезда');
+      if(!String(b.reason||'').trim()||![b.residenceRating,b.staffRating].every(n=>Number.isInteger(n)&&n>=1&&n<=5))return fail(res,400,'Укажите причину и обе оценки от 1 до 5');
+      b.note='Дата выезда: '+date+'\nПричина: '+String(b.reason).slice(0,1000)+'\nРезиденция: '+b.residenceRating+' / 5\nСотрудники: '+b.staffRating+' / 5\nПояснение: '+String(b.comments||'').slice(0,1000);
+    }
     const r = await query(`INSERT INTO doc_requests (user_id, kind, note) VALUES ($1, $2, $3) RETURNING id`,
-      [s.uid, b.kind, String(b.note || '').slice(0, 500)]);
+      [s.uid, b.kind, String(b.note || '').slice(0, b.kind==='departure'?2400:500)]);
     json(res, 201, { id: String(r.rows[0].id) });
     notify.notifyAdmin('tickets', `<b>Запрос: ${KIND_NAME[b.kind]}</b>${b.note ? '\n' + String(b.note).slice(0, 200) : ''}`).catch(() => {});
   });

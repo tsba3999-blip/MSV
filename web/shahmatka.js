@@ -435,7 +435,7 @@
       title: 'Шахматка заселения',
       days: 35,
       months: 12,
-      scale: 'day',            // 'day' — дни месяца, 'year' — месяцы года
+      scale: 'year',           // По умолчанию показываем весь год.
       readOnly: false,         // true — смотреть можно, переселять нельзя
       zoom: 'm',
       start: null,
@@ -518,6 +518,7 @@
           '<span class="msv-sh__swatch" style="background:var(--sh-' + k + '-bg);border-color:var(--sh-' + k + '-br)"></span>' +
           esc(STATUS_LABEL[k]) + '</span>';
       }).join('');
+      lg.insertAdjacentHTML('beforeend','<span class="msv-sh__legend-item"><span class="msv-sh__swatch" style="background:var(--msv-lavender)"></span>Оплаченный месяц</span><span class="msv-sh__legend-item"><span class="msv-sh__swatch" style="background:rgba(203,182,255,.25)"></span>Годовой контракт</span>');
       this.root.appendChild(lg);
     }
 

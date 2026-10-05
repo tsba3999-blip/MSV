@@ -139,12 +139,17 @@ MSV.ready(function (ctx) {
   RES.forEach(function (res) {
     var d = ctx.bookings(res);
     var byId = {}; d.residents.forEach(function (r) { byId[r.id] = r; });
-    var busy = 0, debt = 0, debtPeople = 0, leaving = 0, minors = 0;
+    var busy = 0, debt = 0, debtPeople = 0, leaving = 0, minors = 0, men = 0, women = 0;
 
     d.bookings.forEach(function (b) {
       var from = day(b.from), to = day(b.to);
       if (from === null || to === null) return;
-      if (from <= today && to >= today) busy++;
+      if (from <= today && to >= today && b.residentId) {
+        busy++;
+        var person=byId[b.residentId];
+        if(person && person.gender==='м')men++;
+        if(person && person.gender==='ж')women++;
+      }
       var owed = (b.accrued || 0) - (b.paid || 0);
       if (owed > 0.5) { debt += owed; debtPeople++; }
       if (to >= today && to - today <= 14 * DAY) leaving++;
@@ -162,7 +167,7 @@ MSV.ready(function (ctx) {
 
     total.beds += res.beds.length; total.busy += busy; total.debt += debt;
     total.debtPeople += debtPeople; total.leaving += leaving; total.minors += minors;
-    rows.push({ res: res, beds: res.beds.length, busy: busy });
+    rows.push({ res: res, beds: res.beds.length, busy: busy, men:men, women:women });
   });
 
   var free = total.beds - total.busy;
@@ -180,15 +185,10 @@ MSV.ready(function (ctx) {
       '<span class="msv-note stat__note">' + esc(x[2]) + '</span></div>';
   }).join('');
 
-  document.getElementById('byRes').innerHTML = rows.map(function (x) {
+  document.getElementById('byRes').innerHTML = '<table class="grid"><thead><tr><th>Резиденция</th><th>Загрузка в чел.</th><th>Загрузка в %</th><th>Пол</th></tr></thead><tbody>'+rows.map(function (x) {
     var pct = x.beds ? Math.round(100 * x.busy / x.beds) : 0;
-    return '<a class="res-row" href="admin-shahmatka.html?res=' + encodeURIComponent(x.res.id) + '">' +
-      '<img class="res-row__logo" src="' + esc(x.res.logo || '') + '" alt="">' +
-      '<span class="res-row__body"><span class="res-row__name">' + esc(x.res.title) + '</span>' +
-        '<span class="res-row__bar"><span class="res-row__fill" style="width:' + pct + '%"></span></span></span>' +
-      '<span class="res-row__num"><b>' + x.busy + ' / ' + x.beds + '</b><span class="msv-note">' + pct + '%</span></span>' +
-    '</a>';
-  }).join('');
+    return '<tr><td><a href="admin-shahmatka.html?res='+encodeURIComponent(x.res.id)+'">'+esc(x.res.title)+'</a></td><td>'+x.busy+' из '+x.beds+'</td><td>'+pct+'%</td><td>М — '+x.men+'<br>Ж — '+x.women+(x.busy>x.men+x.women?'<br><span class="msv-note">Не указан — '+(x.busy-x.men-x.women)+'</span>':'')+'</td></tr>';
+  }).join('')+'</tbody></table>';
 });
 </script>
 <script src="mark.js"></script>

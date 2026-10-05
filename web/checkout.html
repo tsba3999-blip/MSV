@@ -283,7 +283,9 @@
   /* Документы: пока не приняты все три — оплата и код выключены */
   var docs = Array.prototype.slice.call(document.querySelectorAll('[data-doc]'));
   var payBtn = document.getElementById('pay');
-  function docsOk() { return docs.every(function (d) { return d.checked; }); }
+  var docVersions=null;
+  fetch('/api/documents/current',{credentials:'same-origin'}).then(function(r){if(!r.ok)throw Error();return r.json();}).then(function(v){docVersions=v;syncDocs();}).catch(function(){document.getElementById('docsNote').textContent='Не удалось загрузить редакции документов. Обновите страницу.';});
+  function docsOk() { return !!docVersions && docs.every(function (d) { return d.checked; }); }
   function syncDocs() {
     var ok = docsOk();
     payBtn.disabled = !ok;
@@ -360,7 +362,7 @@
       body: JSON.stringify({ bedId: bedId, from: from, deposit: deposit.checked,
         annual: annual.checked,
         months: params.get('months') || '',
-        docs: { contract: true, rules: true, consent: true } }) })
+        docVersions:docVersions, docs: { contract: true, rules: true, consent: true } }) })
       .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j || {} }; }, function () { return { s: r.status, j: {} }; }); })
       .then(function (r) {
         if (r.s === 201) { location.href = 'cabinet-resident.html'; return; }

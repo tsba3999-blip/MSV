@@ -115,7 +115,7 @@
          но синхронно для страниц, поэтому грузим заранее всё,
          что понадобится роли. */
       return liveResidences().then(function (residences) {
-        var needBookings = me.role === 'admin' || me.role === 'moderator';
+        var needBookings = me.role === 'admin' || me.role === 'moderator' || (me.sectionAccess && (me.sectionAccess.chart || me.sectionAccess.residents || me.sectionAccess.charges));
         var jobs = [];
         if (needBookings) residences.forEach(function (r) { jobs.push(liveBookings(r).catch(function () { return null; })); });
         jobs.push(liveTickets().catch(function () { return null; }));

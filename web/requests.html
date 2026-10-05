@@ -28,7 +28,7 @@
   <p class="msv-body" style="margin:0 0 var(--msv-s16);color:var(--msv-n500)">Заказать документ или попросить исправить данные. Готовое появится в «Мои документы», о ходе сообщим в уведомлениях.</p>
 
   <h2 class="msv-sub group__title">Заказать</h2>
-  <div class="rows" id="kinds">
+  <div class="rows" id="kinds"><a class="row" href="departure.html"><span class="row__text"><span class="row__name">Заявка на выезд</span><span class="msv-note row__note">Дата, причина и оценка проживания</span></span></a>
     <button class="row" type="button" data-kind="registration"><span class="row__text"><span class="row__name">Регистрацию</span><span class="msv-note row__note">Миграционный учёт по адресу резиденции. До 7 рабочих дней.</span></span><span class="row__end"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
     <button class="row" type="button" data-kind="residence_cert"><span class="row__text"><span class="row__name">Справку о проживании</span><span class="msv-note row__note">Для вуза, банка, работодателя. До 2 рабочих дней.</span></span><span class="row__end"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
     <button class="row" type="button" data-kind="guardian_contract"><span class="row__text"><span class="row__name">Договор для опеки</span><span class="msv-note row__note">Если тебе нет 18 — копия договора для родителей или попечителя.</span></span><span class="row__end"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
@@ -75,7 +75,7 @@
 <script>
 (function () {
   'use strict';
-  var NAMES = { registration: 'Регистрация', residence_cert: 'Справка о проживании', guardian_contract: 'Договор для опеки', fix: 'Исправление данных', relocation: 'Переселение' };
+  var NAMES = { registration: 'Регистрация', residence_cert: 'Справка о проживании', guardian_contract: 'Договор для опеки', fix: 'Исправление данных', departure:'Заявка на выезд', relocation: 'Переселение' };
   var demo = [
     { kind: 'residence_cert', status: 'Готово', at: '02.09.2026', note: 'для МИСИС' },
     { kind: 'registration', status: 'В работе', at: '28.08.2026', note: '' }

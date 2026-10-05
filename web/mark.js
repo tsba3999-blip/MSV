@@ -148,7 +148,7 @@
           ['admin-residents.html', 'Резиденты'],
           ['admin-tickets.html', 'Все заявки'],
           ['cabinet-staff.html', 'Мои задачи'],
-          ['cabinet-admin.html', 'Статистика'],
+          ['cabinet-admin.html', 'Обзор'],
           ['admin-reputation.html', 'Репутация'],
           ['staff-mailings.html', 'Рассылки'],
           ['staff-salary.html', 'Моя зарплата'],
@@ -212,6 +212,9 @@
       var handshake = href === 'contracts-preview.html';
       var statistics = href === 'cabinet-admin.html' && /Статистика|Обзор/.test(link.textContent);
       if (!handshake && !statistics) return;
+      if (statistics) {
+        Array.from(link.childNodes).forEach(function(n){if(n.nodeType===3 && n.textContent.trim())n.textContent=' Обзор';});
+      }
       var oldIcon = link.querySelector('svg');
       var path = handshake
         ? '<path d="m2 12 4-7 4 2 3-2 5 2 4 6-3 3-4 4-3-1-3-2-3-3z"/><path d="m10 7-3 4 2 2 4-3 6 6M6 14l3-3M9 17l2-3M12 19l2-3"/>'
@@ -256,6 +259,17 @@
         });
       }
     }
+    var staffNav=document.querySelector('.side__nav');
+    if(staffNav && role==='staff' && me.sectionAccess){
+      [['chart','staff-shahmatka.html','Шахматка'],['residents','staff-residents.html','Резиденты'],['charges','admin-residents.html','Оплаты и депозиты'],['payroll','admin-staff.html','Начисления сотрудникам']].forEach(function(item){
+        if(!me.sectionAccess[item[0]] || staffNav.querySelector('a[href="'+item[1]+'"]'))return;
+        var link=document.createElement('a');link.className='side__link';link.href=item[1];link.dataset.section=item[0];link.innerHTML=(originalIcons[item[1]]||'');link.append(document.createTextNode(item[2]));staffNav.append(link);
+      });
+    }
+    if(staffNav && role!=='resident' && !staffNav.querySelector('a[href="support.html"]')){var support=document.createElement('a');support.className='side__link';support.href='support.html';support.textContent='Поддержка';staffNav.append(support);}
+    if(staffNav && me.sectionAccess && role!=='admin')staffNav.querySelectorAll('a').forEach(function(link){var href=link.getAttribute('href')||'',key=link.dataset.section||(/shahmatka/.test(href)?'chart':/residents/.test(href)?'residents':/charges/.test(href)?'charges':/tickets|repair/.test(href)?'tickets':/admin-staff.html/.test(href)?'payroll':null);if(key && me.sectionAccess[key]===false)link.hidden=true;});
+    if(staffNav && ['admin','moderator'].includes(role) && (!me.sectionAccess||me.sectionAccess.residents)){var departures=document.createElement('a');departures.className='side__link';departures.href='admin-departures.html';departures.textContent='Заявки на выезд';staffNav.append(departures);}
+    document.dispatchEvent(new Event('msv:menu-ready'));
     // «М» ведёт в свой кабинет
     a.href = ROLE_HOME[role] || 'menu.html';
     if (role === 'moderator' && !me.canPayroll) a.href = 'admin-shahmatka.html';
@@ -310,17 +324,9 @@
   /* Значок «фильтр» перед строкой отбора: чтобы она читалась как фильтр, а
      не как россыпь кнопок. Ставим сами на каждой странице, где такая строка
      появится — и на будущих тоже (решение заказчика 24.09.2026). */
-  Array.prototype.forEach.call(document.querySelectorAll('.bar'), function (bar) {
-    if (!bar.querySelector('.bar__search, .bar__chip')) return;   // строка не про отбор
-    if (bar.querySelector('.bar__ico')) return;
-    var ico = document.createElement('span');
-    ico.className = 'bar__ico';
-    ico.title = 'Фильтр';
-    ico.setAttribute('aria-hidden', 'true');
-    ico.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
-      'stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16l-6.5 7.5V19L10.5 21v-8.5z"/></svg>';
-    bar.insertBefore(ico, bar.firstChild);
-  });
+  /* Значок фильтра больше не добавляем — просьба владельца от 04.10.2026. */
+  Array.prototype.forEach.call(document.querySelectorAll('.bar__ico'), function (ico) { ico.remove(); });
+
 
   // Сворачивание бокового меню кабинетов: << у имени, >> в свёрнутом виде
   (function () {

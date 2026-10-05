@@ -53,7 +53,7 @@ async function findUser(contact) {
 }
 
 /* Сколько промахов до блокировки и на сколько блокировать */
-const MAX_ATTEMPTS = 3;
+const MAX_ATTEMPTS = 4;
 const LOCK_MINUTES = 30;
 
 /* Запросить код. В новой модели код не рассылается — его выдаёт
@@ -73,7 +73,7 @@ async function strangerAttempt(contact) {
      ON CONFLICT (contact) DO UPDATE SET
        attempts = CASE WHEN login_attempts.locked_until IS NOT NULL AND login_attempts.locked_until < now()
                        THEN 1 ELSE login_attempts.attempts + 1 END,
-       locked_until = CASE WHEN login_attempts.attempts + 1 >= $2
+       locked_until = CASE WHEN login_attempts.locked_until IS NOT NULL AND login_attempts.locked_until <= now() THEN NULL WHEN login_attempts.attempts + 1 >= $2
                            THEN now() + ($3 || ' minutes')::interval ELSE login_attempts.locked_until END,
        updated_at = now()
      RETURNING attempts, locked_until`,
@@ -84,7 +84,7 @@ async function strangerAttempt(contact) {
 async function strangerLocked(contact) {
   const r = await query(`SELECT locked_until FROM login_attempts WHERE contact = $1`, [contact.value]);
   const row = r.rows[0];
-  return !!(row && row.locked_until && new Date(row.locked_until) > new Date());
+  return row && row.locked_until && new Date(row.locked_until) > new Date() ? row.locked_until : null;
 }
 
 /* Проверить пин. Один ответ на все неудачи — «код не подошёл»:
@@ -106,17 +106,19 @@ async function verifyPin(rawContact, rawPin) {
     if (user && !user.is_active) {
       return { ok: false, error: 'Доступ закрыт: проживание завершено. По вопросам — к модератору.' };
     }
-    if (await strangerLocked(contact)) return { ok: false, error: locked };
+    const lock=await strangerLocked(contact);
+    if (lock) return { ok:false,error:locked,lockedUntil:lock,attemptsRemaining:0 };
     const a = await strangerAttempt(contact);
-    if (a.locked_until && new Date(a.locked_until) > new Date()) return { ok: false, error: locked };
-    return { ok: false, error: 'Код не подошёл.' };
+    if (a.locked_until && new Date(a.locked_until) > new Date()) return { ok:false,error:locked,lockedUntil:a.locked_until,attemptsRemaining:0 };
+    return { ok:false,error:'Код не подошёл.',attemptsRemaining:Math.max(0,MAX_ATTEMPTS-a.attempts) };
   }
 
   const r = await query(
     `SELECT pin_hash, pin_expires, pin_attempts, locked_until, first_login FROM users WHERE id = $1`, [user.id]);
   const row = r.rows[0];
 
-  if (row.locked_until && new Date(row.locked_until) > new Date()) return { ok: false, error: locked };
+  if (row.locked_until && new Date(row.locked_until) > new Date()) return { ok:false,error:locked,lockedUntil:row.locked_until,attemptsRemaining:0 };
+  if(row.locked_until) { await query('UPDATE users SET pin_attempts=0,locked_until=NULL WHERE id=$1 AND locked_until<=now()',[user.id]); }
 
   // ВРЕМЕННО: демо-код открывает вход любому существующему пользователю.
   if (config.demoMode && pin === config.demoPin) {
@@ -124,11 +126,8 @@ async function verifyPin(rawContact, rawPin) {
     return { ok: true, user, firstLogin: !row.first_login };
   }
 
-  if (!row.pin_hash) return { ok: false, error: 'Код не подошёл.' };
-  // Одноразовый код (если выдан) — со сроком; постоянный — без
-  if (row.pin_expires && new Date(row.pin_expires) < new Date()) return { ok: false, error: 'Код устарел.' };
-
-  const good = crypto.timingSafeEqual(
+  // Неустановленный или просроченный код тоже считается неудачной попыткой.
+  const good = !!row.pin_hash && !(row.pin_expires && new Date(row.pin_expires) < new Date()) && crypto.timingSafeEqual(
     Buffer.from(row.pin_hash, 'hex'), Buffer.from(hashPin(pin, user.id), 'hex'));
 
   if (!good) {
@@ -138,8 +137,8 @@ async function verifyPin(rawContact, rawPin) {
        WHERE id = $1 RETURNING pin_attempts, locked_until`,
       [user.id, MAX_ATTEMPTS, String(LOCK_MINUTES)]);
     const u = upd.rows[0];
-    if (u.locked_until && new Date(u.locked_until) > new Date()) return { ok: false, error: locked };
-    return { ok: false, error: 'Код не подошёл. Осталось попыток: ' + (MAX_ATTEMPTS - u.pin_attempts) };
+    if (u.locked_until && new Date(u.locked_until) > new Date()) return { ok:false,error:locked,lockedUntil:u.locked_until,attemptsRemaining:0 };
+    return { ok:false,error:'Код не подошёл.',attemptsRemaining:Math.max(0,MAX_ATTEMPTS-u.pin_attempts) };
   }
 
   await afterLogin(user.id, row.first_login);
@@ -263,6 +262,7 @@ function clearCookie() {
 }
 
 function readSession(req) {
+  if(req.sectionSession)return req.sectionSession;
   const raw = req.headers.cookie || '';
   const m = raw.match(new RegExp('(?:^|;\\s*)' + COOKIE + '=([^;]+)'));
   return m ? verify(m[1]) : null;

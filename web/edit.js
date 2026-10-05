@@ -34,23 +34,27 @@
   /* ---------- Ключ элемента: путь от body ---------- */
 
   function keyOf(el) {
+    if(el.matches('.side__nav a[href]'))return 'menu:'+el.getAttribute('href').split('?')[0];
+    var doc=el.closest('.doc');
     var parts = [];
     var node = el;
-    while (node && node !== document.body) {
+    while (node && node !== (doc || document.body)) {
       var parent = node.parentNode;
       var idx = Array.prototype.indexOf.call(parent.children, node);
       parts.unshift(node.tagName.toLowerCase() + ':' + idx);
       node = parent;
     }
-    return parts.join('/');
+    return (doc?'doc:0/':'')+parts.join('/');
   }
 
   function byKey(key) {
+    if(key.indexOf('menu:')===0)return Array.from(document.querySelectorAll('.side__nav a[href]')).find(function(a){return a.getAttribute('href').split('?')[0]===key.slice(5);})||null;
     var node = document.body;
     var parts = key.split('/');
+    if(parts[0]==='doc:0'){node=document.querySelector('.doc');parts.shift();}
     for (var i = 0; i < parts.length; i++) {
       var p = parts[i].split(':');
-      node = node.children[Number(p[1])];
+      node = node && node.children[Number(p[1])];
       if (!node || node.tagName.toLowerCase() !== p[0]) return null;
     }
     return node;
@@ -75,7 +79,12 @@
       if (r.status !== 200 || !Array.isArray(r.body)) return;
       r.body.forEach(function (x) {
         var el = byKey(x.key);
-        if (el) el.innerHTML = x.html;
+        if (el) {
+          var icon = el.querySelector('svg');
+          var savedIcon = icon ? icon.cloneNode(true) : null;
+          el.innerHTML = x.html;
+          if (savedIcon && !el.querySelector('svg')) el.prepend(savedIcon);
+        }
       });
     }).catch(function () { /* сервера нет — страница открыта с диска */ });
   }
@@ -96,6 +105,7 @@
         '<span class="edit-bar__hint">Правка: щёлкни текст и меняй. <b data-edit="count">0</b> изменений</span>' +
         '<button type="button" class="edit-bar__btn edit-bar__btn--save" data-edit="save">Сохранить</button>' +
         '<button type="button" class="edit-bar__btn" data-edit="cancel">Отмена</button>' +
+        '<a class="edit-bar__btn" href="content-history.html">История правок</a>' +
       '</span>';
     document.body.appendChild(bar);
 
@@ -219,7 +229,13 @@
   }
 
   function save() {
-    var changes = Object.keys(state.changed).map(function (k) { return { key: k, html: state.changed[k] }; });
+    var changes = Object.keys(state.changed).map(function (k) {
+      var el=byKey(k), original=el && el.dataset.editOrig;
+      var template=document.createElement('template');template.innerHTML=original || '';
+      var icon=template.content.querySelector('svg');
+      if(icon && el && !el.querySelector('svg')) { el.prepend(icon.cloneNode(true));state.changed[k]=el.innerHTML; }
+      return { key: k, html: state.changed[k], original: original };
+    });
     if (!changes.length) return;
 
     if (DEMO) {
@@ -254,6 +270,7 @@
   var DEMO = location.protocol === 'file:';
 
   if (!DEMO) {
+    document.addEventListener('msv:menu-ready',applySaved);
     applySaved().then(function () {
       return api('GET', '/api/auth/me');
     }).then(function (r) {
