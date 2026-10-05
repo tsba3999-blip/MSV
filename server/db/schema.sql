@@ -822,3 +822,40 @@ ON CONFLICT(user_id) DO UPDATE SET place='all',
 UPDATE staff_profiles p SET place=CASE u.id WHEN 8 THEN 'uyut' WHEN 10 THEN 'forma' WHEN 11 THEN 'all' WHEN 794 THEN 'all' END
 FROM users u WHERE p.user_id=u.id AND u.role='staff'
  AND ((u.id=8 AND u.name='Зорина Марина') OR (u.id=10 AND u.name='Лэкэтуш Наталья') OR (u.id=11 AND u.name='Харина Елена') OR (u.id=794 AND u.name='Альфия Гисматуллина'));
+
+-- Подряды: рабочий реестр. Данные демонстрационного браузерного макета не импортируются.
+CREATE TABLE IF NOT EXISTS vendor_contracts (
+ id bigserial PRIMARY KEY, seed_key text UNIQUE, details jsonb NOT NULL,
+ payments jsonb NOT NULL DEFAULT '[]', sort_order integer NOT NULL DEFAULT 0,
+ version integer NOT NULL DEFAULT 1
+);
+CREATE TABLE IF NOT EXISTS vendor_reminders (
+ id bigserial PRIMARY KEY, contract_id bigint NOT NULL REFERENCES vendor_contracts(id),
+ user_id bigint NOT NULL REFERENCES users(id), deadline date NOT NULL,
+ lead_value integer NOT NULL, lead_unit text NOT NULL, text text NOT NULL,
+ is_read boolean NOT NULL DEFAULT false, created_at timestamptz NOT NULL DEFAULT now(),
+ UNIQUE(contract_id,user_id,deadline,lead_value,lead_unit)
+);
+INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-0','{"name":"Руслетелематика","group":"Не распределено","status":"Действует","amount":0,"frequency":1,"reminderValue":null,"reminderUnit":"weeks","payments":[]}',0) ON CONFLICT(seed_key) DO NOTHING;
+INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-1','{"name":"Интернет МТС Шаболовка","group":"Шаболовка","status":"Действует","amount":0,"frequency":1,"reminderValue":null,"reminderUnit":"weeks","payments":[]}',1) ON CONFLICT(seed_key) DO NOTHING;
+INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-2','{"name":"Таском","group":"Не распределено","status":"Действует","amount":0,"frequency":1,"reminderValue":null,"reminderUnit":"weeks","payments":[]}',2) ON CONFLICT(seed_key) DO NOTHING;
+INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-3','{"name":"Атол","group":"Не распределено","status":"Действует","amount":0,"frequency":1,"reminderValue":null,"reminderUnit":"weeks","payments":[]}',3) ON CONFLICT(seed_key) DO NOTHING;
+INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-4','{"name":"Скала Шаболовка","group":"Шаболовка","status":"Действует","amount":0,"frequency":1,"reminderValue":null,"reminderUnit":"weeks","payments":[]}',4) ON CONFLICT(seed_key) DO NOTHING;
+INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-5','{"name":"Скала Варшавка","group":"Варшавка","status":"Действует","amount":0,"frequency":1,"reminderValue":null,"reminderUnit":"weeks","payments":[]}',5) ON CONFLICT(seed_key) DO NOTHING;
+INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-6','{"name":"Эколайн ТБО","group":"Не распределено","status":"Действует","amount":0,"frequency":1,"reminderValue":null,"reminderUnit":"weeks","payments":[]}',6) ON CONFLICT(seed_key) DO NOTHING;
+INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-7','{"name":"ЭЦП","group":"Не распределено","status":"Действует","amount":0,"frequency":1,"reminderValue":null,"reminderUnit":"weeks","payments":[]}',7) ON CONFLICT(seed_key) DO NOTHING;
+INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-8','{"name":"Сертификаты","group":"Не распределено","status":"Действует","amount":0,"frequency":1,"reminderValue":null,"reminderUnit":"weeks","payments":[]}',8) ON CONFLICT(seed_key) DO NOTHING;
+INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-9','{"name":"Аренда Шаболовская","group":"Шаболовка","status":"Действует","amount":0,"frequency":1,"reminderValue":null,"reminderUnit":"weeks","payments":[]}',9) ON CONFLICT(seed_key) DO NOTHING;
+INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-10','{"name":"Аренда Варшавка","group":"Варшавка","status":"Действует","amount":0,"frequency":1,"reminderValue":null,"reminderUnit":"weeks","payments":[]}',10) ON CONFLICT(seed_key) DO NOTHING;
+INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-11','{"name":"Аренда Тверская","group":"Тверская","status":"Действует","amount":0,"frequency":1,"reminderValue":null,"reminderUnit":"weeks","payments":[]}',11) ON CONFLICT(seed_key) DO NOTHING;
+INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-12','{"name":"Коммуналка Шаболовская","group":"Шаболовка","status":"Действует","amount":0,"frequency":1,"reminderValue":null,"reminderUnit":"weeks","payments":[]}',12) ON CONFLICT(seed_key) DO NOTHING;
+INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-13','{"name":"Коммуналка Варшавка","group":"Варшавка","status":"Действует","amount":0,"frequency":1,"reminderValue":null,"reminderUnit":"weeks","payments":[]}',13) ON CONFLICT(seed_key) DO NOTHING;
+INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-14','{"name":"Коммуналка Тверская","group":"Тверская","status":"Действует","amount":0,"frequency":1,"reminderValue":null,"reminderUnit":"weeks","payments":[]}',14) ON CONFLICT(seed_key) DO NOTHING;
+INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-15','{"name":"Налоги","group":"Не распределено","status":"Действует","amount":0,"frequency":1,"reminderValue":null,"reminderUnit":"weeks","payments":[]}',15) ON CONFLICT(seed_key) DO NOTHING;
+INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-16','{"name":"Расходники","group":"Не распределено","status":"Действует","amount":0,"frequency":1,"reminderValue":null,"reminderUnit":"weeks","payments":[]}',16) ON CONFLICT(seed_key) DO NOTHING;
+INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-17','{"name":"ЕТЦ ВО","group":"Не распределено","status":"Действует","amount":0,"frequency":1,"reminderValue":null,"reminderUnit":"weeks","payments":[]}',17) ON CONFLICT(seed_key) DO NOTHING;
+INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-18','{"name":"Барьер рус","group":"Не распределено","status":"Действует","amount":0,"frequency":1,"reminderValue":null,"reminderUnit":"weeks","payments":[]}',18) ON CONFLICT(seed_key) DO NOTHING;
+INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-19','{"name":"Шахматка Тл","group":"Не распределено","status":"Действует","amount":0,"frequency":1,"reminderValue":null,"reminderUnit":"weeks","payments":[]}',19) ON CONFLICT(seed_key) DO NOTHING;
+INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-20','{"name":"ЭДО Контур","group":"Не распределено","status":"Действует","amount":0,"frequency":1,"reminderValue":null,"reminderUnit":"weeks","payments":[]}',20) ON CONFLICT(seed_key) DO NOTHING;
+INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-21','{"name":"Персоналкин","group":"Не распределено","status":"Действует","amount":0,"frequency":1,"reminderValue":null,"reminderUnit":"weeks","payments":[]}',21) ON CONFLICT(seed_key) DO NOTHING;
+INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-22','{"name":"Бухгалтерия","group":"Общие","status":"Действует","amount":0,"frequency":1,"reminderValue":null,"reminderUnit":"weeks","payments":[]}',22) ON CONFLICT(seed_key) DO NOTHING;

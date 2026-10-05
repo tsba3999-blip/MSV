@@ -38,6 +38,10 @@ require('./routes/staff')(router.route);
 require('./routes/card')(router.route);
 require('./routes/holds')(router.route);
 require('./routes/relocation')(router.route);
+require('./routes/vendor-contracts')(router.route);
+const vendorReminders=require('./lib/vendor-reminders');
+setInterval(()=>vendorReminders.sweep().catch(e=>console.error('[vendor-reminders]',e.message)),60*60*1000);
+setTimeout(()=>vendorReminders.sweep().catch(e=>console.error('[vendor-reminders]',e.message)),15000);
 
 /* Бесплатные брони: раз в десять минут гасим сгоревшие и предупреждаем
    тех, у кого до конца меньше четырёх часов (решение заказчика 24.09.2026) */

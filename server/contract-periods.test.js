@@ -1,0 +1,10 @@
+'use strict';
+const assert=require('node:assert/strict'),periods=require('../web/contract-periods');
+assert.equal(periods.end('2026-10-17',3),'2027-01-17');
+assert.equal(periods.last({start:'2026-10-17',months:3}),'2027-01-16');
+assert.equal(periods.end('2024-01-31',1),'2024-02-29');
+assert.equal(periods.end('2026-01-31',1),'2026-02-28');
+assert.throws(()=>periods.end('2026-02-30',1));assert.throws(()=>periods.end('2026-10-01',0));assert.throws(()=>periods.end('2026-10-01',1.5));
+assert.equal(periods.amount({sum:1234.56,period:'2026-09'},'2026-09'),1234.56);
+const payment={start:'2026-10-17',months:3,sum:10000.01};assert.equal(Math.round(['2026-10','2026-11','2026-12','2027-01'].reduce((n,m)=>n+periods.amount(payment,m),0)*100),1000001);assert.equal(periods.amount(payment,'2027-02'),0);
+console.log('PASS arbitrary periods, leap years, invalid dates and exact monthly allocation');

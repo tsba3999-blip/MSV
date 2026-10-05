@@ -8,6 +8,7 @@ const {chromium}=require('playwright'),fs=require('fs'),path=require('path'),ass
  await page.route('**/*',async route=>{const u=new URL(route.request().url());if(u.pathname.startsWith('/api/')){
   if(u.pathname==='/api/auth/me')return route.fulfill({json:viewing?{id:'10',name:'Тест Резидент',role:'resident',preview:{returnTo:'admin-residents.html'}}:{...people[0],canEditSite:true,canPayroll:true}});
   if(u.pathname==='/api/staff'){if(route.request().method()==='POST'){const b=route.request().postDataJSON();assert.equal(b.name,'Тестовый Сотрудник');assert.equal(b.salary,null);people.push({...b,id:'99',userId:'99'});return route.fulfill({status:201,json:{id:'99'}});}return route.fulfill({json:people});}
+  if(u.pathname==='/api/vendor-contracts')return route.fulfill({json:[{id:'1',name:'Скала Шаболовка',group:'Шаболовка',status:'Действует',amount:0,frequency:1,version:1,payments:[]}]});
   if(u.pathname==='/api/residences')return route.fulfill({json:residences});
   if(u.pathname==='/api/shahmatka')return route.fulfill({json:{residents:[{id:'10',name:'Тест Резидент',phone:'+79000000001',contactPerson:'Родитель +79000000002',registrations:[]}],bookings:[{id:'20',bedId:'bed',residentId:'10',from:'2026-09-01',to:'2027-08-31',accrued:30000,paid:30000,depositCharged:true,depositAmount:10000,depositPaid:10000}],payments:[]}});
   if(u.pathname==='/api/cabinet-preview/start'){selected=route.request().postDataJSON();viewing=true;return route.fulfill({json:{url:'support.html'}});}

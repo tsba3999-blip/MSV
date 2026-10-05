@@ -423,3 +423,4 @@
 })();
 
 (function(){var script=document.createElement('script');script.src='cabinet-preview.js';document.head.append(script);})();
+(function(){var script=document.createElement('script');script.src='vendor-notices.js';document.head.append(script);})();
