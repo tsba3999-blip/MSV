@@ -420,3 +420,5 @@
 
   back.href = u.pathname + u.search;
 })();
+
+(function(){var script=document.createElement('script');script.src='cabinet-preview.js';document.head.append(script);})();

@@ -263,6 +263,7 @@ function clearCookie() {
 
 function readSession(req) {
   if(req.sectionSession)return req.sectionSession;
+  if(req.previewSession)return req.previewSession;
   const raw = req.headers.cookie || '';
   const m = raw.match(new RegExp('(?:^|;\\s*)' + COOKIE + '=([^;]+)'));
   return m ? verify(m[1]) : null;

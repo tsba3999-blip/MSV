@@ -23,7 +23,8 @@
   .tri[aria-expanded="true"] svg { transform: rotate(180deg); }
   .miss { color: var(--msv-red); font-weight: 600; }
   .who-link { color: inherit; text-decoration: none; } .who-link:hover .who-cell__name { text-decoration: underline; }
-.grid:first-of-type{table-layout:fixed}.grid:first-of-type th:first-child{width:28%}.grid:first-of-type th:last-child{width:5%}.grid:first-of-type th:nth-child(5){width:24%}th[data-sort]{cursor:pointer}.grid [data-pay],.grid [data-bonus]{margin:2px}
+.grid:first-of-type{table-layout:fixed}.grid:first-of-type th:first-child{width:30%}.grid:first-of-type th:nth-child(2){width:17%}.grid:first-of-type th:nth-child(3){width:17%}.grid:first-of-type th:nth-child(4){width:15%}.grid:first-of-type th:nth-child(5){width:17%}.grid:first-of-type th:last-child{width:4%}.grid:first-of-type th:nth-child(5),.grid:first-of-type td:nth-child(5){text-align:center}th[data-sort]{cursor:pointer}.staff-actions{display:flex;flex-direction:column;align-items:center;gap:6px}.staff-actions .msv-btn{width:132px;max-width:100%;font-weight:400}.staff-actions [data-bonus]{background:rgba(203,182,255,.25);color:var(--msv-n500);box-shadow:none}.staff-actions [data-bonus]:hover{background:rgba(203,182,255,.4)}
+.staff-marker{display:inline-flex;align-items:center;justify-content:center;flex:0 0 28px;height:28px;border-radius:50%;background:var(--msv-n100);font-size:13px;font-weight:400}
 </style>
 <style>
   body { --role: var(--msv-graphite); --role-ink: var(--msv-graphite); }
@@ -156,16 +157,16 @@ MSV.ready(function (ctx) {
 
   function render() {
     var list = STAFF.filter(function (s) { return !filter || s.place === filter; });
-    list.sort(function(a,b){var x=a[sortKey],y=b[sortKey];return sortDir*(sortKey==='salary'?(Number(x)||0)-(Number(y)||0):String(x||'').localeCompare(String(y||''),'ru',{numeric:true}));});
+    list.sort(function(a,b){var order={uyut:0,forma:1,all:2},group=(order[a.place]??3)-(order[b.place]??3);var x=a[sortKey],y=b[sortKey];return group||sortDir*(sortKey==='salary'?(Number(x)||0)-(Number(y)||0):String(x||'').localeCompare(String(y||''),'ru',{numeric:true}));});
     document.getElementById('count').textContent = list.length + ' из ' + STAFF.length;
     document.getElementById('rows').innerHTML = list.map(function (s) {
       return '<tr data-id="' + esc(s.id) + '">' +
-        '<td><a class="who-link" href="admin-staff-view.html?id=' + esc(s.id) + '" title="Открыть кабинет сотрудника"><span class="who-cell"><span class="who-cell__face">' + (s.photo?'<img src="'+esc(s.photo)+'" alt="Фото сотрудника" data-zoom style="width:48px;height:48px;object-fit:cover;border-radius:50%">':esc(initials(s.name))) + '</span><span><span class="who-cell__name">' + esc(s.name) + '</span><span class="msv-note" style="display:block">'+esc(s.position)+'</span></span></span></a></td>' +
+        '<td><a class="who-link" href="admin-staff-view.html?id=' + esc(s.id) + '" title="Открыть кабинет сотрудника"><span class="who-cell"><span class="staff-marker">' + ({uyut:'У',forma:'Ф',all:'А'}[s.place]||'—') + '</span><span class="who-cell__face">' + (s.photo?'<img src="'+esc(s.photo)+'" alt="Фото сотрудника" data-zoom style="width:48px;height:48px;object-fit:cover;border-radius:50%">':esc(initials(s.name))) + '</span><span><span class="who-cell__name">' + esc(s.name) + '</span><span class="msv-note" style="display:block">'+esc(s.position)+'</span></span></span></a></td>' +
         '<td>' + (s.place ? esc(PLACE[s.place]) : '<span class="miss">уточнить</span>') + '</td>' +
 
         '<td>' + esc(tenure(s.started)) + '</td>' +
         '<td class="num">' + money(s.salary) + '</td>' +
-        '<td class="num"><button class="msv-btn msv-btn--s msv-btn--primary" type="button" data-pay>Начислить</button><button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-bonus>Премировать</button></td>' +
+        '<td><div class="staff-actions"><button class="msv-btn msv-btn--s msv-btn--primary" type="button" data-pay>Начислить</button><button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-bonus>Премировать</button></div></td>' +
         '<td class="num"><button class="tri" type="button" data-more aria-expanded="false" aria-label="Подробнее"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></td>' +
       '</tr>' +
       '<tr class="more" data-more-of="' + esc(s.id) + '" hidden><td colspan="6"><dl class="more__grid">' +
@@ -173,7 +174,7 @@ MSV.ready(function (ctx) {
         '<div><dt>Куда переводить</dt><dd>' + (s.payTo ? esc(s.payTo) : '<span class="miss">уточнить</span>') + '</dd></div>' +
         '<div><dt>Работает с</dt><dd>' + fdate(s.started) + '</dd></div>' +
         '<div><dt>Тип отношений</dt><dd>' + esc(s.relation) + '</dd></div>' +
-      '</dl></td></tr>';
+      '</dl>'+ (ctx.me && ctx.me.canEditSite && s.role!=='admin'?'<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-cabinet="'+esc(s.id)+'">ЛК</button>':'')+'</td></tr>';
     }).join('');
   }
 

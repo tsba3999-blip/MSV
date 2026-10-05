@@ -13,6 +13,7 @@
   body { --role: var(--msv-graphite); --role-ink: var(--msv-graphite); }
   .who-link { color: inherit; text-decoration: none; } .who-link:hover .who-cell__name { text-decoration: underline; }
   .role-pill--staff { background: var(--msv-ice); color: var(--msv-graphite); }
+.staff-marker{display:inline-flex;align-items:center;justify-content:center;flex:0 0 28px;height:28px;border-radius:50%;background:var(--msv-n100);color:var(--msv-graphite);font-size:13px;font-weight:500}
 </style>
 </head>
 <body>
@@ -173,7 +174,7 @@
     return window.MSV_STAFF_LOAD().then(function (list) {
       people = (list || []).map(function (s) {
         return { id: String(s.id), name: s.name, role: s.role, position: s.position,
-                 contact: s.phone || s.email || '',
+                 contact: s.phone || s.email || '', place:s.place, phone:s.phone,
                  sectionAccess:s.sectionAccess, photo:s.photo, canEditShahmatka: s.canEditShahmatka, canPayroll: s.canPayroll };
       });
       render();
@@ -184,10 +185,13 @@
   function render() {
     var box = document.getElementById('people');
     if (!box) return;
-    box.innerHTML = people.map(function (p) {
+    box.innerHTML = people.slice().sort(function(a,b){var order={uyut:0,forma:1,all:2};return (order[a.place]??3)-(order[b.place]??3)||a.name.localeCompare(b.name,'ru');}).map(function (p) {
       var edit = editing === p.id;
       var st = edit ? draftSt : stateOf(p);
       var self = meId === p.id;
+      var roleLabel=/^Администратор [12]$/.test(p.position)?p.position:ROLE[st.role][0];
+      var roleStyle=/^Администратор/.test(roleLabel)||p.phone==='+79772511236'?'role-pill--admin':ROLE[st.role][1];
+      var marker={forma:'Ф',uyut:'У',all:'А'}[p.place]||'—';
       var on = lit(st);
 
       var pills = PERMS.map(function (x) {
@@ -203,9 +207,9 @@
 
       return '<tr' + (edit ? ' class="is-edit"' : '') + '><td>' +
           '<a class="who-link" href="admin-staff-view.html?id=' + esc(p.id) + '" title="Открыть карточку сотрудника"><span class="who-cell">' +
-          '<span class="who-cell__face">' + esc(ini(p.name)) + '</span><span><span class="who-cell__name">' + esc(p.name) + '</span>' +
+          '<span class="staff-marker">'+marker+'</span><span class="who-cell__face">' + (p.photo?'<img src="'+esc(p.photo)+'" alt="Фото сотрудника" style="width:48px;height:48px;object-fit:cover;border-radius:50%">':esc(ini(p.name))) + '</span><span><span class="who-cell__name">' + esc(p.name) + '</span>' +
           '<span class="msv-note">' + esc(p.position) + (p.contact ? ' · ' + esc(p.contact) : '') + '</span></span></span></a></td>' +
-        '<td><span class="role-pill ' + ROLE[st.role][1] + '">' + ROLE[st.role][0] + '</span></td>' +
+        '<td><span class="role-pill ' + roleStyle + '">' + esc(roleLabel) + '</span></td>' +
         '<td><span class="perm">' + pills + '</span>' +
           (what ? '<p class="msv-note rights-note">' + esc(what) + '</p>' : '') + '</td>' +
         '<td>' + (edit

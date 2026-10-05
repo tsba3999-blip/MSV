@@ -83,7 +83,7 @@ MSV.ready(function (ctx) {
         res: res, userId: person.id, bookingId: b.id,
         name: person.name, photo: person.photo || '',
         university: person.university || '',
-        phone: person.phone || '', messengers: person.messengers || [],
+        contactPerson:person.contactPerson||'', depositAmount:Number(b.depositAmount)||0,depositPaid:Number(b.depositPaid)||0, phone: person.phone || '', messengers: person.messengers || [],
         bed: bed ? bed.label : '',
         room: room ? (room.name || ('к. ' + room.number)) : '',
         owed: owed,
@@ -248,20 +248,9 @@ MSV.ready(function (ctx) {
       /* Долг одной колонкой: крупно — сколько ещё должен, мелко — сколько
          из скольки уже оплачено. Отдельный столбец «остаток» не нужен: его
          пришлось бы считать глазами (решение заказчика 24.09.2026). */
-      var pay = x.owed > 0.5
-        ? '<b class="owe">' + esc(money(x.owed)) + '</b>' +
-          (x.paid > 0.5 ? '<span class="msv-note sub">оплачено ' + esc(num(x.paid)) + ' из ' + esc(num(x.accrued)) + '</span>' : '') +
-          (x.penalty > 0.5 ? '<span class="msv-note sub">пени ' + esc(num(x.penalty)) + '</span>' : '')
-        : '<span class="tag tag--ok">без долга</span>';
-
-      /* Кнопки на время переноса данных: оплату и депозит за тех, кто
-         заселился до появления системы, заносит модератор. */
-      var payBtn = x.owed > 0.5
-        ? '<button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" data-act="paid" title="Отметить оплату за месяц">Внести</button>'
-        : '<span class="tag tag--ok">оплачено</span>';
-      var depBtn = x.deposit
-        ? '<span class="tag tag--ok">внесён</span>'
-        : '<button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" data-act="dep" title="Депозит равен месячной плате и засчитывается оплатой августа">Внести</button>';
+      var pay='<span class="tag '+(x.owed>0.5?(x.penalty>0.5?'tag--warn':'tag--bad'):'tag--ok')+'" title="'+(x.owed>0.5?'К оплате':'Остаток')+'">'+esc(money(x.owed))+'</span>'+(x.penalty>0.5?'<span class="tag tag--warn" title="Пени">'+esc(money(x.penalty))+' пени</span>':'');
+      var payBtn='<span class="tag '+(x.owed>0.5?'tag--bad':'tag--ok')+'" title="Всего внесено платежей">'+esc(money(x.paid))+'</span>'+(x.owed>0.5?'<button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" data-act="paid" title="Внести оплату">Внести</button>':'');
+      var depBtn='<span class="tag '+(x.depositAmount>0&&x.depositPaid>=x.depositAmount?'tag--ok':'tag--bad')+'" title="Внесено за август. Начислено: '+esc(money(x.depositAmount))+'">'+esc(money(x.depositPaid))+'</span>'+(!x.deposit?'<button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" data-act="dep" title="Внести депозит за август">Внести</button>':'');
 
       /* Нет регистрации — кнопка «Загрузить», есть — метка со сроком. Метка
          тоже нажимается: так заменяют просроченную (24.09.2026) */
@@ -292,11 +281,12 @@ MSV.ready(function (ctx) {
         '<td>' + (x.phone ? '<a href="tel:+' + esc(digits(x.phone)) + '">' + esc(x.phone) + '</a>' : '—') + mess(x) + '</td>' +
         '<td>' + pay + '</td><td>' + payBtn + '</td><td>' + depBtn + '</td>' +
         '<td>' + reg + '</td>' +
-        '<td class="num"><button class="msv-btn msv-btn--s msv-btn--tertiary del" type="button" data-del title="Удалить резидента из базы">Удалить</button></td>' +
-      '</tr>';
+        '<td class="num"><button class="tri" type="button" data-resident-more aria-expanded="false" aria-label="Подробнее"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></td></tr>'+
+      '<tr class="resident-more" hidden data-name="'+esc(x.name)+'" data-user="'+esc(x.userId)+'"><td colspan="8"><div class="resident-details"><span>Контакт родителя: '+esc(x.contactPerson||'не указан')+'</span><span class="resident-details__actions">'+(ctx.me&&ctx.me.canEditSite?'<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-cabinet="'+esc(x.userId)+'">ЛК</button>':'')+'<button class="msv-btn msv-btn--s msv-btn--tertiary del" type="button" data-del title="Удалить резидента из базы">Удалить</button></span></div></td></tr>';
     }).join('');
   }
 
+  rowsBox.addEventListener('click',function(e){var b=e.target.closest('[data-resident-more]');if(!b)return;var open=b.getAttribute('aria-expanded')==='true';b.setAttribute('aria-expanded',String(!open));b.closest('tr').nextElementSibling.hidden=open;});
   /* ---------- Управление ---------- */
 
   var timer = null;

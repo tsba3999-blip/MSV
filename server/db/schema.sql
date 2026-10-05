@@ -810,3 +810,15 @@ WITH old AS (
  DELETE FROM content_overrides WHERE html='Статистика' AND key='div:0/aside:0/nav:2/a:0' AND page='cabinet-admin.html' RETURNING *
 ) INSERT INTO content_history(page,key,before_html,after_html,actor_id) SELECT page,key,html,NULL,updated_by FROM old;
 ALTER TYPE request_kind ADD VALUE IF NOT EXISTS 'departure';
+
+-- Названия и принадлежность к администрации по поручению владельца, 05.10.2026.
+INSERT INTO staff_profiles(user_id,position,place)
+SELECT id,CASE WHEN can_edit_site AND role='admin' THEN 'Администратор 1'
+              WHEN phone='+79853926755' THEN 'Администратор 2' ELSE '' END,'all'
+FROM users WHERE (can_edit_site AND role='admin') OR phone IN ('+79853926755','+79772511236','+79778270405')
+ON CONFLICT(user_id) DO UPDATE SET place='all',
+ position=CASE WHEN EXCLUDED.position<>'' THEN EXCLUDED.position ELSE staff_profiles.position END;
+
+UPDATE staff_profiles p SET place=CASE u.id WHEN 8 THEN 'uyut' WHEN 10 THEN 'forma' WHEN 11 THEN 'all' END
+FROM users u WHERE p.user_id=u.id AND u.role='staff'
+ AND ((u.id=8 AND u.name='Зорина Марина') OR (u.id=10 AND u.name='Лэкэтуш Наталья') OR (u.id=11 AND u.name='Харина Елена'));

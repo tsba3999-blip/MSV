@@ -109,7 +109,7 @@ module.exports = function register(route) {
     /* Ведёт ли система деньги сама. Нужно кабинетам, чтобы честно сказать
        модератору: пени и продажа мест пока не работают (24.09.2026). */
     const mr = await query(`SELECT value FROM settings WHERE key = 'money_rules'`);
-    json(res, 200, { id: u.id, role: u.role, name: u.name, residences,
+    json(res, 200, { id: u.id, role: u.role, name: u.name, residences, preview:req.previewActor||null,
       /* Править шахматку может только модератор или администратор.
          Остальные смотрят (правило заказчика 25.09.2026). Раньше право
          можно было выдать сотруднику лично — и страница обещала ему

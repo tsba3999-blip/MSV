@@ -105,6 +105,8 @@ module.exports = function register(route) {
              COALESCE(bal.accrued, 0) AS accrued, COALESCE(bal.paid, 0) AS paid,
              EXISTS (SELECT 1 FROM charges ch JOIN bookings cb ON cb.id=ch.booking_id WHERE (cb.id=b.id OR cb.contract_id=b.contract_id)
                        AND ch.kind = 'deposit' AND ch.cancelled_at IS NULL) AS has_deposit,
+             COALESCE((SELECT SUM(ch.amount) FROM charges ch JOIN bookings cb ON cb.id=ch.booking_id WHERE (cb.id=b.id OR cb.contract_id=b.contract_id) AND ch.kind='deposit' AND ch.cancelled_at IS NULL),0) AS deposit_amount,
+             COALESCE((SELECT SUM(p.amount) FROM payments p JOIN bookings pb ON pb.id=p.booking_id WHERE (pb.id=b.id OR pb.contract_id=b.contract_id) AND p.note='Депозит'),0) AS deposit_payments,
              COALESCE((SELECT SUM(ch.amount) FROM charges ch WHERE ch.booking_id = b.id
                         AND ch.kind = 'penalty' AND ch.cancelled_at IS NULL), 0) AS penalty
       FROM bookings b
@@ -184,6 +186,8 @@ module.exports = function register(route) {
         contractFrom: isoDate(b.contract_from), contractTo: isoDate(b.contract_to),
         contractEnded: isoDate(b.ended_at), annual: b.annual === null ? true : !!b.annual,
         depositCharged: !!b.has_deposit, penalty: Number(b.penalty),
+        depositAmount: Number(b.deposit_amount),
+        depositPaid: Math.min(Number(b.deposit_amount),Math.max(0,Number(b.deposit_payments),Number(b.paid)-(Number(b.accrued)-Number(b.deposit_amount)))),
         paidMonths: b.history_finance ? b.history_finance.paidMonths : paidBy[b.id] || []
       })),
       payments: pays.rows.map((p) => ({

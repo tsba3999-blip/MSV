@@ -28,6 +28,7 @@ require('./routes/content-history')(router.route);
 require('./routes/section-access')(router.route);
 require('./routes/support')(router.route);
 require('./routes/document-versions')(router.route);
+require('./routes/cabinet-preview')(router.route);
 require('./routes/settings')(router.route);
 require('./routes/admin')(router.route);
 require('./routes/resident')(router.route);
@@ -98,6 +99,7 @@ const server = http.createServer(async (req, res) => {
       }
     }
 
+    if(!await require('./lib/cabinet-preview').gate(req,res))return;
     if(!await require('./lib/section-access').gate(req,res))return;
     const handled = await router.dispatch(req, res);
     if (handled !== false) return;
