@@ -819,6 +819,6 @@ FROM users WHERE (can_edit_site AND role='admin') OR phone IN ('+79853926755','+
 ON CONFLICT(user_id) DO UPDATE SET place='all',
  position=CASE WHEN EXCLUDED.position<>'' THEN EXCLUDED.position ELSE staff_profiles.position END;
 
-UPDATE staff_profiles p SET place=CASE u.id WHEN 8 THEN 'uyut' WHEN 10 THEN 'forma' WHEN 11 THEN 'all' END
+UPDATE staff_profiles p SET place=CASE u.id WHEN 8 THEN 'uyut' WHEN 10 THEN 'forma' WHEN 11 THEN 'all' WHEN 794 THEN 'all' END
 FROM users u WHERE p.user_id=u.id AND u.role='staff'
- AND ((u.id=8 AND u.name='Зорина Марина') OR (u.id=10 AND u.name='Лэкэтуш Наталья') OR (u.id=11 AND u.name='Харина Елена'));
+ AND ((u.id=8 AND u.name='Зорина Марина') OR (u.id=10 AND u.name='Лэкэтуш Наталья') OR (u.id=11 AND u.name='Харина Елена') OR (u.id=794 AND u.name='Альфия Гисматуллина'));
