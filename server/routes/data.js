@@ -79,8 +79,13 @@ module.exports = function register(route) {
        23.09.2026). Годовые контракты сюда не попадают: показываем только то,
        что освобождается в ближайшие SOON_DAYS дней. Поле release_from —
        ручная пометка модератора, она главнее расчётной даты. */
-    const SOON_DAYS = 90;
-    const horizon = new Date(Date.now() + SOON_DAYS * 86400000);
+    const today = new Date();
+    const horizon = new Date(today);
+    horizon.setDate(1);
+    horizon.setMonth(horizon.getMonth() + 2);
+    const lastDay = new Date(horizon.getFullYear(), horizon.getMonth() + 1, 0).getDate();
+    horizon.setDate(Math.min(today.getDate(), lastDay));
+    const SOON_DAYS = Math.ceil((horizon - today) / 86400000);
     const soon = {};
     r.rows.forEach((x) => {
       if (x.release_from) { soon[x.bed_id] = isoDate(x.release_from); return; }

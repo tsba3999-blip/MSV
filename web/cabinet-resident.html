@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="icon" href="favicon4.png" type="image/png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#F5F1EA">
 <title>Главная — МСВ</title>
 <link rel="stylesheet" href="tokens.css">
@@ -186,6 +186,7 @@
     border-radius: var(--msv-r12);
     color: var(--msv-graphite);
   }
+a.tab[href="notifications.html"]{position:relative}.top__dot{width:auto;min-width:22px;height:22px;padding:0 5px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:12px;color:white;background:var(--msv-red)}.top__dot[hidden]{display:none}
 </style>
 </head>
 <body>
@@ -204,7 +205,7 @@
         <path d="M18 9a6 6 0 1 0-12 0c0 6-3 7-3 7h18s-3-1-3-7"/>
         <path d="M10.5 20.5a2 2 0 0 0 3 0"/>
       </svg>
-      <span class="top__dot" aria-hidden="true"></span>
+      <span class="top__dot" hidden></span>
     </a>
 
     <a class="top__act" href="index.html" aria-label="Выйти из аккаунта">
@@ -347,9 +348,9 @@
       }
 
       // Непрочитанные уведомления — числом на плитке, как в строке меню
-      var un = (d.notices || []).filter(function (n) { return !n.read; }).length;
+      var un = Number.isInteger(d.unreadCount) ? d.unreadCount : (d.notices || []).filter(function (n) { return !n.read; }).length;
       var cnt = document.getElementById('noteCount');
-      if (cnt && un) { cnt.textContent = un; cnt.hidden = false; }
+      if(cnt){cnt.textContent=un;cnt.hidden=!un;}document.querySelectorAll('a[href="notifications.html"]').forEach(function(a){if(!a.matches('.top__act,.tab'))return;var badge=a.querySelector('.top__dot');if(!badge){badge=document.createElement('span');badge.className='top__dot';a.appendChild(badge);}badge.textContent=un;badge.hidden=!un;a.setAttribute('aria-label','Уведомления: '+un+' непрочитанных');});
     })
     .catch(function () {});
 })();

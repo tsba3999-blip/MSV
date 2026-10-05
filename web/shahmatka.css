@@ -1239,3 +1239,5 @@ body.msv-sh-dragging .msv-sh__bar { cursor: grabbing; }
 .msv-sh__underlay .msv-sh__gridline--month { z-index: 24; }
 .msv-sh__body { position: relative; isolation: isolate; }
 .msv-sh .msv-sh__paid{background:var(--msv-lavender,#CBB6FF);border-color:var(--msv-violet,#6E3BFF);color:var(--msv-graphite,#34495E)}
+
+.msv-sh__panel-foot [data-act="edit"],.msv-sh__panel-foot [data-act="profile"]{flex:1;min-width:0;justify-content:center}

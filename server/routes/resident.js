@@ -78,6 +78,7 @@ module.exports = function register(route) {
 
     const [u, bk, notices, tickets] = await Promise.all([
       query(`SELECT u.id, u.name, u.phone, u.email, u.role, u.photo_url,
+                    (SELECT count(*) FROM notices WHERE user_id=u.id AND NOT is_read) AS unread_count,
                     (SELECT position FROM staff_profiles WHERE user_id = u.id) AS position,
                     p.* FROM users u
              LEFT JOIN resident_profiles p ON p.user_id = u.id WHERE u.id = $1`, [s.uid]),
@@ -118,6 +119,7 @@ module.exports = function register(route) {
         from: iso(b.date_from), to: iso(b.date_to),
         accrued: Number(b.accrued), paid: Number(b.paid), balance: Number(b.accrued) - Number(b.paid)
       } : null,
+      unreadCount: Number(user.unread_count),
       notices: notices.rows.map((n) => ({ id: String(n.id), kind: n.kind, text: n.text, read: n.is_read, at: n.created_at })),
       tickets: tickets.rows.map((t) => ({ id: String(t.id), category: t.category, status: t.status, at: t.created_at }))
     });

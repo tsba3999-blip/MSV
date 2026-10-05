@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="icon" href="favicon4.png" type="image/png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#F5F1EA">
 <title>Выбор комнаты — МСВ</title>
 <link rel="stylesheet" href="tokens.css">
@@ -87,7 +87,7 @@
       (d.busy || []).forEach(function (id) { window.__BUSY__[id] = true; });
       // Места, которые ещё заняты, но уже выставлены в продажу: значение — дата заезда
       window.__SOON__ = d.soon || {};
-      window.__SOON_DAYS__ = d.soonDays || 90;
+      window.__SOON_DAYS__ = d.soonDays || 60;
     }
   } catch (e) {}
 })();
@@ -215,7 +215,7 @@ MSV.ready(function (ctx) {
     return html;
   }
 
-  var SOON_DAYS = window.__SOON_DAYS__ || 90;
+  var SOON_DAYS = window.__SOON_DAYS__ || 60;
 
   /* Тип комнаты: у капсульных пишем «Капсулы», у обычных — сколько мест */
   function kindOf(r) {

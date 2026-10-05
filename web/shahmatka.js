@@ -2002,8 +2002,8 @@
       '<div class="msv-sh__panel-foot">' +
         (b.holdUntil
           ? '<button type="button" class="msv-sh__btn msv-sh__btn--primary" data-act="unhold">Снять бронь</button>'
-          : (b.movedTo ? '' : '<button type="button" class="msv-sh__btn msv-sh__btn--primary" data-act="edit">Изменить бронь</button>') +
-            '<button type="button" class="msv-sh__btn" data-act="profile">Профиль</button>') +
+          : (b.movedTo ? '' : '<button type="button" class="msv-btn msv-btn--primary" data-act="edit">Переселить</button>') +
+            '<button type="button" class="msv-btn msv-btn--secondary" data-act="profile">Профиль</button>') +
       '</div>';
 
     this.panel.innerHTML = html;

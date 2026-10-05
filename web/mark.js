@@ -13,6 +13,7 @@
 (function () {
   'use strict';
 
+  if(!document.querySelector('link[rel=icon]')){var icon=document.createElement('link');icon.rel='icon';icon.type='image/svg+xml';icon.href='favicon.svg';document.head.appendChild(icon);}
   var page = location.pathname.split('/').pop() || 'index.html';
 
   /* Кто вошёл — спрашиваем один раз на страницу, остальное считаем от

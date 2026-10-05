@@ -26,7 +26,7 @@
     var date = month + c.due.slice(7), late = date < today;
     return '<span class="badge ' + (late?'late':'soon') + '">' + (late?'Просрочено':'К оплате') + '<br>' + money(c.amount) + '</span>';
   }
-  function controls(c) { if(!configuring)return '';return '<span class="grip" draggable="true" data-drag="'+esc(c.id)+'" title="Перетащить">⠿</span><button class="move" data-move="-1" data-id="'+esc(c.id)+'" aria-label="Поднять договор">↑</button><button class="move" data-move="1" data-id="'+esc(c.id)+'" aria-label="Опустить договор">↓</button>'; }
+  function controls(c) { if(!configuring)return '';return '<span class="grip" draggable="true" data-drag="'+esc(c.id)+'" title="Перетащить">⠿</span>'; }
   var arrow="<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M6 9l6 6 6-6\"/></svg>";
   function name(c) { var short=c.name;if(design==='groups'&&view==='calendar'){var endings={'Шаболовка':/\s+Шаболов(?:ка|ская)\s*$/i,'Варшавка':/\s+Варшавка\s*$/i,'Тверская':/\s+Тверская\s*$/i};if(endings[c.group])short=short.replace(endings[c.group],'');}
     return '<div class="contract-name"><button class="name" data-open="'+esc(c.id)+'">'+esc(short)+'</button><button class="tri" data-detail="'+esc(c.id)+'" aria-expanded="false" aria-label="Подробнее о '+esc(short)+'">'+arrow+'</button></div><div class="contract-details" data-details="'+esc(c.id)+'" hidden><p>Ответственный: '+esc(c.responsible||'—')+'</p><p>Исполнитель: '+esc(c.executor||'—')+'</p><p>'+esc(c.notes||'')+'</p></div>';
