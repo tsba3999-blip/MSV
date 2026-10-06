@@ -35,12 +35,12 @@ module.exports = function register(route) {
     const session=auth.readSession(req);
     if(!session || !(await seesAllPayroll(session)))return fail(res,403,'Нет доступа к сотрудникам и зарплатам');
     const r = await query(`
-      SELECT u.id, u.name, u.role, u.phone, u.email, u.photo_url, u.section_access, p.position, p.place, p.birthday, p.started_at, p.salary, p.pay_to, p.relation, p.can_edit_shahmatka, p.can_payroll
+      SELECT u.id, u.name, u.role, u.phone, u.email, u.photo_url, u.section_access, p.position, p.place, p.birthday, p.started_at, p.salary, p.pay_to, p.relation, p.payroll_excluded, p.can_edit_shahmatka, p.can_payroll
       FROM users u LEFT JOIN staff_profiles p ON p.user_id = u.id
       WHERE u.role IN ('staff', 'moderator', 'admin') AND u.is_active ORDER BY u.name`);
     json(res, 200, r.rows.map((x) => ({ id: String(x.id), userId: String(x.id), name: x.name, role: x.role, phone: x.phone, email: x.email,
       position: x.position || '', place: x.place || '', birthday: iso(x.birthday), started: iso(x.started_at),
-      salary: x.salary, payTo: x.pay_to || '', relation: x.relation || '',
+      salary: x.salary, payrollExcluded: !!x.payroll_excluded, payTo: x.pay_to || '', relation: x.relation || '',
       photo: x.photo_url || '', sectionAccess: {...require('../lib/section-access').defaults(x.role,x.can_payroll),...x.section_access},
       canEditShahmatka: !!x.can_edit_shahmatka, canPayroll: !!x.can_payroll })));
   });
@@ -286,7 +286,7 @@ module.exports = function register(route) {
 
   const salaryPeriods = require('../lib/payroll-half');
   async function halfAccess(req,res){const s=auth.readSession(req);if(!s){fail(res,401,'Не выполнен вход');return null;}if(s.role==='resident'||!(await seesAllPayroll(s))){fail(res,403,'Нет доступа к начислению зарплат');return null;}return s;}
-  async function halfData(q,uid,lock){const r=await q(`SELECT u.name,p.salary,CURRENT_DATE::text AS today FROM users u JOIN staff_profiles p ON p.user_id=u.id WHERE u.id=$1 AND u.is_active AND u.role IN ('staff','moderator','admin') ${lock?'FOR UPDATE OF p':''}`,[uid]);if(!r.rows[0])throw Object.assign(Error('Сотрудник не найден'),{status:404});let x;try{x=salaryPeriods.preview(r.rows[0].today,r.rows[0].salary,'previous-half');}catch(e){throw Object.assign(e,{status:400});}return {...x,userId:String(uid),name:r.rows[0].name};}
+  async function halfData(q,uid,lock){const r=await q(`SELECT u.name,p.salary,p.payroll_excluded,CURRENT_DATE::text AS today FROM users u JOIN staff_profiles p ON p.user_id=u.id WHERE u.id=$1 AND u.is_active AND u.role IN ('staff','moderator','admin') ${lock?'FOR UPDATE OF p':''}`,[uid]);if(!r.rows[0])throw Object.assign(Error('Сотрудник не найден'),{status:404});if(r.rows[0].payroll_excluded)throw Object.assign(Error('Для этого сотрудника начисление зарплаты отключено'),{status:403});let x;try{x=salaryPeriods.preview(r.rows[0].today,r.rows[0].salary,'previous-half');}catch(e){throw Object.assign(e,{status:400});}return {...x,userId:String(uid),name:r.rows[0].name};}
   route('GET','/api/payroll/half-preview',async(req,res)=>{if(!await halfAccess(req,res))return;const uid=Number(req.query.userId);if(!Number.isInteger(uid)||uid<=0)return fail(res,400,'Нужен сотрудник');try{const x=await halfData(query,uid,false);x.already=(await query('SELECT id FROM payroll WHERE user_id=$1 AND cycle_key=$2',[uid,x.key])).rowCount>0;json(res,200,x);}catch(e){if(e.status)return fail(res,e.status,e.message);throw e;}});
   route('POST','/api/payroll/half',async(req,res)=>{const s=await halfAccess(req,res);if(!s)return;const b=await readJson(req),uid=Number(b.userId);if(!Number.isInteger(uid)||uid<=0)return fail(res,400,'Нужен сотрудник');try{const x=await tx(async q=>{const x=salaryPeriods.corrected(await halfData(q,uid,true),b);const r=await q('INSERT INTO payroll(user_id,period,amount,bonus,paid_by,cycle_key) VALUES($1,$2,$3,0,$4,$5) ON CONFLICT(user_id,cycle_key) WHERE cycle_key IS NOT NULL DO NOTHING RETURNING id',[uid,x.period,x.amount,s.uid,x.key]);if(!r.rowCount)throw Object.assign(Error('Эта половина оклада уже начислена'),{status:409});await q("INSERT INTO audit_log(actor_id,action,target,payload) VALUES($1,'payroll.half',$2,$3)",[s.uid,'payroll:'+r.rows[0].id,JSON.stringify(x)]);const text='Начислена зарплата: '+x.period+' — '+x.amount.toLocaleString('ru-RU')+' руб. Когда деньги придут, нажмите «Получил» в разделе «Мои зарплаты».';await q("INSERT INTO notices(user_id,kind,text) VALUES($1,'ok',$2)",[uid,text]);return {...x,id:String(r.rows[0].id),text};});json(res,201,{id:x.id,period:x.period,amount:x.amount});query('SELECT tg_chat_id FROM users WHERE id=$1',[uid]).then(r=>{if(r.rows[0]?.tg_chat_id)return notify.sendTelegram(r.rows[0].tg_chat_id,x.text);}).catch(()=>{});}catch(e){if(e.status)return fail(res,e.status,e.message);throw e;}});
 
@@ -298,6 +298,8 @@ module.exports = function register(route) {
     if (!require('../lib/names')(b)) return fail(res,400,'Необходимо вводить данные по-русски');
     const uid = Number(b.userId), amount = Number(b.amount), bonus = Number(b.bonus) || 0;
     if (!Number.isInteger(uid) || !Number.isInteger(amount) || !Number.isInteger(bonus) || amount < 0 || bonus < 0 || amount + bonus <= 0) return fail(res, 400, 'Нужны сотрудник и сумма');
+    const eligible=await query('SELECT payroll_excluded FROM staff_profiles WHERE user_id=$1',[uid]);
+    if(eligible.rows[0]?.payroll_excluded)return fail(res,403,'Для этого сотрудника начисление зарплаты отключено');
     const period = String(b.period || '').trim().slice(0, 80); if (!period) return fail(res, 400, 'Укажи период');
     const r = await query(`INSERT INTO payroll (user_id, period, amount, bonus, paid_by) VALUES ($1, $2, $3, $4, $5) RETURNING id`, [uid, period, amount, bonus, s.uid]);
     await query(`INSERT INTO audit_log (actor_id, action, target, payload) VALUES ($1, 'payroll.add', $2, $3)`, [s.uid, 'user:' + uid, JSON.stringify({ period, amount, bonus })]);

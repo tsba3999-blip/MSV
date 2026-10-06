@@ -864,3 +864,5 @@ INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-22','{
 ALTER TABLE payroll ALTER COLUMN amount TYPE numeric(14,2);
 ALTER TABLE payroll ADD COLUMN IF NOT EXISTS cycle_key text;
 CREATE UNIQUE INDEX IF NOT EXISTS payroll_cycle_unique ON payroll(user_id,cycle_key) WHERE cycle_key IS NOT NULL;
+
+ALTER TABLE staff_profiles ADD COLUMN IF NOT EXISTS payroll_excluded boolean NOT NULL DEFAULT false;

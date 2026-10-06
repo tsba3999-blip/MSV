@@ -244,7 +244,7 @@ MSV.ready(function (ctx) {
   async function loadLog(){var r=await ctx.api('GET','/api/payroll');if(r.status!==200){document.getElementById('payrollStatus').textContent='Не удалось загрузить начисления';return;}document.getElementById('log').innerHTML=r.body.length?r.body.map(function(x){return '<tr><td>'+new Date(x.paidAt).toLocaleDateString('ru-RU')+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.period)+'</td><td class="num">'+money(x.amount)+'</td><td class="num">'+(x.bonus?money(x.bonus):'—')+'</td><td class="num">'+money(x.total)+'</td><td><span class="tag tag--mute">'+(x.receivedAt?'получил':'ждёт')+'</span></td></tr>';}).join(''):'<tr><td colspan="7" class="grid__empty">Начислений пока нет.</td></tr>';}
   if(ctx.live)loadLog().catch(function(){document.getElementById('payrollStatus').textContent='Не удалось загрузить начисления';});
   function load() {
-    window.MSV_STAFF_LOAD().then(function (list) { STAFF = list.slice(); render(); });
+    window.MSV_STAFF_LOAD().then(function (list) { STAFF = list.filter(function(person){return !person.payrollExcluded;}); render(); });
   }
   load();
 });
