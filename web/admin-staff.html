@@ -24,6 +24,7 @@
   .miss { color: var(--msv-red); font-weight: 600; }
   .who-link { color: inherit; text-decoration: none; } .who-link:hover .who-cell__name { text-decoration: underline; }
 .staff-table{table-layout:fixed;--staff-name-offset:72px}.staff-table th:nth-child(1){width:28%;padding-left:calc(var(--msv-s16) + var(--staff-name-offset))}.staff-table th:nth-child(2){width:16%}.staff-table th:nth-child(3){width:14%}.staff-table th:nth-child(4){width:14%}.staff-table th:nth-child(5){width:24%}.staff-table th:nth-child(6){width:4%}.staff-table th,.staff-table td{vertical-align:middle}.staff-table th:nth-child(4),.staff-table td:nth-child(4){text-align:left}.staff-table .who-cell__face img{width:36px!important;height:36px!important}.staff-actions{display:flex;flex-direction:row;align-items:center;gap:6px}.staff-actions .msv-btn{flex:1;min-width:0;padding:0 10px;font-weight:400;white-space:nowrap}.staff-actions [data-bonus]{background:rgba(203,182,255,.25);color:var(--msv-n500);box-shadow:none}.staff-actions [data-bonus]:hover{background:rgba(203,182,255,.4)}.staff-marker{display:inline-block;flex:0 0 12px;color:#000;background:none;font-size:13px;font-weight:400}.staff-table tr.more td{padding:10px var(--msv-s16);vertical-align:middle}.staff-table tr.more td:first-child{padding-left:calc(var(--msv-s16) + var(--staff-name-offset))}.staff-table .more dl{margin:0}.staff-table .more dt{font-size:12px;color:var(--msv-n500);margin-bottom:4px}.staff-table .more dd{margin:0;font-weight:400;overflow-wrap:anywhere}.staff-table .more-actions{text-align:right}.staff-sort{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}th[data-sort]{cursor:pointer}.staff-table th{white-space:normal}.staff-table .more[hidden]{display:none!important}@media(max-width:760px){.staff-table{display:table;min-width:980px}.staff-table thead{display:table-header-group}.staff-table tbody{display:table-row-group}.staff-table tr{display:table-row}.staff-table td,.staff-table th{white-space:normal}.staff-table-wrap{overflow:auto}}
+.payroll-dialog{border:0;border-radius:var(--msv-r20);padding:var(--msv-s24);width:min(520px,calc(100vw - 32px));max-height:90svh;color:var(--msv-graphite)}.payroll-dialog::backdrop{background:rgba(52,73,94,.45)}.payroll-dialog h2{margin:0 0 var(--msv-s16)}.payroll-dialog .msv-field{display:block;margin:var(--msv-s16) 0}.payroll-dialog__actions{display:flex;flex-wrap:wrap;gap:var(--msv-s12);margin-top:var(--msv-s24)}.payroll-dialog [hidden]{display:none}
 </style>
 <style>
   body { --role: var(--msv-graphite); --role-ink: var(--msv-graphite); }
@@ -125,7 +126,7 @@
 
       <div class="staff-table-wrap"><table class="grid staff-table">
         <thead><tr><th data-sort="name">Фамилия Имя / Должность</th><th data-sort="place" aria-sort="none"><button type="button" class="staff-sort" aria-pressed="false" title="Включить сортировку по месту работы от А до Я">Место работы<span data-place-sort-hint></span></button></th><th data-sort="started">Стаж</th><th class="num" data-sort="salary">Оклад</th><th>Действия</th><th></th></tr></thead>
-        <tbody id="rows"></tbody>
+        <tbody id="rows"></tbody><tfoot><tr><td colspan="3">ФОТ в этом месяце</td><td id="salaryTotal" style="text-align:left;white-space:nowrap"></td><td colspan="2"></td></tr></tfoot>
       </table></div>
 
       <h2 class="msv-sub" style="margin:var(--msv-s32) 0 var(--msv-s12)">Начисления</h2>
@@ -156,6 +157,7 @@ MSV.ready(function (ctx) {
   function initials(n) { var p = n.split(' '); return (p[0][0] + (p[1] ? p[1][0] : '')).toUpperCase(); }
 
   function render() {
+    document.getElementById('salaryTotal').innerHTML=money(STAFF.reduce(function(total,person){return total+(Number(person.salary)||0);},0));
     var list = STAFF.filter(function (s) { return !filter || s.place === filter; });
     list.sort(function(a,b){var order={uyut:0,forma:1,all:2},group=(order[a.place]??3)-(order[b.place]??3);if(placeSorted)return String(PLACE[a.place]||'').localeCompare(String(PLACE[b.place]||''),'ru')||a.name.localeCompare(b.name,'ru');var x=a[sortKey],y=b[sortKey];return group||sortDir*(sortKey==='salary'?(Number(x)||0)-(Number(y)||0):String(x||'').localeCompare(String(y||''),'ru',{numeric:true}));});
     document.getElementById('count').textContent = list.length + ' из ' + STAFF.length;
@@ -190,10 +192,10 @@ MSV.ready(function (ctx) {
       if(r.status!==200)throw Error(r.body&&r.body.error||'Не удалось рассчитать начисление');
       var x=r.body;
       if(x.already){document.getElementById('payrollStatus').textContent=s.name+': эта половина оклада уже начислена.';await loadLog();return;}
-      if(!confirm(x.name+'\n'+Number(x.amount).toLocaleString('ru-RU')+' ₽ — половина оклада\nЗа '+x.period+'\nСрок выплаты: '+x.payday+'\n\nПодтвердить начисление?'))return;
-      var result=await ctx.api('POST','/api/payroll/half',{userId:x.userId,key:x.key,amount:x.amount});
+      var values=await payrollConfirmation(x);if(!values)return;
+      var result=await ctx.api('POST','/api/payroll/half',Object.assign({userId:x.userId,key:x.key},values));
       if(result.status!==201)throw Error(result.body&&result.body.error||'Не удалось начислить');
-      document.getElementById('payrollStatus').textContent='Начислено: '+x.name+' — '+Number(x.amount).toLocaleString('ru-RU')+' ₽ за '+x.period+'.';
+      document.getElementById('payrollStatus').textContent='Начислено: '+x.name+' — '+Number(result.body.amount).toLocaleString('ru-RU')+' ₽ за '+result.body.period+'.';
       await loadLog();
     }).catch(function(error){document.getElementById('payrollStatus').textContent=error.message;}).finally(function(){p.disabled=false;});
 
@@ -227,6 +229,17 @@ MSV.ready(function (ctx) {
   });
 
   document.querySelector('.grid thead').addEventListener('click',function(e){var th=e.target.closest('[data-sort]');if(!th)return;if(th.dataset.sort==='place'){placeSorted=!placeSorted;}else{placeSorted=false;sortDir=sortKey===th.dataset.sort?-sortDir:1;sortKey=th.dataset.sort;}var placeTh=document.querySelector('th[data-sort=place]');placeTh.setAttribute('aria-sort',placeSorted?'ascending':'none');placeTh.querySelector('button').setAttribute('aria-pressed',String(placeSorted));placeTh.querySelector('button').title=placeSorted?'Выключить сортировку А–Я':'Включить сортировку по месту работы от А до Я';document.querySelector('[data-place-sort-hint]').textContent=placeSorted?' ↑':'';render();});
+  function payrollConfirmation(x){return new Promise(function(resolve){
+    var dialog=document.createElement('dialog');dialog.className='payroll-dialog';
+    dialog.innerHTML='<form><h2 class="msv-sub">Подтвердить начисление</h2><p data-name></p><label class="msv-field"><span class="msv-field__label">Сумма, ₽</span><input class="msv-input" name="amount" type="number" min="0.01" max="2147483647" step="0.01" required readonly></label><label class="msv-field"><span class="msv-field__label">За период</span><input class="msv-input" name="period" maxlength="80" required readonly></label><div class="payroll-dialog__actions"><button class="msv-btn msv-btn--secondary" type="button" data-edit>Исправить</button><button class="msv-btn msv-btn--primary" type="submit">Подтвердить</button><button class="msv-btn msv-btn--tertiary" type="button" data-cancel>Отмена</button></div></form>';
+    document.body.append(dialog);var form=dialog.querySelector('form'),changed=false;
+    dialog.querySelector('[data-name]').textContent=x.name;form.elements.amount.value=x.amount;form.elements.period.value=x.period;
+    function finish(value){dialog.close();dialog.remove();resolve(value);}
+    dialog.querySelector('[data-cancel]').onclick=function(){finish(null);};dialog.addEventListener('cancel',function(e){e.preventDefault();finish(null);});
+    dialog.querySelector('[data-edit]').onclick=function(){changed=true;this.hidden=true;form.elements.amount.readOnly=false;form.elements.period.readOnly=false;form.elements.amount.focus();form.elements.amount.select();};
+    form.onsubmit=function(e){e.preventDefault();if(!form.reportValidity())return;var period=form.elements.period.value.trim();if(!period){form.elements.period.focus();return;}finish(changed?{corrected:true,baseAmount:x.amount,amount:Number(form.elements.amount.value),period:period}:{amount:x.amount});};
+    dialog.showModal();
+  });}
   async function loadLog(){var r=await ctx.api('GET','/api/payroll');if(r.status!==200){document.getElementById('payrollStatus').textContent='Не удалось загрузить начисления';return;}document.getElementById('log').innerHTML=r.body.length?r.body.map(function(x){return '<tr><td>'+new Date(x.paidAt).toLocaleDateString('ru-RU')+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.period)+'</td><td class="num">'+money(x.amount)+'</td><td class="num">'+(x.bonus?money(x.bonus):'—')+'</td><td class="num">'+money(x.total)+'</td><td><span class="tag tag--mute">'+(x.receivedAt?'получил':'ждёт')+'</span></td></tr>';}).join(''):'<tr><td colspan="7" class="grid__empty">Начислений пока нет.</td></tr>';}
   if(ctx.live)loadLog().catch(function(){document.getElementById('payrollStatus').textContent='Не удалось загрузить начисления';});
   function load() {

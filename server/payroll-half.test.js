@@ -11,3 +11,5 @@ assert.equal(preview('2026-10-03',40000,'current-month').period,'1–15 октя
 assert.equal(preview('2026-10-17',40000,'current-month').period,'16–31 октября 2026');
 assert.throws(()=>preview('2026-10-03',null,'previous-half'));
 console.log('PASS half salaries, both period conventions, leap year, January rollover and late payments');
+
+const {corrected}=require('./lib/payroll-half');const x=preview('2026-10-03',40000,'previous-half');const changed=corrected(x,{key:x.key,corrected:true,baseAmount:20000,amount:18500.5,period:'Исправленный период'});assert.equal(changed.amount,18500.5);assert.equal(changed.correction.originalAmount,20000);assert.equal(changed.period,'Исправленный период');assert.throws(()=>corrected(x,{key:x.key,corrected:true,baseAmount:1,amount:100,period:'Период'}));assert.throws(()=>corrected(x,{key:x.key,corrected:true,baseAmount:20000,amount:-1,period:'Период'}));

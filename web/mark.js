@@ -96,7 +96,7 @@
     document.documentElement.setAttribute('data-role', role);
     if (role === 'admin') {
       var adminSide = document.querySelector('.side');
-      if (adminSide) adminSide.style.background = 'linear-gradient(160deg, var(--msv-graphite) 0%, var(--msv-n500) 100%)';
+      if (adminSide) adminSide.style.background = me.canEditSite ? 'linear-gradient(to bottom, var(--msv-graphite) 0%, #000 100%)' : 'linear-gradient(160deg, var(--msv-graphite) 0%, var(--msv-n500) 100%)';
     }
     if (role === 'resident' && page === 'menu.html') document.body.classList.add('resident-menu-gradient');
 
