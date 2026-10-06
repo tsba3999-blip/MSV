@@ -859,3 +859,8 @@ INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-19','{
 INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-20','{"name":"ЭДО Контур","group":"Не распределено","status":"Действует","amount":0,"frequency":1,"reminderValue":null,"reminderUnit":"weeks","payments":[]}',20) ON CONFLICT(seed_key) DO NOTHING;
 INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-21','{"name":"Персоналкин","group":"Не распределено","status":"Действует","amount":0,"frequency":1,"reminderValue":null,"reminderUnit":"weeks","payments":[]}',21) ON CONFLICT(seed_key) DO NOTHING;
 INSERT INTO vendor_contracts(seed_key,details,sort_order) VALUES('initial-22','{"name":"Бухгалтерия","group":"Общие","status":"Действует","amount":0,"frequency":1,"reminderValue":null,"reminderUnit":"weeks","payments":[]}',22) ON CONFLICT(seed_key) DO NOTHING;
+
+-- Подтверждаемое начисление половины оклада: точность до копеек и защита от повторов.
+ALTER TABLE payroll ALTER COLUMN amount TYPE numeric(14,2);
+ALTER TABLE payroll ADD COLUMN IF NOT EXISTS cycle_key text;
+CREATE UNIQUE INDEX IF NOT EXISTS payroll_cycle_unique ON payroll(user_id,cycle_key) WHERE cycle_key IS NOT NULL;

@@ -1,0 +1,13 @@
+'use strict';
+const assert=require('node:assert/strict'),{preview}=require('./lib/payroll-half');
+assert.deepEqual(preview('2026-10-03',40000,'previous-half'),{key:'2026-10:1',salary:40000,amount:20000,period:'16–30 сентября 2026',payday:'2–5 октября 2026'});
+assert.equal(preview('2026-10-16',80000,'previous-half').period,'1–15 октября 2026');
+assert.equal(preview('2027-01-05',25000,'previous-half').period,'16–31 декабря 2026');
+assert.equal(preview('2028-03-02',100000,'previous-half').period,'16–29 февраля 2028');
+assert.equal(preview('2026-10-06',40000,'previous-half').key,'2026-10:1');
+assert.equal(preview('2026-10-31',40000,'previous-half').key,'2026-10:2');
+assert.equal(preview('2026-10-16',35001,'previous-half').amount,17500.5);
+assert.equal(preview('2026-10-03',40000,'current-month').period,'1–15 октября 2026');
+assert.equal(preview('2026-10-17',40000,'current-month').period,'16–31 октября 2026');
+assert.throws(()=>preview('2026-10-03',null,'previous-half'));
+console.log('PASS half salaries, both period conventions, leap year, January rollover and late payments');

@@ -1,0 +1,11 @@
+'use strict';
+if(!String(process.env.DATABASE_URL).endsWith('/msv_payroll_check'))throw Error('Isolated database required');
+const assert=require('node:assert/strict'),{query}=require('./lib/db'),auth=require('./lib/auth'),{server}=require('./index');
+(async()=>{await new Promise(r=>server.listen(0,'127.0.0.1',r));const base='http://127.0.0.1:'+server.address().port;async function user(role){return (await query('INSERT INTO users(name,role,email) VALUES($1,$2,$3) RETURNING *',['Тест Зарплаты',role,role+'@payroll.invalid'])).rows[0];}const admin=await user('admin'),staff=await user('staff'),mod=await user('moderator');await query('INSERT INTO staff_profiles(user_id,salary) VALUES($1,35001),($2,NULL)',[staff.id,mod.id]);
+async function call(path,u,body){const r=await fetch(base+path,{method:body?'POST':'GET',headers:{Cookie:auth.sessionCookie(u).split(';')[0],'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});return {status:r.status,body:await r.json()};}
+const url='/api/payroll/half-preview?userId='+staff.id;assert.equal((await call(url,staff)).status,403);assert.equal((await call(url,mod)).status,403);assert.equal((await call('/api/payroll/half-preview?userId='+mod.id,admin)).status,400);
+let p=(await call(url,admin)).body;assert.equal(p.amount,17500.5);assert.equal(p.already,false);assert.equal((await call('/api/payroll/half',admin,{userId:staff.id,key:p.key,amount:1})).status,409);
+const results=await Promise.all([call('/api/payroll/half',admin,{userId:staff.id,key:p.key,amount:p.amount}),call('/api/payroll/half',admin,{userId:staff.id,key:p.key,amount:p.amount})]);assert.deepEqual(results.map(r=>r.status).sort(),[201,409]);assert.equal((await call(url,admin)).body.already,true);
+const rows=(await call('/api/payroll',admin)).body;assert.equal(rows.length,1);assert.equal(rows[0].amount,17500.5);assert.equal(rows[0].total,17500.5);assert.equal((await query('SELECT count(*)::int n FROM notices WHERE user_id=$1',[staff.id])).rows[0].n,1);
+console.log('PASS exact half salary, authorized access, no salary validation, stale amount rejection, concurrent duplicate protection, single notice and persistent history');
+})().then(()=>process.exit(0)).catch(e=>{console.error(e);process.exit(1)});

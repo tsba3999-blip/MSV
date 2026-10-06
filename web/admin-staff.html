@@ -129,6 +129,7 @@
       </table></div>
 
       <h2 class="msv-sub" style="margin:var(--msv-s32) 0 var(--msv-s12)">Начисления</h2>
+      <p id="payrollStatus" class="msv-note" role="status"></p>
       <table class="grid">
         <thead><tr><th>Дата</th><th>Сотрудник</th><th>За период</th><th class="num">Зарплата</th><th class="num">Премия</th><th class="num">Итого</th><th>Получил</th></tr></thead>
         <tbody id="log"><tr><td colspan="7" class="grid__empty">Начислений пока нет.</td></tr></tbody>
@@ -150,7 +151,7 @@ MSV.ready(function (ctx) {
   var log = [];
   var filter = '', sortKey='name', sortDir=1,placeSorted=false;
   function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-  function money(n) { return n == null ? '<span class="miss">уточнить</span>' : String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '\u2009') + '\u2009руб.'; }
+  function money(n) { return n == null ? '<span class="miss">уточнить</span>' : Number(n).toLocaleString('ru-RU',{maximumFractionDigits:2}) + '\u2009руб.'; }
   function fdate(iso) { return iso ? iso.split('-').reverse().join('.') : '<span class="miss">уточнить</span>'; }
   function initials(n) { var p = n.split(' '); return (p[0][0] + (p[1] ? p[1][0] : '')).toUpperCase(); }
 
@@ -183,21 +184,19 @@ MSV.ready(function (ctx) {
     var p = e.target.closest('[data-pay], [data-bonus]'); if (!p) return;
     var s = STAFF.filter(function (x) { return x.id === p.closest('tr').dataset.id; })[0];
     if(p.hasAttribute('data-bonus')){var amount=Number(prompt('Премия для '+s.name+'. Сумма, руб.:',''));if(!Number.isInteger(amount)||amount<=0)return;var reason=prompt('За что премия?','');if(reason===null)return;p.disabled=true;ctx.api('POST','/api/payroll',{userId:s.userId||s.id,period:'Премия: '+reason,amount:0,bonus:amount}).then(function(r){p.disabled=false;alert(r.status===201?'Премия начислена':r.body.error||'Не удалось начислить');}).catch(function(){p.disabled=false;alert('Сервер не отвечает');});return;}
-    var d = new Date(), half = d.getDate() <= 15 ? 'аванс' : 'зарплата';
-    var period = half + ' за ' + ['январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь'][d.getMonth()] + ' ' + d.getFullYear();
-    var sum = prompt(s.name + ' — ' + period + '.\nСумма, руб.:', s.salary ? (half === 'аванс' ? Math.round(s.salary * 0.4) : Math.round(s.salary * 0.6)) : '');
-    if (sum === null) return; sum = Number(String(sum).replace(/\D/g, '')); if (!sum) { alert('Нужна сумма'); return; }
-    var bonus = prompt('Премия, руб. (0, если нет):', '0'); if (bonus === null) return; bonus = Number(String(bonus).replace(/\D/g, '')) || 0;
-    function ok() {
-      log.unshift({ at: d, name: s.name, period: period, sum: sum, bonus: bonus });
-      document.getElementById('log').innerHTML = log.map(function (x) {
-        return '<tr><td>' + x.at.toLocaleDateString('ru-RU') + '</td><td>' + esc(x.name) + '</td><td>' + esc(x.period) + '</td><td class="num">' + money(x.sum) + '</td><td class="num">' + (x.bonus ? money(x.bonus) : '—') + '</td><td class="num"><b>' + money(x.sum + x.bonus) + '</b></td><td><span class="tag tag--mute">ждёт</span></td></tr>';
-      }).join('');
-      alert('Начисление сохранено для ' + s.name + '.');
-    }
-    if (!ctx.live) { ok(); return; }
-    ctx.api('POST', '/api/payroll', { userId: s.userId || s.id, period: period, amount: sum, bonus: bonus })
-      .then(function (r) { if (r.status === 201) ok(); else alert(r.body && r.body.error || 'Не удалось'); }).catch(function () { alert('Сервер не отвечает'); });
+    if(!ctx.live){alert('Без сервера начисление недоступно');return;}
+    p.disabled=true;
+    ctx.api('GET','/api/payroll/half-preview?userId='+encodeURIComponent(s.userId||s.id)).then(async function(r){
+      if(r.status!==200)throw Error(r.body&&r.body.error||'Не удалось рассчитать начисление');
+      var x=r.body;
+      if(x.already){document.getElementById('payrollStatus').textContent=s.name+': эта половина оклада уже начислена.';await loadLog();return;}
+      if(!confirm(x.name+'\n'+Number(x.amount).toLocaleString('ru-RU')+' ₽ — половина оклада\nЗа '+x.period+'\nСрок выплаты: '+x.payday+'\n\nПодтвердить начисление?'))return;
+      var result=await ctx.api('POST','/api/payroll/half',{userId:x.userId,key:x.key,amount:x.amount});
+      if(result.status!==201)throw Error(result.body&&result.body.error||'Не удалось начислить');
+      document.getElementById('payrollStatus').textContent='Начислено: '+x.name+' — '+Number(x.amount).toLocaleString('ru-RU')+' ₽ за '+x.period+'.';
+      await loadLog();
+    }).catch(function(error){document.getElementById('payrollStatus').textContent=error.message;}).finally(function(){p.disabled=false;});
+
   });
 
   document.querySelector('.bar').addEventListener('click', function (e) {
@@ -228,6 +227,8 @@ MSV.ready(function (ctx) {
   });
 
   document.querySelector('.grid thead').addEventListener('click',function(e){var th=e.target.closest('[data-sort]');if(!th)return;if(th.dataset.sort==='place'){placeSorted=!placeSorted;}else{placeSorted=false;sortDir=sortKey===th.dataset.sort?-sortDir:1;sortKey=th.dataset.sort;}var placeTh=document.querySelector('th[data-sort=place]');placeTh.setAttribute('aria-sort',placeSorted?'ascending':'none');placeTh.querySelector('button').setAttribute('aria-pressed',String(placeSorted));placeTh.querySelector('button').title=placeSorted?'Выключить сортировку А–Я':'Включить сортировку по месту работы от А до Я';document.querySelector('[data-place-sort-hint]').textContent=placeSorted?' ↑':'';render();});
+  async function loadLog(){var r=await ctx.api('GET','/api/payroll');if(r.status!==200){document.getElementById('payrollStatus').textContent='Не удалось загрузить начисления';return;}document.getElementById('log').innerHTML=r.body.length?r.body.map(function(x){return '<tr><td>'+new Date(x.paidAt).toLocaleDateString('ru-RU')+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.period)+'</td><td class="num">'+money(x.amount)+'</td><td class="num">'+(x.bonus?money(x.bonus):'—')+'</td><td class="num">'+money(x.total)+'</td><td><span class="tag tag--mute">'+(x.receivedAt?'получил':'ждёт')+'</span></td></tr>';}).join(''):'<tr><td colspan="7" class="grid__empty">Начислений пока нет.</td></tr>';}
+  if(ctx.live)loadLog().catch(function(){document.getElementById('payrollStatus').textContent='Не удалось загрузить начисления';});
   function load() {
     window.MSV_STAFF_LOAD().then(function (list) { STAFF = list.slice(); render(); });
   }
