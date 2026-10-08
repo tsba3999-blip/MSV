@@ -26,6 +26,11 @@
   .rm__photo-first { position: absolute; left: 0; bottom: 0; padding: 2px 6px; font: 500 10px var(--msv-font); color: #fff; background: rgba(16,22,31,.7); border-radius: 0 6px 0 0; }
   .rm__foot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--msv-s8); }
   .rm__foot-gap { flex: 1 1 auto; }
+  .rm__more { position: relative; }
+  .rm__more summary { list-style: none; cursor: pointer; }
+  .rm__more summary::-webkit-details-marker { display: none; }
+  .rm__more[open] summary svg { transform: rotate(180deg); }
+  .rm__more-menu { position: absolute; right: 0; bottom: calc(100% + var(--msv-s8)); z-index: 5; padding: var(--msv-s8); background: var(--msv-white); border: 1px solid var(--msv-n100); border-radius: var(--msv-r12); box-shadow: var(--msv-e1); white-space: nowrap; }
   .rm__photo-del { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; font-size: 16px; line-height: 1; color: #fff; background: rgba(16,22,31,.7); border: 0; border-radius: 50%; cursor: pointer; }
   .rm__photo-add { width: 96px; height: 72px; font-size: 24px; color: var(--msv-red); background: transparent; border: 2px dashed var(--msv-n300); border-radius: var(--msv-r11); cursor: pointer; }
   .rm__photo-add:hover { border-color: var(--msv-red); }
@@ -325,7 +330,7 @@ MSV.ready(function (ctx) {
         '<div class="rm__foot">' +
           '<button type="button" class="msv-btn msv-btn--s msv-btn--tertiary" data-act="addBed">+ место</button>' +
           '<span class="rm__foot-gap"></span>' +
-          '<button class="msv-btn msv-btn--s msv-btn--destructive" type="button" data-act="delRoom" title="Удалить комнату">Удалить комнату</button>' +
+          '<details class="rm__more"><summary class="msv-btn msv-btn--s msv-btn--tertiary">Ещё <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><div class="rm__more-menu"><button class="msv-btn msv-btn--s msv-btn--destructive" type="button" data-act="delRoom">Удалить комнату</button></div></details>' +
           '<button class="msv-btn msv-btn--s msv-btn--primary" type="button" data-act="save"' + (dirty(r.id) ? '' : ' disabled') + '>Сохранить</button>' +
         '</div>' +
       '</section>';

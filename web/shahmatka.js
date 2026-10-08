@@ -717,7 +717,7 @@
 
       /* Гасим выделение текста: браузер начинал выделять подпись внутри
          полосы и присылал pointercancel, обрывая перенос до начала. */
-      e.preventDefault();
+      if (e.pointerType === 'mouse') e.preventDefault();
 
       var track = bar.parentNode;
       var axis = self._axis();
@@ -754,6 +754,13 @@
     this._moveHandler = function (e) { self._dragMove(e); };
     this._upHandler = function (e) { self._dragEnd(e); };
 
+    // Не мешаем свайпу; после удержания оставляем жест переносу брони.
+    this._on(this.canvas, 'touchmove', function (e) {
+      if (self._drag && self._drag.hold && e.touches.length === 1 && e.cancelable) e.preventDefault();
+    }, { passive: false });
+    this._on(this.canvas, 'touchstart', function (e) {
+      if (e.touches.length > 1 && self._drag) self._dragEnd({ pointerId: self._drag.pointerId, type: 'pointercancel' });
+    }, { passive: true });
     this._on(document, 'pointermove', this._moveHandler);
     this._on(document, 'pointerup', this._upHandler);
     this._on(document, 'pointercancel', this._upHandler);
@@ -963,7 +970,7 @@
     if (!g.active) { this._drag = null; return; }
 
     var pending = null;
-    if (g.target && g.ok) {
+    if ((!e || e.type !== 'pointercancel') && g.target && g.ok) {
       var b = this._bookingById(g.id);
       if (b) pending = { booking: b, toBed: g.target.dataset.bed, from: g.newFrom, to: g.newTo };
     }
