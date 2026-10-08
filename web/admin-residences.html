@@ -29,7 +29,12 @@
   .rm__photo-del { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; font-size: 16px; line-height: 1; color: #fff; background: rgba(16,22,31,.7); border: 0; border-radius: 50%; cursor: pointer; }
   .rm__photo-add { width: 96px; height: 72px; font-size: 24px; color: var(--msv-red); background: transparent; border: 2px dashed var(--msv-n300); border-radius: var(--msv-r11); cursor: pointer; }
   .rm__photo-add:hover { border-color: var(--msv-red); }
-  .rm__beds { width: 100%; border-collapse: collapse; margin-bottom: var(--msv-s8); }
+  .rm__beds-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; margin-bottom: var(--msv-s8); }
+  .rm__beds { width: 100%; min-width: 460px; table-layout: fixed; border-collapse: collapse; }
+  .rm__beds th:nth-child(1) { width: 28%; }
+  .rm__beds th:nth-child(2) { width: 30%; }
+  .rm__beds th:nth-child(3) { width: 30%; }
+  .rm__beds th:nth-child(4) { width: 12%; }
   .rm__beds th { text-align: left; font: 500 12px var(--msv-font); color: var(--msv-n500); padding: 0 var(--msv-s8) var(--msv-s4); }
   .rm__beds td { padding: 2px var(--msv-s8); border-top: 1px solid var(--msv-n100); }
   .rm__beds .num { text-align: right; }
@@ -303,7 +308,7 @@ MSV.ready(function (ctx) {
           '<button type="button" class="rm__photo-add" data-act="addPhoto" aria-label="Добавить фото">+</button>' +
         '</div>' +
 
-        '<table class="rm__beds"><thead><tr><th>Место</th><th>Ярус</th><th class="num">Цена в месяц, руб.</th><th></th></tr></thead><tbody>' +
+        '<div class="rm__beds-scroll" role="region" aria-label="Места комнаты" tabindex="0"><table class="rm__beds"><thead><tr><th>Место</th><th>Ярус</th><th class="num">Цена в месяц, руб.</th><th></th></tr></thead><tbody>' +
           list.map(function (b) {
             return '<tr data-bed="' + esc(b.id) + '">' +
               '<td><input class="rm__cell" data-f="label" value="' + esc(b.label) + '" aria-label="Обозначение места"></td>' +
@@ -316,7 +321,7 @@ MSV.ready(function (ctx) {
               '<td class="num"><button type="button" class="rm__x" data-act="delBed" aria-label="Удалить место">&times;</button></td>' +
             '</tr>';
           }).join('') +
-        '</tbody></table>' +
+        '</tbody></table></div>' +
         '<div class="rm__foot">' +
           '<button type="button" class="msv-btn msv-btn--s msv-btn--tertiary" data-act="addBed">+ место</button>' +
           '<span class="rm__foot-gap"></span>' +

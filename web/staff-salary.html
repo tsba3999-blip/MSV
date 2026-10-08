@@ -215,7 +215,7 @@
 
         var parts = [];
         if (weeks) parts.push(weeks + ' ' + plural(weeks, 'неделя', 'недели', 'недель'));
-        if (months) parts.push(months + ' ' + plural(months, 'месяц', 'месяца', 'месяцев'));
+        if (months) parts.push(months + '\u00a0мес.');
         if (years) parts.push(years + ' ' + plural(years, 'год', 'года', 'лет'));
         var box = document.getElementById('tenure');
         if (box) box.textContent = parts.join(' · ');

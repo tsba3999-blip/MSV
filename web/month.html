@@ -117,7 +117,7 @@
     }).join('');
 
     go.disabled = !picked.length;
-    go.textContent = picked.length > 1 ? 'Оплатить ' + picked.length + ' ' + plural(picked.length, 'месяц', 'месяца', 'месяцев') : 'Проверить данные';
+    go.textContent = picked.length > 1 ? 'Оплатить ' + picked.length + '\u00a0мес.' : 'Проверить данные';
   }
 
   function plural(n, one, few, many) {
