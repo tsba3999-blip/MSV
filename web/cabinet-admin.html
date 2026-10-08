@@ -187,7 +187,7 @@ MSV.ready(function (ctx) {
 
   document.getElementById('byRes').innerHTML = '<table class="grid"><thead><tr><th>Резиденция</th><th>Загрузка в чел.</th><th>Загрузка в %</th><th>Пол</th></tr></thead><tbody>'+rows.map(function (x) {
     var pct = x.beds ? Math.round(100 * x.busy / x.beds) : 0;
-    return '<tr><td><a href="admin-shahmatka.html?res='+encodeURIComponent(x.res.id)+'">'+esc(x.res.title)+'</a></td><td>'+x.busy+' из '+x.beds+'</td><td>'+pct+'%</td><td>М — '+x.men+'<br>Ж — '+x.women+(x.busy>x.men+x.women?'<br><span class="msv-note">Не указан — '+(x.busy-x.men-x.women)+'</span>':'')+'</td></tr>';
+    return '<tr><td><a href="admin-shahmatka.html?res='+encodeURIComponent(x.res.id)+'">'+esc(({forma:'Форма',uyut:'Уют'})[x.res.id] || x.res.title)+'</a></td><td>'+x.busy+' из '+x.beds+'</td><td>'+pct+'%</td><td>М — '+x.men+'<br>Ж — '+x.women+(x.busy>x.men+x.women?'<br><span class="msv-note">Не указан — '+(x.busy-x.men-x.women)+'</span>':'')+'</td></tr>';
   }).join('')+'</tbody></table>';
 });
 </script>
