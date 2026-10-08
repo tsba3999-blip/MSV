@@ -8,6 +8,7 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#FB344A">
 <title>Москва в студентов верит!</title>
+<script src="home-theme.js"></script>
 <link rel="stylesheet" href="tokens.css">
 <style>
   /* Первая страница — красное полотно с паттерном.
@@ -18,7 +19,7 @@
      сгиба — чтобы его увидеть, страницу надо протянуть примерно на треть
      экрана (решение заказчика 24.09.2026). Вбок не скроллится: раньше на
      некоторых экранах вылезала полоса и бежевая кромка справа. */
-  html, body { min-height: 100%; overflow-x: hidden; background: var(--msv-red); }
+  html, body { min-height: 100%; overflow-x: hidden; background: var(--home-base, #193b56); }
   body { margin: 0; }
 
   .start {
@@ -28,7 +29,7 @@
     /* экран плюс треть: ровно столько, чтобы подвал начинался за сгибом */
     min-height: 100vh;
     min-height: 130svh;
-    background: var(--msv-red);
+    background: linear-gradient(135deg, var(--home-base, #193b56), var(--home-end, #392552));
   }
 
   /* Паттерн — полосой поверху, не заходя под знак и не мешая кнопкам.
@@ -199,6 +200,11 @@
     .start__brand, .start__entry { max-width: 420px; }
     .start__logo { max-width: none; }
   }
+  .home-info { display:flex; flex-wrap:wrap; justify-content:center; gap:6px 12px; margin-top:20px; color:#fff; font-size:14px; line-height:1.5; font-variant-numeric:tabular-nums; }
+  .home-info a { color:inherit; text-decoration:none; }
+  .home-info a:hover { text-decoration:underline; }
+  .home-info span,.home-info a { white-space:nowrap; }
+  .home-credit { opacity:1; font-size:11px; }
   .entry-session { margin-bottom: 16px; padding: 16px; border-radius: 20px; background: var(--msv-graphite); color: #fff; text-align: left; }
   .entry-session[hidden] { display: none; }
   .entry-session__title { display: flex; align-items: center; gap: 8px; font-weight: 700; }
@@ -212,13 +218,14 @@
 <body>
 
 <main class="start">
-  <div class="start__glow" id="glow" aria-hidden="true"><span></span><span></span><span></span></div>
+  
   <div class="start__inner">
 
     <div class="start__hero">
     <div class="start__brand">
       <a class="start__logo-link" href="login.html" aria-label="Вход для резидентов"><img class="start__logo" src="msv-1200-white.png" width="1200" height="209"
            alt="МСВ — Москва в студентов верит!"></a>
+      <div class="home-info" data-no-edit><span id="moscowClock"></span><span id="moscowDay"></span><a id="moscowWeather" href="https://www.met.no/en" target="_blank" rel="noopener" title="Температура по прогнозу MET Norway">Москва · погода загружается</a></div>
     </div>
 
     <div class="start__entry">
@@ -260,48 +267,12 @@
       <a class="start__partner" href="partner.html">Регистрация средства размещения</a>
     </div>
 
+    <p class="start__legal home-credit">Погода: <a href="https://www.met.no/en">MET Norway</a> · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Температура округлена.</p>
     <p class="start__legal">© 2026 МСВ. Все права защищены. <a href="legal.html">Правовая информация</a></p>
   </div>
 </main>
 
-<script>
-/* Живой градиент: у каждого пятна своя «цель» — точка, куда оно стремится.
-   Без курсора цель медленно кружит по экрану; с курсором — курсор со сдвигом.
-   Пятно идёт к цели как груз на пружине (ускорение + трение), поэтому после
-   остановки курсора ещё пару-тройку секунд покачивается и затихает. */
-(function () {
-  'use strict';
-  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  var box = document.getElementById('glow'); if (!box) return;
-  var dots = Array.prototype.slice.call(box.children);
-  var W = innerWidth, H = innerHeight;
-  addEventListener('resize', function () { W = innerWidth; H = innerHeight; });
-  var mouse = null, lastMove = 0;
-  function onMove(x, y) { mouse = [x, y]; lastMove = performance.now(); }
-  addEventListener('pointermove', function (e) { onMove(e.clientX, e.clientY); }, { passive: true });
-  addEventListener('touchmove', function (e) { var t = e.touches[0]; if (t) onMove(t.clientX, t.clientY); }, { passive: true });
-
-  var B = dots.map(function (el, i) {
-    return { el: el, x: W * (0.25 + 0.25 * i), y: H * (0.3 + 0.2 * i), vx: 0, vy: 0,
-             k: 0.012 + 0.004 * i, damp: 0.955 - 0.01 * i,          // жёсткость пружины и трение: разные — пятна не сливаются
-             ox: (i - 1) * 0.18, oy: (i - 1) * 0.12, ph: i * 2.1, sp: 0.00016 + 0.00005 * i };
-  });
-  function frame(now) {
-    var idle = !mouse || now - lastMove > 6000;   // через 6 с без курсора — снова свободное плавание
-    B.forEach(function (b) {
-      var tx, ty;
-      if (idle) { tx = W * (0.5 + 0.32 * Math.sin(now * b.sp + b.ph)); ty = H * (0.5 + 0.28 * Math.cos(now * b.sp * 1.3 + b.ph)); }
-      else { tx = mouse[0] + W * b.ox; ty = mouse[1] + H * b.oy; }
-      b.vx += (tx - b.x) * b.k; b.vy += (ty - b.y) * b.k;
-      b.vx *= b.damp; b.vy *= b.damp;
-      b.x += b.vx; b.y += b.vy;
-      b.el.style.transform = 'translate3d(' + b.x.toFixed(1) + 'px,' + b.y.toFixed(1) + 'px,0)';
-    });
-    requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
-})();
-</script>
+<script src="home-info.js"></script>
 
 <script src="entry-session.js"></script>
 <script src="mark.js"></script>

@@ -22,6 +22,7 @@ const limitAuth = createLimiter({ windowMs: 60000, max: 60 });
 const router = createRouter();
 require('./routes/auth')(router.route);
 require('./routes/data')(router.route);
+require('./routes/weather')(router.route);
 require('./routes/tickets')(router.route);
 require('./routes/content')(router.route);
 require('./routes/content-history')(router.route);
