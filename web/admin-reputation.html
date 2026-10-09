@@ -15,6 +15,11 @@
   .set__title { margin: 0 0 var(--msv-s12); }
   .set__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--msv-s12); }
   .set .msv-field { margin-bottom: 0; }
+  .reputation-log { max-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; border-radius:var(--msv-r12); box-shadow:var(--msv-e1); }
+  #log { display:table; min-width:720px; overflow:visible; border-radius:0; box-shadow:none; }
+  #log thead { display:table-header-group; }
+  #log tbody { display:table-row-group; }
+  #log tr { display:table-row; }
 </style>
 <style>
   body { --role: var(--msv-graphite); --role-ink: var(--msv-graphite); }
@@ -131,6 +136,7 @@
       </div>
 
       <h2 class="msv-sub" style="margin:0 0 var(--msv-s12)">Последние начисления</h2>
+      <div class="reputation-log" role="region" aria-label="Последние начисления" tabindex="0">
       <table class="grid" id="log">
         <thead><tr><th>Дата</th><th>Резидент</th><th>Событие</th><th class="num">Токены</th><th>Кто занёс</th></tr></thead>
         <tbody>
@@ -139,6 +145,7 @@
           <tr><td>14.07.26</td><td>Логинов Артём</td><td>Шум после 23:00</td><td class="num" style="color:var(--msv-red);font-weight:700">−0,5</td><td>Мария Гущина</td></tr>
         </tbody>
       </table>
+      </div>
     </main>
   </div>
 
