@@ -319,8 +319,7 @@
 /* Шапка комнаты. Верхняя граница толще обычной — по ней видно,
    где кончается одна комната и начинается другая. */
 .msv-sh__group {
-  position: sticky;
-  left: 0;
+  position: relative;
   z-index: 20;
   display: flex;
   align-items: center;
@@ -347,6 +346,8 @@
    вертикали кнопки «свернуть всё» в шапке: правый край — левый
    столбец минус 12 px, с учётом отступа строки 12 px. */
 .msv-sh__group-head {
+  position: sticky;
+  left: 12px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1241,3 +1242,6 @@ body.msv-sh-dragging .msv-sh__bar { cursor: grabbing; }
 .msv-sh .msv-sh__paid{background:var(--msv-lavender,#CBB6FF);border-color:var(--msv-violet,#6E3BFF);color:var(--msv-graphite,#34495E)}
 
 .msv-sh__panel-foot [data-act="edit"],.msv-sh__panel-foot [data-act="profile"]{flex:1;min-width:0;justify-content:center}
+
+/* На телефоне сетка имеет свою область прокрутки по обеим осям. */
+@media(max-width:860px){.msv-sh__scroll{flex:0 1 auto;max-height:70svh;min-height:260px;overflow:auto;touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch;overscroll-behavior:auto}}
