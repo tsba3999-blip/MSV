@@ -11,6 +11,8 @@
 <link rel="stylesheet" href="cabinet.css">
 <link rel="stylesheet" href="form.css">
 <style>
+  .staff-more{position:relative}.staff-more summary{list-style:none;cursor:pointer}.staff-more summary::-webkit-details-marker{display:none}.staff-more[open] summary svg{transform:rotate(180deg)}.staff-more__menu{position:absolute;right:0;top:calc(100% + 8px);z-index:5;padding:8px;background:var(--msv-white);border:1px solid var(--msv-n100);border-radius:var(--msv-r12);box-shadow:var(--msv-e1);white-space:nowrap}
+  @media(max-width:600px){.staff-more__menu{left:0;right:auto}}
   .set { margin-bottom: var(--msv-s24); padding: var(--msv-s20); background: var(--msv-white); border-radius: var(--msv-r20); box-shadow: var(--msv-e1); }
   .set__title { margin: 0 0 var(--msv-s8); } .set__text { margin: 0 0 var(--msv-s16); color: var(--msv-n500); }
   .set__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--msv-s12); }
@@ -23,7 +25,7 @@
   .tri[aria-expanded="true"] svg { transform: rotate(180deg); }
   .miss { color: var(--msv-red); font-weight: 600; }
   .who-link { color: inherit; text-decoration: none; } .who-link:hover .who-cell__name { text-decoration: underline; }
-.staff-table{table-layout:fixed;--staff-name-offset:72px}.staff-table th:nth-child(1){width:28%;padding-left:calc(var(--msv-s16) + var(--staff-name-offset))}.staff-table th:nth-child(2){width:16%}.staff-table th:nth-child(3){width:14%}.staff-table th:nth-child(4){width:14%}.staff-table th:nth-child(5){width:24%}.staff-table th:nth-child(6){width:4%}.staff-table th,.staff-table td{vertical-align:middle}.staff-table th:nth-child(4),.staff-table td:nth-child(4){text-align:left}.staff-table .who-cell__face img{width:36px!important;height:36px!important}.staff-actions{display:flex;flex-direction:row;align-items:center;gap:6px}.staff-actions .msv-btn{flex:1;min-width:0;padding:0 10px;font-weight:400;white-space:nowrap}.staff-actions [data-bonus]{background:rgba(203,182,255,.25);color:var(--msv-n500);box-shadow:none}.staff-actions [data-bonus]:hover{background:rgba(203,182,255,.4)}.staff-marker{display:inline-block;flex:0 0 12px;color:#000;background:none;font-size:13px;font-weight:400}.staff-table tr.more td{padding:10px var(--msv-s16);vertical-align:middle}.staff-table tr.more td:first-child{padding-left:calc(var(--msv-s16) + var(--staff-name-offset))}.staff-table .more dl{margin:0}.staff-table .more dt{font-size:12px;color:var(--msv-n500);margin-bottom:4px}.staff-table .more dd{margin:0;font-weight:400;overflow-wrap:anywhere}.staff-table .more-actions{text-align:right}.staff-sort{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}th[data-sort]{cursor:pointer}.staff-table th{white-space:normal}.staff-table .more[hidden]{display:none!important}@media(max-width:760px){.staff-table{display:table;min-width:980px}.staff-table thead{display:table-header-group}.staff-table tbody{display:table-row-group}.staff-table tr{display:table-row}.staff-table td,.staff-table th{white-space:normal}.staff-table-wrap{overflow:auto}}
+.staff-table{table-layout:fixed;--staff-name-offset:72px}.staff-table th:nth-child(1){width:28%;padding-left:calc(var(--msv-s16) + var(--staff-name-offset))}.staff-table th:nth-child(2){width:20%}.staff-table th:nth-child(3){width:18%}.staff-table th:nth-child(4){width:30%}.staff-table th:nth-child(5){width:4%}.staff-table th,.staff-table td{vertical-align:middle}.staff-table th:nth-child(3),.staff-table td:nth-child(3){text-align:left}.staff-table .who-cell__face img{width:36px!important;height:36px!important}.staff-actions{display:flex;flex-direction:row;align-items:center;gap:6px}.staff-actions .msv-btn{flex:1;min-width:0;padding:0 10px;font-weight:400;white-space:nowrap}.staff-actions [data-bonus]{background:rgba(203,182,255,.25);color:var(--msv-n500);box-shadow:none}.staff-actions [data-bonus]:hover{background:rgba(203,182,255,.4)}.staff-marker{display:inline-block;flex:0 0 12px;color:#000;background:none;font-size:13px;font-weight:400}.staff-table tr.more td{padding:10px var(--msv-s16);vertical-align:middle}.staff-table tr.more td:first-child{padding-left:calc(var(--msv-s16) + var(--staff-name-offset))}.staff-table .more dl{margin:0}.staff-table .more dt{font-size:12px;color:var(--msv-n500);margin-bottom:4px}.staff-table .more dd{margin:0;font-weight:400;overflow-wrap:anywhere}.staff-table .more-actions{text-align:right}.staff-sort{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}th[data-sort]{cursor:pointer}.staff-table th{white-space:normal}.staff-table .more[hidden]{display:none!important}@media(max-width:760px){.staff-table{display:table;min-width:980px}.staff-table thead{display:table-header-group}.staff-table tbody{display:table-row-group}.staff-table tr{display:table-row}.staff-table td,.staff-table th{white-space:normal}.staff-table-wrap{overflow:auto}}
 .payroll-dialog{border:0;border-radius:var(--msv-r20);padding:var(--msv-s24);width:min(520px,calc(100vw - 32px));max-height:90svh;color:var(--msv-graphite)}.payroll-dialog{background:#202124;color:#f1f3f4;color-scheme:dark}.payroll-dialog .msv-field__label{color:#e8eaed}.payroll-dialog .msv-input{background:#303134;color:#f1f3f4;border-color:#70757a}.payroll-dialog .msv-input:focus{border-color:var(--msv-red)}.payroll-dialog .msv-btn--secondary{background:#3c4043;color:#f1f3f4}.payroll-dialog .msv-btn--tertiary{color:#f1f3f4}
 .payroll-dialog::backdrop{background:rgba(52,73,94,.45)}.payroll-dialog h2{margin:0 0 var(--msv-s16)}.payroll-dialog .msv-field{display:block;margin:var(--msv-s16) 0}.payroll-dialog__actions{display:flex;flex-wrap:wrap;gap:var(--msv-s12);margin-top:var(--msv-s24)}.payroll-dialog [hidden]{display:none}
 </style>
@@ -122,12 +124,12 @@
         <button class="bar__chip" type="button" data-place="forma" aria-pressed="false">Шаб.</button>
         <button class="bar__chip" type="button" data-place="uyut" aria-pressed="false">Варш.</button>
         <button class="bar__chip" type="button" data-place="all" aria-pressed="false">Администрация</button><span class="msv-note bar__count" id="count"></span>
-        <button class="msv-btn msv-btn--m msv-btn--primary" type="button" id="addStaff">Добавить сотрудника</button>
+        <details class="staff-more"><summary class="msv-btn msv-btn--s msv-btn--tertiary">Ещё <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><div class="staff-more__menu"><button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" id="addStaff">Добавить сотрудника</button></div></details>
       </div>
 
       <div class="staff-table-wrap"><table class="grid staff-table">
-        <thead><tr><th data-sort="name">Фамилия Имя / Должность</th><th data-sort="place" aria-sort="none"><button type="button" class="staff-sort" aria-pressed="false" title="Включить сортировку по месту работы от А до Я">Место работы<span data-place-sort-hint></span></button></th><th data-sort="started">Стаж</th><th class="num" data-sort="salary">Оклад</th><th>Действия</th><th></th></tr></thead>
-        <tbody id="rows"></tbody><tfoot><tr><td colspan="3">ФОТ в этом месяце</td><td id="salaryTotal" style="text-align:left;white-space:nowrap"></td><td colspan="2"></td></tr></tfoot>
+        <thead><tr><th data-sort="name">Фамилия Имя / Должность</th><th data-sort="place" aria-sort="none"><button type="button" class="staff-sort" aria-pressed="false" title="Включить сортировку по месту работы от А до Я">Место работы<span data-place-sort-hint></span></button></th><th class="num" data-sort="salary">Оклад</th><th>Действия</th><th></th></tr></thead>
+        <tbody id="rows"></tbody><tfoot><tr><td colspan="2">ФОТ в этом месяце</td><td id="salaryTotal" style="text-align:left;white-space:nowrap"></td><td colspan="2"></td></tr></tfoot>
       </table></div>
 
       <h2 class="msv-sub" style="margin:var(--msv-s32) 0 var(--msv-s12)">Начисления</h2>
@@ -167,7 +169,7 @@ MSV.ready(function (ctx) {
         '<td><a class="who-link" href="admin-staff-view.html?id=' + esc(s.id) + '" title="Открыть кабинет сотрудника"><span class="who-cell"><span class="staff-marker">' + ({uyut:'У',forma:'Ш',all:'А'}[s.place]||'—') + '</span><span class="who-cell__face">' + (s.photo?'<img src="'+esc(s.photo)+'" alt="Фото сотрудника" data-zoom style="width:48px;height:48px;object-fit:cover;border-radius:50%">':esc(initials(s.name))) + '</span><span><span class="who-cell__name">' + esc(s.name) + '</span><span class="msv-note" style="display:block">'+esc(s.position)+'</span></span></span></a></td>' +
         '<td>' + (s.place ? esc(PLACE[s.place]) : '<span class="miss">уточнить</span>') + '</td>' +
 
-        '<td>' + esc(tenure(s.started)) + '</td>' +
+
         '<td class="num">' + money(s.salary) + '</td>' +
         '<td><div class="staff-actions"><button class="msv-btn msv-btn--s msv-btn--primary" type="button" data-pay>Начислить</button><button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-bonus>Премировать</button></div></td>' +
         '<td class="num"><button class="tri" type="button" data-more aria-expanded="false" aria-label="Подробнее"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></td>' +
@@ -175,9 +177,9 @@ MSV.ready(function (ctx) {
       '<tr class="more" data-more-of="'+esc(s.id)+'" hidden>'+
         '<td><dl><dt>Дата рождения</dt><dd>'+fdate(s.birthday)+'</dd></dl></td>'+
         '<td><dl><dt>Куда переводить</dt><dd>'+(s.payTo?esc(s.payTo):'<span class="miss">уточнить</span>')+'</dd></dl></td>'+
-        '<td><dl><dt>Работает с</dt><dd>'+fdate(s.started)+'</dd></dl></td>'+
         '<td><dl><dt>Тип отношений</dt><dd>'+esc(s.relation||'—')+'</dd></dl></td>'+
-        '<td colspan="2" class="more-actions">'+(ctx.me&&ctx.me.canEditSite&&s.role!=='admin'?'<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-cabinet="'+esc(s.id)+'">ЛК</button>':'')+'</td></tr>';
+        '<td><dl><dt>Работает с</dt><dd>'+fdate(s.started)+'</dd><dt style="margin-top:8px">Стаж</dt><dd>'+esc(tenure(s.started))+'</dd></dl></td>'+
+        '<td class="more-actions">'+(ctx.me&&ctx.me.canEditSite&&s.role!=='admin'?'<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-cabinet="'+esc(s.id)+'">ЛК</button>':'')+'</td></tr>';
     }).join('');
   }
 
@@ -211,6 +213,7 @@ MSV.ready(function (ctx) {
      кода войти ему нечем, а «добавили в список» без входа — это тот же
      второй список, только на день позже (25.09.2026). */
   document.getElementById('addStaff').addEventListener('click', function () {
+    this.closest('details').open=false;
     var name = prompt('Фамилия Имя Отчество:'); if (!name) return;
     var contact = prompt('Телефон или почта — по ним он будет входить:'); if (!contact) return;
     var position = prompt('Должность:', 'Горничная-администратор') || '';

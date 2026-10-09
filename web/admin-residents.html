@@ -11,6 +11,8 @@
 <link rel="stylesheet" href="cabinet.css">
 <link rel="stylesheet" href="form.css">
 <style>
+  .residents-scroll{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;border-radius:var(--msv-r12)}
+  @media(max-width:860px){.residents-scroll .grid{display:table;min-width:1200px;table-layout:auto!important;overflow:visible}.residents-scroll thead{display:table-header-group}.residents-scroll tbody{display:table-row-group}.residents-scroll .grid tr{display:table-row}.residents-scroll col{width:auto!important}}
   .invite { margin-bottom: var(--msv-s24); padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r12); box-shadow: var(--msv-e1); }
   .invite[hidden] { display: none; }
   .invite__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--msv-s12); }
@@ -157,6 +159,7 @@
         <span class="msv-note bar__count" id="count"></span>
       </div>
 
+      <div class="residents-scroll" role="region" aria-label="Резиденты" tabindex="0">
       <table class="grid" style="table-layout:fixed">
         <!-- Доли взяты по фактической ширине содержимого, а не на глаз:
              имя с вузом шире всех, телефон и место примерно равны,
@@ -177,6 +180,7 @@
         </thead>
         <tbody id="rows"></tbody>
       </table>
+      </div>
     </main>
   </div>
 
