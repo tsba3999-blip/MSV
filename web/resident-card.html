@@ -58,6 +58,8 @@
   .lst__end { flex: 0 0 auto; text-align: right; white-space: nowrap; }
   .lst__name { display: block; font-weight: 600; }
   .lst__note { display: block; color: var(--msv-n500); font-size: var(--msv-note-size); }
+  .stay-line { display: block; text-align: left; }
+  .stay-line--whole { white-space: nowrap; }
   .num { font-variant-numeric: tabular-nums; }
 
   .files { display: flex; flex-wrap: wrap; gap: var(--msv-s8); }
@@ -227,8 +229,10 @@ MSV.ready(function (ctx) {
     html += sect('Проживание', d.bookings.length
       ? rows(d.bookings, function (b) {
           return row(day(b.from) + ' — ' + day(b.to),
-            esc(b.room + ' · ' + b.label + (b.tier ? ' (' + b.tier + ')' : '')),
-            esc(b.residence + ' · ' + b.tariff + ' · ' + money(b.price) + ' в месяц') +
+            '<span class="stay-line">' + esc(b.room) + '</span><span class="stay-line">' + esc((b.tier ? String(b.label).replace(/\.[нв]$/i, '') : b.label) + (b.tier ? ' ' + b.tier : '')) + '</span>',
+            '<span class="stay-line">' + esc(String(b.residence || '').replace(/^(?:Резиденция|Квартира)\s+/i, '').replace(/^FORMA$/i, 'Форма')) + '</span>' +
+            '<span class="stay-line stay-line--whole">' + esc(b.tariff) + '</span>' +
+            '<span class="stay-line stay-line--whole">' + esc(money(b.price) + ' в мес.') + '</span>' +
               (b.releaseFrom ? ' · <b>в продаже с ' + esc(day(b.releaseFrom)) + '</b>' : ''),
             '<span class="num">' + esc(money(b.paid)) + ' из ' + esc(money(b.accrued)) + '</span>');
         })
