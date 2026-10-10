@@ -86,7 +86,14 @@
     transition: transform var(--msv-fast) var(--msv-ease);
   }
 
-  .bento > .tile:not(.tile--pay) { height:160px; min-height:160px; }
+  .bento > .tile:not(.tile--pay) { height:112px; min-height:112px; padding:12px; }
+
+  .bento > .tile:not(.tile--pay) .tile__cap { padding-top:2px; }
+  .tile--photo { position:relative; overflow:hidden; }
+  .tile--photo > img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; }
+  .tile--photo::after { content:''; position:absolute; inset:0; background:linear-gradient(transparent 35%,rgba(0,0,0,.72)); pointer-events:none; }
+  .tile--photo .tile__icon { visibility:hidden; }
+  .tile--photo .tile__cap { position:relative; z-index:1; color:var(--msv-white); }
 
   .tile:active { transform: scale(.98); }
   .tile:focus-visible { outline: 2px solid var(--msv-violet); outline-offset: 2px; }
@@ -338,6 +345,13 @@ a.tab[href="notifications.html"]{position:relative}.top__dot{width:auto;min-widt
     .then(function (d) {
       if (!d) return;
       var stub = document.querySelector('.stub'); if (stub) stub.remove();
+      var profileTile = document.querySelector('.tile[href="mydata.html"]');
+      if (profileTile && d.me.photo) {
+        var photo = document.createElement('img');
+        photo.alt = ''; photo.decoding = 'async';
+        photo.onload = function () { profileTile.prepend(photo); profileTile.classList.add('tile--photo'); };
+        photo.src = d.me.photo;
+      }
       var first = (d.me.name || '').split(' ')[1] || d.me.name;
       var nm = document.querySelector('.top__name'); if (nm) nm.textContent = 'Привет, ' + first;
       var pl = document.querySelector('.top__place');
