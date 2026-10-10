@@ -145,9 +145,13 @@
   /* Счётчик непрочитанного — как в строке меню */
   .tile__count { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; margin-left: var(--msv-s8); padding: 0 6px; font-size: 12px; line-height: 20px; color: var(--msv-white); background: var(--msv-red); border-radius: 10px; vertical-align: middle; }
 
-  .tile__icon { flex: 0 0 auto; width:48px; height:48px; }
-  .tile--gradient { background:linear-gradient(135deg,var(--msv-sky),var(--msv-lavender)); }
-  .tile__cap { margin-top: auto; padding-top: var(--msv-s12); font-size: 14px; line-height: 19px; font-weight: 600; }
+  .tile__icon { flex: 0 0 auto; width:48px; height:48px; stroke-width:1.25; }
+  .tile--gradient { background:linear-gradient(135deg,var(--gradient-from,var(--msv-sky)),var(--gradient-to,var(--msv-lavender))); }
+  .tile--gradient-aqua { --gradient-from:var(--msv-aqua); --gradient-to:var(--msv-sky); }
+  .tile--gradient-lime { --gradient-from:var(--msv-lime); --gradient-to:var(--msv-aqua); }
+  .tile--gradient-sun { --gradient-from:var(--msv-yellow); --gradient-to:var(--msv-lime); }
+  .tile--gradient-mist { --gradient-from:var(--msv-lavender); --gradient-to:var(--msv-aqua); }
+  .tile__cap { margin-top: auto; padding-top: var(--msv-s12); font-size: 14px; line-height: 19px; font-weight: 400; }
 
   /* Событие дня 2×1, графит */
   .tile--event {
@@ -315,9 +319,10 @@ a.tab[href="notifications.html"]{position:relative}.top__dot{width:auto;min-widt
   }
 
   var which = pick(tiles, 3);
+  var gradients = pick(['sky', 'aqua', 'lime', 'sun', 'mist'], 3);
   which.forEach(function (el, i) {
     el.classList.remove('tile--plain');
-    el.classList.add('tile--gradient');
+    el.classList.add('tile--gradient', 'tile--gradient-' + gradients[i]);
   });
 })();
 
