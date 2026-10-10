@@ -56,18 +56,19 @@
 
   var css = document.createElement('style');
   css.textContent =
-    '.msv-mark-btn{position:fixed;top:14px;right:14px;z-index:10040;display:flex;align-items:center;justify-content:center;' +
+    '.msv-mark-btn{position:fixed;top:6px;right:14px;z-index:10040;display:flex;align-items:center;justify-content:center;' +
       'width:44px;height:44px;border-radius:12px;background:#fff;box-shadow:0 3px 9px rgba(52,73,94,.18);text-decoration:none;' +
       'transition:transform .09s cubic-bezier(.2,0,0,1)}' +
-    '.msv-mark-btn--staff{background:#7EB2DD}.msv-mark-btn--admin{background:#34495E}' +
+    '.msv-mark-btn--staff{--mark-color:var(--msv-sky,#7EB2DD)}.msv-mark-btn--admin{--mark-color:#000}' +
     '.msv-mark-btn:hover{transform:translateY(-1px)}' +
     '.msv-mark-btn:active{transform:scale(.97)}' +
     '.msv-mark-btn:focus-visible{outline:2px solid #6E3BFF;outline-offset:2px}' +
     '.msv-mark-btn img{display:block;width:28px;height:28px;object-fit:contain}' +
-    '.msv-mark-btn--ph{background:#FB344A;color:#fff;font:700 18px/1 var(--msv-font,sans-serif);transform:skewX(-14deg)}' +
+    '.msv-mark-btn--ph{background:var(--mark-color,#FB344A);color:#fff;font:700 18px/1 var(--msv-font,sans-serif);transform:skewX(-14deg)}' +
     '.msv-mark-btn--ph:hover{transform:skewX(-14deg) translateY(-1px)}' +
     /* карандаш редактора сдвигаем левее, чтобы не наезжал */
-    '.edit-bar{right:70px!important}' +
+    '.edit-bar{right:70px!important;top:8px!important}' +
+    '@media(max-width:480px){.msv-mark-btn{top:8px;right:14px}.edit-bar{top:10px!important}}' +
     /* на страницах резидента шапка узкая — освобождаем место справа */
     '.page .head,.app .top{padding-right:56px}' +
     /* в кабинете сотрудника справа в шапке стоят знаки резиденций —
@@ -318,7 +319,7 @@
          понимал, почему не может править свои данные (25.09.2026). */
       var h = bar.offsetHeight;
       document.body.style.paddingTop = h + 'px';
-      a.style.top = (14 + h) + 'px';
+      // The menu mark keeps the same viewport position on every page.
     }
   });
 
