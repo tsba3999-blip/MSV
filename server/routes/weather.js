@@ -27,7 +27,9 @@ module.exports = function (route) {
       const point = points.reduce((best,p) => Math.abs(Date.parse(p.time)-now) < (best ? Math.abs(Date.parse(best.time)-now) : Infinity) ? p : best, null);
       const temperature = point?.data?.instant?.details?.air_temperature;
       if (typeof temperature !== 'number' || !Number.isFinite(temperature) || Math.abs(Date.parse(point.time)-now) > 90 * 60000 || !(now-Date.parse(cache.meta.updated_at) < 12 * 3600000)) throw Error('Weather stale');
-      json(res,200,{temperature,time:point.time,source:'MET Norway'});
+      const symbol = point.data.next_1_hours?.summary?.symbol_code || point.data.next_6_hours?.summary?.symbol_code || '';
+      const windSpeed = point.data.instant.details.wind_speed;
+      json(res,200,{temperature,symbol,windSpeed,time:point.time,source:'MET Norway'});
     } catch (_) { json(res,503,{error:'Погода временно недоступна'}); }
   });
 };

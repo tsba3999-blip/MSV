@@ -16,7 +16,21 @@
       var data = await r.json();
       if (!r.ok || typeof data.temperature !== 'number' || !Number.isFinite(data.temperature)) throw Error('weather');
       var t = Math.round(data.temperature);
-      weather.textContent = 'Москва ' + (t > 0 ? '+' : '') + t + ' °C';
+      var code = String(data.symbol || '').toLowerCase();
+      var condition = code.includes('thunder') ? ['⛈️','Гроза'] : code.includes('sleet') ? ['🌨️','Мокрый снег'] : code.includes('snow') ? ['❄️','Снег'] : code.includes('rain') ? ['🌧️','Дождь'] : data.windSpeed >= 10 ? ['🌬️','Ветрено'] : code.includes('fog') ? ['🌫️','Туман'] : code.includes('partlycloudy') || code.includes('fair') ? ['⛅','Переменная облачность'] : code.includes('cloudy') ? ['☁️','Облачно'] : code.includes('clearsky') ? (code.includes('night') ? ['🌙','Ясно, ночь'] : ['☀️','Ясно']) : null;
+      weather.replaceChildren();
+      if (condition) {
+        var icon = document.createElement('span'); icon.textContent = condition[0]; icon.setAttribute('role','img'); icon.setAttribute('aria-label',condition[1]); icon.title = condition[1];
+        weather.append(icon, ' ');
+      }
+      weather.append('Москва ');
+      var temperature = document.createElement('span'); temperature.className = 'weather-temperature';
+      temperature.append((t > 0 ? '+' : '') + t + ' °C');
+      var meter = document.createElement('span'); meter.className = 'weather-meter'; meter.setAttribute('aria-hidden','true');
+      var count = Math.min(3, Math.max(1, Math.ceil(Math.abs(t) / 10)));
+      meter.textContent = t === 0 ? '·' : (t < 0 ? '❄' : '☀').repeat(count);
+      meter.title = t === 0 ? 'Ноль градусов' : (t < 0 ? 'Чем холоднее, тем больше снежинок' : 'Чем теплее, тем больше солнышек');
+      temperature.append(meter); weather.append(temperature);
       weather.title = 'MET Norway · прогноз на ' + new Date(data.time).toLocaleTimeString('ru-RU',{timeZone:'Europe/Moscow',hour:'2-digit',minute:'2-digit'});
     } catch (_) { weather.textContent = 'Москва · погода недоступна'; }
   }
