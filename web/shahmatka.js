@@ -937,8 +937,13 @@
     var box = this.scroll.getBoundingClientRect();
     var edge = 48, step = 14;
 
-    if (e.clientY < box.top + edge) this.scroll.scrollTop -= step;
-    else if (e.clientY > box.bottom - edge) this.scroll.scrollTop += step;
+    if (window.matchMedia('(max-width:860px)').matches && this.scroll.scrollHeight <= this.scroll.clientHeight + 1) {
+      if (e.clientY < edge) window.scrollBy(0, -step);
+      else if (e.clientY > window.innerHeight - edge) window.scrollBy(0, step);
+    } else {
+      if (e.clientY < box.top + edge) this.scroll.scrollTop -= step;
+      else if (e.clientY > box.bottom - edge) this.scroll.scrollTop += step;
+    }
 
     if (e.clientX < box.left + edge) this.scroll.scrollLeft -= step;
     else if (e.clientX > box.right - edge) this.scroll.scrollLeft += step;

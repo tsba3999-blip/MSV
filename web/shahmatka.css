@@ -1244,8 +1244,14 @@ body.msv-sh-dragging .msv-sh__bar { cursor: grabbing; }
 .msv-sh__panel-foot [data-act="edit"],.msv-sh__panel-foot [data-act="profile"]{flex:1;min-width:0;justify-content:center}
 
 /* На телефоне сетка имеет свою область прокрутки по обеим осям. */
-@media(max-width:860px){.msv-sh__scroll{flex:0 1 auto;max-height:70svh;min-height:260px;overflow:auto;touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch;overscroll-behavior:auto}}
+@media(max-width:860px){.msv-sh__scroll{flex:0 0 auto;max-height:none;min-height:260px;overflow:auto;touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch;overscroll-behavior:auto}}
 
 /* Optical centering of the two resident panel actions. */
 .msv-sh__panel-foot [data-act="edit"],
 .msv-sh__panel-foot [data-act="profile"] { padding-top: 0; padding-bottom: 2px; }
+
+@media(max-width:860px){
+  .shell:has(.msv-sh){height:auto;min-height:100svh}
+  .shell:has(.msv-sh) .work__body{overflow:visible}
+  .msv-sh{height:auto}
+}
