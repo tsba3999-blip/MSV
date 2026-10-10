@@ -64,7 +64,16 @@
   .files a { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 var(--msv-s12); font-size: 13px; color: var(--msv-graphite); background: var(--msv-beige); border-radius: var(--msv-r11); text-decoration: none; }
   .files a:hover { background: var(--msv-n100); }
 
-  @media (max-width: 720px) { .lst__when { width: 100px; } }
+  @media (max-width: 720px) {
+    .lst__row { flex-direction: column; align-items: stretch; gap: var(--msv-s4); }
+    .lst__when { width: auto; }
+    .lst__body { flex: 0 1 auto; overflow-wrap: anywhere; }
+    .lst__end { text-align: left; white-space: normal; overflow-wrap: anywhere; }
+    .card-top { flex-direction: column; align-items: flex-start; }
+    .card-top__ava { align-self: flex-start; width: 96px; height: 96px; min-height: 0; }
+    img.card-top__ava { width: auto; height: auto; max-width: 100%; max-height: 320px; object-fit: contain; }
+    .card-top__t { width: 100%; }
+  }
 </style>
 </head>
 <body>
@@ -123,6 +132,16 @@ MSV.ready(function (ctx) {
       '<input class="msv-input" data-f="' + name + '" type="' + (type || 'text') + '" value="' + esc(value) + '"></label>';
   }
 
+  function placeSummary(b) {
+    var tier = String(b.tier || '').toLowerCase();
+    var shortTier = tier === 'нижнее' ? 'Нижн.' : tier === 'верхнее' ? 'Верхн.' : '';
+    var label = String(b.label || '');
+    if (shortTier) label = label.replace(/\.[нв]$/i, '');
+    var residence = String(b.residence || '').replace(/^(?:Резиденция|Квартира)\s+/i, '');
+    if (/^forma$/i.test(residence)) residence = 'Форма';
+    return (shortTier || (tier ? tier[0].toUpperCase() + tier.slice(1) : 'Место')) + ' ' + label + ' · ' + b.room + ' · ' + residence;
+  }
+
   function draw(d) {
     document.title = (d.me.name || 'Карточка резидента') + ' — МСВ';
 
@@ -144,7 +163,7 @@ MSV.ready(function (ctx) {
       '<span class="card-top__t">' +
         '<h2 class="msv-sub card-top__name">' + esc(d.me.name || 'Без имени') + '</h2>' +
         '<p class="msv-body card-top__sub">' + (live
-            ? esc((live.tier ? live.tier[0].toUpperCase() + live.tier.slice(1) : 'Место') + ' ' + live.label + ' · ' + live.room + ' · ' + live.residence)
+            ? esc(placeSummary(live))
             : 'Места сейчас нет') + '</p>' +
         '<p class="msv-body card-top__sub">' + esc(d.me.phone || 'телефон не указан') + (d.me.email ? ' · ' + esc(d.me.email) : '') + '</p>' +
         '<span class="card-top__tags">' +
@@ -156,7 +175,7 @@ MSV.ready(function (ctx) {
 
     /* ---------- числа ---------- */
     html += '<div class="facts">' +
-      '<div class="fact"><span>Баланс</span><b class="' + (balance > 0.5 ? 'bad' : 'ok') + '">' + esc(balance > 0.5 ? money(balance) : 'нет долга') + '</b></div>' +
+      '<div class="fact"><span>' + (balance > 0.5 ? 'Баланс отрицательный (долг)' : balance < -0.5 ? 'Баланс положительный (оплата вовремя)' : 'Баланс нулевой (долга нет)') + '</span><b class="' + (balance > 0.5 ? 'bad' : 'ok') + '">' + esc(balance > 0.5 ? '−' + money(balance) : balance < -0.5 ? '+' + money(-balance) : money(0)) + '</b></div>' +
       '<div class="fact"><span>Репутация</span><b>' + d.reputation.score + '</b></div>' +
       '<div class="fact"><span>Жизней</span><b>' + d.reputation.lives + ' из 3</b></div>' +
       '<div class="fact"><span>Заявок открыто</span><b>' + openTickets + '</b></div>' +
