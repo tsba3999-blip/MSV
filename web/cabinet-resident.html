@@ -160,6 +160,12 @@
   .tile--gradient-lime { --gradient-from:var(--msv-lime); --gradient-to:var(--msv-aqua); }
   .tile--gradient-sun { --gradient-from:var(--msv-yellow); --gradient-to:var(--msv-lime); }
   .tile--gradient-mist { --gradient-from:var(--msv-lavender); --gradient-to:var(--msv-aqua); }
+  .tile--gradient-rings {
+    color:var(--msv-white);
+    background:linear-gradient(rgba(30,12,90,.38),rgba(30,12,90,.38)),repeating-radial-gradient(circle at 32% 65%,transparent 0 18px,rgba(255,255,255,.2) 19px,transparent 36px),radial-gradient(ellipse at 32% 65%,#fa718f 0%,#c653e5 30%,#5721c9 65%,#25128d 100%);
+  }
+  .tile--gradient-candy { background:radial-gradient(ellipse at 100% 60%,rgba(79,162,223,.7),transparent 65%),linear-gradient(155deg,#f46ac0 0%,#e5b5e4 35%,#91e4ef 70%,#f9dbee 100%); }
+  .tile--gradient-lemon { background:radial-gradient(ellipse at 85% 20%,#fffd93,transparent 60%),linear-gradient(145deg,#f9ff48 0%,#beffb0 45%,#63f2e8 80%,#93efff 100%); }
   .tile__cap { margin-top: auto; padding-top: var(--msv-s12); font-size: 14px; line-height: 19px; font-weight: 400; }
 
   /* Событие дня 2×1, графит */
@@ -328,7 +334,7 @@ a.tab[href="notifications.html"]{position:relative}.top__dot{width:auto;min-widt
   }
 
   var which = pick(tiles, 3);
-  var gradients = pick(['sky', 'aqua', 'lime', 'sun', 'mist'], 3);
+  var gradients = pick(['sky', 'aqua', 'lime', 'sun', 'mist', 'rings', 'candy', 'lemon'], 3);
   which.forEach(function (el, i) {
     el.classList.remove('tile--plain');
     el.classList.add('tile--gradient', 'tile--gradient-' + gradients[i]);
