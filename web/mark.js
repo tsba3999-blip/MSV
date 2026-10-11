@@ -532,6 +532,10 @@
     if(bar&&!document.body.classList.contains('editing')){
       bar.style.setProperty('top',Math.max(8,center-22)+'px','important');
       bar.style.setProperty('right',floating?'70px':'14px','important');
+      var rights=document.querySelector('.rights-scroll');
+      if(rights&&!floating){
+        bar.style.setProperty('right',Math.max(0,document.documentElement.clientWidth-rights.getBoundingClientRect().right)+'px','important');
+      }
     }
   }
   function schedule(){if(!queued){queued=true;requestAnimationFrame(align)}}
