@@ -207,7 +207,7 @@ module.exports = function register(route) {
     }
     const health = Number.isInteger(b.healthScore) && b.healthScore >= 1 && b.healthScore <= 5 ? b.healthScore : null;
     const mess = Array.isArray(b.messengers) ? b.messengers.filter((m) => m === 'tg' || m === 'max') : [];
-    const gender = b.gender === 'м' || b.gender === 'ж' ? b.gender : null;
+    const gender = await require('../lib/profile-gender').resolve(query, s.uid, b);
 
     await tx(async (q) => {
       /* COALESCE, а не прямая запись: в форме анкеты нет города, контактного

@@ -506,3 +506,8 @@ a.side__who:focus-visible { outline: 2px solid var(--msv-white); outline-offset:
 .msv-table-scroll > table > :is(thead,tbody,tfoot) > tr { display:table-row; }
 .msv-table-scroll > table th,.msv-table-scroll > table td { display:table-cell; padding:10px 12px; line-height:1.2; height:auto; }
 .msv-table-scroll > table .msv-note { line-height:1.2; }
+
+.side__who--portrait::before { display:none; }
+.side__portrait { grid-row:1 / 3; width:38px; height:38px; object-fit:cover; border-radius:50%; cursor:zoom-in; }
+.shell--folded .side__portrait { width:36px; height:36px; }
+@media(max-width:860px) { .side__portrait { display:none; } }

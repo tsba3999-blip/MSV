@@ -235,7 +235,7 @@ module.exports = function register(route) {
     const bday = /^\d{4}-\d{2}-\d{2}$/.test(String(b.birthday || '')) ? b.birthday : null;
     const health = Number.isInteger(b.healthScore) && b.healthScore >= 1 && b.healthScore <= 5 ? b.healthScore : null;
     const mess = Array.isArray(b.messengers) ? b.messengers.filter((m) => m === 'tg' || m === 'max') : [];
-    const gender = b.gender === 'м' || b.gender === 'ж' ? b.gender : null;
+    const gender = await require('../lib/profile-gender').resolve(query, id, b);
 
     const exists = await query(`SELECT 1 FROM users WHERE id = $1`, [id]);
     if (!exists.rows[0]) return fail(res, 404, 'Резидент не найден');

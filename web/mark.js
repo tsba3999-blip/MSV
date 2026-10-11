@@ -283,6 +283,7 @@
     var face = document.querySelector('.who__face');
     if (face) {
       if (me.photo) {
+        face.dataset.zoomSource = me.photo; face.style.cursor = 'zoom-in';
         face.style.backgroundImage = 'url("' + me.photo + '")';
         face.style.backgroundSize = 'cover';
         face.style.backgroundPosition = 'center';
@@ -365,6 +366,7 @@
         if (me.photo) {
           who.style.setProperty('--face', 'url("' + me.photo + '")');
           who.setAttribute('data-photo', '1');
+          var portrait = document.createElement('img'); portrait.src = me.photo; portrait.alt = 'Фото ' + (me.name || 'сотрудника'); portrait.setAttribute('data-zoom',''); portrait.className = 'side__portrait'; who.prepend(portrait); who.classList.add('side__who--portrait');
         }
       });
     }
@@ -411,6 +413,16 @@
   var key='msv.pendingNavigation', pending;
   try { pending=JSON.parse(sessionStorage.getItem(key)||'null');sessionStorage.removeItem(key); } catch(e){}
   if(pending && pending.to===location.href && Date.now()-pending.at<30000){history.replaceState(Object.assign({},history.state,{msvFrom:pending.from}), '');}
+  else if (!(history.state && history.state.msvFrom) && document.referrer && history.length > 1) {
+    // Also cover same-site navigation performed by scripts, while keeping direct-entry fallbacks.
+    try {
+      var referrer = new URL(document.referrer);
+      var navigation = performance.getEntriesByType('navigation')[0];
+      if (referrer.origin === location.origin && referrer.href !== location.href && (!navigation || navigation.type === 'navigate')) {
+        history.replaceState(Object.assign({}, history.state, {msvFrom:referrer.href}), '');
+      }
+    } catch (e) {}
+  }
   document.addEventListener('click',function(e){
     var a=e.target.closest('a');if(!a||e.button!==0||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey||a.target==='_blank'||a.hasAttribute('download'))return;
     var isBack=a.matches('.head__back,.form__back')||a.textContent.trim()==='Вернуться';
@@ -448,3 +460,5 @@
 })();
 
 (function(){function wrapTables(){document.querySelectorAll('table.grid,table.rights').forEach(function(t){if(t.parentElement.classList.contains('msv-table-scroll'))return;if(t.parentElement.matches('.staff-table-wrap,.rights-scroll')){t.parentElement.classList.add('msv-table-scroll');return;}var wrap=document.createElement('div');wrap.className='msv-table-scroll';wrap.setAttribute('tabindex','0');wrap.setAttribute('role','region');wrap.setAttribute('aria-label','Таблица с прокруткой');t.parentNode.insertBefore(wrap,t);wrap.appendChild(t);});}wrapTables();new MutationObserver(wrapTables).observe(document.body,{childList:true,subtree:true});})();
+
+(function(){if(!document.querySelector('script[src="zoom.js"]')){var script=document.createElement('script');script.src='zoom.js';document.head.appendChild(script);}})();

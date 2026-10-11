@@ -17,6 +17,8 @@
 
 (function () {
   'use strict';
+  if (window.MSVPhotoViewer) return;
+  window.MSVPhotoViewer = true;
 
   var box = null;        // само окно просмотра
   var list = [];         // [{ src, alt }]
@@ -134,15 +136,17 @@
       }
     }
 
-    var img = e.target.closest('img[data-zoom], .zoomable img');
+    var face = e.target.closest('[data-zoom-source]');
+    if (face) { e.preventDefault(); e.stopImmediatePropagation(); open([{src:face.dataset.zoomSource,alt:face.getAttribute('aria-label') || 'Фотография'}],0); return; }
+    var img = e.target.closest('img[data-zoom], .zoomable img, img.card-top__ava, .who-cell__face img, img.who-cell__face, img.msv-sh__avatar');
     if (!img || !img.src) return;
-    e.preventDefault();
+    e.preventDefault(); e.stopImmediatePropagation();
 
     var wrap = img.closest('[data-gallery]');
     var items = (wrap && fromGallery(wrap)) || fromNeighbours(img);
     list = items;                                    // indexOf смотрит в list
     open(items, indexOf(img.getAttribute('data-zoom') || img.src));
-  });
+  }, true);
 
   document.addEventListener('keydown', function (e) {
     if (!box) return;

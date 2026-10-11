@@ -153,6 +153,7 @@
 
 <script src="universities.js"></script>
 <script src="suggest.js"></script>
+<script src="gender.js"></script>
 <script>
 /* ФИО — только по-русски (решение заказчика 22.09.2026): латиница не принимается,
    внутри рамки поля показывается подсказка. Дефис, апостроф и пробел разрешены. */
@@ -198,6 +199,15 @@ var MSV_NEXT = (function () {
     var chip = document.querySelector('.chip[data-gender="' + saved + '"]');
     if (chip && chip.getAttribute('aria-pressed') !== 'true') chip.click();
   }, 0);
+
+  var genderManual = false;
+  function autoGender() {
+    if (genderManual) return;
+    var guess = MSVGender.infer({firstName:document.getElementById('fFirst').value, lastName:document.getElementById('fLast').value});
+    document.querySelectorAll('[data-group="gender"]').forEach(function(c) { c.setAttribute('aria-pressed', String(c.dataset.gender === guess)); });
+  }
+  ['fFirst','fLast'].forEach(function(id) { document.getElementById(id).addEventListener('input', autoGender); });
+  document.addEventListener('click', function(e) { if(e.target.closest('[data-group="gender"]')) genderManual = true; }, true);
 
   /* ---------- Подсказки по вузам ---------- */
 
@@ -407,6 +417,8 @@ var MSV_NEXT = (function () {
       if (m === 'tg') { document.getElementById('tgField').hidden = false; }
     });
     if (v.tgNick) document.getElementById('tgNick').value = v.tgNick;
+    if (v.gender) genderManual = true;
+    if (!v.gender) autoGender();
     if (v.gender) document.querySelectorAll('.chip[data-group="gender"]').forEach(function (c) {
       c.setAttribute('aria-pressed', c.getAttribute('data-gender') === v.gender ? 'true' : 'false');
     });
