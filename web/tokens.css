@@ -490,7 +490,7 @@ button:has(> .msv-chevron),summary:has(> .msv-chevron) { display:inline-flex; al
 
 /* User presence: one compact badge for photos and initials. */
 .presence-avatar { position:relative; display:inline-flex; flex:0 0 auto; vertical-align:middle; }
-.presence-dot { position:absolute; right:-5px; top:-5px; width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; z-index:1; }
+.presence-dot { position:absolute; right:0; top:0; width:24px; height:24px; display:inline-flex; align-items:flex-start; justify-content:flex-end; cursor:pointer; z-index:1; }
 .presence-dot::before { content:''; width:12px; height:12px; border:2px solid var(--msv-white); border-radius:50%; background:var(--msv-n300); box-sizing:border-box; }
 .presence-dot--online::before { width:18px; height:18px; background:#9ACD32; }
 .presence-dot:focus-visible { outline:2px solid var(--msv-graphite); border-radius:50%; }
