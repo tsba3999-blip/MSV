@@ -335,6 +335,7 @@
   (function () {
     var shell = document.querySelector('.shell'), side = document.querySelector('.side');
     if (!shell || !side) return;
+    side.insertBefore(a, side.firstChild);
     var who = side.querySelector('.side__who');
 
     /* Имя в боковом меню было зашито в вёрстку — у всех стояла «Ирина
@@ -389,7 +390,6 @@
       shell.classList.remove('shell--folded');
       if (who && window.innerWidth > 860) {
         side.style.setProperty('--fold-who-width', who.offsetWidth + 'px');
-        side.style.setProperty('--fold-who-gap', (who.offsetTop - parseFloat(getComputedStyle(side).paddingTop)) + 'px');
       }
       shell.classList.toggle('shell--folded', folded);
       place();
