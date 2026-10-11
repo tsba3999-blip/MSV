@@ -100,13 +100,14 @@
   .onb__img { max-height:100%; }
   .onb__foot { flex:0 0 auto; padding-top:var(--msv-s16); width:100%; }
   @media (min-width:768px) {
-    .onb { max-width:800px; padding:var(--msv-s24) var(--msv-s48) var(--msv-s32); }
-    .screen--on { display:flex; flex-direction:column; align-items:center; }
+    .onb { max-width:800px; display:grid; grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(0,max-content) auto; align-content:center; padding:var(--msv-s24) var(--msv-s48); }
+    .screen { grid-area:1 / 1; display:flex; flex-direction:column; align-items:center; visibility:hidden; pointer-events:none; min-height:0; overflow-y:auto; max-height:calc(100dvh - 140px); }
+    .screen--on { visibility:visible; pointer-events:auto; }
     .onb__art { width:100%; height:clamp(180px,34dvh,320px); padding:var(--msv-s12) 0; }
     .onb__img, .onb__art svg { width:auto; height:100%; max-width:100%; max-height:100%; object-fit:contain; }
     .onb__title { flex:none; width:100%; text-align:center; font-size:40px; line-height:46px; }
     .onb__text { flex:none; width:100%; max-width:640px; text-align:center; font-size:17px; line-height:26px; }
-    .onb__foot { align-self:center; max-width:360px; }
+    .onb__foot { grid-area:2 / 1; justify-self:center; align-self:start; max-width:360px; }
     .dots { justify-content:center; }
   }
 </style>
@@ -170,7 +171,10 @@
     onb.dataset.step = String(n);
     document.body.dataset.step = String(n);
     screens.forEach(function (s) {
-      s.classList.toggle('screen--on', Number(s.dataset.screen) === n);
+      var active = Number(s.dataset.screen) === n;
+      s.classList.toggle('screen--on', active);
+      s.inert = !active;
+      s.setAttribute('aria-hidden', String(!active));
     });
     dots.forEach(function (d, i) { d.classList.toggle('dot--on', i === n - 1); });
     bar.setAttribute('aria-valuenow', String(n));
@@ -178,6 +182,8 @@
     if (theme) theme.setAttribute('content', '#F5F1EA');
     screens.forEach(function (s) { s.scrollTop = 0; });
   }
+
+  show(step);
 
   next.addEventListener('click', function () {
     if (step < LAST) { show(step + 1); return; }
