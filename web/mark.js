@@ -275,8 +275,10 @@
     if(staffNav && ['admin','moderator'].includes(role) && (!me.sectionAccess||me.sectionAccess.residents)){var departures=document.createElement('a');departures.className='side__link';departures.href='admin-departures.html';departures.textContent='Заявки на выезд';staffNav.append(departures);}
     if (staffNav) {
       [['support.html','<path d="M21 11a8 8 0 0 1-8 8H5l-3 3V11a9 9 0 0 1 19 0Z"/><path d="M9 8a3 3 0 0 1 6 0c0 2-3 2-3 4"/><path d="M12 15h.01"/>'],
-       ['admin-departures.html','<path d="M10 4H4v16h6M14 8l4 4-4 4M8 12h12"/>']].forEach(function (item) {
+       ['admin-departures.html','<path d="M10 4H4v16h6M14 8l4 4-4 4M8 12h12"/>'],
+       ['admin-rights.html','<path d="M3 21h18M4 17V4h4v13M10 17V4h4v13M17 5l3-1 3 12-3 1Z"/>']].forEach(function (item) {
         var link = staffNav.querySelector('a[href="' + item[0] + '"]');
+        if (link && item[0] === 'admin-rights.html') { var previous = link.querySelector('svg'); if (previous) previous.remove(); }
         if (link && !link.querySelector('svg')) link.insertAdjacentHTML('afterbegin','<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + item[1] + '</svg>');
       });
     }
