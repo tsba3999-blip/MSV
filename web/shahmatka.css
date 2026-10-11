@@ -131,7 +131,7 @@
   border-radius: 8px;
 }
 
-.msv-sh__search { width: 220px; }
+.msv-sh__search { width: 280px; flex-shrink: 0; }
 .msv-sh__date:focus-visible,
 .msv-sh__search:focus-visible { outline: 2px solid var(--sh-accent); outline-offset: 1px; }
 
