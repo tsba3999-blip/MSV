@@ -137,6 +137,10 @@
   .msg[hidden] { display: none; }
 
   .foot { margin-top: 0; padding-top: var(--msv-form-gap, 20px); }
+  .phone-hint { margin:0 0 var(--msv-s12); }
+  .phone-field { position:relative; margin-bottom:0; }
+  .phone-field__prefix { position:absolute; left:18px; top:0; height:var(--msv-field); display:flex; align-items:center; color:#000; pointer-events:none; font-family:var(--msv-font); font-size:var(--msv-body-size); }
+  .phone-field .msv-input { padding-left:48px; }
   .code-hint { margin: 0 0 var(--msv-s12); color: var(--msv-n500); }
 
 
@@ -177,11 +181,12 @@
       <span id="err1Text"></span>
     </div>
 
-    <p class="msv-note msv-field__hint">После четырёх неверных кодов вход с этого номера закрывается на полчаса.</p>
+    <p class="msv-note phone-hint" id="phoneHint">После четырёх неверных кодов вход с этого номера закрывается на полчаса.</p>
 
-    <label class="msv-field">
+    <label class="msv-field phone-field">
+      <span class="phone-field__prefix" aria-hidden="true">+7</span>
       <input class="msv-input" id="contact" type="tel" inputmode="tel"
-             autocomplete="username" aria-label="Телефон" placeholder="+7 999 000-00-00">
+             autocomplete="username" aria-label="Телефон, код страны +7" aria-describedby="phoneHint" placeholder="999 000-00-00">
     </label>
 
 
@@ -274,6 +279,10 @@
   var step1 = document.getElementById('step1');
   var step2 = document.getElementById('step2');
   var contact = document.getElementById('contact');
+  contact.addEventListener('input', function () {
+    var digits = contact.value.replace(/\D/g, '');
+    if (digits.length === 11 && /^[78]/.test(digits)) contact.value = digits.slice(1);
+  });
   var btnSend = document.getElementById('btnSend');
   var btnLogin = document.getElementById('btnLogin');
   var btnResend = document.getElementById('btnResend');

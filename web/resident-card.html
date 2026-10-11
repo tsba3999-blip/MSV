@@ -44,10 +44,7 @@
   .sect { margin-bottom: var(--msv-s16); padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r12); box-shadow: var(--msv-e1); }
   .sect__head { display: flex; align-items: center; justify-content: space-between; gap: var(--msv-s12); margin-bottom: var(--msv-s12); }
   .sect__title { margin: 0; }
-  .profile-settings { position:relative; flex:0 0 auto; }
-  .profile-settings > summary { list-style:none; width:var(--msv-btn-m); padding:0; }
-  .profile-settings > summary::-webkit-details-marker { display:none; }
-  .profile-settings__menu { position:absolute; top:calc(100% + var(--msv-s4)); right:0; z-index:10; padding:var(--msv-s8); background:var(--msv-white); border:1px solid var(--msv-n100); border-radius:var(--msv-r12); box-shadow:var(--msv-e1); white-space:nowrap; }
+  .profile-settings { flex:0 0 auto; width:var(--msv-btn-m); padding:0; }
 
   .sect__empty { margin: 0; color: var(--msv-n500); }
 
@@ -72,12 +69,13 @@
   .stay-line--whole { white-space:normal; }
   .num { font-variant-numeric: tabular-nums; }
   .card-table-scroll { max-width:100%; overflow-x:auto; touch-action:pan-x pan-y; }
-  .card-table { width:100%; border-collapse:separate; border-spacing:0; font-size:var(--msv-body-size); }
+  .card-table { width:100%; min-width:720px; table-layout:fixed; border-collapse:separate; border-spacing:0; font-size:var(--msv-body-size); }
   .card-table th, .card-table td { padding:12px 16px; text-align:left; vertical-align:top; border-bottom:1px solid var(--msv-n100); min-width:140px; line-height:1.4; }
   .card-table th { color:var(--msv-table-head-ink); font-size:var(--msv-note-size); font-weight:500; vertical-align:middle; line-height:20px; border-bottom:0; }
   .card-table thead th:first-child { border-radius:var(--msv-r11) 0 0 0; }
   .card-table thead th:last-child { border-radius:0 var(--msv-r11) 0 0; }
-  .card-table th:last-child, .card-table td:last-child { text-align:right; white-space:nowrap; }
+  .card-table th, .card-table td { width:25%; overflow-wrap:anywhere; }
+  .card-table th:last-child, .card-table td:last-child { text-align:right; white-space:normal; }
   .card-table tbody tr:last-child td { border-bottom:0; }
   .card-table .stay-line { display:block; margin:0; }
   .card-table .stay-line--whole { white-space:normal; }
@@ -338,7 +336,7 @@ MSV.ready(function (ctx) {
           '<span class="msv-note" id="saveMsg"></span>' +
         '</div>' +
       '</div>',
-      '<details class="profile-settings"><summary class="msv-btn msv-btn--m msv-btn--tertiary msv-icon-muted" aria-label="Настройки анкеты" title="Настройки анкеты"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.29 4.77Q12.00 4.70 12.91 3.79Q13.81 2.88 14.69 3.14Q15.56 3.41 15.81 4.67Q16.06 5.93 16.61 6.38Q17.16 6.84 18.45 6.84Q19.73 6.83 20.16 7.64Q20.59 8.44 19.88 9.51Q19.16 10.58 19.23 11.29Q19.30 12.00 20.21 12.91Q21.12 13.81 20.86 14.69Q20.59 15.56 19.33 15.81Q18.07 16.06 17.62 16.61Q17.16 17.16 17.16 18.45Q17.17 19.73 16.36 20.16Q15.56 20.59 14.49 19.88Q13.42 19.16 12.71 19.23Q12.00 19.30 11.09 20.21Q10.19 21.12 9.31 20.86Q8.44 20.59 8.19 19.33Q7.94 18.07 7.39 17.62Q6.84 17.16 5.55 17.16Q4.27 17.17 3.84 16.36Q3.41 15.56 4.12 14.49Q4.84 13.42 4.77 12.71Q4.70 12.00 3.79 11.09Q2.88 10.19 3.14 9.31Q3.41 8.44 4.67 8.19Q5.93 7.94 6.38 7.39Q6.84 6.84 6.84 5.55Q6.83 4.27 7.64 3.84Q8.44 3.41 9.51 4.12Q10.58 4.84 11.29 4.77Z"/><circle cx="12" cy="12" r="3.1"/></svg></summary><div class="profile-settings__menu"><button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" id="editBtn">Править анкету</button></div></details>');
+      '<button type="button" id="editBtn" class="profile-settings msv-btn msv-btn--m msv-btn--tertiary msv-icon-muted" aria-controls="edit" aria-expanded="false" aria-label="Править анкету" title="Править анкету"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.29 4.77Q12.00 4.70 12.91 3.79Q13.81 2.88 14.69 3.14Q15.56 3.41 15.81 4.67Q16.06 5.93 16.61 6.38Q17.16 6.84 18.45 6.84Q19.73 6.83 20.16 7.64Q20.59 8.44 19.88 9.51Q19.16 10.58 19.23 11.29Q19.30 12.00 20.21 12.91Q21.12 13.81 20.86 14.69Q20.59 15.56 19.33 15.81Q18.07 16.06 17.62 16.61Q17.16 17.16 17.16 18.45Q17.17 19.73 16.36 20.16Q15.56 20.59 14.49 19.88Q13.42 19.16 12.71 19.23Q12.00 19.30 11.09 20.21Q10.19 21.12 9.31 20.86Q8.44 20.59 8.19 19.33Q7.94 18.07 7.39 17.62Q6.84 17.16 5.55 17.16Q4.27 17.17 3.84 16.36Q3.41 15.56 4.12 14.49Q4.84 13.42 4.77 12.71Q4.70 12.00 3.79 11.09Q2.88 10.19 3.14 9.31Q3.41 8.44 4.67 8.19Q5.93 7.94 6.38 7.39Q6.84 6.84 6.84 5.55Q6.83 4.27 7.64 3.84Q8.44 3.41 9.51 4.12Q10.58 4.84 11.29 4.77Z"/><circle cx="12" cy="12" r="3.1"/></svg></button>');
 
     /* ---------- проживание ---------- */
     html += sect('Проживание', d.bookings.length
@@ -432,13 +430,17 @@ MSV.ready(function (ctx) {
     var edit = document.getElementById('edit');
     var btn = document.getElementById('editBtn');
     if (!edit || !btn) return;
+    function setEditing(open) {
+      edit.hidden = !open;
+      btn.setAttribute('aria-expanded', String(open));
+      btn.setAttribute('aria-label', open ? 'Свернуть правку' : 'Править анкету');
+      btn.title = open ? 'Свернуть правку' : 'Править анкету';
+    }
     btn.addEventListener('click', function () {
-      edit.hidden = !edit.hidden;
-      btn.closest('details').open = false;
-      btn.textContent = edit.hidden ? 'Править анкету' : 'Свернуть правку';
+      setEditing(edit.hidden);
     });
     document.getElementById('cancel').addEventListener('click', function () {
-      edit.hidden = true; btn.textContent = 'Править анкету';
+      setEditing(false);
     });
     document.getElementById('save').addEventListener('click', function () {
       var msg = document.getElementById('saveMsg');
