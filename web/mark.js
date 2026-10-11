@@ -50,7 +50,9 @@
   img.onerror = function () {
     // файла нет — временная плашка
     a.classList.add('msv-mark-btn--ph');
+    var sidebarLogo = a.querySelector('.side__short-logo');
     a.textContent = 'М';
+    if (sidebarLogo) a.appendChild(sidebarLogo);
   };
   a.appendChild(img);
 
@@ -336,6 +338,9 @@
     var shell = document.querySelector('.shell'), side = document.querySelector('.side');
     if (!shell || !side) return;
     side.insertBefore(a, side.firstChild);
+    var shortLogo = document.createElement('img');
+    shortLogo.src = 'msv-mark-white.png'; shortLogo.alt = ''; shortLogo.className = 'side__short-logo';
+    a.appendChild(shortLogo);
     var who = side.querySelector('.side__who');
 
     /* Имя в боковом меню было зашито в вёрстку — у всех стояла «Ирина
