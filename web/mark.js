@@ -438,6 +438,17 @@
 (function(){var script=document.createElement('script');script.src='vendor-notices.js';document.head.append(script);})();
 /* Keep the current section visible in the horizontal menu without scrolling the page. */
 (function () {
+  function orderSections() {
+    document.querySelectorAll('.side__nav').forEach(function (nav) {
+      var residences = nav.querySelector('a[href="admin-residences.html"]');
+      var chart = nav.querySelector('a[href="admin-shahmatka.html"]');
+      if (residences && chart && residences.nextElementSibling === chart) {
+        nav.insertBefore(chart, residences);
+      }
+    });
+  }
+  orderSections();
+  document.addEventListener('msv:menu-ready', orderSections);
   function revealCurrentSection() {
     document.querySelectorAll('.side__nav').forEach(function (nav) {
       if (getComputedStyle(nav).flexDirection !== 'row') return;
