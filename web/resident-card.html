@@ -170,7 +170,7 @@ MSV.ready(function (ctx) {
         '<p class="msv-body card-top__sub">' + esc(d.me.phone || 'телефон не указан') + (d.me.email ? ' · ' + esc(d.me.email) : '') + '</p>' +
         '<span class="card-top__tags">' +
           (balance > 0.5 ? '<span class="tag tag--bad">долг ' + esc(money(balance)) + '</span>' : '<span class="tag tag--ok">долгов нет</span>') +
-          (d.profile.docsSignedAt ? '<span class="tag tag--info">документы приняты</span>' : '<span class="tag tag--warn">документы не приняты</span>') +
+          (d.profile.docsSignedAt ? '<span class="tag tag--ok">документы приняты</span>' : '<span class="tag tag--warn">документы не приняты</span>') +
           (d.me.isActive ? '' : '<span class="tag tag--bad">вход закрыт</span>') +
         '</span>' +
       '</span></div>';
