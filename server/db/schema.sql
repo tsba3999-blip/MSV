@@ -866,3 +866,18 @@ ALTER TABLE payroll ADD COLUMN IF NOT EXISTS cycle_key text;
 CREATE UNIQUE INDEX IF NOT EXISTS payroll_cycle_unique ON payroll(user_id,cycle_key) WHERE cycle_key IS NOT NULL;
 
 ALTER TABLE staff_profiles ADD COLUMN IF NOT EXISTS payroll_excluded boolean NOT NULL DEFAULT false;
+
+-- Единственный администратор: подтверждённая существующая учётная запись владельца.
+WITH previous AS (SELECT id,name FROM users WHERE id=570 AND role='admin' AND name<>'Тишкин Сергей Анатольевич'),
+ logged AS (INSERT INTO audit_log(action,target,payload) SELECT 'admin.owner.restore','user:'||id,jsonb_build_object('beforeName',name,'afterName','Тишкин Сергей Анатольевич') FROM previous)
+UPDATE users SET name='Тишкин Сергей Анатольевич' WHERE id IN (SELECT id FROM previous);
+CREATE OR REPLACE FUNCTION msv_protect_admin_owner() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+ IF (NEW.role='admin' AND (NEW.id<>570 OR NEW.name<>'Тишкин Сергей Анатольевич'))
+ OR (NEW.id=570 AND (NEW.role<>'admin' OR NOT NEW.is_active OR NEW.name<>'Тишкин Сергей Анатольевич')) THEN
+  RAISE EXCEPTION 'Единственный администратор — Тишкин Сергей' USING ERRCODE='23514',CONSTRAINT='msv_single_admin_owner';
+ END IF;
+ RETURN NEW;
+END $$;
+DROP TRIGGER IF EXISTS msv_single_admin_owner ON users;
+CREATE TRIGGER msv_single_admin_owner BEFORE INSERT OR UPDATE ON users FOR EACH ROW EXECUTE FUNCTION msv_protect_admin_owner();

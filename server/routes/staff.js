@@ -120,6 +120,7 @@ module.exports = function register(route) {
        не может создать себе учётную запись. Заводить администратора может
        только администратор (24.09.2026). */
     const ROLES = ['staff', 'moderator', 'admin'];
+    if (b.role === 'admin') return fail(res,403,'Администратор один: Тишкин Сергей. Создание второго администратора запрещено');
     const role = ROLES.indexOf(b.role) >= 0 ? b.role : 'staff';
     const out = await tx(async (q) => {
       const col = contact.kind === 'email' ? 'email' : 'phone';
@@ -167,6 +168,7 @@ module.exports = function register(route) {
        сняв роль с себя, человек запер бы сам себя снаружи. Последнего
        администратора понизить нельзя по той же причине — иначе права
        менять станет некому (решение заказчика 25.09.2026). */
+    if (b.role === 'admin' && String(uid) !== require('../lib/admin-owner').id) return fail(res,403,'Права администратора закреплены за владельцем');
     if (b.role !== undefined) {
       const ROLES = ['staff', 'moderator', 'admin'];
       if (ROLES.indexOf(b.role) < 0) return fail(res, 400, 'Неизвестная роль');

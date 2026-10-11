@@ -129,7 +129,7 @@ const server = http.createServer(async (req, res) => {
     }
   } catch (err) {
     console.error(`[${req.method} ${req.url}]`, err);
-    if (!res.headersSent) fail(res, 500, 'Ошибка сервера');
+    if (!res.headersSent) fail(res, err.constraint === 'msv_single_admin_owner' ? 403 : 500, err.constraint === 'msv_single_admin_owner' ? 'Администратор один: Тишкин Сергей. Его имя и роль защищены от изменения.' : 'Ошибка сервера');
   } finally {
     if (process.env.LOG_REQUESTS === '1') {
       console.log(`${req.method} ${req.url} ${res.statusCode} ${Date.now() - started}мс`);

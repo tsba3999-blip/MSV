@@ -1,4 +1,5 @@
 'use strict';
+const adminOwner = require('./admin-owner');
 
 /* ============================================================
    Вход по пинкоду и сессии
@@ -121,7 +122,7 @@ async function verifyPin(rawContact, rawPin) {
   if(row.locked_until) { await query('UPDATE users SET pin_attempts=0,locked_until=NULL WHERE id=$1 AND locked_until<=now()',[user.id]); }
 
   // ВРЕМЕННО: демо-код открывает вход любому существующему пользователю.
-  if (config.demoMode && pin === config.demoPin) {
+  if (config.demoMode && user.role !== 'admin' && pin === config.demoPin) {
     await afterLogin(user.id, row.first_login);
     return { ok: true, user, firstLogin: !row.first_login };
   }
@@ -152,6 +153,7 @@ async function verifyPin(rawContact, rawPin) {
 async function demoLogin(rawRole) {
   if (!config.demoMode) return { ok: false, error: 'Открытый вход выключен' };
   const role = String(rawRole || '');
+  if (role === 'admin') return {ok:false,error:'Администратор входит только по своему телефону и личному коду'};
   if (!RANK.hasOwnProperty(role)) return { ok: false, error: 'Неизвестная роль' };
   const r = await query(
     `SELECT id, role, name FROM users WHERE role = $1 AND is_active ORDER BY id LIMIT 1`, [role]);
@@ -246,13 +248,15 @@ function verify(token) {
   try {
     const p = JSON.parse(Buffer.from(body, 'base64url').toString('utf8'));
     if (!p.uid || !p.role || !p.exp || p.exp < Date.now()) return null;
+    if (p.role === 'admin' && (String(p.uid) !== adminOwner.id || p.adminVersion !== adminOwner.sessionVersion)) return null;
     return p;
   } catch (e) { return null; }
 }
 
 function sessionCookie(user) {
   const exp = Date.now() + config.sessionDays * 86400000;
-  const token = sign({ uid: user.id, role: user.role, exp });
+  if (user.role === 'admin' && String(user.id) !== adminOwner.id) throw new Error('Недопустимый аккаунт администратора');
+  const token = sign({ uid: user.id, role: user.role, exp, ...(user.role === 'admin' ? {adminVersion:adminOwner.sessionVersion} : {}) });
   // HttpOnly — скрипту на странице cookie не видна; SameSite — не уходит на чужие сайты
   return `${COOKIE}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${config.sessionDays * 86400}`;
 }
