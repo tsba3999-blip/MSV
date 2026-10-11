@@ -204,7 +204,10 @@
     border-radius: var(--msv-r12);
     color: var(--msv-graphite);
   }
-a.tab[href="notifications.html"]{position:relative}.top__dot{width:auto;min-width:22px;height:22px;padding:0 5px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:12px;color:white;background:var(--msv-red)}.top__dot[hidden]{display:none}
+a.tab[href="notifications.html"] { position:relative; }
+  .top__dot { top:calc(50% - 22px); left:calc(50% + 8px); right:auto; width:auto; min-width:16px; height:16px; padding:0 3px; box-sizing:border-box; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:600; line-height:1; color:white; background:var(--msv-red); }
+  .tab .top__dot { border-color:var(--msv-graphite); }
+  .top__dot[hidden] { display:none; }
 </style>
 </head>
 <body>

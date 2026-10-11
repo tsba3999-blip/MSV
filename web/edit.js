@@ -123,7 +123,7 @@
       '.edit-bar{position:fixed;top:12px;right:12px;z-index:10050;display:flex;align-items:center;gap:8px;' +
         'font-family:var(--msv-font,sans-serif);font-size:13px}' +
       '.edit-bar__pen{width:44px;height:44px;display:flex;align-items:center;justify-content:center;padding:0;' +
-        'color:var(--msv-n300,#B8B1A5);background:transparent;border:0;border-radius:50%;cursor:pointer;' +
+        'color:var(--msv-n300,#B8B1A5);background:var(--msv-beige,#F5F1EA);border:0;border-radius:50%;cursor:pointer;' +
         'box-shadow:none}' +
       '.edit-bar__pen:hover{background:#F5F1EA}' +
       '.edit-bar__pen[aria-pressed="true"]{color:#fff;background:#FB344A;border-color:#FB344A}' +

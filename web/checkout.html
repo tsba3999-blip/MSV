@@ -56,8 +56,9 @@
   .sign-docs--miss { border: 1px solid var(--msv-red); background: var(--msv-n100); }
   /* Сумма и пояснение к ней — одной колонкой справа (решение заказчика 23.09.2026) */
   .total.total--note { display:grid; grid-template-columns:auto minmax(0,1fr); align-items:baseline; margin-bottom: var(--msv-s12); }
-  .total--note > .msv-body { white-space:nowrap; }
-  .total__right { text-align:right; white-space:nowrap; }
+  .total--note > .msv-body { white-space:nowrap; font-size:var(--msv-sub-size); grid-column:1; grid-row:2; }
+  .total__right { text-align:right; white-space:nowrap; grid-column:2; grid-row:2; }
+  .total--note > .deposit-note { grid-column:1 / -1; grid-row:1; margin:0 0 var(--msv-s4); }
   .total__note { display: block; margin-top: var(--msv-s4); grid-column:1 / -1; text-align:right; color: var(--msv-n500); }
   .payer__lock { margin: var(--msv-s8) 0 0; color: var(--msv-n500); }
   .form > .payer, .form > .autopay, .form > .sbp { margin: 0 0 var(--msv-form-gap, 20px); }
@@ -114,7 +115,7 @@
   <div class="sign-docs">
     <p class="msv-sub sign-docs__title">Обязательно прочитайте перед подписанием</p>
     <p class="msv-note sign-docs__lead">Подписывая данные Договор и Правила, вы подтверждаете, что вы прочитали, поняли и согласны со всеми условиями, включая те, что изложены в приложениях и дополнительных соглашениях. Неизучение текста договора до подписания не освобождает вас от исполнения принятых на себя обязательств и не служит основанием для оспаривания условий договора.</p>
-    <p class="msv-body" style="margin:0 0 var(--msv-s12)">Я принимаю:</p>
+    <p class="msv-sub" style="margin:0 0 var(--msv-s12)">Я принимаю:</p>
     <label class="check"><input class="check__box" type="checkbox" id="dContract" data-doc>
       <span class="check__text"><span class="check__name"><a class="msv-link" href="doc-contract.html" target="_blank" rel="noopener">Договор-оферту</a></span></span></label>
     <label class="check"><input class="check__box" type="checkbox" id="dRules" data-doc>
