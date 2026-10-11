@@ -1246,3 +1246,16 @@ body.msv-sh-dragging .msv-sh__bar { cursor: grabbing; }
   .shell:has(.msv-sh) .work__body{overflow:visible}
   .msv-sh{height:auto}
 }
+/* Compact phone toolbar: period navigation first, actions together below. */
+@media (max-width:760px) {
+  .msv-sh__toolbar { display:grid; grid-template-columns:28px 70px 28px minmax(0,1fr); gap:6px; }
+  .msv-sh__toolbar .msv-sh__title { grid-column:1 / -1; }
+  .msv-sh__toolbar [data-act="prev"],.msv-sh__toolbar [data-act="next"] { width:28px; padding:0; }
+  .msv-sh__toolbar [data-act="today"] { padding:0 6px; }
+  .msv-sh__toolbar .msv-sh__date { width:100%; min-width:0; padding:0 5px; font-size:12px; height:34px; }
+  .msv-sh__toolbar [data-act="scale"] { grid-column:1 / -1; justify-self:start; }
+  .msv-sh__toolbar [data-act="onlyfree"] { grid-column:1 / 4; padding:0 6px; }
+  .msv-sh__toolbar [data-act="hold"] { grid-column:4; justify-self:start; padding:0 6px; }
+  .msv-sh__toolbar .msv-sh__spacer,.msv-sh__toolbar .msv-sh__zoom { display:none; }
+  .msv-sh__toolbar .msv-sh__search { grid-column:1 / -1; min-width:0; }
+}
