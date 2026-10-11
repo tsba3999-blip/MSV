@@ -425,3 +425,25 @@
 
 (function(){var script=document.createElement('script');script.src='cabinet-preview.js';document.head.append(script);})();
 (function(){var script=document.createElement('script');script.src='vendor-notices.js';document.head.append(script);})();
+/* Keep the current section visible in the horizontal menu without scrolling the page. */
+(function () {
+  function revealCurrentSection() {
+    document.querySelectorAll('.side__nav').forEach(function (nav) {
+      if (getComputedStyle(nav).flexDirection !== 'row') return;
+      var page = location.pathname.split('/').pop();
+      var active = Array.from(nav.querySelectorAll('a')).find(function (link) {
+        return new URL(link.href, location.href).pathname.split('/').pop() === page && !link.hidden;
+      }) || nav.querySelector('[aria-current="page"]');
+      if (!active) return;
+      var box = nav.getBoundingClientRect(), item = active.getBoundingClientRect();
+      nav.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+    });
+  }
+  function schedule() { requestAnimationFrame(revealCurrentSection); }
+  document.addEventListener('msv:menu-ready', schedule);
+  window.addEventListener('load', schedule);
+  window.addEventListener('pageshow', schedule);
+  window.addEventListener('resize', schedule);
+  if (document.fonts) document.fonts.ready.then(schedule);
+  schedule();
+})();

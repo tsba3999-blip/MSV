@@ -315,6 +315,7 @@ MSV.ready(function (ctx) {
       location.href = 'admin-residents.html?q=' + encodeURIComponent(r.name);
     }
   });
+  if (params.get('free') === '1') { window.sh.onlyFree = true; window.sh.refresh(); }
 });
 </script>
 

@@ -16,3 +16,6 @@ h1{font-size:var(--msv-sub-size,28px)}.eyebrow{display:none}.scroll,.contract-gr
 /* Компактные строки; на телефоне прокручивается вся таблица, включая название. */
 #board .calendar.chess td:first-child{padding:4px 12px}.calendar.chess .contract-name{min-height:28px}.calendar.chess .period{min-height:32px;margin-top:0;padding:2px;line-height:14px}.calendar.chess .period small{margin-top:1px;line-height:11px}
 @media(max-width:750px){#board .scroll{width:100%;max-width:100%;overflow-x:auto;touch-action:pan-x pan-y}#board .calendar th:first-child,#board .calendar td:first-child{position:static}}
+
+.contracts-top{display:flex;align-items:center;justify-content:space-between;gap:16px}
+@media(max-width:750px){.filters #yearLabel{flex:1 1 100%;min-width:0}.filters #yearLabel input,.filters #yearLabel select{width:100%}}
