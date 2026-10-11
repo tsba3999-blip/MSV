@@ -164,7 +164,7 @@
      ============================================================ */
 
   var ROLE = { admin: ['Администратор', 'role-pill--admin'], moderator: ['Модератор', 'role-pill--moderator'], staff: ['Сотрудник', 'role-pill--staff'] };
-  var PERMS = ['Шахматка', 'Резиденты', 'Заявки', 'Начисления', 'Зарплаты', 'Права'];
+  var PERMS = ['Шахматка', 'Резиденты', 'Заявки', 'Начисления', 'Зарплаты'];
 
   function esc(v) { return String(v == null ? '' : v).replace(/</g, '&lt;'); }
   function ini(n) { var p = n.split(' '); return (p[0][0] + (p[1] ? p[1][0] : '')).toUpperCase(); }
@@ -211,7 +211,7 @@
       var marker={forma:'Ф',uyut:'У',all:'А'}[p.place]||'—';
       var on = lit(st);
 
-      var pills = PERMS.map(function (x) {
+      var pills = st.role === 'admin' ? '<span class="perm__item perm__item--on" title="Полный доступ ко всем разделам">Тотал</span>' : PERMS.map(function (x) {
         var cls = 'perm__item' + (on[x] ? ' perm__item--on' : '');
         if (!edit) return '<span class="' + cls + '">' + x + '</span>';
         var why = locked(st, x, self);
