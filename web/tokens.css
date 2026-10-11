@@ -470,3 +470,6 @@ body, h1, h2, h3, p, button, a, label { hyphens: none; }
   .edit-bar { right: 60px !important; top: 10px !important; }
   .edit-bar__meta { display: none; }
 }
+
+/* Names in cabinet headers and resident cards: 120% leading. */
+.side__name, .who__name, .top__name, .card-top__name { line-height: 1.2; }
