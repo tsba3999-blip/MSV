@@ -179,7 +179,7 @@ MSV.ready(function (ctx) {
         ? '<img class="card-top__ava" src="' + esc(d.profile.photo) + '" alt="" data-zoom>'
         : '<span class="card-top__ava">' + esc(initials(d.me.name)) + '</span>') +
       '<span class="card-top__t">' +
-        '<h2 class="msv-sub card-top__name">' + esc(d.me.name || 'Без имени') + '</h2>' +
+        '<h2 class="msv-sub card-top__name">' + esc([d.profile.lastName, d.profile.firstName, d.profile.middleName].filter(Boolean).join(' ') || d.me.name || 'Без имени') + '</h2>' +
         '<p class="msv-body card-top__sub">' + (live
             ? esc(placeSummary(live))
             : 'Места сейчас нет') + '</p>' +
@@ -205,17 +205,12 @@ MSV.ready(function (ctx) {
     var p = d.profile;
     html += sect('Анкета',
       '<dl class="pairs">' +
-        '<div><dt>Фамилия</dt><dd>' + esc(p.lastName || '—') + '</dd></div>' +
-        '<div><dt>Имя</dt><dd>' + esc(p.firstName || '—') + '</dd></div>' +
-        '<div><dt>Отчество</dt><dd>' + esc(p.middleName || '—') + '</dd></div>' +
         '<div><dt>Пол</dt><dd>' + esc(p.gender === 'ж' ? 'женский' : (p.gender === 'м' ? 'мужской' : '—')) + '</dd></div>' +
         '<div><dt>Дата рождения</dt><dd>' + (p.birthday ? esc(day(p.birthday)) : '—') + '</dd></div>' +
         '<div><dt>Город</dt><dd>' + esc(p.city || '—') + '</dd></div>' +
         '<div><dt>ВУЗ</dt><dd>' + esc(p.university || '—') + '</dd></div>' +
         '<div><dt>Курс</dt><dd>' + esc(p.course || '—') + '</dd></div>' +
         '<div><dt>Факультет</dt><dd>' + esc(p.faculty || '—') + '</dd></div>' +
-        '<div><dt>Телефон</dt><dd>' + esc(d.me.phone || '—') + '</dd></div>' +
-        '<div><dt>Почта</dt><dd>' + esc(d.me.email || '—') + '</dd></div>' +
         '<div><dt>Мессенджеры</dt><dd>' + esc((p.messengers || []).map(function (m) { return m === 'tg' ? 'Telegram' : 'Макс'; }).join(', ') || '—') + '</dd></div>' +
         '<div><dt>Контактное лицо</dt><dd>' + esc(p.contactPerson || '—') + '</dd></div>' +
         '<div><dt>Профиль VK</dt><dd>' + (p.vk ? '<a class="msv-link" href="' + esc(p.vk) + '" target="_blank" rel="noopener">' + esc(p.vk) + '</a>' : '—') + '</dd></div>' +
