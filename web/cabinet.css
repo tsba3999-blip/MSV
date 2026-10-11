@@ -514,9 +514,10 @@ a.side__who:focus-visible { outline: 2px solid var(--msv-white); outline-offset:
 
 /* Preserve the portrait position when collapsing the desktop sidebar. */
 @media (min-width:861px) {
+  .side__who { margin-bottom:48px; }
   .shell--folded .side { padding-left:var(--msv-s16); padding-right:var(--msv-s16); }
-  .shell--folded .side__who { display:grid; width:var(--fold-who-width); flex-shrink:0; justify-content:normal; padding:var(--msv-s8) var(--msv-s12); margin:var(--fold-who-gap,0px) 40px var(--msv-s24) 0; }
+  .shell--folded .side__who { display:grid; width:var(--fold-who-width); flex-shrink:0; justify-content:normal; padding:var(--msv-s8) var(--msv-s12); margin:var(--fold-who-gap,0px) 40px 48px 0; }
   .shell--folded .side__name, .shell--folded .side__role { display:block; visibility:hidden; }
   .shell--folded .side__portrait, .shell--folded .side__who::before { width:38px; height:38px; }
-  .shell--folded .side__fold { right:-28px; z-index:2; background:var(--role,var(--msv-graphite)); }
+  .side__fold { right:auto; z-index:2; }
 }

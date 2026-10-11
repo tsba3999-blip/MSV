@@ -374,8 +374,17 @@
     btn.type = 'button'; btn.className = 'side__fold'; btn.setAttribute('aria-label', 'Свернуть меню'); btn.title = 'Свернуть меню';
     btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 6l-6 6 6 6"/><path d="M18 6l-6 6 6 6"/></svg>';
     side.appendChild(btn);
-    // Стрелка стоит напротив имени сотрудника (в свёрнутом меню — сверху)
-    function place() { if (!who) return; btn.style.top = (who.offsetTop + who.offsetHeight / 2 - 14) + 'px'; }
+    // Оба действия занимают одно место под фотографией.
+    function place() {
+      if (!who || window.innerWidth <= 860) return;
+      var face = who.querySelector('.side__portrait');
+      var box = who.getBoundingClientRect(), base = side.getBoundingClientRect();
+      var left = box.left + parseFloat(getComputedStyle(who).paddingLeft);
+      var bottom = box.top + box.height / 2 + 19;
+      if (face) { var photo = face.getBoundingClientRect(); left = photo.left; bottom = photo.bottom; }
+      btn.style.left = (left - base.left + 5) + 'px';
+      btn.style.top = (bottom - base.top + 8) + 'px';
+    }
     function apply(folded) {
       shell.classList.remove('shell--folded');
       if (who && window.innerWidth > 860) {
