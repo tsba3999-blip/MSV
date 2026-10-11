@@ -187,10 +187,11 @@ MSV.ready(function (ctx) {
 
   var free = total.beds - total.busy;
   var load = total.beds ? Math.round(100 * total.busy / total.beds) : 0;
+  var freePercent = total.beds ? 100 - load : 0;
 
   document.getElementById('stats').innerHTML = [
     ['Занято мест · ' + load + '%', total.busy + ' из ' + total.beds, '', ''],
-    ['Свободно', String(free), freeMen + ' — м, ' + freeWomen + ' — ж' + (freeOther ? ', ' + freeOther + ' — без указания пола' : ''), ''],
+    ['Свободно · ' + freePercent + '%', String(free), freeMen + ' — м, ' + freeWomen + ' — ж' + (freeOther ? ', ' + freeOther + ' — без указания пола' : ''), ''],
     ['Долги', money(total.debt), total.debtPeople + ' чел. не внесли полную сумму', total.debt > 0 ? ' stat--debt' : ''],
     ['Выезжают за две недели', String(total.leaving), 'освободят места', ''],
     ['Несовершеннолетних', String(total.minors), 'нужно согласие родителей', '']

@@ -311,7 +311,7 @@ MSV.ready(function (ctx) {
       return '<section class="rm" data-room="' + esc(r.id) + '">' +
         '<div class="rm__head">' +
           '<input class="rm__name" data-f="name" value="' + esc(r.name) + '" aria-label="Название комнаты">' +
-          '<details class="rm__settings"><summary class="msv-btn msv-btn--s msv-btn--tertiary" aria-label="Настройки комнаты"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 3-1 3-3 1-2 3 2 2-2 2 2 3 3 1 1 3h6l1-3 3-1 2-3-2-2 2-2-2-3-3-1-1-3Z"/><circle cx="12" cy="12" r="3"/></svg></summary><div class="rm__settings-fields">' +
+          '<details class="rm__settings"><summary class="msv-btn msv-btn--s msv-btn--tertiary msv-icon-muted" aria-label="Настройки комнаты"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 3-1 3-3 1-2 3 2 2-2 2 2 3 3 1 1 3h6l1-3 3-1 2-3-2-2 2-2-2-3-3-1-1-3Z"/><circle cx="12" cy="12" r="3"/></svg></summary><div class="rm__settings-fields">' +
           '<select class="rm__sex" data-f="gender" aria-label="Пол">' +
             '<option value=""' + (!r.gender ? ' selected' : '') + '>пол не задан</option>' +
             '<option value="ж"' + (r.gender === 'ж' ? ' selected' : '') + '>женская</option>' +
@@ -342,7 +342,7 @@ MSV.ready(function (ctx) {
         '<div class="rm__foot">' +
 
           '<span class="rm__foot-gap"></span>' +
-          '<details class="rm__more"><summary class="msv-btn msv-btn--s msv-btn--tertiary" aria-label="Дополнительные настройки"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 3-1 3-3 1-2 3 2 2-2 2 2 3 3 1 1 3h6l1-3 3-1 2-3-2-2 2-2-2-3-3-1-1-3Z"/><circle cx="12" cy="12" r="3"/></svg></summary><div class="rm__more-menu"><button type="button" class="msv-btn msv-btn--s msv-btn--tertiary" data-act="addBed">+ место</button><button class="msv-btn msv-btn--s msv-btn--destructive" type="button" data-act="delRoom">Удалить комнату</button></div></details>' +
+          '<details class="rm__more"><summary class="msv-btn msv-btn--s msv-btn--tertiary msv-icon-muted" aria-label="Дополнительные настройки"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 3-1 3-3 1-2 3 2 2-2 2 2 3 3 1 1 3h6l1-3 3-1 2-3-2-2 2-2-2-3-3-1-1-3Z"/><circle cx="12" cy="12" r="3"/></svg></summary><div class="rm__more-menu"><button type="button" class="msv-btn msv-btn--s msv-btn--tertiary" data-act="addBed">+ место</button><button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" data-act="delRoom">Удалить комнату</button></div></details>' +
           '<button class="msv-btn msv-btn--s msv-btn--primary" type="button" data-act="save"' + (dirty(r.id) ? '' : ' disabled') + '>Сохранить</button>' +
         '</div>' +
       '</section>';

@@ -134,6 +134,7 @@ module.exports = function register(route) {
     const p = (r.rows[0] && r.rows[0].notify_prefs) || {};
     json(res, 200, {
       tg: p.tg !== false, max: p.max === true, email: p.email !== false,
+      assignedOnly: p.assignedOnly !== false, examReminder: p.examReminder !== false,
       scope: ['all', 'mine', 'none'].indexOf(p.scope) >= 0 ? p.scope : 'all'
     });
   });
@@ -142,12 +143,19 @@ module.exports = function register(route) {
     const s = auth.readSession(req);
     if (!s) return fail(res, 401, 'Не выполнен вход');
     const b = await readJson(req);
-    if (!require('../lib/names')(b)) return fail(res,400,'Необходимо вводить данные по-русски');
-    const prefs = {
-      tg: b.tg === true, max: b.max === true, email: b.email === true,
-      scope: ['all', 'mine', 'none'].indexOf(b.scope) >= 0 ? b.scope : 'all'
-    };
-    await query(`UPDATE users SET notify_prefs = $2 WHERE id = $1`, [s.uid, JSON.stringify(prefs)]);
+    if (!b || typeof b !== 'object' || Array.isArray(b)) return fail(res, 400, 'Некорректные настройки');
+    const prefs = {};
+    for (const key of ['tg', 'max', 'email', 'assignedOnly', 'examReminder']) {
+      if (Object.prototype.hasOwnProperty.call(b, key)) {
+        if (typeof b[key] !== 'boolean') return fail(res, 400, 'Некорректные настройки');
+        prefs[key] = b[key];
+      }
+    }
+    if (Object.prototype.hasOwnProperty.call(b, 'scope')) {
+      if (!['all', 'mine', 'none'].includes(b.scope)) return fail(res, 400, 'Некорректные настройки');
+      prefs.scope = b.scope;
+    }
+    await query(`UPDATE users SET notify_prefs = COALESCE(notify_prefs, '{}'::jsonb) || $2::jsonb WHERE id = $1`, [s.uid, JSON.stringify(prefs)]);
     json(res, 200, prefs);
   });
 

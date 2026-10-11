@@ -482,3 +482,8 @@ body, h1, h2, h3, p, button, a, label { hyphens: none; }
 /* Unified navigation and disclosure chevrons. */
 .msv-chevron { display:inline-block; flex-shrink:0; vertical-align:middle; stroke-width:2; }
 button:has(> .msv-chevron),summary:has(> .msv-chevron) { display:inline-flex; align-items:center; justify-content:center; }
+
+/* Негромкие служебные иконки: размер и цвет как у удаления фото. */
+.msv-btn.msv-icon-muted { display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; padding:0; border:0; border-radius:var(--msv-r11); background:transparent; color:var(--msv-n300); box-shadow:none; }
+.msv-btn.msv-icon-muted svg { width:20px; height:20px; }
+.msv-btn.msv-icon-muted:hover, .msv-btn.msv-icon-muted:focus-visible { color:var(--msv-n500); background:var(--msv-n100); }

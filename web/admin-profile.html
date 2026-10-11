@@ -23,6 +23,7 @@
 <style>
   body { --role: var(--msv-graphite); --role-ink: var(--msv-graphite); }
 </style>
+<link rel="stylesheet" href="settings-save.css">
 </head>
 <body>
 
@@ -142,21 +143,23 @@
           <label class="msv-field"><span class="msv-field__label">В команде с</span>
             <input class="msv-input" id="pStarted" readonly></label>
         </div>
-        <button class="msv-btn msv-btn--m msv-btn--primary" type="button" style="margin-top:var(--msv-s16)" id="saveProfile">Сохранить</button>
+        <button class="msv-btn msv-btn--m msv-btn--primary" type="button" style="margin-top:var(--msv-s16)" id="saveProfile" disabled>Сохранить</button>
         <span class="msv-note" id="saveMsg" hidden style="margin-left:var(--msv-s12)"></span>
       </section>
 
       <section class="set">
         <h2 class="msv-sub set__title">Уведомления мне</h2>
         <p class="msv-body set__text">Куда сообщать о новых заявках и просрочках.</p>
-        <label class="tog"><input type="checkbox" checked> <span>Telegram</span></label>
-        <label class="tog"><input type="checkbox"> <span>Почта</span></label>
-        <label class="tog"><input type="checkbox" checked> <span>Только заявки, назначенные на меня</span></label>
+        <label class="tog"><input data-pref="tg" type="checkbox" checked> <span>Telegram</span></label>
+        <label class="tog"><input data-pref="email" type="checkbox"> <span>Почта</span></label>
+        <label class="tog"><input data-pref="assignedOnly" type="checkbox" checked> <span>Только заявки, назначенные на меня</span></label>
         <p class="msv-note" style="margin:var(--msv-s16) 0 var(--msv-s4)">Что присылать</p>
         <label class="tog"><input type="radio" name="scope" value="all" checked> <span>Отправлять все уведомления</span></label>
         <label class="tog"><input type="radio" name="scope" value="mine"> <span>Только касающиеся меня</span></label>
         <label class="tog"><input type="radio" name="scope" value="none"> <span>Не отправлять совсем</span></label>
         <p class="msv-note" id="noneWarn" hidden style="margin-top:var(--msv-s8);padding:var(--msv-s12) var(--msv-s16);background:var(--msv-n100);border:1px solid var(--msv-red);border-radius:var(--msv-r12)">Отказываясь от уведомлений, я полностью беру на себя ответственность за неинформированность: о сроках оплаты, изменениях в правилах и событиях мне не сообщат.</p>
+        <button class="msv-btn msv-btn--m msv-btn--primary" type="button" data-save-prefs disabled style="margin-top:var(--msv-s16)">Сохранить</button>
+        <span class="msv-note" data-prefs-message role="status" hidden style="margin-left:var(--msv-s12)"></span>
       </section>
 
       <section class="set">
@@ -176,6 +179,19 @@
      «Сохранено», не отправляя никуда ни байта (24.09.2026). */
   var FIELDS = { name: 'pName', position: 'pPosition', phone: 'pPhone', email: 'pEmail' };
 
+  var button = document.getElementById('saveProfile');
+  var baseline = null, busy = false;
+  function values() {
+    var body = {};
+    Object.keys(FIELDS).forEach(function (k) { body[k] = document.getElementById(FIELDS[k]).value.trim(); });
+    return body;
+  }
+  function refresh() { button.disabled = busy || baseline === null || JSON.stringify(values()) === baseline; }
+  Object.keys(FIELDS).forEach(function (k) {
+    var input = document.getElementById(FIELDS[k]);
+    input.disabled = true;
+    input.addEventListener('input', function () { document.getElementById('saveMsg').hidden = true; refresh(); });
+  });
   function fmtDay(v) {
     var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(v || ''));
     return m ? m[3] + '.' + m[2] + '.' + m[1] : '';
@@ -185,7 +201,7 @@
     fetch('/api/me/staff', { credentials: 'same-origin' })
       .then(function (r) { return r.status === 200 ? r.json() : null; })
       .then(function (d) {
-        if (!d) return;
+        if (!d) throw new Error('load');
         Object.keys(FIELDS).forEach(function (k) {
           var el = document.getElementById(FIELDS[k]);
           if (el) el.value = d[k] || '';
@@ -196,11 +212,16 @@
         if (p) p.value = d.place || '';
         var s = document.getElementById('pStarted');
         if (s) s.value = fmtDay(d.started);
+        baseline = JSON.stringify(values());
+        Object.keys(FIELDS).forEach(function (k) { document.getElementById(FIELDS[k]).disabled = false; });
+        refresh();
       })
-      .catch(function () {});
+      .catch(function () { var m = document.getElementById('saveMsg'); m.textContent = 'Не удалось загрузить данные. Обновите страницу.'; m.hidden = false; });
   }
 
   document.getElementById('saveProfile').addEventListener('click', function () {
+    if (button.disabled) return;
+    busy = true; refresh();
     var m = document.getElementById('saveMsg');
     var body = {};
     Object.keys(FIELDS).forEach(function (k) {
@@ -217,27 +238,22 @@
       })
       .then(function (r) {
         if (r.s === 200) {
+          baseline = JSON.stringify(body);
           m.textContent = 'Сохранено';
+          document.getElementById('cardName').textContent = body.name;
           var n = document.querySelector('.side__name');
           if (n && body.name) n.textContent = body.name;
         } else {
           m.textContent = r.j.error || 'Не удалось сохранить';
         }
       })
-      .catch(function () { m.textContent = 'Сервер не отвечает'; });
+      .catch(function () { m.textContent = 'Сервер не отвечает'; })
+      .finally(function () { busy = false; refresh(); });
   });
 })();
 </script>
 
-<script>
-(function () {
-  'use strict';
-  var warn = document.getElementById('noneWarn');
-  document.querySelectorAll('input[name="scope"]').forEach(function (r) {
-    r.addEventListener('change', function () { warn.hidden = r.value !== 'none'; });
-  });
-})();
-</script>
+<script src="notify-prefs.js"></script>
 <script src="crop.js"></script><script src="face.js"></script>
 <script src="mark.js"></script>
 <script src="zoom.js"></script>

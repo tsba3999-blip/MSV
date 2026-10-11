@@ -1,0 +1,7 @@
+[data-save-prefs]:disabled,
+#saveProfile:disabled {
+  background: var(--msv-n100);
+  color: var(--msv-n500);
+  border-color: var(--msv-n100);
+  opacity: 1;
+}
