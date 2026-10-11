@@ -881,3 +881,15 @@ BEGIN
 END $$;
 DROP TRIGGER IF EXISTS msv_single_admin_owner ON users;
 CREATE TRIGGER msv_single_admin_owner BEFORE INSERT OR UPDATE ON users FOR EACH ROW EXECUTE FUNCTION msv_protect_admin_owner();
+
+-- Imported countries were stored in city. Keep citizenship separately.
+ALTER TABLE resident_profiles ADD COLUMN IF NOT EXISTS citizenship text;
+WITH moved AS (
+ UPDATE resident_profiles SET citizenship=trim(city), city=NULL
+ WHERE trim(city) IN ('Российская Федерация','Беларусь','Узбекистан','Украина','Турция','Эстония','Казахстан','Южно-Африканская Республика','Кыргызская Республика')
+ AND (NULLIF(trim(citizenship),'') IS NULL OR trim(citizenship)=trim(city))
+ RETURNING user_id,citizenship
+)
+INSERT INTO audit_log (action,target,payload)
+SELECT 'resident.citizenship.migrate','user:' || user_id,
+ jsonb_build_object('oldCity',citizenship,'citizenship',citizenship,'city',NULL) FROM moved;

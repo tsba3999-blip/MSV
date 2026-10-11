@@ -55,7 +55,7 @@ module.exports = function register(route) {
 
     const u = await query(`
       SELECT u.id, u.name, u.role, u.phone, u.email, u.is_active, u.created_at, u.first_login, u.invited_at,
-             p.last_name, p.first_name, p.middle_name, p.birthday, p.city, p.university, p.course,
+             p.last_name, p.first_name, p.middle_name, p.birthday, p.city, p.citizenship, p.university, p.course,
              p.faculty, p.about, p.health_score, p.contact_person, p.vk, p.messengers,
              COALESCE(u.photo_url, p.photo_url, (SELECT f.url FROM resident_files f WHERE f.user_id=u.id AND f.kind='photo' ORDER BY f.uploaded_at DESC LIMIT 1)) AS photo_url,
              p.gender, p.docs_signed_at, p.updated_at
@@ -115,7 +115,7 @@ module.exports = function register(route) {
       },
       profile: {
         lastName: row.last_name || '', firstName: row.first_name || '', middleName: row.middle_name || '',
-        birthday: iso(row.birthday), city: row.city || '', university: row.university || '',
+        birthday: iso(row.birthday), city: row.city || '', citizenship: row.citizenship || '', university: row.university || '',
         course: row.course || '', faculty: row.faculty || '', about: row.about || '',
         healthScore: row.health_score, contactPerson: row.contact_person || '', vk: row.vk || '',
         photo: row.photo_url || '', messengers: row.messengers || [], gender: row.gender || '',
@@ -256,6 +256,7 @@ module.exports = function register(route) {
          str(b.university, 200), str(b.course, 20), str(b.faculty, 200), str(b.about, 600), health,
          str(b.contactPerson, 200), str(b.vk, 200), mess, gender]);
 
+      if (b.citizenship !== undefined) await q('UPDATE resident_profiles SET citizenship=$1 WHERE user_id=$2', [str(b.citizenship, 100), id]);
       const full = [b.lastName, b.firstName, b.middleName].filter(Boolean).join(' ').trim();
       if (full) await q(`UPDATE users SET name = $1 WHERE id = $2`, [full.slice(0, 200), id]);
       if (b.phone !== undefined) await q(`UPDATE users SET phone = $1 WHERE id = $2`, [str(b.phone, 30), id]);

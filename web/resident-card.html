@@ -306,6 +306,7 @@ MSV.ready(function (ctx) {
     html += sect('Анкета',
       '<dl class="pairs">' +
         '<div><dt>Дата рождения</dt><dd>' + (p.birthday ? esc(day(p.birthday)) : '—') + '</dd></div>' +
+        '<div><dt>Гражданство</dt><dd>' + esc(p.citizenship || '—') + '</dd></div>' +
         '<div><dt>Город</dt><dd>' + esc(p.city || '—') + '</dd></div>' +
         '<div><dt>ВУЗ</dt><dd>' + esc(p.university || '—') + '</dd></div>' +
         '<div><dt>Курс</dt><dd>' + esc(p.course || '—') + '</dd></div>' +
@@ -322,7 +323,7 @@ MSV.ready(function (ctx) {
           field('Фамилия', 'lastName', p.lastName) + field('Имя', 'firstName', p.firstName) +
           field('Отчество', 'middleName', p.middleName) +
           '<label class="msv-field"><span class="msv-label">Пол</span><select class="msv-input" data-f="gender"><option value="">Не указан</option><option value="м"' + (MSVGender.resolve(p) === 'м' ? ' selected' : '') + '>Мужской</option><option value="ж"' + (MSVGender.resolve(p) === 'ж' ? ' selected' : '') + '>Женский</option></select></label>' + field('Дата рождения', 'birthday', p.birthday || '', 'date') +
-          field('Город', 'city', p.city) + field('ВУЗ', 'university', p.university) +
+          field('Гражданство', 'citizenship', p.citizenship) + field('Город', 'city', p.city) + field('ВУЗ', 'university', p.university) +
           field('Курс', 'course', p.course) + field('Факультет', 'faculty', p.faculty) +
           field('Телефон', 'phone', d.me.phone, 'tel') + field('Почта', 'email', d.me.email, 'email') +
           field('Контактное лицо', 'contactPerson', p.contactPerson) + field('Профиль VK', 'vk', p.vk) +

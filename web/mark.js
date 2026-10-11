@@ -375,8 +375,13 @@
     btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 6l-6 6 6 6"/><path d="M18 6l-6 6 6 6"/></svg>';
     side.appendChild(btn);
     // Стрелка стоит напротив имени сотрудника (в свёрнутом меню — сверху)
-    function place() { if (!who || shell.classList.contains('shell--folded')) { btn.style.top = ''; return; } btn.style.top = (who.offsetTop + who.offsetHeight / 2 - 14) + 'px'; }
+    function place() { if (!who) return; btn.style.top = (who.offsetTop + who.offsetHeight / 2 - 14) + 'px'; }
     function apply(folded) {
+      shell.classList.remove('shell--folded');
+      if (who && window.innerWidth > 860) {
+        side.style.setProperty('--fold-who-width', who.offsetWidth + 'px');
+        side.style.setProperty('--fold-who-gap', (who.offsetTop - parseFloat(getComputedStyle(side).paddingTop)) + 'px');
+      }
       shell.classList.toggle('shell--folded', folded);
       place();
       btn.setAttribute('aria-label', folded ? 'Развернуть меню' : 'Свернуть меню'); btn.title = btn.getAttribute('aria-label');
@@ -384,7 +389,8 @@
     }
     var saved = false; try { saved = localStorage.getItem('msv.sideFolded') === '1'; } catch (e) {}
     apply(saved);
-    window.addEventListener('resize', place);
+    window.addEventListener('resize', function () { apply(shell.classList.contains('shell--folded')); });
+    meReq.then(function () { apply(shell.classList.contains('shell--folded')); });
     btn.addEventListener('click', function () {
       var f = !shell.classList.contains('shell--folded'); apply(f);
       try { localStorage.setItem('msv.sideFolded', f ? '1' : '0'); } catch (e) {}

@@ -127,7 +127,7 @@ module.exports = function register(route) {
 
     const [users, regs, pays] = await Promise.all([
       query(`
-        SELECT u.id, u.name, u.phone, p.gender, p.birthday, p.city, p.university, p.faculty,
+        SELECT u.id, u.name, u.phone, p.gender, p.birthday, p.city, p.citizenship, p.university, p.faculty,
                p.contact_person, p.vk, p.messengers, p.docs_signed_at,
                -- фото человек ставит себе сам, оно лежит в учётной записи
                COALESCE(u.photo_url, p.photo_url, (SELECT f.url FROM resident_files f WHERE f.user_id=u.id AND f.kind='photo' ORDER BY f.uploaded_at DESC LIMIT 1)) AS photo_url
@@ -167,7 +167,7 @@ module.exports = function register(route) {
     json(res, 200, {
       residents: users.rows.map((u) => ({
         id: String(u.id), name: u.name, phone: u.phone || '', gender: u.gender || '',
-        birthday: isoDate(u.birthday), city: u.city || '',
+        birthday: isoDate(u.birthday), city: u.city || '', citizenship: u.citizenship || '',
         university: u.university || '', program: u.faculty || '',
         contactPerson: u.contact_person || '', vk: u.vk || '', photo: u.photo_url || '',
         messengers: u.messengers || [], signedAt: isoDate(u.docs_signed_at),
