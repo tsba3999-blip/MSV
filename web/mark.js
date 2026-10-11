@@ -274,8 +274,8 @@
     if(staffNav && me.sectionAccess && role!=='admin')staffNav.querySelectorAll('a').forEach(function(link){var href=link.getAttribute('href')||'',key=link.dataset.section||(/shahmatka/.test(href)?'chart':/residents/.test(href)?'residents':/charges/.test(href)?'charges':/tickets|repair/.test(href)?'tickets':/admin-staff.html/.test(href)?'payroll':null);if(key && me.sectionAccess[key]===false)link.hidden=true;});
     if(staffNav && ['admin','moderator'].includes(role) && (!me.sectionAccess||me.sectionAccess.residents)){var departures=document.createElement('a');departures.className='side__link';departures.href='admin-departures.html';departures.textContent='Заявки на выезд';staffNav.append(departures);}
     if (staffNav) {
-      [['support.html','<path d="M21 11a8 8 0 0 1-8 8H5l-3 3V11a9 9 0 0 1 19 0Z"/><path d="M9 8a3 3 0 0 1 6 0c0 2-3 2-3 4"/><path d="M12 15h.01"/>'],
-       ['admin-departures.html','<path d="M10 4H4v16h6M14 8l4 4-4 4M8 12h12"/>'],
+      [['support.html','<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/><path d="M5.6 5.6l3.9 3.9"/><path d="M14.5 14.5l3.9 3.9"/><path d="M18.4 5.6l-3.9 3.9"/><path d="M9.5 14.5l-3.9 3.9"/>'],
+       ['admin-departures.html','<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 12h8M8 16h8M8 19h4"/>'],
        ['admin-rights.html','<path d="M3 21h18M4 17V4h4v13M10 17V4h4v13M17 5l3-1 3 12-3 1Z"/>']].forEach(function (item) {
         var link = staffNav.querySelector('a[href="' + item[0] + '"]');
         if (link && item[0] === 'admin-rights.html') { var previous = link.querySelector('svg'); if (previous) previous.remove(); }
