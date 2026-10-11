@@ -166,7 +166,7 @@
   <span class="role" id="roleBadge"><span class="role__dot"></span><span id="roleName">Резидент</span></span>
 
   <h1 class="msv-h title" id="pageTitle">Вход</h1>
-  <p class="msv-body lead" id="pageLead">Введи почту или телефон и четырёхзначный код. Код выдаёт модератор.</p>
+  <p class="msv-body lead" id="pageLead">Введи телефон и четырёхзначный код. <strong>КОД ВЫДАЕТ МОДЕРАТОР</strong></p>
 
   <!-- Шаг 1: контакт -->
   <section class="step step--on" id="step1" aria-labelledby="pageTitle">
@@ -178,12 +178,14 @@
       <span id="err1Text"></span>
     </div>
 
-    <label class="msv-field">
-      <span class="msv-field__label">Почта или телефон</span>
-      <input class="msv-input" id="contact" type="text" inputmode="email"
-             autocomplete="username" placeholder="ivan@mail.ru или +7 999 000-00-00">
-    </label>
     <p class="msv-note msv-field__hint">После четырёх неверных кодов вход с этого номера закрывается на полчаса.</p>
+
+    <label class="msv-field">
+      <span class="msv-field__label">Телефон</span>
+      <input class="msv-input" id="contact" type="tel" inputmode="tel"
+             autocomplete="username" placeholder="+7 999 000-00-00">
+    </label>
+
 
     <div class="foot">
       <button class="msv-btn msv-btn--block msv-btn--primary" id="btnSend" type="button">Дальше</button>
@@ -262,8 +264,8 @@
   if (badge) badge.hidden = true;      // роль заранее неизвестна — не обещаем её
   document.getElementById('pageTitle').textContent = 'Вход';
   document.getElementById('headTitle').textContent = 'Вход';
-  document.getElementById('pageLead').textContent =
-    'Введи телефон или рабочую почту и четырёхзначный код. Код выдаёт модератор.';
+  document.getElementById('pageLead').innerHTML =
+    'Введи телефон и четырёхзначный код. <strong>КОД ВЫДАЕТ МОДЕРАТОР</strong>';
   document.title = 'Вход — Москва в студентов верит!';
 
   /* Раньше страница сама входила под первой учётной записью нужной роли —
@@ -299,10 +301,7 @@
 
   function normalize(value) {
     var v = String(value || '').trim();
-    if (v.indexOf('@') !== -1) {
-      // почта: одна собака, точка в домене, без пробелов
-      return /^[^\s@]+@[^\s@.]+\.[^\s@]{2,}$/.test(v) ? { kind: 'email', value: v.toLowerCase() } : null;
-    }
+    if (!/^[+\d\s()-]+$/.test(v)) return null;
     var digits = v.replace(/\D/g, '');
     if (digits.length === 11 && (digits.charAt(0) === '7' || digits.charAt(0) === '8')) {
       return { kind: 'phone', value: '+7' + digits.slice(1) };
@@ -320,7 +319,7 @@
     var parsed = normalize(contact.value);
     if (!parsed) {
       contact.classList.add('msv-input--error');
-      showError(1, 'Проверь запись. Почта — вида ivan@mail.ru, телефон — 11 цифр.');
+      showError(1, 'Проверь номер телефона: 10 цифр или 11 цифр с 7 или 8 в начале.');
       contact.focus();
       return;
     }

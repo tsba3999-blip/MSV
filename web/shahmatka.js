@@ -592,7 +592,9 @@
 
     /* Наведение и клик по полосам — делегированием, чтобы обработчиков
        было ровно два, а не по два на каждую бронь. */
+    this._on(this.canvas, 'touchstart', function () { hideTip(); }, { passive:true });
     this._on(this.canvas, 'mouseover', function (e) {
+      if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) { hideTip(); return; }
       var bar2 = e.target.closest('.msv-sh__bar');
       if (!bar2 || !self.canvas.contains(bar2)) return;
       var b = self._bookingById(bar2.dataset.id);
@@ -607,6 +609,7 @@
     });
 
     this._on(this.canvas, 'focusin', function (e) {
+      if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) { hideTip(); return; }
       var bar2 = e.target.closest('.msv-sh__bar');
       if (!bar2) return;
       var b = self._bookingById(bar2.dataset.id);
@@ -1966,8 +1969,8 @@
 
         '<div class="msv-sh__sect">' +
           '<dl class="msv-sh__pairs">' +
-            '<dt>Проживание</dt><dd>' + esc(fmtDate(b.from)) + ', ' + esc(b.checkIn) +
-              ' — ' + esc(fmtDate(b.to)) + ', ' + esc(b.checkOut) + '</dd>' +
+            '<dt>Проживание</dt><dd>' + esc(fmtDate(b.from)) +
+              ' — ' + esc(fmtDate(b.to)) + '</dd>' +
             '<dt>Ночей</dt><dd>' + nights + '</dd>' +
             (b.bookedAt !== null ? '<dt>Дата бронирования</dt><dd>' + esc(fmtDate(b.bookedAt)) + '</dd>' : '') +
             (b.tariff ? '<dt>Тариф</dt><dd>' + esc(b.tariff) + '</dd>' : '') +

@@ -113,6 +113,18 @@
 
   .screen { display: none; }
   .screen--on { display: contents; }
+  /* The shared footer stays visible; only slide content scrolls. */
+  .onb { display:flex; height:100svh; height:100dvh; min-height:0; padding-top:var(--msv-s16); overflow:hidden; }
+  .screen--on { display:block; flex:1 1 auto; min-height:0; overflow-y:auto; touch-action:pan-y; }
+  .onb__art { height:clamp(140px,28dvh,228px); padding:var(--msv-s12) 0; }
+  .onb__img { max-height:100%; }
+  .onb__foot { flex:0 0 auto; padding-top:var(--msv-s16); width:100%; }
+  @media(min-width:768px) {
+    .screen--on { display:grid; grid-template-columns:1fr 1fr; grid-template-rows:auto 1fr; grid-template-areas:"art title" "art text"; gap:var(--msv-s12) var(--msv-s48); }
+    .onb__art { height:auto; grid-row:1 / -1; }
+    .onb__title { align-self:end; margin-top:var(--msv-s32); }
+    .onb__foot { align-self:flex-end; max-width:360px; }
+  }
 </style>
 </head>
 <body data-step="1">
@@ -121,12 +133,7 @@
 
 <div class="onb" id="onb" data-step="1">
 
-  <div class="onb__head">
-    <!-- Пропуск ведёт сразу к анкете -->
-    <a class="onb__skip" href="login.html?next=residences.html">Пропустить</a>
-  </div>
-
-  <div class="screen screen--on" data-screen="1">
+<div class="screen screen--on" data-screen="1">
     <div class="onb__art">
       <img class="onb__img" src="onb-1.jpg" width="512" height="512" alt="Рисунок: человек складывает руками сердечко">
     </div>
@@ -185,7 +192,7 @@
     bar.setAttribute('aria-valuenow', String(n));
     next.textContent = LABEL[n];
     if (theme) theme.setAttribute('content', '#F5F1EA');
-    window.scrollTo(0, 0);
+    screens.forEach(function (s) { s.scrollTop = 0; });
   }
 
   next.addEventListener('click', function () {
@@ -193,6 +200,21 @@
     // Сразу к выбору резиденции: анкету спросим перед оплатой
     location.href = 'login.html?next=residences.html';
   });
+
+  var swipe = null;
+  onb.addEventListener('touchstart', function (e) {
+    swipe = e.touches.length === 1 && !e.target.closest('a,button,input') ? { x:e.touches[0].clientX, y:e.touches[0].clientY } : null;
+  }, {passive:true});
+  onb.addEventListener('touchmove', function (e) { if(e.touches.length !== 1) swipe = null; }, {passive:true});
+  onb.addEventListener('touchcancel', function () { swipe = null; }, {passive:true});
+  onb.addEventListener('touchend', function (e) {
+    if (!swipe || !e.changedTouches.length) return;
+    var dx = e.changedTouches[0].clientX - swipe.x, dy = e.changedTouches[0].clientY - swipe.y;
+    swipe = null;
+    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    if (dx < 0 && step < LAST) show(step + 1);
+    else if (dx > 0 && step > 1) show(step - 1);
+  }, {passive:true});
 
   document.addEventListener('keydown', function (e) {
     if (e.key === 'ArrowLeft' && step > 1) show(step - 1);

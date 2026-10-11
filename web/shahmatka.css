@@ -326,7 +326,7 @@
   gap: 8px;
   width: 100%;
   min-height: 34px;
-  padding: 0 12px;
+  padding: 0 8px;
   font-size: 12px;
   font-weight: 700;
   color: var(--sh-ink);
@@ -338,16 +338,10 @@
 .msv-sh__body > .msv-sh__group:first-child { border-top-width: 1px; }
 
 
-/* Название и стрелка живут в зоне шириной с левый столбец, поэтому
-   стрелки всех комнат выстраиваются по одной вертикали независимо от
-   длины названия. */
-/* Левый столбец узкий, поэтому название комнаты выходит в область
-   сетки (в строке комнаты броней нет). Стрелка сворачивания стоит на
-   вертикали кнопки «свернуть всё» в шапке: правый край — левый
-   столбец минус 12 px, с учётом отступа строки 12 px. */
+/* Заголовок комнаты выровнен с номерами мест и остаётся виден при прокрутке. */
 .msv-sh__group-head {
   position: sticky;
-  left: 12px;
+  left: 8px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -358,10 +352,7 @@
 .msv-sh__group-name { flex: 0 0 auto; white-space: nowrap; }
 
 .msv-sh__group-head .msv-sh__fold {
-  order: -1;                                   /* стрелка первой */
-  /* правый край стрелки = левый столбец − 12 px, как у кнопки «свернуть всё»:
-     отступ строки 12 + margin + 22 (кнопка) = left-w − 12 */
-  margin-left: calc(var(--sh-left-w) - 46px);
+  margin-left: 0;
   margin-right: 0;
 }
 
