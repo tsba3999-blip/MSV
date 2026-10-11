@@ -152,7 +152,7 @@
           ['admin-residents.html', 'Резиденты'],
           ['admin-tickets.html', 'Все заявки'],
           ['cabinet-staff.html', 'Мои задачи'],
-          ['cabinet-admin.html', 'Обзор'],
+          ['cabinet-admin.html', 'Статистика'],
           ['admin-reputation.html', 'Репутация'],
           ['staff-mailings.html', 'Рассылки'],
           ['staff-salary.html', 'Моя зарплата'],
@@ -217,7 +217,7 @@
       var statistics = href === 'cabinet-admin.html' && /Статистика|Обзор/.test(link.textContent);
       if (!handshake && !statistics) return;
       if (statistics) {
-        Array.from(link.childNodes).forEach(function(n){if(n.nodeType===3 && n.textContent.trim())n.textContent=' Обзор';});
+        Array.from(link.childNodes).forEach(function(n){if(n.nodeType===3 && n.textContent.trim())n.textContent=' Статистика';});
       }
       var oldIcon = link.querySelector('svg');
       var path = handshake
