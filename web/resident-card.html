@@ -36,6 +36,8 @@
   .fact b { display: block; margin-top: 2px; font: 700 20px/26px var(--msv-font); }
   .fact b.bad { color: var(--msv-red); }
   .fact b.ok { color: #4A6B12; }
+  .fact b.life-hearts { display:flex; align-items:center; gap:4px; min-height:26px; }
+  .life-hearts svg { width:22px; height:22px; flex:none; }
 
   .sect { margin-bottom: var(--msv-s16); padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r12); box-shadow: var(--msv-e1); }
   .sect__head { display: flex; align-items: center; justify-content: space-between; gap: var(--msv-s12); margin-bottom: var(--msv-s12); }
@@ -144,6 +146,20 @@ MSV.ready(function (ctx) {
     return (shortTier || (tier ? tier[0].toUpperCase() + tier.slice(1) : 'Место')) + ' ' + label + ' · ' + b.room + ' · ' + residence;
   }
 
+  function lifeHearts(value) {
+    if (value === null || value === undefined || value === '' || !Number.isFinite(Number(value))) return '<b aria-label="Количество жизней неизвестно">—</b>';
+    var lives = Math.max(0, Math.min(3, Math.floor(Number(value))));
+    var heart = 'M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z';
+    var html = '<b class="life-hearts" role="img" aria-label="Жизней ' + lives + ' из 3">';
+    for (var i = 0; i < 3; i++) {
+      var alive = i < lives, color = alive ? '#FB344A' : '#111';
+      html += '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="' + heart + '" fill="' + color + '" stroke="' + color + '" stroke-width="' + (alive ? '2' : '1.6') + '" stroke-linejoin="round"/>';
+      if (!alive) html += '<path d="M12.6 5.4L10.2 9.4l3.4 1.6-3 3.6 2.8 1.8-2.6 3.6 1.2 2.2" fill="none" stroke="#F5F1EA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>';
+      html += '</svg>';
+    }
+    return html + '</b>';
+  }
+
   function draw(d) {
     document.title = (d.me.name || 'Карточка резидента') + ' — МСВ';
 
@@ -179,7 +195,7 @@ MSV.ready(function (ctx) {
     html += '<div class="facts">' +
       '<div class="fact"><span>' + (balance > 0.5 ? 'Баланс отрицательный (долг)' : balance < -0.5 ? 'Баланс положительный (оплата вовремя)' : 'Баланс нулевой (долга нет)') + '</span><b class="' + (balance > 0.5 ? 'bad' : 'ok') + '">' + esc(balance > 0.5 ? '−' + money(balance) : balance < -0.5 ? '+' + money(-balance) : money(0)) + '</b></div>' +
       '<div class="fact"><span>Репутация</span><b>' + d.reputation.score + '</b></div>' +
-      '<div class="fact"><span>Жизней</span><b>' + d.reputation.lives + ' из 3</b></div>' +
+      '<div class="fact"><span>Жизней</span>' + lifeHearts(d.reputation.lives) + '</div>' +
       '<div class="fact"><span>Заявок открыто</span><b>' + openTickets + '</b></div>' +
       '<div class="fact"><span>Входов</span><b>' + d.logins.total + '</b></div>' +
       '<div class="fact"><span>Оплат</span><b>' + d.payments.length + '</b></div>' +
