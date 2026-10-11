@@ -26,6 +26,7 @@
   .card-top__ava { flex: 0 0 auto; align-self: stretch; width: 96px; min-height: 96px; display: flex; align-items: center; justify-content: center; font: 700 26px/1 var(--msv-font); color: var(--msv-n500); background: var(--msv-n100); border-radius: var(--msv-r12); object-fit: cover; }
   .card-top__t { flex: 1 1 auto; min-width: 0; }
   .card-top__name { margin: 0 0 var(--msv-s4); }
+  .card-top__name .msv-gender { margin-left:8px; vertical-align:middle; }
   .card-top__sub { margin: 0; color: var(--msv-n500); }
   .card-top__tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: var(--msv-s8); }
 
@@ -42,6 +43,11 @@
   .sect { margin-bottom: var(--msv-s16); padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r12); box-shadow: var(--msv-e1); }
   .sect__head { display: flex; align-items: center; justify-content: space-between; gap: var(--msv-s12); margin-bottom: var(--msv-s12); }
   .sect__title { margin: 0; }
+  .profile-settings { position:relative; flex:0 0 auto; }
+  .profile-settings > summary { list-style:none; width:var(--msv-btn-m); padding:0; }
+  .profile-settings > summary::-webkit-details-marker { display:none; }
+  .profile-settings__menu { position:absolute; top:calc(100% + var(--msv-s4)); right:0; z-index:10; padding:var(--msv-s8); background:var(--msv-white); border:1px solid var(--msv-n100); border-radius:var(--msv-r12); box-shadow:var(--msv-e1); white-space:nowrap; }
+
   .sect__empty { margin: 0; color: var(--msv-n500); }
 
   .pairs { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--msv-s8) var(--msv-s16); margin: 0; }
@@ -84,7 +90,79 @@
 
 <div class="shell">
 
-  <aside class="side" id="side"></aside>
+  <aside class="side" id="side">
+    <a class="side__logo-link" href="index.html" title="На главную"><img class="side__logo" src="msv-1200-white.png" width="1200" height="209"
+         alt="МСВ — Москва в студентов верит!"></a>
+
+    <a class="side__who" href="admin-profile.html" title="Мой профиль">
+      <span class="side__name">&nbsp;</span>
+      <span class="side__role">Администратор</span>
+    </a>
+
+    <nav class="side__nav" aria-label="Разделы кабинета">
+      <a class="side__link" href="cabinet-admin.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>
+        Обзор
+      </a>
+      <!-- Задачник M² (Vikunja) — пока отдельным входом, открывается в новой вкладке; единый вход — после переезда на домен -->
+      <a class="side__link" href="http://104.171.138.117:3456/" target="_blank" rel="noopener">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5H5v14h14v-4"/><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M6 15l2 2 4-4"/></svg>
+        Задачи M²
+      </a>
+      <a class="side__link" href="admin-staff.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6.5a3 3 0 0 1 0 5.8"/><path d="M18 20a5.5 5.5 0 0 0-3-4.6"/></svg>
+        Сотрудники
+      </a>
+      <a class="side__link" href="admin-residences.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V8l7-4 7 4v13"/><path d="M9 21v-6h6v6"/><path d="M9 11h.01"/><path d="M15 11h.01"/></svg>
+        Резиденции
+      </a>
+      <a class="side__link" href="admin-shahmatka.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M9 10v9"/></svg>
+        Шахматка
+      </a>
+      <a class="side__link" href="admin-residents.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6.5a3 3 0 0 1 0 5.8"/><path d="M18 20a5.5 5.5 0 0 0-3-4.6"/></svg>
+        Резиденты
+      </a>
+      <a class="side__link" href="admin-tickets.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M8 3v4"/><path d="M16 3v4"/><path d="M9 14l2 2 4-4"/></svg>
+        Заявки
+      </a>
+      <a class="side__link" href="admin-reputation.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l2.4 5 5.6.8-4 3.9 1 5.5-5-2.7-5 2.7 1-5.5-4-3.9 5.6-.8z"/></svg>
+        Репутация
+      </a>
+      <a class="side__link" href="admin-rights.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l8-8"/><path d="M17 6l2 2"/></svg>
+        Права доступа
+      </a>
+      <a class="side__link" href="admin-settings.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v2"/><path d="M12 19v2"/><path d="M4.5 7.5l1.7 1"/><path d="M17.8 15.5l1.7 1"/><path d="M4.5 16.5l1.7-1"/><path d="M17.8 8.5l1.7-1"/></svg>
+        Настройки
+      </a>
+    </nav>
+
+    <div class="side__out">
+      <a class="side__exit" href="index.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/>
+        </svg>
+        Выйти
+      </a>
+    </div>
+  </aside>
 
   <div class="work">
     <header class="work__top">
@@ -146,6 +224,13 @@ MSV.ready(function (ctx) {
     return (shortTier || (tier ? tier[0].toUpperCase() + tier.slice(1) : 'Место')) + ' ' + label + ' · ' + b.room + ' · ' + residence;
   }
 
+  function genderBadge(value) {
+    var sex = String(value || '').toLowerCase();
+    if (sex !== 'м' && sex !== 'ж' && sex !== 'm' && sex !== 'f') return '';
+    var female = sex === 'ж' || sex === 'f';
+    return '<span class="msv-gender msv-gender--' + (female ? 'f' : 'm') + '" aria-label="' + (female ? 'Женский пол' : 'Мужской пол') + '">' + (female ? 'Ж' : 'М') + '</span>';
+  }
+
   function lifeHearts(value) {
     if (value === null || value === undefined || value === '' || !Number.isFinite(Number(value))) return '<b aria-label="Количество жизней неизвестно">—</b>';
     var lives = Math.max(0, Math.min(3, Math.floor(Number(value))));
@@ -179,7 +264,7 @@ MSV.ready(function (ctx) {
         ? '<img class="card-top__ava" src="' + esc(d.profile.photo) + '" alt="" data-zoom>'
         : '<span class="card-top__ava">' + esc(initials(d.me.name)) + '</span>') +
       '<span class="card-top__t">' +
-        '<h2 class="msv-sub card-top__name">' + esc([d.profile.lastName, d.profile.firstName, d.profile.middleName].filter(Boolean).join(' ') || d.me.name || 'Без имени') + '</h2>' +
+        '<h2 class="msv-sub card-top__name">' + esc([d.profile.lastName, d.profile.firstName, d.profile.middleName].filter(Boolean).join(' ') || d.me.name || 'Без имени') + genderBadge(d.profile.gender) + '</h2>' +
         '<p class="msv-body card-top__sub">' + (live
             ? esc(placeSummary(live))
             : 'Места сейчас нет') + '</p>' +
@@ -205,7 +290,6 @@ MSV.ready(function (ctx) {
     var p = d.profile;
     html += sect('Анкета',
       '<dl class="pairs">' +
-        '<div><dt>Пол</dt><dd>' + esc(p.gender === 'ж' ? 'женский' : (p.gender === 'м' ? 'мужской' : '—')) + '</dd></div>' +
         '<div><dt>Дата рождения</dt><dd>' + (p.birthday ? esc(day(p.birthday)) : '—') + '</dd></div>' +
         '<div><dt>Город</dt><dd>' + esc(p.city || '—') + '</dd></div>' +
         '<div><dt>ВУЗ</dt><dd>' + esc(p.university || '—') + '</dd></div>' +
@@ -234,7 +318,7 @@ MSV.ready(function (ctx) {
           '<span class="msv-note" id="saveMsg"></span>' +
         '</div>' +
       '</div>',
-      '<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" id="editBtn">Править анкету</button>');
+      '<details class="profile-settings"><summary class="msv-btn msv-btn--m msv-btn--tertiary" aria-label="Настройки анкеты" title="Настройки анкеты"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 3-1 3-3 1-2 3 2 2-2 2 2 3 3 1 1 3h6l1-3 3-1 2-3-2-2 2-2-2-3-3-1-1-3Z"/><circle cx="12" cy="12" r="3"/></svg></summary><div class="profile-settings__menu"><button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" id="editBtn">Править анкету</button></div></details>');
 
     /* ---------- проживание ---------- */
     html += sect('Проживание', d.bookings.length
@@ -330,6 +414,7 @@ MSV.ready(function (ctx) {
     if (!edit || !btn) return;
     btn.addEventListener('click', function () {
       edit.hidden = !edit.hidden;
+      btn.closest('details').open = false;
       btn.textContent = edit.hidden ? 'Править анкету' : 'Свернуть правку';
     });
     document.getElementById('cancel').addEventListener('click', function () {

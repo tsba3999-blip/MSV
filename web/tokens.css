@@ -473,3 +473,8 @@ body, h1, h2, h3, p, button, a, label { hyphens: none; }
 
 /* Names in cabinet headers and resident cards: 120% leading. */
 .side__name, .who__name, .top__name, .card-top__name { line-height: 1.2; }
+
+/* Единый маркер пола в карточках и шахматке. */
+.msv-gender { display:inline-flex; align-items:center; justify-content:center; flex:none; box-sizing:border-box; width:24px; height:24px; padding:0; border:1px solid; border-radius:4px; font:700 12px/1 var(--msv-font); }
+.msv-gender--f { --gender-ink:#A3316B; --gender-bg:#FCEBF3; --gender-border:#F3C9DD; color:var(--gender-ink); background:var(--gender-bg); border-color:var(--gender-border); }
+.msv-gender--m { --gender-ink:#1B4C9E; --gender-bg:#E8F0FF; --gender-border:#C3D8FE; color:var(--gender-ink); background:var(--gender-bg); border-color:var(--gender-border); }

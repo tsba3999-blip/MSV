@@ -438,8 +438,7 @@
   border: 1px solid var(--sh-line);
 }
 
-.msv-sh__tag--f { color: #A3316B; background: #FCEBF3; border-color: #F3C9DD; }
-.msv-sh__tag--m { color: #1B4C9E; background: #E8F0FF; border-color: #C3D8FE; }
+.msv-sh__tag.msv-gender { width:auto; height:auto; line-height:inherit; color:var(--gender-ink); background:var(--gender-bg); border-color:var(--gender-border); }
 
 .msv-sh__track { position: relative; flex: 0 0 auto; z-index: 1; }
 

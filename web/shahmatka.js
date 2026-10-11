@@ -1505,8 +1505,8 @@
         var open = !self.collapsed[g.id];
         var sex = g.room ? g.room.gender : '';
         var tag = '';
-        if (sex === 'ж' || sex === 'f') tag = '<span class="msv-sh__tag msv-sh__tag--f">Ж</span>';
-        else if (sex === 'м' || sex === 'm') tag = '<span class="msv-sh__tag msv-sh__tag--m">М</span>';
+        if (sex === 'ж' || sex === 'f') tag = '<span class="msv-sh__tag msv-sh__tag--f msv-gender msv-gender--f">Ж</span>';
+        else if (sex === 'м' || sex === 'm') tag = '<span class="msv-sh__tag msv-sh__tag--m msv-gender msv-gender--m">М</span>';
 
         rows += '<div class="msv-sh__group">' +
           '<span class="msv-sh__group-head">' +
