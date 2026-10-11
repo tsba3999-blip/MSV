@@ -273,6 +273,13 @@
     if(staffNav && role!=='resident' && !staffNav.querySelector('a[href="support.html"]')){var support=document.createElement('a');support.className='side__link';support.href='support.html';support.textContent='Поддержка';staffNav.append(support);}
     if(staffNav && me.sectionAccess && role!=='admin')staffNav.querySelectorAll('a').forEach(function(link){var href=link.getAttribute('href')||'',key=link.dataset.section||(/shahmatka/.test(href)?'chart':/residents/.test(href)?'residents':/charges/.test(href)?'charges':/tickets|repair/.test(href)?'tickets':/admin-staff.html/.test(href)?'payroll':null);if(key && me.sectionAccess[key]===false)link.hidden=true;});
     if(staffNav && ['admin','moderator'].includes(role) && (!me.sectionAccess||me.sectionAccess.residents)){var departures=document.createElement('a');departures.className='side__link';departures.href='admin-departures.html';departures.textContent='Заявки на выезд';staffNav.append(departures);}
+    if (staffNav) {
+      [['support.html','<path d="M21 11a8 8 0 0 1-8 8H5l-3 3V11a9 9 0 0 1 19 0Z"/><path d="M9 8a3 3 0 0 1 6 0c0 2-3 2-3 4"/><path d="M12 15h.01"/>'],
+       ['admin-departures.html','<path d="M10 4H4v16h6M14 8l4 4-4 4M8 12h12"/>']].forEach(function (item) {
+        var link = staffNav.querySelector('a[href="' + item[0] + '"]');
+        if (link && !link.querySelector('svg')) link.insertAdjacentHTML('afterbegin','<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + item[1] + '</svg>');
+      });
+    }
     document.dispatchEvent(new Event('msv:menu-ready'));
     // «М» ведёт в свой кабинет
     a.href = ROLE_HOME[role] || 'menu.html';
@@ -306,7 +313,7 @@
        это кабинет и где свой. Иначе выходит, что главный администратор
        «не может себя редактировать» (решение заказчика 25.09.2026). */
     var residentPage = !/^(admin-|staff-|cabinet-admin|cabinet-staff)/.test(page);
-    if (residentPage && role !== 'resident') {
+    if (residentPage && role !== 'resident' && !document.querySelector('.shell .side')) {
       var bar = document.createElement('div');
       bar.className = 'msv-role-bar';
       bar.style.background = ROLE_COLOR[role] || '#34495E';
@@ -361,6 +368,7 @@
         var n = who.querySelector('.side__name');
         var r = who.querySelector('.side__role');
         if (n && me.name) n.textContent = me.name;
+        if (n && me.name) n.title = me.name;
         /* Подписываем должностью, если она указана: у двух
            администраторов подписи разные (25.09.2026) */
         if (r) r.textContent = me.position || ROLE_NAME[me.role] || me.role;
@@ -374,6 +382,7 @@
           who.setAttribute('data-photo', '1');
           var portrait = document.createElement('img'); portrait.src = me.photo; portrait.alt = 'Фото ' + (me.name || 'сотрудника'); portrait.setAttribute('data-zoom',''); portrait.className = 'side__portrait'; who.prepend(portrait); who.classList.add('side__who--portrait');
         }
+        side.classList.add('side--user-ready');
       });
     }
     var btn = document.createElement('button');
@@ -405,6 +414,7 @@
     }
     var saved = false; try { saved = localStorage.getItem('msv.sideFolded') === '1'; } catch (e) {}
     apply(saved);
+    document.documentElement.classList.remove('msv-side-pending','msv-side-start-folded');
     window.addEventListener('resize', function () { apply(shell.classList.contains('shell--folded')); });
     meReq.then(function () { apply(shell.classList.contains('shell--folded')); });
     document.addEventListener('msv:menu-ready', place);
