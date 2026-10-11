@@ -206,6 +206,7 @@
   }
 a.tab[href="notifications.html"] { position:relative; }
   .top__dot { top:calc(50% - 17px); left:calc(50% + 3px); right:auto; width:max-content; min-width:16px; height:16px; padding:0 2px; box-sizing:border-box; border-radius:12px; display:grid; place-items:center; font:600 10px/12px Arial,sans-serif; text-align:center; color:white; background:var(--msv-red); }
+  .top__dot > span { display:block; line-height:1; transform:translateY(-.5px); }
   .tab .top__dot { border-color:var(--msv-graphite); }
   .top__dot[hidden] { display:none; }
 </style>
@@ -374,7 +375,7 @@ a.tab[href="notifications.html"] { position:relative; }
       // Непрочитанные уведомления — числом на плитке, как в строке меню
       var un = Number.isInteger(d.unreadCount) ? d.unreadCount : (d.notices || []).filter(function (n) { return !n.read; }).length;
       var cnt = document.getElementById('noteCount');
-      if(cnt){cnt.textContent=un;cnt.hidden=!un;}document.querySelectorAll('a[href="notifications.html"]').forEach(function(a){if(!a.matches('.top__act,.tab'))return;var badge=a.querySelector('.top__dot');if(!badge){badge=document.createElement('span');badge.className='top__dot';a.appendChild(badge);}badge.textContent=un;badge.hidden=!un;a.setAttribute('aria-label','Уведомления: '+un+' непрочитанных');});
+      if(cnt){cnt.textContent=un;cnt.hidden=!un;}document.querySelectorAll('a[href="notifications.html"]').forEach(function(a){if(!a.matches('.top__act,.tab'))return;var badge=a.querySelector('.top__dot');if(!badge){badge=document.createElement('span');badge.className='top__dot';a.appendChild(badge);}var digit=document.createElement('span');digit.textContent=un;badge.replaceChildren(digit);badge.hidden=!un;a.setAttribute('aria-label','Уведомления: '+un+' непрочитанных');});
     })
     .catch(function () {});
 })();
