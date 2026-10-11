@@ -38,7 +38,8 @@
   html.gate body { visibility: hidden; }
   .sbp { display: flex; align-items: center; gap: var(--msv-s12); margin: 0 0 var(--msv-s16); padding: var(--msv-s12) var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r12); box-shadow: var(--msv-e1); color: inherit; text-decoration: none; }
   /* Знак СБП — целиком, файл с сайта МСВ (решение заказчика 23.09.2026) */
-  .sbp__logo { flex: 0 0 auto; width: 76px; }
+  .sbp__logo { flex: 0 0 auto; width: 40px; height: 52px; overflow: hidden; position: relative; }
+  .sbp__logo img { position:absolute; width:80px !important; max-width:none; left:-20px; top:-14px; }
   .sbp__logo img { display: block; width: 100%; height: auto; }
   .sbp__text { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
   .sbp__title { font-size: 17px; line-height: 22px; }
@@ -59,6 +60,14 @@
   .total__right { text-align:right; white-space:nowrap; }
   .total__note { display: block; margin-top: var(--msv-s4); grid-column:1 / -1; text-align:right; color: var(--msv-n500); }
   .payer__lock { margin: var(--msv-s8) 0 0; color: var(--msv-n500); }
+  .form > .payer, .form > .autopay, .form > .sbp { margin: 0 0 var(--msv-form-gap, 20px); }
+  .form > .form__foot { padding-top:0; }
+  .total.total--note { margin-bottom:var(--msv-form-gap, 20px); }
+  .deposit-note[hidden] { display:none; }
+  .deposit-help { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; padding:0; margin-left:4px; border:1px solid currentColor; border-radius:50%; color:inherit; background:transparent; cursor:pointer; }
+  .deposit-dialog { max-width: min(460px, calc(100vw - 32px)); box-sizing:border-box; padding:24px; border:0; border-radius:20px; color:var(--msv-graphite); background:var(--msv-white); }
+  .deposit-dialog::backdrop { background:rgba(0,0,0,.4); }
+  .deposit-dialog p { margin:0 0 20px; }
 </style>
 <link rel="stylesheet" href="rooms.css">
 <style>
@@ -105,12 +114,13 @@
   <div class="sign-docs">
     <p class="msv-sub sign-docs__title">Обязательно прочитайте перед подписанием</p>
     <p class="msv-note sign-docs__lead">Подписывая данные Договор и Правила, вы подтверждаете, что вы прочитали, поняли и согласны со всеми условиями, включая те, что изложены в приложениях и дополнительных соглашениях. Неизучение текста договора до подписания не освобождает вас от исполнения принятых на себя обязательств и не служит основанием для оспаривания условий договора.</p>
+    <p class="msv-body" style="margin:0 0 var(--msv-s12)">Я принимаю:</p>
     <label class="check"><input class="check__box" type="checkbox" id="dContract" data-doc>
-      <span class="check__text"><span class="check__name">Я принимаю <a class="msv-link" href="doc-contract.html" target="_blank" rel="noopener">Договор-оферту</a></span></span></label>
+      <span class="check__text"><span class="check__name"><a class="msv-link" href="doc-contract.html" target="_blank" rel="noopener">Договор-оферту</a></span></span></label>
     <label class="check"><input class="check__box" type="checkbox" id="dRules" data-doc>
-      <span class="check__text"><span class="check__name">Я принимаю <a class="msv-link" href="doc-rules.html" target="_blank" rel="noopener">Правила проживания</a></span></span></label>
+      <span class="check__text"><span class="check__name"><a class="msv-link" href="doc-rules.html" target="_blank" rel="noopener">Правила проживания</a></span></span></label>
     <label class="check"><input class="check__box" type="checkbox" id="dConsent" data-doc>
-      <span class="check__text"><span class="check__name">Я даю <a class="msv-link" href="doc-consent.html" target="_blank" rel="noopener">Согласие на обработку персональных данных</a></span></span></label>
+      <span class="check__text"><span class="check__name"><a class="msv-link" href="doc-consent.html" target="_blank" rel="noopener">Согласие на обработку персональных данных</a></span></span></label>
     <p class="msv-note sign-docs__note" id="docsNote">Оплата станет доступна, когда примешь все три документа. Документы принимаются заново при каждой оплате — дата и время каждой подписи хранятся в разделе «Подписанные документы».</p>
   </div>
 
@@ -148,16 +158,15 @@
     <p class="msv-note" id="qrNote" hidden style="margin-top:var(--msv-s8)">Это заглушка. Настоящий код придёт от банка, когда подключим оплату.</p>
   </div>
 
-  <a class="msv-btn msv-btn--block msv-btn--secondary" href="autopay.html" style="margin-bottom:var(--msv-s16)">Вы можете настроить ежемесячный автоплатёж</a>
+  <a class="msv-btn msv-btn--block msv-btn--secondary autopay" href="autopay.html">Вы можете настроить ежемесячный автоплатёж</a>
 
   <!-- СБП: знак, пояснение и условие цены (решение заказчика 22.09.2026) -->
   <a class="sbp" href="sbp.html">
-    <span class="sbp__logo"><img src="sbp-logo.png" width="1024" height="514" alt="Система быстрых платежей"></span>
+    <span class="sbp__logo"><img src="sbp-symbol.png" width="860" height="860" alt="Система быстрых платежей"></span>
     <span class="sbp__text">
       <span class="msv-sub sbp__title">Почему мы просим оплачивать по СБП?</span>
       <span class="msv-note sbp__note">Открыть пояснение</span>
     </span>
-    <svg class="sbp__chev msv-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
   </a>
 
   <div class="form__foot">
@@ -166,6 +175,7 @@
       <span class="total__right">
         <b id="total">0 руб.</b>
       </span>
+      <span class="msv-note total__note deposit-note" id="depositNote" hidden>В т.ч. депозит<button class="deposit-help" id="depositHelp" type="button" aria-label="Что такое депозит" aria-haspopup="dialog">?</button></span>
       <span class="msv-note total__note">Данная стоимость только при условии оплаты по СБП.</span>
     </div>
     <button class="msv-btn msv-btn--block msv-btn--primary" id="pay" type="button" disabled>Перейти к оплате</button>
@@ -173,9 +183,14 @@
 
 </div>
 
+<dialog class="deposit-dialog" id="depositDialog" aria-label="О депозите">
+  <p class="msv-body">П. 6.1. Правил проживания: Размер депозита равен стоимости аренды места в месяц и является оплатой за последний месяц проживания годового контракта (августа следующего года, после которого был заключен годовой контракт).</p>
+  <form method="dialog"><button class="msv-btn msv-btn--secondary" type="submit">Закрыть</button></form>
+</dialog>
 <script>
 (function () {
   'use strict';
+  document.getElementById('depositHelp').addEventListener('click', function () { document.getElementById('depositDialog').showModal(); });
 
   var params = new URLSearchParams(location.search);
 
@@ -251,6 +266,7 @@
   function syncTotal() {
     var p = priceNow(), rent = p * COUNT;
     total.textContent = money(rent + (deposit.checked ? p : 0));   // депозит — одна месячная плата
+    document.getElementById('depositNote').hidden = !deposit.checked || p <= 0;
     var m = document.getElementById('rMonth'); if (m) m.textContent = money(p);
     var s = document.getElementById('rSum');   if (s) s.textContent = money(rent);
     var c = document.getElementById('rTerm');

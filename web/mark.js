@@ -95,6 +95,8 @@
      берём их, чтобы роль читалась одинаково везде (25.09.2026). */
   meReq.then(function (me) {
     if (!me) return;
+    window.MSVPresenceMe = me;
+    var presenceScript = document.createElement('script'); presenceScript.src = 'presence.js'; document.head.appendChild(presenceScript);
     var role = me.role || 'resident';
     document.documentElement.setAttribute('data-role', role);
     if (role === 'admin') {
@@ -321,8 +323,7 @@
       bar.style.background = ROLE_COLOR[role] || '#34495E';
       bar.innerHTML = '<span>Вы вошли как <b>' + (me.position || ROLE_NAME[role] || role) +
         '</b>. Это кабинет резидента — так его видит жилец.</span>' +
-        '<a href="' + (ROLE_SELF[role] || 'menu.html') + '">Мой профиль</a>' +
-        '<a href="' + (ROLE_HOME[role] || 'menu.html') + '">Мой кабинет</a>';
+        '<a href="' + (ROLE_HOME[role] || 'menu.html') + '">Мой ЛК</a>';
       document.body.insertBefore(bar, document.body.firstChild);
       document.body.classList.add('msv-has-role-bar');
       /* Полоса закреплена сверху, а не просто стоит первой: страницы
@@ -508,3 +509,35 @@
 (function(){function wrapTables(){document.querySelectorAll('table.grid,table.rights').forEach(function(t){if(t.parentElement.classList.contains('msv-table-scroll'))return;if(t.parentElement.matches('.staff-table-wrap,.rights-scroll')){t.parentElement.classList.add('msv-table-scroll');return;}var wrap=document.createElement('div');wrap.className='msv-table-scroll';wrap.setAttribute('tabindex','0');wrap.setAttribute('role','region');wrap.setAttribute('aria-label','Таблица с прокруткой');t.parentNode.insertBefore(wrap,t);wrap.appendChild(t);});}wrapTables();new MutationObserver(wrapTables).observe(document.body,{childList:true,subtree:true});})();
 
 (function(){if(!document.querySelector('script[src="zoom.js"]')){var script=document.createElement('script');script.src='zoom.js';document.head.appendChild(script);}})();
+
+/* Settings always use the same gear as room/profile settings. */
+(function(){
+  function settingsIcon(){document.querySelectorAll('a[href="admin-settings.html"],a[href="staff-settings.html"],a[href="settings.html"]').forEach(function(link){var svg=link.querySelector('svg');if(!svg)return;svg.innerHTML='<path d="M11.29 4.77Q12.00 4.70 12.91 3.79Q13.81 2.88 14.69 3.14Q15.56 3.41 15.81 4.67Q16.06 5.93 16.61 6.38Q17.16 6.84 18.45 6.84Q19.73 6.83 20.16 7.64Q20.59 8.44 19.88 9.51Q19.16 10.58 19.23 11.29Q19.30 12.00 20.21 12.91Q21.12 13.81 20.86 14.69Q20.59 15.56 19.33 15.81Q18.07 16.06 17.62 16.61Q17.16 17.16 17.16 18.45Q17.17 19.73 16.36 20.16Q15.56 20.59 14.49 19.88Q13.42 19.16 12.71 19.23Q12.00 19.30 11.09 20.21Q10.19 21.12 9.31 20.86Q8.44 20.59 8.19 19.33Q7.94 18.07 7.39 17.62Q6.84 17.16 5.55 17.16Q4.27 17.17 3.84 16.36Q3.41 15.56 4.12 14.49Q4.84 13.42 4.77 12.71Q4.70 12.00 3.79 11.09Q2.88 10.19 3.14 9.31Q3.41 8.44 4.67 8.19Q5.93 7.94 6.38 7.39Q6.84 6.84 6.84 5.55Q6.83 4.27 7.64 3.84Q8.44 3.41 9.51 4.12Q10.58 4.84 11.29 4.77Z"/><circle cx="12" cy="12" r="3.1"/>';svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('stroke-width','1.8');});}
+  settingsIcon();document.addEventListener('msv:menu-ready',settingsIcon);
+})();
+
+/* Align floating tools to the page heading; leave desktop sidebar branding in place. */
+(function(){
+  var queued=false,observed=null;
+  var resize=new ResizeObserver(schedule);
+  function align(){
+    queued=false;var heading=document.querySelector('h1');if(!heading)return;
+    if(observed!==heading){resize.disconnect();resize.observe(heading);observed=heading;}
+    var mark=document.querySelector('.msv-mark-btn'),bar=document.querySelector('.edit-bar');
+    var floating=mark&&getComputedStyle(mark).position==='fixed';
+    var host=heading.closest('.work__top,.head,.top')||heading;
+    host.classList.toggle('msv-heading-tools',!!floating);
+    var r=heading.getBoundingClientRect(),center=r.top+r.height/2;
+    if(floating)mark.style.setProperty('top',Math.max(8,center-22)+'px','important');
+    if(bar&&!document.body.classList.contains('editing')){
+      bar.style.setProperty('top',Math.max(10,center-20)+'px','important');
+      bar.style.setProperty('right',floating?'70px':'14px','important');
+    }
+  }
+  function schedule(){if(!queued){queued=true;requestAnimationFrame(align)}}
+  var css=document.createElement('style');css.textContent='.msv-heading-tools{padding-right:124px!important;min-height:60px;box-sizing:border-box}.msv-heading-tools h1{min-width:0;overflow-wrap:break-word}';document.head.appendChild(css);
+  new MutationObserver(schedule).observe(document.body,{childList:true,subtree:true});
+  addEventListener('resize',schedule);addEventListener('scroll',schedule,{passive:true});document.addEventListener('msv:menu-ready',schedule);document.fonts.ready.then(schedule);schedule();
+})();
+
+(function(){function tasksIcon(){document.querySelectorAll('a').forEach(function(a){if(!/Задачи\s*[MМ][²2]/.test(a.textContent))return;var svg=a.querySelector('svg');if(svg)svg.innerHTML='<path d="M5 3h14M5 21h14M7 3v4l5 5-5 5v4M17 3v4l-5 5 5 5v4"/>';});}tasksIcon();document.addEventListener('msv:menu-ready',tasksIcon);})();

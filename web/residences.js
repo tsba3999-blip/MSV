@@ -200,7 +200,7 @@ window.MSV_RESIDENCES = [
     ]
   },
   {
-    id: "molod", name: "Молодежка", title: "Квартира Молодежка", logo: "molodejka.png",
+    id: "molod", name: "Молодежка", title: "Молодежка", logo: "molodejka.png",
     rooms: [
       {"id": "molod-r1", "buildingId": "molod", "number": "1", "name": "№1 Малая", "gender": "ж", "size": 2, "note": "малая"},
       {"id": "molod-r2", "buildingId": "molod", "number": "2", "name": "№2 Средняя", "gender": "ж", "size": 2, "note": "средняя, места равноценные"},

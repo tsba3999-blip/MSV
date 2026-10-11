@@ -112,13 +112,13 @@
     <main class="work__body">
       <p class="msv-note notice">Токены — плюсы и минусы к репутации резидента. Заносит модератор или администратор. Без сервера — до обновления страницы.</p>
 
-      <div class="set" style="max-width:720px">
+      <div class="set msv-form-card" style="max-width:720px">
         <h2 class="msv-sub set__title">Начислить токены</h2>
         <div class="set__grid">
           <label class="msv-field"><span class="msv-field__label">Резидент</span>
             <input class="msv-input" id="who" list="people" placeholder="Начни вводить фамилию"><datalist id="people"></datalist></label>
           <label class="msv-field"><span class="msv-field__label">Событие</span>
-            <select class="msv-select" id="kind">
+            <select class="msv-select msv-input" id="kind">
               <option value="+1.0">Организация события · +1,0</option>
               <option value="+0.5">Помощь соседям, волонтёрство · +0,5</option>
               <option value="+0.4">Все платежи вовремя полгода · +0,4</option>
@@ -131,8 +131,8 @@
           <label class="msv-field" id="customWrap" hidden><span class="msv-field__label">Токены (от −5 до +5)</span>
             <input class="msv-input" id="custom" inputmode="decimal" placeholder="+0,7 или −1,5"></label>
         </div>
-        <input class="msv-input" id="details" placeholder="Что именно произошло — резидент увидит этот текст" style="margin-top:var(--msv-s12)">
-        <button class="msv-btn msv-btn--m msv-btn--primary" type="button" id="add" style="margin-top:var(--msv-s12)">Начислить</button>
+        <input class="msv-input" id="details" placeholder="Что именно произошло — резидент увидит этот текст" style="margin-top:var(--msv-form-gap)">
+        <button class="msv-btn msv-btn--m msv-btn--primary" type="button" id="add" style="margin-top:var(--msv-form-gap)">Начислить</button>
         <span class="msv-note" id="msg" hidden style="margin-left:var(--msv-s12)"></span>
       </div>
 

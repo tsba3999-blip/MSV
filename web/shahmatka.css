@@ -638,7 +638,8 @@
 .msv-sh__panel-body--flush .msv-sh__sect:first-child { padding-right: 56px; }   /* место под крестик */
 
 /* Лепестки мессенджеров — форма из брендбука: радиусы 24/8 по диагонали */
-.msv-sh__petals { display: inline-flex; gap: 6px; margin-left: 8px; vertical-align: middle; }
+.msv-sh__contacts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.msv-sh__petals { display: inline-flex; gap: 6px; margin-left: 0; vertical-align: middle; }
 .msv-sh__petal {
   display: inline-flex; align-items: center; height: 26px; padding: 0 12px;
   font-size: 12px; font-weight: 700; color: var(--sh-ink); text-decoration: none;
@@ -1246,15 +1247,15 @@ body.msv-sh-dragging .msv-sh__bar { cursor: grabbing; }
   .msv-sh{height:auto}
 }
 /* Compact phone toolbar: period navigation first, actions together below. */
+.msv-sh__view-actions { display:contents; }
 @media (max-width:760px) {
   .msv-sh__toolbar { display:grid; grid-template-columns:28px 70px 28px minmax(0,1fr); gap:6px; }
   .msv-sh__toolbar .msv-sh__title { grid-column:1 / -1; }
   .msv-sh__toolbar [data-act="prev"],.msv-sh__toolbar [data-act="next"] { width:28px; padding:0; }
   .msv-sh__toolbar [data-act="today"] { padding:0 6px; }
   .msv-sh__toolbar .msv-sh__date { width:100%; min-width:0; padding:0 5px; font-size:12px; height:34px; }
-  .msv-sh__toolbar [data-act="scale"] { grid-column:1 / -1; justify-self:start; }
-  .msv-sh__toolbar [data-act="onlyfree"] { grid-column:1 / 4; padding:0 6px; }
-  .msv-sh__toolbar [data-act="hold"] { grid-column:4; justify-self:start; padding:0 6px; }
+  .msv-sh__view-actions { grid-column:1 / -1; display:flex; gap:6px; }
+  .msv-sh__view-actions .msv-sh__btn { flex:1 1 auto; min-width:0; padding:0 6px; white-space:nowrap; font-size:12px; }
   .msv-sh__toolbar .msv-sh__spacer,.msv-sh__toolbar .msv-sh__zoom { display:none; }
   .msv-sh__toolbar .msv-sh__search { grid-column:1 / -1; min-width:0; }
 }
@@ -1270,3 +1271,12 @@ body.msv-sh-dragging .msv-sh__bar { cursor: grabbing; }
 
 .msv-sh__bar-name { z-index:2; }
 @media(max-width:760px){ .msv-sh__bar { height:28px; } }
+
+.msv-sh__head,.msv-sh__head-left { background:var(--msv-table-head-bg);color:var(--msv-table-head-ink); }
+.msv-sh__head :is(.msv-sh__month,.msv-sh__foldall,.msv-sh__day span) { color:var(--msv-table-head-ink); }
+.msv-sh__documents-line { grid-column:1/-1;display:block;margin-top:0;line-height:1.5; }
+.msv-sh__documents-line dt,.msv-sh__documents-line dd { display:inline;margin:0;text-align:left; }
+
+.msv-sh__accrued-label .short{display:none}
+@media(max-width:600px){.msv-sh__accrued-label .full{display:none}.msv-sh__accrued-label .short{display:inline;white-space:nowrap}}
+body:has(.msv-sh__panel--on) .msv-mark-btn,body:has(.msv-sh__panel--on) .edit-bar{display:none!important}

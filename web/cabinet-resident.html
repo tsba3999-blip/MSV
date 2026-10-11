@@ -160,10 +160,7 @@
   .tile--gradient-lime { --gradient-from:var(--msv-lime); --gradient-to:var(--msv-aqua); }
   .tile--gradient-sun { --gradient-from:var(--msv-yellow); --gradient-to:var(--msv-lime); }
   .tile--gradient-mist { --gradient-from:var(--msv-lavender); --gradient-to:var(--msv-aqua); }
-  .tile--gradient-rings {
-    color:var(--msv-white);
-    background:linear-gradient(rgba(30,12,90,.38),rgba(30,12,90,.38)),repeating-radial-gradient(circle at 32% 65%,transparent 0 18px,rgba(255,255,255,.2) 19px,transparent 36px),radial-gradient(ellipse at 32% 65%,#fa718f 0%,#c653e5 30%,#5721c9 65%,#25128d 100%);
-  }
+  .tile--gradient-rings { color:var(--msv-graphite); background:linear-gradient(135deg,#DCD7F3,#C8E4EB); }
   .tile--gradient-candy { background:radial-gradient(ellipse at 100% 60%,rgba(79,162,223,.7),transparent 65%),linear-gradient(155deg,#f46ac0 0%,#e5b5e4 35%,#91e4ef 70%,#f9dbee 100%); }
   .tile--gradient-lemon { background:radial-gradient(ellipse at 85% 20%,#fffd93,transparent 60%),linear-gradient(145deg,#f9ff48 0%,#beffb0 45%,#63f2e8 80%,#93efff 100%); }
   .tile__cap { margin-top: auto; padding-top: var(--msv-s12); font-size: 14px; line-height: 19px; font-weight: 400; }
@@ -251,10 +248,7 @@ a.tab[href="notifications.html"]{position:relative}.top__dot{width:auto;min-widt
       </span>
     </a>
 
-    <a class="tile tile--small tile--plain" href="notifications.html">
-      <svg class="tile__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 9a6 6 0 1 0-12 0c0 6-3 7-3 7h18s-3-1-3-7"/><path d="M10.5 20.5a2 2 0 0 0 3 0"/></svg>
-      <span class="tile__cap">Уведомления<span class="tile__count" id="noteCount" hidden></span></span>
-    </a>
+
     <a class="tile tile--small tile--plain" href="payments.html">
       <svg class="tile__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="9" cy="6" rx="6" ry="3"/><path d="M3 6v4c0 1.7 2.7 3 6 3M3 10v4c0 1.7 2.7 3 6 3"/><ellipse cx="15" cy="14" rx="6" ry="3"/><path d="M9 14v4c0 1.7 2.7 3 6 3s6-1.3 6-3v-4"/></svg>
       <span class="tile__cap">История оплат</span>

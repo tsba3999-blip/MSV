@@ -23,6 +23,7 @@
 <style>
   body { --role: var(--msv-graphite); --role-ink: var(--msv-graphite); }
 </style>
+<link rel="stylesheet" href="settings-save.css">
 </head>
 <body>
 
@@ -157,7 +158,7 @@
       </section>
 
       <div style="display:flex;gap:var(--msv-s8);align-items:center;margin-top:var(--msv-s24)">
-        <button class="msv-btn msv-btn--m msv-btn--primary" type="button" id="save">Сохранить настройки</button>
+        <button class="msv-btn msv-btn--m msv-btn--primary" type="button" id="save" data-save-settings disabled>Сохранить настройки</button>
         <span class="msv-note" id="saveMsg" hidden></span>
       </div>
     </main>
@@ -171,6 +172,10 @@
 
   var fields = Array.prototype.slice.call(document.querySelectorAll('[data-key]'));
 
+  var save=document.getElementById('save'), baseline=null, busy=false;
+  function values(){var body={};fields.forEach(function(f){body[f.dataset.key]=f.type==='checkbox'?(f.checked?'1':'0'):f.value.trim()});return body;}
+  function refresh(){save.disabled=busy||baseline===null||JSON.stringify(values())===baseline;}
+  fields.forEach(function(f){f.disabled=true;['input','change'].forEach(function(ev){f.addEventListener(ev,function(){document.getElementById('saveMsg').hidden=true;refresh()})})});
   function api(method, url, body) {
     return fetch(url, { method: method, credentials: 'same-origin',
       headers: body ? { 'Content-Type': 'application/json' } : {}, body: body ? JSON.stringify(body) : undefined })
@@ -178,22 +183,23 @@
   }
 
   api('GET', '/api/settings').then(function (r) {
-    if (r.s !== 200) return;
+    if (r.s !== 200) throw Error('load');
     fields.forEach(function (f) {
       var v = r.j[f.dataset.key];
       if (v === undefined) return;
       if (f.type === 'checkbox') f.checked = v === '1'; else f.value = v;
     });
-  }).catch(function () {});
+    baseline=JSON.stringify(values());fields.forEach(function(f){f.disabled=false});refresh();
+  }).catch(function () {var m=document.getElementById('saveMsg');m.textContent='Не удалось загрузить настройки. Обновите страницу.';m.hidden=false;});
 
   document.getElementById('save').addEventListener('click', function () {
-    var body = {};
-    fields.forEach(function (f) { body[f.dataset.key] = f.type === 'checkbox' ? (f.checked ? '1' : '0') : f.value.trim(); });
+    if(save.disabled)return;var body=values();busy=true;refresh();
     var msg = document.getElementById('saveMsg');
     api('POST', '/api/settings', body).then(function (r) {
+      if(r.s===200)baseline=JSON.stringify(body);
       msg.textContent = r.s === 200 ? 'Сохранено' : (r.j.error || 'Не удалось сохранить');
       msg.hidden = false;
-    }).catch(function () { msg.textContent = 'Сервер не отвечает'; msg.hidden = false; });
+    }).catch(function () { msg.textContent = 'Сервер не отвечает'; msg.hidden = false; }).finally(function(){busy=false;refresh()});
   });
 
   document.getElementById('testTg').addEventListener('click', function () {

@@ -10,7 +10,7 @@ BEGIN;
 INSERT INTO residences (id, name, title, logo_url, sort) VALUES
   ('forma', 'FORMA', 'Резиденция FORMA', '/forma.png', 1),
   ('uyut', 'Уют', 'Резиденция Уют', '/uyt.gif', 2),
-  ('molod', 'Молодежка', 'Квартира Молодежка', '/molodejka.png', 3)
+  ('molod', 'Молодежка', 'Молодежка', '/molodejka.png', 3)
 ON CONFLICT (id) DO UPDATE SET name=EXCLUDED.name, title=EXCLUDED.title, logo_url=EXCLUDED.logo_url, sort=EXCLUDED.sort;
 
 INSERT INTO rooms (id, residence_id, number, name, gender, size, note) VALUES

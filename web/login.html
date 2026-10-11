@@ -136,7 +136,8 @@
   .msg { margin-bottom: var(--msv-s16); }
   .msg[hidden] { display: none; }
 
-  .foot { margin-top: auto; padding-top: var(--msv-s32); }
+  .foot { margin-top: 0; padding-top: var(--msv-form-gap, 20px); }
+  .code-hint { margin: 0 0 var(--msv-s12); color: var(--msv-n500); }
 
 
   .sent { margin-bottom: var(--msv-s24); }
@@ -160,13 +161,11 @@
         <path d="M15 6l-6 6 6 6"/>
       </svg>
     <span class="head__back-label form__back-label">Вернуться</span></a>
-    <a class="msv-note head__title-link" id="headTitle" href="index.html" style="color:var(--msv-n500);text-decoration:none">Вход</a>
   </div>
 
   <span class="role" id="roleBadge"><span class="role__dot"></span><span id="roleName">Резидент</span></span>
 
   <h1 class="msv-h title" id="pageTitle">Вход</h1>
-  <p class="msv-body lead" id="pageLead">Введи телефон и четырёхзначный код. <strong>КОД ВЫДАЕТ МОДЕРАТОР</strong></p>
 
   <!-- Шаг 1: контакт -->
   <section class="step step--on" id="step1" aria-labelledby="pageTitle">
@@ -181,9 +180,8 @@
     <p class="msv-note msv-field__hint">После четырёх неверных кодов вход с этого номера закрывается на полчаса.</p>
 
     <label class="msv-field">
-      <span class="msv-field__label">Телефон</span>
       <input class="msv-input" id="contact" type="tel" inputmode="tel"
-             autocomplete="username" placeholder="+7 999 000-00-00">
+             autocomplete="username" aria-label="Телефон" placeholder="+7 999 000-00-00">
     </label>
 
 
@@ -206,7 +204,8 @@
       <span id="err2Text"></span>
     </div>
 
-    <div class="pin" id="pin">
+    <p class="msv-note code-hint" id="codeHint"><strong>КОД ВЫДАЕТ МОДЕРАТОР</strong></p>
+    <div class="pin" id="pin" role="group" aria-label="Четырёхзначный код" aria-describedby="codeHint">
       <input class="pin__cell" type="password" inputmode="numeric" maxlength="1" autocomplete="off" data-lpignore="true" data-1p-ignore data-form-type="other" aria-label="Первая цифра">
       <input class="pin__cell" type="password" inputmode="numeric" maxlength="1" autocomplete="off" data-lpignore="true" data-1p-ignore data-form-type="other" aria-label="Вторая цифра">
       <input class="pin__cell" type="password" inputmode="numeric" maxlength="1" autocomplete="off" data-lpignore="true" data-1p-ignore data-form-type="other" aria-label="Третья цифра">
@@ -263,9 +262,6 @@
   var badge = document.getElementById('roleBadge');
   if (badge) badge.hidden = true;      // роль заранее неизвестна — не обещаем её
   document.getElementById('pageTitle').textContent = 'Вход';
-  document.getElementById('headTitle').textContent = 'Вход';
-  document.getElementById('pageLead').innerHTML =
-    'Введи телефон и четырёхзначный код. <strong>КОД ВЫДАЕТ МОДЕРАТОР</strong>';
   document.title = 'Вход — Москва в студентов верит!';
 
   /* Раньше страница сама входила под первой учётной записью нужной роли —

@@ -21,3 +21,15 @@ h1{font-size:var(--msv-sub-size,28px)}.eyebrow{display:none}.scroll,.contract-gr
 @media(max-width:750px){.filters #yearLabel{flex:1 1 100%;min-width:0}.filters #yearLabel input,.filters #yearLabel select{width:100%}}
 
 .tri { display:inline-flex; align-items:center; justify-content:center; padding:0; }
+
+/* Shared spacing and aligned control sizes. */
+.contracts .views { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:16px; }
+.contracts #tableDesigns {grid-template-columns:repeat(2,minmax(0,1fr));}
+.contracts .views button,.contracts #tableDesigns button { min-height:52px;padding:10px 16px;line-height:1.3; }
+.contracts .filters { gap:16px;align-items:end; }
+.contracts .filters label { gap:8px; }
+.contracts .filters input,.contracts .filters select { padding-left:16px;padding-right:16px; }
+.contracts #year { padding-right:16px; }
+.contracts #year::-webkit-calendar-picker-indicator { margin:0; padding:0; width:16px;height:16px;cursor:pointer; }
+.contracts #configure[aria-pressed=true] { background:var(--msv-n100);color:var(--msv-n500); }
+@media(max-width:600px){.contracts .views:not(#tableDesigns){grid-template-columns:1fr;} }

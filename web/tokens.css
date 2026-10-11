@@ -269,7 +269,7 @@ body, h1, h2, h3, p, button, a, label { hyphens: none; }
   outline-offset: 2px;
 }
 
-.msv-btn[disabled] { opacity: .35; cursor: default; transform: none; box-shadow: none; }
+.msv-btn[disabled] { background: var(--msv-n100) !important; color: var(--msv-n500) !important; border-color: var(--msv-n100) !important; opacity: 1 !important; cursor: default; transform: none; box-shadow: none; }
 
 .msv-btn--m { height: var(--msv-btn-m); padding: 0 var(--msv-s20); font-size: 15px; border-radius: calc(var(--msv-btn-m) / 2); }
 .msv-btn--s { height: var(--msv-btn-s); padding: 0 var(--msv-s16); font-size: 13px; border-radius: calc(var(--msv-btn-s) / 2); }
@@ -487,3 +487,26 @@ button:has(> .msv-chevron),summary:has(> .msv-chevron) { display:inline-flex; al
 .msv-btn.msv-icon-muted { display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; padding:0; border:0; border-radius:var(--msv-r11); background:transparent; color:var(--msv-n300); box-shadow:none; }
 .msv-btn.msv-icon-muted svg { width:20px; height:20px; }
 .msv-btn.msv-icon-muted:hover, .msv-btn.msv-icon-muted:focus-visible { color:var(--msv-n500); background:var(--msv-n100); }
+
+/* User presence: one compact badge for photos and initials. */
+.presence-avatar { position:relative; display:inline-flex; flex:0 0 auto; vertical-align:middle; }
+.presence-dot { position:absolute; right:-5px; bottom:-5px; width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; z-index:1; }
+.presence-dot::before { content:''; width:12px; height:12px; border:2px solid var(--msv-white); border-radius:50%; background:var(--msv-n300); box-sizing:border-box; }
+.presence-dot--online::before { background:#568A45; }
+.presence-dot:focus-visible { outline:2px solid var(--msv-graphite); border-radius:50%; }
+.presence-tip { position:fixed; z-index:10000; max-width:min(280px,calc(100vw - 16px)); padding:8px 12px; border-radius:8px; color:var(--msv-white); background:var(--msv-graphite); font:13px/1.4 var(--msv-font); pointer-events:none; }
+
+:root { --msv-form-gap:var(--msv-s20); }
+.set.msv-form-card { padding:var(--msv-form-gap); }
+.msv-form-card .set__grid { gap:var(--msv-form-gap); grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr)); }
+.msv-form-card .set__title { margin-bottom:var(--msv-form-gap); }
+.msv-form-card .msv-field { min-width:0; }
+.msv-form-card .msv-input { min-width:0; max-width:100%; box-sizing:border-box; }
+
+/* One header palette for every data table, including sticky header cells. */
+:root { --msv-table-head-bg:var(--msv-graphite); --msv-table-head-ink:var(--msv-beige); }
+table thead th, table thead td { background:var(--msv-table-head-bg)!important; color:var(--msv-table-head-ink)!important; }
+table thead :is(button,a) { color:inherit!important; }
+/* Standard full-size form and filter controls; table cell editors stay compact. */
+.msv-input,.msv-select,.msv-field>select,.filters input,.filters select,.bar__search { height:var(--msv-field)!important; box-sizing:border-box; }
+.msv-select,.msv-field>select,.filters select { appearance:none; -webkit-appearance:none; padding-right:44px!important; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2334495E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")!important; background-repeat:no-repeat!important; background-position:right 16px center!important; background-size:16px!important; }

@@ -893,3 +893,9 @@ WITH moved AS (
 INSERT INTO audit_log (action,target,payload)
 SELECT 'resident.citizenship.migrate','user:' || user_id,
  jsonb_build_object('oldCity',citizenship,'citizenship',citizenship,'city',NULL) FROM moved;
+
+-- Recent authenticated activity, independent of login/session lifetime.
+ALTER TABLE users ADD COLUMN IF NOT EXISTS last_active_at timestamptz;
+
+-- Approved residence display name.
+UPDATE residences SET title='Молодежка' WHERE id='molod' AND title='Квартира Молодежка';

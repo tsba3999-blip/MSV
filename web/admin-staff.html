@@ -26,7 +26,7 @@
   .tri[aria-expanded="true"] svg { transform: rotate(180deg); }
   .miss { color: var(--msv-red); font-weight: 600; }
   .who-link { color: inherit; text-decoration: none; } .who-link:hover .who-cell__name { text-decoration: underline; }
-.staff-table{table-layout:fixed;--staff-name-offset:72px}.staff-table th:nth-child(1){width:32%;padding-left:calc(var(--msv-s16) + var(--staff-name-offset))}.staff-table th:nth-child(2){width:32%}.staff-table th:nth-child(3){width:32%}.staff-table th:nth-child(4){width:4%}.staff-table th,.staff-table td{vertical-align:middle}.staff-table th:nth-child(2),.staff-table td:nth-child(2){text-align:left}.staff-table .who-cell__face img{width:36px!important;height:36px!important}.staff-actions{display:flex;flex-direction:row;align-items:center;gap:6px}.staff-actions .msv-btn{flex:1;min-width:0;padding:0 10px;font-weight:400;white-space:nowrap}.staff-actions [data-bonus]{background:rgba(203,182,255,.25);color:var(--msv-n500);box-shadow:none}.staff-actions [data-bonus]:hover{background:rgba(203,182,255,.4)}.staff-marker{display:inline-block;flex:0 0 12px;color:#000;background:none;font-size:13px;font-weight:400}.staff-table tr.more td{padding:10px var(--msv-s16);vertical-align:middle}.staff-table tr.more td:first-child{padding-left:calc(var(--msv-s16) + var(--staff-name-offset))}.staff-table .more dl{margin:0}.staff-table .more dt{font-size:12px;color:var(--msv-n500);margin-bottom:4px}.staff-table .more dd{margin:0;font-weight:400;overflow-wrap:anywhere}.staff-table .more-actions{text-align:right}.staff-sort{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}th[data-sort]{cursor:pointer}.staff-table th{white-space:normal}.staff-table .more[hidden]{display:none!important}@media(max-width:760px){.staff-table{display:table;min-width:980px}.staff-table thead{display:table-header-group}.staff-table tbody{display:table-row-group}.staff-table tr{display:table-row}.staff-table td,.staff-table th{white-space:normal}.staff-table-wrap{overflow:auto}}
+.staff-table{table-layout:fixed;--staff-name-offset:72px}.staff-table th:nth-child(1){width:32%;padding-left:calc(var(--msv-s16) + var(--staff-name-offset))}.staff-table th:nth-child(2){width:32%}.staff-table th:nth-child(3){width:32%}.staff-table th:nth-child(4){width:72px}.staff-table th,.staff-table td{vertical-align:middle}.staff-table th:nth-child(2),.staff-table td:nth-child(2){text-align:left}.staff-table .who-cell__face img{width:36px!important;height:36px!important}.staff-actions{display:flex;flex-direction:row;align-items:center;gap:6px}.staff-actions .msv-btn{flex:1;min-width:0;padding:0 10px;font-weight:400;white-space:nowrap}.staff-actions [data-bonus]{background:rgba(203,182,255,.25);color:var(--msv-n500);box-shadow:none}.staff-actions [data-bonus]:hover{background:rgba(203,182,255,.4)}.staff-marker{display:inline-block;flex:0 0 12px;color:#000;background:none;font-size:13px;font-weight:400}.staff-table tr.more td{padding:10px var(--msv-s16);vertical-align:middle}.staff-table tr.more td:first-child{padding-left:calc(var(--msv-s16) + var(--staff-name-offset))}.staff-table .more dl{margin:0}.staff-table .more dt{font-size:12px;color:var(--msv-n500);margin-bottom:4px}.staff-table .more dd{margin:0;font-weight:400;overflow-wrap:anywhere}.staff-table .more-actions{text-align:right}.staff-sort{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}th[data-sort]{cursor:pointer}.staff-table th{white-space:normal}.staff-table .more[hidden]{display:none!important}@media(max-width:760px){.staff-table{display:table;min-width:980px}.staff-table thead{display:table-header-group}.staff-table tbody{display:table-row-group}.staff-table tr{display:table-row}.staff-table td,.staff-table th{white-space:normal}.staff-table-wrap{overflow:auto}}
 .payroll-dialog{border:0;border-radius:var(--msv-r20);padding:var(--msv-s24);width:min(520px,calc(100vw - 32px));max-height:90svh;color:var(--msv-graphite)}.payroll-dialog{background:#202124;color:#f1f3f4;color-scheme:dark}.payroll-dialog .msv-field__label{color:#e8eaed}.payroll-dialog .msv-input{background:#303134;color:#f1f3f4;border-color:#70757a}.payroll-dialog .msv-input:focus{border-color:var(--msv-red)}.payroll-dialog .msv-btn--secondary{background:#3c4043;color:#f1f3f4}.payroll-dialog .msv-btn--tertiary{color:#f1f3f4}
 .payroll-dialog::backdrop{background:rgba(52,73,94,.45)}.payroll-dialog h2{margin:0 0 var(--msv-s16)}.payroll-dialog .msv-field{display:block;margin:var(--msv-s16) 0}.payroll-dialog__actions{display:flex;flex-wrap:wrap;gap:var(--msv-s12);margin-top:var(--msv-s24)}.payroll-dialog [hidden]{display:none}
 /* Compact payroll columns, with native scrolling in both directions. */
@@ -34,7 +34,7 @@
 .staff-table th:nth-child(1) { width:42%; }
 .staff-table th:nth-child(2) { width:19%; }
 .staff-table th:nth-child(3) { width:35%; }
-.staff-table th:nth-child(4) { width:4%; }
+.staff-table th:nth-child(4) { width:72px; }
 .staff-table th,.staff-table td { padding-top:10px; padding-bottom:10px; }
 .staff-table-wrap { max-width:100%; overflow-x:auto; touch-action:pan-x pan-y; overscroll-behavior:auto; }
 @media(max-width:760px) {
@@ -47,6 +47,9 @@
 .fot-history > summary::-webkit-details-marker { display:none; }
 .fot-history[open] > summary svg { transform:rotate(180deg); }
 .fot-history table { width:auto; min-width:620px; }
+.staff-table tr:not(.more)>td:last-child{padding-left:16px;padding-right:16px;text-align:center;}.staff-table tr:not(.more)>td:last-child .tri{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;padding:0;box-sizing:border-box;}
+.staff-more__menu{left:auto!important;right:0;max-width:calc(100vw - 32px);box-sizing:border-box;}.staff-more__menu .msv-btn{max-width:100%;white-space:normal;height:auto;min-height:36px;}
+.staff-table tr.more>td:first-child{padding:16px;}.staff-details{position:sticky;left:16px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;white-space:normal;}.staff-details dl{margin:0}.staff-details dt:not(:first-child){margin-top:8px}@media(max-width:760px){.staff-details{width:calc(100vw - 64px);grid-template-columns:1fr;}}
 </style>
 <style>
   body { --role: var(--msv-graphite); --role-ink: var(--msv-graphite); }
@@ -186,7 +189,7 @@ MSV.ready(function (ctx) {
     document.getElementById('count').textContent = list.length + ' из ' + STAFF.length;
     document.getElementById('rows').innerHTML = list.map(function (s) {
       return '<tr data-id="' + esc(s.id) + '">' +
-        '<td><a class="who-link" href="admin-staff-view.html?id=' + esc(s.id) + '" title="Открыть кабинет сотрудника"><span class="who-cell"><span class="staff-marker">' + ({uyut:'У',forma:'Ш',all:'А'}[s.place]||'—') + '</span><span class="who-cell__face">' + (s.photo?'<img src="'+esc(s.photo)+'" alt="Фото сотрудника" data-zoom style="width:48px;height:48px;object-fit:cover;border-radius:50%">':esc(initials(s.name))) + '</span><span><span class="who-cell__name">' + esc(s.name) + '</span><span class="msv-note" style="display:block">'+esc(s.position)+'</span></span></span></a></td>' +
+        '<td><a class="who-link" href="admin-staff-view.html?id=' + esc(s.id) + '" title="Открыть кабинет сотрудника"><span class="who-cell"><span class="staff-marker">' + ({uyut:'У',forma:'Ш',all:'А'}[s.place]||'—') + '</span><span class="who-cell__face presence-avatar" data-presence-user="' + esc(s.id) + '">' + (s.photo?'<img src="'+esc(s.photo)+'" alt="Фото сотрудника" data-zoom style="width:48px;height:48px;object-fit:cover;border-radius:50%">':esc(initials(s.name))) + '</span><span><span class="who-cell__name">' + esc(s.name) + '</span><span class="msv-note" style="display:block">'+esc(s.position)+'</span></span></span></a></td>' +
 
 
 
@@ -194,11 +197,11 @@ MSV.ready(function (ctx) {
         '<td><div class="staff-actions"><button class="msv-btn msv-btn--s msv-btn--primary" type="button" data-pay>Начислить</button><button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-bonus>Премировать</button></div></td>' +
         '<td class="num"><button class="tri" type="button" data-more aria-expanded="false" aria-label="Подробнее"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="msv-chevron"><path d="M6 9l6 6 6-6"/></svg></button></td>' +
       '</tr>' +
-      '<tr class="more" data-more-of="'+esc(s.id)+'" hidden>'+
-        '<td><dl><dt>Дата рождения</dt><dd>'+fdate(s.birthday)+'</dd></dl></td>'+
-        '<td><dl><dt>Куда переводить</dt><dd>'+(s.payTo?esc(s.payTo):'<span class="miss">уточнить</span>')+'</dd><dt style="margin-top:8px">Тип отношений</dt><dd>'+esc(s.relation||'—')+'</dd></dl></td>'+
-        '<td><dl><dt>Работает с</dt><dd>'+fdate(s.started)+'</dd><dt style="margin-top:8px">Стаж</dt><dd>'+esc(tenure(s.started))+'</dd></dl></td>'+
-        '<td class="more-actions">'+(ctx.me&&ctx.me.canEditSite&&s.role!=='admin'?'<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-cabinet="'+esc(s.id)+'">ЛК</button>':'')+'</td></tr>';
+      '<tr class="more" data-more-of="'+esc(s.id)+'" hidden><td colspan="4"><div class="staff-details">'+
+        '<dl><dt>Дата рождения</dt><dd>'+fdate(s.birthday)+'</dd></dl>'+
+        '<dl><dt>Куда переводить</dt><dd>'+(s.payTo?esc(s.payTo):'<span class="miss">уточнить</span>')+'</dd><dt>Тип отношений</dt><dd>'+esc(s.relation||'—')+'</dd></dl>'+
+        '<dl><dt>Работает с</dt><dd>'+fdate(s.started)+'</dd><dt>Стаж</dt><dd>'+esc(tenure(s.started))+'</dd></dl>'+
+        (ctx.me&&ctx.me.canEditSite&&s.role!=='admin'?'<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-cabinet="'+esc(s.id)+'">ЛК</button>':'')+'</div></td></tr>';
     }).join('');
   }
 

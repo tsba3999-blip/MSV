@@ -495,14 +495,15 @@
       '<button type="button" class="msv-sh__btn" data-act="today">Сегодня</button>' +
       '<button type="button" class="msv-sh__btn msv-sh__btn--icon" data-act="next" aria-label="Следующий месяц">›</button>' +
       '<input type="date" class="msv-sh__date" data-act="date" aria-label="Начало периода">' +
+      '<div class="msv-sh__view-actions">' +
       '<button type="button" class="msv-sh__btn" data-act="scale" aria-pressed="false">Весь год</button>' +
-      '<button type="button" class="msv-sh__btn" data-act="onlyfree" aria-pressed="false" title="Показать только свободные сегодня места">Только свободные</button>' +
+      '<button type="button" class="msv-sh__btn" data-act="onlyfree" aria-pressed="false" title="Показать только свободные сегодня места">Свободные</button>' +
       '<span class="msv-sh__spacer"></span>' +
       // Бесплатная бронь: нужна редко, поэтому стоит в углу и объясняет
       // себя подсказкой при наведении (решение заказчика 24.09.2026)
       '<button type="button" class="msv-sh__btn msv-sh__hold-btn" data-act="hold" aria-label="Забронировать место без оплаты">Забронировать' +
         '<span class="msv-sh__hold-tip" role="tooltip">Бесплатная бронь на 24 или 48 часов</span>' +
-      '</button>' +
+      '</button></div>' +
       '<input type="search" class="msv-sh__search" data-act="search" placeholder="Фамилия, комната или место" aria-label="Поиск">' +
       '<span class="msv-sh__zoom" role="group" aria-label="Масштаб">' +
         '<button type="button" class="msv-sh__btn" data-zoom="s">Мелко</button>' +
@@ -1904,8 +1905,8 @@
         signed = first;
       }
       if (!r || r.docsSigned === false) return '';          // покажется «не указано»
-      if (signed === null) return 'подписаны';
-      return 'подписаны ' + esc(fmtDateFull(signed));
+      if (signed === null) return '<strong>подписаны</strong>';
+      return '<span style="white-space:nowrap"><strong>подписаны</strong> ' + esc(fmtDateFull(signed)) + '</span>';
     }
 
     /* Дата подписи равна дате первой оплаты — так заведено у заказчика. */
@@ -1953,17 +1954,17 @@
         '</div>' +
           /* Телефон остаётся при фамилии. Если его нет — так и пишем, чтобы
              строка не исчезала молча (24.09.2026). */
-          '<div class="msv-sh__value' + (phoneHTML(res) ? '' : ' msv-sh__value--empty') + '" style="margin-top:8px">' +
+          '<div class="msv-sh__value msv-sh__contacts' + (phoneHTML(res) ? '' : ' msv-sh__value--empty') + '" style="margin-top:8px">' +
             (phoneHTML(res) || 'телефон не указан') + '</div>' +
         '</div>' +
 
         /* Деньги — сразу под фамилией: это первое, что смотрит модератор */
         '<div class="msv-sh__sect">' +
           '<dl class="msv-sh__pairs">' +
-            '<dt>Начислено за проживание</dt><dd>' + esc(money(b.accrued)) + '</dd>' +
+            '<dt class="msv-sh__accrued-label"><span class="full">Начислено за проживание</span><span class="short">Начислено за прож.</span></dt><dd>' + esc(money(b.accrued)) + '</dd>' +
             '<dt>Оплачено</dt><dd>' + esc(money(b.paid)) + '</dd>' +
-            '<dt>Баланс</dt><dd class="' + (balance > 0.5 ? 'msv-sh__debt' : 'msv-sh__ok') + '">' +
-              esc(money(Math.abs(balance))) + (balance > 0.5 ? ' к оплате' : (balance < -0.5 ? ' переплата' : '')) +
+            '<dt>' + (balance < -0.5 ? 'Переплата' : 'К оплате') + '</dt><dd class="' + (balance > 0.5 ? 'msv-sh__debt' : 'msv-sh__ok') + '">' +
+              esc(money(Math.abs(balance))) +
             '</dd>' +
           '</dl>' +
         '</div>' +
@@ -1974,7 +1975,7 @@
               ' — ' + esc(fmtDate(b.to)) + '</dd>' +
             '<dt>Ночей</dt><dd>' + nights + '</dd>' +
             (b.bookedAt !== null ? '<dt>Дата бронирования</dt><dd>' + esc(fmtDate(b.bookedAt)) + '</dd>' : '') +
-            (b.tariff ? '<dt>Тариф</dt><dd>' + esc(b.tariff) + '</dd>' : '') +
+            (b.tariff ? '<dt>Контракт</dt><dd>' + (/^годовой(?: контракт)?$/i.test(b.tariff.trim()) ? 'Годовой' : 'НЕ годовой') + '</dd>' : '') +
             (b.source ? '<dt>Источник</dt><dd>' + esc(b.source) + '</dd>' : '') +
           '</dl>' +
         '</div>' +
@@ -1988,7 +1989,7 @@
             pair('Контактное лицо', esc(res ? res.contactPerson : '')) +
             pair('Профиль в VK', res && res.vk
               ? '<a href="' + esc(safeUrl(res.vk)) + '" target="_blank" rel="noopener noreferrer">' + esc(res.vk) + '</a>' : '') +
-            pair('Договор-оферта о проживании, Правила проживания', docsLine(res, pays)) +
+            '<div class="msv-sh__documents-line"><dt>Договор-оферта о проживании, Правила проживания</dt> <dd>' + (docsLine(res, pays) || '<span class="msv-sh__value--empty">не указано</span>') + '</dd></div>' +
           '</dl>' +
         '</div>' +
 

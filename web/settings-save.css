@@ -1,4 +1,5 @@
 [data-save-prefs]:disabled,
+[data-save-settings]:disabled,
 #saveProfile:disabled {
   background: var(--msv-n100);
   color: var(--msv-n500);

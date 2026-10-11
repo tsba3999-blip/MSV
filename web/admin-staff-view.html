@@ -156,9 +156,9 @@ MSV.ready(function (ctx) {
        человека узнают быстрее, чем по строке в таблице (решение
        заказчика 25.09.2026). */
     '<section class="set"><div class="card-top">' +
-      (s.photo
+      '<span class="presence-avatar" data-presence-user="' + esc(s.id) + '">' + (s.photo
         ? '<img class="card-top__ava" src="' + esc(s.photo) + '" alt="" data-zoom>'
-        : '<span class="card-top__ava">' + esc(s.name.split(' ').map(function (w) { return w[0] || ''; }).slice(0, 2).join('').toUpperCase()) + '</span>') +
+        : '<span class="card-top__ava">' + esc(s.name.split(' ').map(function (w) { return w[0] || ''; }).slice(0, 2).join('').toUpperCase()) + '</span>') + '</span>' +
       '<span class="card-top__t">' +
         '<h2 class="msv-sub card-top__name">' + esc(s.name) + '</h2>' +
         '<p class="msv-body card-top__sub">' + esc(s.position || 'должность не указана') + '</p>' +

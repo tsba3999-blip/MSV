@@ -26,6 +26,13 @@
 .rights .rights-note { margin:6px 0 0; line-height:1.2; }
 .rights .who-cell__name,.rights .msv-note { line-height:1.2; }
 @media(max-width:760px) { .rights { display:table; } .rights thead { display:table-header-group; } .rights tbody { display:table-row-group; } .rights tr { display:table-row; } .rights th,.rights td { display:table-cell; } }
+.rights .rights-act {display:flex;flex-direction:column;align-items:stretch;gap:8px;white-space:normal;}
+.rights .rights-act .msv-btn {width:100%;min-width:0;padding:0 10px;}
+.rights .role-pill {max-width:100%;white-space:normal;overflow-wrap:anywhere;box-sizing:border-box;}
+.rights .role-mobile {display:none;}
+.rights .who-cell>span:last-child {min-width:0;}
+.rights .who-cell__name {overflow-wrap:anywhere;}
+@media(max-width:760px){.rights {min-width:740px;} .rights th:nth-child(1){width:240px;} .rights th:nth-child(3){width:340px;} .rights th:nth-child(4){width:160px;} .rights th:nth-child(2),.rights td:nth-child(2){display:none;} .rights .role-mobile {display:inline-flex;margin:6px 0;} }
 </style>
 </head>
 <body>
@@ -114,8 +121,6 @@
     <main class="work__body">
       <p class="msv-note notice">Нажмите «Изменить», включите или отключите отдельные разделы и сохраните. Роль сотрудника при этом не меняется.</p>
 
-      <h2 class="msv-sub" style="margin:0 0 var(--msv-s12)">Кто и что может</h2>
-
       <div class="rights-scroll" role="region" aria-label="Права доступа" tabindex="0"><table class="rights">
         <thead>
           <tr><th>Человек</th><th>Роль</th><th>Доступ к разделам</th><th></th></tr>
@@ -186,7 +191,7 @@
     return window.MSV_STAFF_LOAD().then(function (list) {
       people = (list || []).map(function (s) {
         return { id: String(s.id), name: s.name, role: s.role, position: s.position,
-                 contact: s.phone || s.email || '', place:s.place, phone:s.phone,
+                 contact: s.phone || '', place:s.place, phone:s.phone,
                  sectionAccess:s.sectionAccess, photo:s.photo, canEditShahmatka: s.canEditShahmatka, canPayroll: s.canPayroll };
       });
       render();
@@ -219,7 +224,7 @@
 
       return '<tr' + (edit ? ' class="is-edit"' : '') + '><td>' +
           '<a class="who-link" href="admin-staff-view.html?id=' + esc(p.id) + '" title="Открыть карточку сотрудника"><span class="who-cell">' +
-          '<span class="staff-marker">'+marker+'</span><span class="who-cell__face">' + (p.photo?'<img src="'+esc(p.photo)+'" alt="Фото сотрудника" style="width:48px;height:48px;object-fit:cover;border-radius:50%">':esc(ini(p.name))) + '</span><span><span class="who-cell__name">' + esc(p.name) + '</span>' +
+          '<span class="staff-marker">'+marker+'</span><span class="who-cell__face presence-avatar" data-presence-user="' + esc(p.id) + '">' + (p.photo?'<img src="'+esc(p.photo)+'" alt="Фото сотрудника" style="width:48px;height:48px;object-fit:cover;border-radius:50%">':esc(ini(p.name))) + '</span><span><span class="who-cell__name">' + esc(p.name) + '</span><span class="role-mobile role-pill ' + roleStyle + '">' + esc(roleLabel) + '</span>' +
           '<span class="msv-note">' + esc(p.position) + (p.contact ? ' · ' + esc(p.contact) : '') + '</span></span></span></a></td>' +
         '<td><span class="role-pill ' + roleStyle + '">' + esc(roleLabel) + '</span></td>' +
         '<td><span class="perm">' + pills + '</span>' +
