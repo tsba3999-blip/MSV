@@ -494,6 +494,9 @@ button:has(> .msv-chevron),summary:has(> .msv-chevron) { display:inline-flex; al
 .presence-dot::before { content:''; width:12px; height:12px; border:2px solid var(--msv-white); border-radius:50%; background:var(--msv-n300); box-sizing:border-box; }
 .presence-dot--online::before { width:18px; height:18px; background:#9ACD32; }
 .presence-dot:focus-visible { outline:2px solid var(--msv-graphite); border-radius:50%; }
+.presence-inline { display:inline-flex; width:1em; height:1em; margin-right:.3em; vertical-align:-.1em; }
+.presence-inline .presence-dot { position:static; width:100%; height:100%; }
+.presence-inline .presence-dot::before { width:100%; height:100%; }
 .presence-tip { position:fixed; z-index:10000; max-width:min(280px,calc(100vw - 16px)); padding:8px 12px; border-radius:8px; color:var(--msv-white); background:var(--msv-graphite); font:13px/1.4 var(--msv-font); pointer-events:none; }
 
 :root { --msv-form-gap:var(--msv-s20); }

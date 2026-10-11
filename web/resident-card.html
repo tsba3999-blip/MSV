@@ -276,11 +276,11 @@ MSV.ready(function (ctx) {
 
     /* ---------- шапка ---------- */
     html += '<div class="card-top">' +
-      '<span class="presence-avatar" data-presence-user="' + esc(d.me.id) + '">' + (d.profile.photo
+      '<span>' + (d.profile.photo
         ? '<img class="card-top__ava" src="' + esc(d.profile.photo) + '" alt="" data-zoom>'
         : '<span class="card-top__ava">' + esc(initials(d.me.name)) + '</span>') + '</span>' +
       '<span class="card-top__t">' +
-        '<h2 class="msv-sub card-top__name">' + esc([d.profile.lastName, d.profile.firstName, d.profile.middleName].filter(Boolean).join(' ') || d.me.name || 'Без имени') + genderBadge(MSVGender.resolve(d.profile)) + '</h2>' +
+        '<h2 class="msv-sub card-top__name"><span class="presence-inline" data-presence-user="' + esc(d.me.id) + '"></span>' + esc([d.profile.lastName, d.profile.firstName, d.profile.middleName].filter(Boolean).join(' ') || d.me.name || 'Без имени') + genderBadge(MSVGender.resolve(d.profile)) + '</h2>' +
         '<p class="msv-body card-top__sub">' + (live
             ? esc(placeSummary(live))
             : 'Места сейчас нет') + '</p>' +
