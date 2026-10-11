@@ -97,7 +97,7 @@
     bar.className = 'edit-bar';
     bar.innerHTML =
       '<button type="button" class="edit-bar__pen" data-edit="toggle" title="Править содержимое" aria-pressed="false">' +
-        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
+        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" ' +
         'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
         '<path d="m16 3 5 5-12 12-6 1 1-6Z"/><path d="m14 5 5 5M4 15l5 5"/></svg>' +
       '</button>' +
@@ -122,9 +122,9 @@
     css.textContent =
       '.edit-bar{position:fixed;top:12px;right:12px;z-index:10050;display:flex;align-items:center;gap:8px;' +
         'font-family:var(--msv-font,sans-serif);font-size:13px}' +
-      '.edit-bar__pen{width:40px;height:40px;display:flex;align-items:center;justify-content:center;' +
-        'color:#34495E;background:#fff;border:1px solid #EAE4DA;border-radius:50%;cursor:pointer;' +
-        'box-shadow:0 3px 9px rgba(52,73,94,.18)}' +
+      '.edit-bar__pen{width:44px;height:44px;display:flex;align-items:center;justify-content:center;padding:0;' +
+        'color:var(--msv-n300,#B8B1A5);background:transparent;border:0;border-radius:50%;cursor:pointer;' +
+        'box-shadow:none}' +
       '.edit-bar__pen:hover{background:#F5F1EA}' +
       '.edit-bar__pen[aria-pressed="true"]{color:#fff;background:#FB344A;border-color:#FB344A}' +
       '.edit-bar__meta{padding:6px 12px;background:#fff;color:#6B665E;border:1px solid #EAE4DA;border-radius:20px;' +

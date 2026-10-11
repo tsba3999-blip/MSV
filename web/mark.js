@@ -530,7 +530,7 @@
     var r=heading.getBoundingClientRect(),center=r.top+r.height/2;
     if(floating)mark.style.setProperty('top',Math.max(8,center-22)+'px','important');
     if(bar&&!document.body.classList.contains('editing')){
-      bar.style.setProperty('top',Math.max(10,center-20)+'px','important');
+      bar.style.setProperty('top',Math.max(8,center-22)+'px','important');
       bar.style.setProperty('right',floating?'70px':'14px','important');
     }
   }
