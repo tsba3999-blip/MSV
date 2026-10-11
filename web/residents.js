@@ -281,7 +281,7 @@ MSV.ready(function (ctx) {
         '<td>' + (x.phone ? '<a href="tel:+' + esc(digits(x.phone)) + '">' + esc(x.phone) + '</a>' : '—') + mess(x) + '</td>' +
         '<td>' + pay + '</td><td>' + payBtn + '</td><td>' + depBtn + '</td>' +
         '<td>' + reg + '</td>' +
-        '<td class="num"><button class="tri" type="button" data-resident-more aria-expanded="false" aria-label="Подробнее"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></td></tr>'+
+        '<td class="num"><button class="tri" type="button" data-resident-more aria-expanded="false" aria-label="Подробнее"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="msv-chevron"><path d="M6 9l6 6 6-6"/></svg></button></td></tr>'+
       '<tr class="resident-more" hidden data-name="'+esc(x.name)+'" data-user="'+esc(x.userId)+'"><td colspan="8"><div class="resident-details"><span>Контакт родителя: '+esc(x.contactPerson||'не указан')+'</span><span class="resident-details__actions">'+(ctx.me&&ctx.me.canEditSite?'<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-cabinet="'+esc(x.userId)+'">ЛК</button>':'')+'<button class="msv-btn msv-btn--s msv-btn--tertiary del" type="button" data-del title="Удалить резидента из базы">Удалить</button></span></div></td></tr>';
     }).join('');
   }

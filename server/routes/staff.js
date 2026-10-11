@@ -275,6 +275,30 @@ module.exports = function register(route) {
     return !!(r.rows[0] && r.rows[0].can_payroll);
   }
 
+  route('GET', '/api/payroll/history', async (req, res) => {
+    const s = auth.readSession(req);
+    if (!s) return fail(res, 401, 'Не выполнен вход');
+    if (s.role === 'resident' || !(await seesAllPayroll(s))) return fail(res, 403, 'Нет доступа к общему ФОТ');
+    const r = await query(`WITH totals AS (
+      SELECT date_trunc('month',paid_at AT TIME ZONE 'Europe/Moscow') AS month,
+             SUM(amount) AS salary,SUM(bonus) AS bonus,COUNT(*)::int AS count FROM payroll GROUP BY 1
+    ), months AS (
+      SELECT generate_series(MIN(month),GREATEST(MAX(month),date_trunc('month',now() AT TIME ZONE 'Europe/Moscow')),interval '1 month') AS month FROM totals
+    ) SELECT to_char(m.month,'YYYY-MM') AS month,COALESCE(t.salary,0) AS salary,
+      COALESCE(t.bonus,0) AS bonus,COALESCE(t.count,0) AS count,
+      m.month=date_trunc('month',now() AT TIME ZONE 'Europe/Moscow') AS current
+      FROM months m LEFT JOIN totals t USING(month) ORDER BY m.month`);
+    let previous = null;
+    const months = r.rows.map(x => {
+      const salary=Number(x.salary),bonus=Number(x.bonus),total=salary+bonus;
+      const delta=previous===null?null:total-previous;
+      const percent=previous===null||previous===0?null:Math.round(delta/previous*1000)/10;
+      previous=total;
+      return {month:x.month,salary,bonus,total,count:Number(x.count),current:x.current,delta,percent};
+    });
+    json(res,200,{months:months.reverse()});
+  });
+
   route('GET', '/api/payroll/month-summary', async (req, res) => {
     const s = auth.readSession(req);
     if (!s) return fail(res, 401, 'Не выполнен вход');

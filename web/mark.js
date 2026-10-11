@@ -238,7 +238,7 @@
         }
         var group = document.createElement('div'); group.className = 'side__personal';
         var toggle = document.createElement('button'); toggle.type = 'button'; toggle.className = 'side__link side__personal-toggle';
-        toggle.innerHTML = profile.innerHTML + '<span class="side__personal-arrow" aria-hidden="true">⌄</span>';
+        toggle.innerHTML = profile.innerHTML + '<svg class="side__personal-arrow msv-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
         toggle.setAttribute('aria-controls', 'staffPersonalMenu');
         var submenu = document.createElement('div'); submenu.id = 'staffPersonalMenu'; submenu.className = 'side__personal-menu';
         profile.before(group); group.appendChild(toggle); group.appendChild(submenu);

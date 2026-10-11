@@ -478,3 +478,7 @@ body, h1, h2, h3, p, button, a, label { hyphens: none; }
 .msv-gender { display:inline-flex; align-items:center; justify-content:center; flex:none; box-sizing:border-box; width:24px; height:24px; padding:0; border:1px solid; border-radius:4px; font:700 12px/1 var(--msv-font); }
 .msv-gender--f { --gender-ink:#A3316B; --gender-bg:#FCEBF3; --gender-border:#F3C9DD; color:var(--gender-ink); background:var(--gender-bg); border-color:var(--gender-border); }
 .msv-gender--m { --gender-ink:#1B4C9E; --gender-bg:#E8F0FF; --gender-border:#C3D8FE; color:var(--gender-ink); background:var(--gender-bg); border-color:var(--gender-border); }
+
+/* Unified navigation and disclosure chevrons. */
+.msv-chevron { display:inline-block; flex-shrink:0; vertical-align:middle; stroke-width:2; }
+button:has(> .msv-chevron),summary:has(> .msv-chevron) { display:inline-flex; align-items:center; justify-content:center; }

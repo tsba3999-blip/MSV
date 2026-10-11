@@ -43,6 +43,10 @@
   .work,.work__body { min-height:0; height:auto; max-height:none; overflow:visible; }
   .staff-table { touch-action:pan-x pan-y; }
 }
+.fot-history > summary { display:flex; align-items:center; gap:8px; width:fit-content; cursor:pointer; list-style:none; }
+.fot-history > summary::-webkit-details-marker { display:none; }
+.fot-history[open] > summary svg { transform:rotate(180deg); }
+.fot-history table { width:auto; min-width:620px; }
 </style>
 <style>
   body { --role: var(--msv-graphite); --role-ink: var(--msv-graphite); }
@@ -139,7 +143,7 @@
         <button class="bar__chip" type="button" data-place="forma" aria-pressed="false">Шаб.</button>
         <button class="bar__chip" type="button" data-place="uyut" aria-pressed="false">Варш.</button>
         <button class="bar__chip" type="button" data-place="all" aria-pressed="false">Администрация</button><span class="msv-note bar__count" id="count"></span>
-        <details class="staff-more"><summary class="msv-btn msv-btn--s msv-btn--tertiary">Ещё <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><div class="staff-more__menu"><button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" id="addStaff">Добавить сотрудника</button></div></details>
+        <details class="staff-more"><summary class="msv-btn msv-btn--s msv-btn--tertiary">Ещё <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="msv-chevron"><path d="M6 9l6 6 6-6"/></svg></summary><div class="staff-more__menu"><button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" id="addStaff">Добавить сотрудника</button></div></details>
       </div>
 
       <div class="staff-table-wrap"><table class="grid staff-table">
@@ -147,7 +151,7 @@
         <tbody id="rows"></tbody><tfoot><tr><td>ФОТ по текущим окладам</td><td id="salaryTotal" style="text-align:left;white-space:nowrap"></td><td colspan="2"></td></tr></tfoot>
       </table></div>
 
-      <section style="margin-top:24px"><h2 class="msv-sub">История ФОТ</h2><label class="msv-field"><span class="msv-field__label">Месяц начисления</span><input id="fotMonth" class="msv-input" type="month" style="max-width:260px"></label><p id="fotResult" class="msv-body" role="status"></p></section>
+      <details id="fotHistory" class="fot-history" style="margin-top:24px"><summary class="msv-sub">История ФОТ <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="msv-chevron"><path d="m6 9 6 6 6-6"/></svg></summary><p class="msv-note">Фактические начисления по месяцам. Текущий месяц ещё не завершён.</p><p id="fotResult" class="msv-note" role="status"></p><div class="msv-table-scroll"><table class="grid"><thead><tr><th>Месяц</th><th class="num">Зарплата</th><th class="num">Премии</th><th class="num">ФОТ</th><th class="num">К предыдущему месяцу</th></tr></thead><tbody id="fotRows"></tbody></table></div></details>
       <h2 class="msv-sub" style="margin:var(--msv-s32) 0 var(--msv-s12)">Начисления</h2>
       <p id="payrollStatus" class="msv-note" role="status"></p>
       <table class="grid">
@@ -188,7 +192,7 @@ MSV.ready(function (ctx) {
 
         '<td class="num">' + money(s.salary) + '</td>' +
         '<td><div class="staff-actions"><button class="msv-btn msv-btn--s msv-btn--primary" type="button" data-pay>Начислить</button><button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-bonus>Премировать</button></div></td>' +
-        '<td class="num"><button class="tri" type="button" data-more aria-expanded="false" aria-label="Подробнее"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></td>' +
+        '<td class="num"><button class="tri" type="button" data-more aria-expanded="false" aria-label="Подробнее"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="msv-chevron"><path d="M6 9l6 6 6-6"/></svg></button></td>' +
       '</tr>' +
       '<tr class="more" data-more-of="'+esc(s.id)+'" hidden>'+
         '<td><dl><dt>Дата рождения</dt><dd>'+fdate(s.birthday)+'</dd></dl></td>'+
@@ -259,10 +263,9 @@ MSV.ready(function (ctx) {
     form.onsubmit=function(e){e.preventDefault();if(!form.reportValidity())return;var period=form.elements.period.value.trim();if(!period){form.elements.period.focus();return;}finish(changed?{corrected:true,baseAmount:x.amount,amount:Number(form.elements.amount.value),period:period}:{amount:x.amount});};
     dialog.showModal();
   });}
-  var fotMonth=document.getElementById('fotMonth'), fotResult=document.getElementById('fotResult'), fotRequest=0;
-  fotMonth.value=new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Moscow'}).slice(0,7);
-  async function loadFot(){var request=++fotRequest;if(!fotMonth.value)return;fotResult.textContent='Загрузка…';try{var r=await ctx.api('GET','/api/payroll/month-summary?month='+encodeURIComponent(fotMonth.value));if(request!==fotRequest)return;if(r.status!==200)throw Error('Не удалось загрузить ФОТ');var x=r.body;fotResult.textContent=x.count?'Зарплата: '+money(x.salary)+' · Премии: '+money(x.bonus)+' · Всего: '+money(x.total):'За этот месяц начислений нет.';}catch(e){if(request===fotRequest)fotResult.textContent='Не удалось загрузить ФОТ';}}
-  fotMonth.addEventListener('change',loadFot);if(ctx.live)loadFot();else fotResult.textContent='История доступна при подключении к серверу.';
+  var fotHistory=document.getElementById('fotHistory'),fotResult=document.getElementById('fotResult'),fotRows=document.getElementById('fotRows'),fotRequest=0;
+  async function loadFot(){if(!fotHistory.open)return;var request=++fotRequest;fotResult.textContent='Загрузка…';try{if(!ctx.live)throw Error();var r=await ctx.api('GET','/api/payroll/history');if(request!==fotRequest)return;if(r.status!==200)throw Error();var months=r.body.months;fotRows.innerHTML=months.map(function(x){var label=new Date(x.month+'-01T12:00:00').toLocaleDateString('ru-RU',{month:'long',year:'numeric'});var change=x.delta===null?'—':x.delta===0?'Без изменений':(x.delta>0?'↑ +':'↓ −')+money(Math.abs(x.delta))+(x.percent===null?'':' ('+(x.percent>0?'+':'')+x.percent.toLocaleString('ru-RU')+'%)');return '<tr><td>'+esc(label)+(x.current?' <span class="msv-note">· текущий</span>':'')+'</td><td class="num">'+money(x.salary)+'</td><td class="num">'+money(x.bonus)+'</td><td class="num"><strong>'+money(x.total)+'</strong></td><td class="num">'+change+'</td></tr>';}).join('');fotResult.textContent=months.length?'':'История появится после первого начисления.';}catch(e){if(request===fotRequest){fotRows.innerHTML='';fotResult.textContent='Не удалось загрузить историю ФОТ. Закройте и откройте её ещё раз.';}}}
+  fotHistory.addEventListener('toggle',function(){if(fotHistory.open)loadFot();else ++fotRequest;});
   async function loadLog(){loadFot();var r=await ctx.api('GET','/api/payroll');if(r.status!==200){document.getElementById('payrollStatus').textContent='Не удалось загрузить начисления';return;}document.getElementById('log').innerHTML=r.body.length?r.body.map(function(x){return '<tr><td>'+new Date(x.paidAt).toLocaleDateString('ru-RU')+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.period)+'</td><td class="num">'+money(x.amount)+'</td><td class="num">'+(x.bonus?money(x.bonus):'—')+'</td><td class="num">'+money(x.total)+'</td><td><span class="tag tag--mute">'+(x.receivedAt?'получил':'ждёт')+'</span></td></tr>';}).join(''):'<tr><td colspan="7" class="grid__empty">Начислений пока нет.</td></tr>';}
   if(ctx.live)loadLog().catch(function(){document.getElementById('payrollStatus').textContent='Не удалось загрузить начисления';});
   function load() {

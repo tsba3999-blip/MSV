@@ -29,6 +29,11 @@
   if (!pic || !pick || location.protocol === 'file:') return;
 
   var drop = document.getElementById('faceDrop');
+  if (drop) {
+    drop.className = 'face__delete';
+    drop.setAttribute('aria-label','Удалить фото'); drop.title = 'Удалить фото';
+    drop.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/></svg>';
+  }
   var msg = document.getElementById('faceMsg');
   var hint = msg ? msg.textContent : '';
 
@@ -37,6 +42,7 @@
 
   var css = document.createElement('style');
   css.textContent =
+    '.face__delete{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;padding:0;border:0;border-radius:var(--msv-r11);background:transparent;color:var(--msv-n300);cursor:pointer}.face__delete[hidden]{display:none}.face__delete:hover,.face__delete:focus-visible{color:var(--msv-n500);background:var(--msv-n100)}' +
     '.face{display:flex;align-items:center;gap:var(--msv-s16);flex-wrap:wrap}' +
     '.face__pic{flex:0 0 auto;display:flex;align-items:center;justify-content:center;width:96px;height:96px;' +
       'border-radius:50%;background:var(--msv-n100);color:var(--msv-white);font:700 28px/1 var(--msv-font,sans-serif);' +
