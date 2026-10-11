@@ -11,6 +11,9 @@
 <link rel="stylesheet" href="cabinet.css">
 <style>
   body { --role: var(--msv-graphite); --role-ink: var(--msv-graphite); }
+  #stats .stat { display:flex;flex-direction:column;gap:var(--msv-s8);padding:var(--msv-s16); }
+  #stats .stat__value,#stats .stat__note { margin:0; }
+  #stats .stat__label { line-height:20px; }
 </style>
 </head>
 <body>
@@ -135,9 +138,11 @@ MSV.ready(function (ctx) {
 
   var total = { beds: 0, busy: 0, debt: 0, debtPeople: 0, leaving: 0, minors: 0 };
   var rows = [];
+  var freeMen = 0, freeWomen = 0, freeOther = 0;
 
   RES.forEach(function (res) {
     var d = ctx.bookings(res);
+    var occupied = new Set();
     var byId = {}; d.residents.forEach(function (r) { byId[r.id] = r; });
     var busy = 0, debt = 0, debtPeople = 0, leaving = 0, minors = 0, men = 0, women = 0;
 
@@ -145,7 +150,7 @@ MSV.ready(function (ctx) {
       var from = day(b.from), to = day(b.to);
       if (from === null || to === null) return;
       if (from <= today && to >= today && b.residentId) {
-        busy++;
+        busy++; occupied.add(String(b.bedId));
         var person=byId[b.residentId];
         if(person && person.gender==='м')men++;
         if(person && person.gender==='ж')women++;
@@ -165,6 +170,15 @@ MSV.ready(function (ctx) {
       }
     });
 
+    var roomGender = {};
+    (res.rooms || []).forEach(function (room) { roomGender[String(room.id)] = room.gender; });
+    res.beds.forEach(function (bed) {
+      if (occupied.has(String(bed.id))) return;
+      var gender = roomGender[String(bed.roomId)];
+      if (gender === 'м') freeMen++;
+      else if (gender === 'ж') freeWomen++;
+      else freeOther++;
+    });
     total.beds += res.beds.length; total.busy += busy; total.debt += debt;
     total.debtPeople += debtPeople; total.leaving += leaving; total.minors += minors;
     rows.push({ res: res, beds: res.beds.length, busy: busy, men:men, women:women });
@@ -174,15 +188,15 @@ MSV.ready(function (ctx) {
   var load = total.beds ? Math.round(100 * total.busy / total.beds) : 0;
 
   document.getElementById('stats').innerHTML = [
-    ['Занято мест', total.busy + ' из ' + total.beds, load + '% заполнено', ''],
-    ['Свободно', String(free), 'можно заселять', ''],
+    ['Занято мест · ' + load + '%', total.busy + ' из ' + total.beds, '', ''],
+    ['Свободно', String(free), freeMen + ' — м, ' + freeWomen + ' — ж' + (freeOther ? ', ' + freeOther + ' — без указания пола' : ''), ''],
     ['Долги', money(total.debt), total.debtPeople + ' чел. не внесли полную сумму', total.debt > 0 ? ' stat--debt' : ''],
     ['Выезжают за две недели', String(total.leaving), 'освободят места', ''],
     ['Несовершеннолетних', String(total.minors), 'нужно согласие родителей', '']
   ].map(function (x) {
     return '<div class="stat' + x[3] + '"><span class="stat__label">' + esc(x[0]) + '</span>' +
       '<span class="stat__value">' + esc(x[1]) + '</span>' +
-      '<span class="msv-note stat__note">' + esc(x[2]) + '</span></div>';
+      (x[2] ? '<span class="msv-note stat__note">' + esc(x[2]) + '</span>' : '') + '</div>';
   }).join('');
 
   document.getElementById('byRes').innerHTML = '<table class="grid"><thead><tr><th>Резиденция</th><th>Загрузка в чел.</th><th>Загрузка в %</th><th>Пол</th></tr></thead><tbody>'+rows.map(function (x) {
