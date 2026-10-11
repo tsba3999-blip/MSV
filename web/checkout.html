@@ -54,9 +54,10 @@
   .sign-docs__note { margin: var(--msv-s8) 0 0; color: var(--msv-n500); }
   .sign-docs--miss { border: 1px solid var(--msv-red); background: var(--msv-n100); }
   /* Сумма и пояснение к ней — одной колонкой справа (решение заказчика 23.09.2026) */
-  .total--note { align-items: flex-start; margin-bottom: var(--msv-s12); }
-  .total__right { text-align: right; }
-  .total__note { display: block; margin-top: var(--msv-s4); max-width: 260px; color: var(--msv-n500); }
+  .total.total--note { display:grid; grid-template-columns:auto minmax(0,1fr); align-items:baseline; margin-bottom: var(--msv-s12); }
+  .total--note > .msv-body { white-space:nowrap; }
+  .total__right { text-align:right; white-space:nowrap; }
+  .total__note { display: block; margin-top: var(--msv-s4); grid-column:1 / -1; text-align:right; color: var(--msv-n500); }
   .payer__lock { margin: var(--msv-s8) 0 0; color: var(--msv-n500); }
 </style>
 <link rel="stylesheet" href="rooms.css">
@@ -93,7 +94,7 @@
   </label>
 
   <label class="check">
-    <input class="check__box" type="checkbox" id="deposit">
+    <input class="check__box" type="checkbox" id="deposit" checked>
     <span class="check__text">
       <span class="check__name">Внести депозит сразу</span>
       <span class="msv-note check__note">Сумма к оплате удваивается. Депозит — это оплата августа, последнего месяца контракта.</span>
@@ -164,8 +165,8 @@
       <span class="msv-body">К оплате</span>
       <span class="total__right">
         <b id="total">0 руб.</b>
-        <span class="msv-note total__note">Данная стоимость только при условии оплаты по СБП.</span>
       </span>
+      <span class="msv-note total__note">Данная стоимость только при условии оплаты по СБП.</span>
     </div>
     <button class="msv-btn msv-btn--block msv-btn--primary" id="pay" type="button" disabled>Перейти к оплате</button>
   </div>
@@ -264,6 +265,7 @@
     window.MSV_HOME.then(function (d) {
       if (!d) return;
       if (d.booking && d.booking.depositPaid) hideDeposit();
+      else if (d.booking && Number(d.booking.paid) > 0) { deposit.checked = false; syncTotal(); }
       var who = document.getElementById('who');
       if (who && d.me && d.me.name) who.textContent = d.me.name;
     });

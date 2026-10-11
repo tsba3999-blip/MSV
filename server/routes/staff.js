@@ -273,6 +273,16 @@ module.exports = function register(route) {
     return !!(r.rows[0] && r.rows[0].can_payroll);
   }
 
+  route('GET', '/api/payroll/month-summary', async (req, res) => {
+    const s = auth.readSession(req);
+    if (!s) return fail(res, 401, 'Не выполнен вход');
+    if (s.role === 'resident' || !(await seesAllPayroll(s))) return fail(res, 403, 'Нет доступа к общему ФОТ');
+    const month = String(req.query.month || '');
+    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month) || Number(month.slice(0,4)) < 1900) return fail(res, 400, 'Укажите месяц');
+    const r = await query(`SELECT COUNT(*)::int AS count, COALESCE(SUM(amount),0) AS salary, COALESCE(SUM(bonus),0) AS bonus FROM payroll WHERE paid_at >= ($1::date::timestamp AT TIME ZONE 'Europe/Moscow') AND paid_at < (($1::date + INTERVAL '1 month')::timestamp AT TIME ZONE 'Europe/Moscow')`,[month+'-01']);
+    const x = r.rows[0]; json(res,200,{month,count:Number(x.count),salary:Number(x.salary),bonus:Number(x.bonus),total:Number(x.salary)+Number(x.bonus)});
+  });
+
   route('GET', '/api/payroll', async (req, res) => {
     const s = auth.readSession(req);
     if (!s) return fail(res, 401, 'Не выполнен вход');

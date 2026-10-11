@@ -9,6 +9,13 @@
 <title>Анкета, шаг 1 — МСВ</title>
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="form.css">
+<style>
+.name-entry { display:block; background:var(--msv-white); border:2px solid var(--msv-n300); border-radius:var(--msv-r11); overflow:hidden; }
+.name-entry:focus-within { border-color:var(--msv-graphite); }
+.name-entry .msv-input { border:0; border-radius:0; }
+.name-entry__error { display:block; padding:0 var(--msv-s16) var(--msv-s8); color:var(--msv-red); line-height:1.2; }
+.name-entry__error[hidden] { display:none; }
+</style>
 </head>
 <body>
 
@@ -148,17 +155,19 @@
 <script src="suggest.js"></script>
 <script>
 /* ФИО — только по-русски (решение заказчика 22.09.2026): латиница не принимается,
-   под полем показывается подсказка. Дефис, апостроф и пробел разрешены. */
+   внутри рамки поля показывается подсказка. Дефис, апостроф и пробел разрешены. */
 (function () {
   'use strict';
   var RU = /^[А-Яа-яЁё\s\-']*$/;
   ['fLast', 'fFirst', 'fMiddle'].forEach(function (id) {
     var el = document.getElementById(id); if (!el) return;
     var hint = document.createElement('span');
-    hint.className = 'msv-note'; hint.hidden = true;
-    hint.style.cssText = 'display:block;margin-top:4px;color:var(--msv-red)';
+    hint.className = 'msv-note name-entry__error'; hint.hidden = true;
+    hint.id = id + 'Error'; hint.setAttribute('aria-live', 'polite');
+    el.setAttribute('aria-describedby', hint.id);
     hint.textContent = 'Необходимо вводить данные по-русски';
-    el.parentNode.appendChild(hint);
+    var box = document.createElement('span'); box.className = 'name-entry';
+    el.parentNode.insertBefore(box, el); box.appendChild(el); box.appendChild(hint);
     el.addEventListener('input', function () {
       var bad = !RU.test(el.value);
       if (bad) el.value = el.value.replace(/[^А-Яа-яЁё\s\-']/g, '');

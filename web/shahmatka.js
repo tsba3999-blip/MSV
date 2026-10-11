@@ -202,6 +202,7 @@
       };
     });
 
+    var importedCountries = ['Российская Федерация','Беларусь','Узбекистан','Украина','Турция','Эстония','Казахстан','Южно-Африканская Республика','Кыргызская Республика'];
     var residents = (raw.residents || raw.users || raw.clients || []).map(function (u) {
       return {
         id: String(firstDefined(u.id, u.userId)),
@@ -209,7 +210,8 @@
         phone: firstDefined(u.phone, u.tel, '') || '',
         birthday: firstDefined(u.birthday, u.birthDate, u.dob, '') || '',
         docsSigned: u.docsSigned !== undefined ? !!u.docsSigned : (u.documents !== undefined ? !!u.documents : null),
-        city: firstDefined(u.city, u.town, '') || '',
+        city: importedCountries.indexOf(u.city) >= 0 ? '' : (firstDefined(u.city, u.town, '') || ''),
+        citizenship: u.citizenship || (importedCountries.indexOf(u.city) >= 0 ? u.city : ''),
         university: firstDefined(u.university, u.vuz, u.school, '') || '',
         program: firstDefined(u.program, u.faculty, u.speciality, '') || '',
         contactPerson: firstDefined(u.contactPerson, u.contact, u.parent, '') || '',
@@ -1700,7 +1702,7 @@
           if (fw < 4) fw = 4;
           if (fl + fw > trackW) fw = trackW - fl;
           fills += '<div class="msv-sh__paid msv-sh__paid--' + st + '" data-id="' + esc(b.id) + '" tabindex="0" role="button" style="left:' + fl.toFixed(1) +
-            'px;width:' + fw.toFixed(1) + 'px;top:' + (top + 4) + 'px"><span class="msv-sh__bar-name">' + esc(name) + '</span></div>';
+            'px;width:' + fw.toFixed(1) + 'px;top:' + (top + 4) + 'px"></div>';
         });
       }
       if (isContract) cls += ' msv-sh__bar--contract';
@@ -1708,8 +1710,7 @@
       bars += '<div class="' + cls + '" data-id="' + esc(b.id) + '" tabindex="0" role="button" ' +
         'aria-label="' + esc(name + ', ' + fmtDateFull(b.from) + ' — ' + fmtDateFull(b.to)) + '" ' +
         'style="left:' + left.toFixed(1) + 'px;width:' + w.toFixed(1) + 'px;top:' + top + 'px">' +
-        (months ? '' :
-          '<span class="msv-sh__bar-dot"></span>' +
+        ('<span class="msv-sh__bar-dot"></span>' +
           '<span class="msv-sh__bar-name">' + esc(name) + '</span>' +
           (sub ? '<span class="msv-sh__bar-sub">' + esc(sub) + '</span>' : '')) +
         bday +
@@ -1981,12 +1982,13 @@
         '<div class="msv-sh__sect">' +
           '<dl class="msv-sh__pairs">' +
             pair('День рождения', bdayHTML(res)) +
+            pair('Гражданство', esc(res ? res.citizenship : '')) +
             pair('Город', esc(res ? res.city : '')) +
             pair('ВУЗ', esc(vuz)) +
             pair('Контактное лицо', esc(res ? res.contactPerson : '')) +
             pair('Профиль в VK', res && res.vk
               ? '<a href="' + esc(safeUrl(res.vk)) + '" target="_blank" rel="noopener noreferrer">' + esc(res.vk) + '</a>' : '') +
-            pair('Документы', docsLine(res, pays)) +
+            pair('Договор-оферта о проживании, Правила проживания', docsLine(res, pays)) +
           '</dl>' +
         '</div>' +
 

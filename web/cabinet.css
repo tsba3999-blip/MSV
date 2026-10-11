@@ -496,3 +496,13 @@ a.side__who:focus-visible { outline: 2px solid var(--msv-white); outline-offset:
 .side__personal-menu[hidden] { display: none; }
 .shell--folded .side__personal-menu { display: none; }
 .side__link[hidden]{display:none!important}
+
+/* Shared compact tables: native touch scrolling, ordinary table layout. */
+.msv-table-scroll { max-width:100%; overflow:auto; touch-action:pan-x pan-y; -webkit-overflow-scrolling:touch; }
+.msv-table-scroll > table.grid,.msv-table-scroll > table.rights { display:table; overflow:visible; }
+.msv-table-scroll > table > thead { display:table-header-group; }
+.msv-table-scroll > table > tbody { display:table-row-group; }
+.msv-table-scroll > table > tfoot { display:table-footer-group; }
+.msv-table-scroll > table > :is(thead,tbody,tfoot) > tr { display:table-row; }
+.msv-table-scroll > table th,.msv-table-scroll > table td { display:table-cell; padding:10px 12px; line-height:1.2; height:auto; }
+.msv-table-scroll > table .msv-note { line-height:1.2; }

@@ -408,19 +408,18 @@
    данных»), кнопка возвращает именно туда (решение заказчика 23.09.2026).
    ============================================================ */
 (function () {
-  'use strict';
-  var back = document.querySelector('.head__back'); if (!back) return;
-  var ref = document.referrer; if (!ref) return;
-
-  var u; try { u = new URL(ref); } catch (e) { return; }
-  if (u.origin !== location.origin) return;            // пришли с чужого сайта
-  if (u.pathname === location.pathname) return;        // перезагрузка этой же страницы
-
-  var from = u.pathname.split('/').pop() || 'index.html';
-  // со входа и с выхода возвращать некуда
-  if (/^(login|signup)\.html$/.test(from)) return;
-
-  back.href = u.pathname + u.search;
+  var key='msv.pendingNavigation', pending;
+  try { pending=JSON.parse(sessionStorage.getItem(key)||'null');sessionStorage.removeItem(key); } catch(e){}
+  if(pending && pending.to===location.href && Date.now()-pending.at<30000){history.replaceState(Object.assign({},history.state,{msvFrom:pending.from}), '');}
+  document.addEventListener('click',function(e){
+    var a=e.target.closest('a');if(!a||e.button!==0||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey||a.target==='_blank'||a.hasAttribute('download'))return;
+    var isBack=a.matches('.head__back,.form__back')||a.textContent.trim()==='Вернуться';
+    if(isBack){var from=history.state&&history.state.msvFrom;
+      if(from && new URL(from,location.href).origin===location.origin && history.length>1){e.preventDefault();e.stopImmediatePropagation();history.back();return;}
+    }
+    var to;try{to=new URL(a.href,location.href);}catch(err){return;}
+    if(to.origin===location.origin && to.pathname!==location.pathname){try{sessionStorage.setItem(key,JSON.stringify({from:location.href,to:to.href,at:Date.now()}));}catch(err){}}
+  },true);
 })();
 
 (function(){var script=document.createElement('script');script.src='cabinet-preview.js';document.head.append(script);})();
@@ -447,3 +446,5 @@
   if (document.fonts) document.fonts.ready.then(schedule);
   schedule();
 })();
+
+(function(){function wrapTables(){document.querySelectorAll('table.grid,table.rights').forEach(function(t){if(t.parentElement.classList.contains('msv-table-scroll'))return;if(t.parentElement.matches('.staff-table-wrap,.rights-scroll')){t.parentElement.classList.add('msv-table-scroll');return;}var wrap=document.createElement('div');wrap.className='msv-table-scroll';wrap.setAttribute('tabindex','0');wrap.setAttribute('role','region');wrap.setAttribute('aria-label','Таблица с прокруткой');t.parentNode.insertBefore(wrap,t);wrap.appendChild(t);});}wrapTables();new MutationObserver(wrapTables).observe(document.body,{childList:true,subtree:true});})();

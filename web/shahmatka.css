@@ -1259,3 +1259,15 @@ body.msv-sh-dragging .msv-sh__bar { cursor: grabbing; }
   .msv-sh__toolbar .msv-sh__spacer,.msv-sh__toolbar .msv-sh__zoom { display:none; }
   .msv-sh__toolbar .msv-sh__search { grid-column:1 / -1; min-width:0; }
 }
+
+/* Names stick to the visible timeline instead of the clipped booking box. */
+.msv-sh__bar { overflow:clip; }
+.msv-sh__bar-name { left:calc(var(--sh-left-w) + 4px); }
+@media(max-width:760px){
+ .msv-sh { --sh-left-w:60px; }
+ .msv-sh__tier { display:none; }
+ .msv-sh__bar-name { max-width:calc(100vw - 112px); white-space:normal; line-height:1.2; }
+}
+
+.msv-sh__bar-name { z-index:2; }
+@media(max-width:760px){ .msv-sh__bar { height:28px; } }

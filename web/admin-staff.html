@@ -143,9 +143,10 @@
 
       <div class="staff-table-wrap"><table class="grid staff-table">
         <thead><tr><th data-sort="name">Фамилия Имя / Должность</th><th class="num" data-sort="salary">Оклад</th><th>Действия</th><th></th></tr></thead>
-        <tbody id="rows"></tbody><tfoot><tr><td>ФОТ в этом месяце</td><td id="salaryTotal" style="text-align:left;white-space:nowrap"></td><td colspan="2"></td></tr></tfoot>
+        <tbody id="rows"></tbody><tfoot><tr><td>ФОТ по текущим окладам</td><td id="salaryTotal" style="text-align:left;white-space:nowrap"></td><td colspan="2"></td></tr></tfoot>
       </table></div>
 
+      <section style="margin-top:24px"><h2 class="msv-sub">История ФОТ</h2><label class="msv-field"><span class="msv-field__label">Месяц начисления</span><input id="fotMonth" class="msv-input" type="month" style="max-width:260px"></label><p id="fotResult" class="msv-body" role="status"></p></section>
       <h2 class="msv-sub" style="margin:var(--msv-s32) 0 var(--msv-s12)">Начисления</h2>
       <p id="payrollStatus" class="msv-note" role="status"></p>
       <table class="grid">
@@ -257,7 +258,11 @@ MSV.ready(function (ctx) {
     form.onsubmit=function(e){e.preventDefault();if(!form.reportValidity())return;var period=form.elements.period.value.trim();if(!period){form.elements.period.focus();return;}finish(changed?{corrected:true,baseAmount:x.amount,amount:Number(form.elements.amount.value),period:period}:{amount:x.amount});};
     dialog.showModal();
   });}
-  async function loadLog(){var r=await ctx.api('GET','/api/payroll');if(r.status!==200){document.getElementById('payrollStatus').textContent='Не удалось загрузить начисления';return;}document.getElementById('log').innerHTML=r.body.length?r.body.map(function(x){return '<tr><td>'+new Date(x.paidAt).toLocaleDateString('ru-RU')+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.period)+'</td><td class="num">'+money(x.amount)+'</td><td class="num">'+(x.bonus?money(x.bonus):'—')+'</td><td class="num">'+money(x.total)+'</td><td><span class="tag tag--mute">'+(x.receivedAt?'получил':'ждёт')+'</span></td></tr>';}).join(''):'<tr><td colspan="7" class="grid__empty">Начислений пока нет.</td></tr>';}
+  var fotMonth=document.getElementById('fotMonth'), fotResult=document.getElementById('fotResult'), fotRequest=0;
+  fotMonth.value=new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Moscow'}).slice(0,7);
+  async function loadFot(){var request=++fotRequest;if(!fotMonth.value)return;fotResult.textContent='Загрузка…';try{var r=await ctx.api('GET','/api/payroll/month-summary?month='+encodeURIComponent(fotMonth.value));if(request!==fotRequest)return;if(r.status!==200)throw Error('Не удалось загрузить ФОТ');var x=r.body;fotResult.textContent=x.count?'Зарплата: '+money(x.salary)+' · Премии: '+money(x.bonus)+' · Всего: '+money(x.total):'За этот месяц начислений нет.';}catch(e){if(request===fotRequest)fotResult.textContent='Не удалось загрузить ФОТ';}}
+  fotMonth.addEventListener('change',loadFot);if(ctx.live)loadFot();else fotResult.textContent='История доступна при подключении к серверу.';
+  async function loadLog(){loadFot();var r=await ctx.api('GET','/api/payroll');if(r.status!==200){document.getElementById('payrollStatus').textContent='Не удалось загрузить начисления';return;}document.getElementById('log').innerHTML=r.body.length?r.body.map(function(x){return '<tr><td>'+new Date(x.paidAt).toLocaleDateString('ru-RU')+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.period)+'</td><td class="num">'+money(x.amount)+'</td><td class="num">'+(x.bonus?money(x.bonus):'—')+'</td><td class="num">'+money(x.total)+'</td><td><span class="tag tag--mute">'+(x.receivedAt?'получил':'ждёт')+'</span></td></tr>';}).join(''):'<tr><td colspan="7" class="grid__empty">Начислений пока нет.</td></tr>';}
   if(ctx.live)loadLog().catch(function(){document.getElementById('payrollStatus').textContent='Не удалось загрузить начисления';});
   function load() {
     window.MSV_STAFF_LOAD().then(function (list) { STAFF = list.filter(function(person){return !person.payrollExcluded;}); render(); });
