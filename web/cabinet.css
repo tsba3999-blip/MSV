@@ -516,10 +516,10 @@ a.side__who:focus-visible { outline: 2px solid var(--msv-white); outline-offset:
 .side .msv-mark-btn .side__short-logo { display:none; }
 @media (min-width:861px) {
   .side__who { margin-bottom:48px; }
-  .side, .shell--folded .side { padding:12px; }
-  .side__logo-link { display:flex; align-items:center; height:44px; flex-shrink:0; margin:0 0 16px 2px; }
+  .side, .shell--folded .side { padding:12px; --side-logo-left:calc((72px - 54.45px) / 2 - 12px); }
+  .side__logo-link { display:flex; align-items:center; height:44px; flex-shrink:0; margin:0 0 16px var(--side-logo-left); }
   .side__logo { width:180px; height:auto; margin:0; }
-  .side .msv-mark-btn { display:none; position:relative; top:auto; right:auto; flex-shrink:0; margin:0 0 16px 2px; width:54.45px; height:44px; background:transparent; box-shadow:none; border-radius:0; transform:none; font-size:0; }
+  .side .msv-mark-btn { display:none; position:relative; top:auto; right:auto; flex-shrink:0; margin:0 0 16px var(--side-logo-left); width:54.45px; height:44px; background:transparent; box-shadow:none; border-radius:0; transform:none; font-size:0; }
   .side .msv-mark-btn img { display:none; }
   .side .msv-mark-btn .side__short-logo { display:block; height:31.35px; width:auto; max-width:none; }
   .shell--folded .side__logo-link { display:none; }
