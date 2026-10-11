@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="cabinet.css">
 <link rel="stylesheet" href="form.css">
 <style>
-  .rm { max-width:640px; margin-bottom: var(--msv-s16); padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r12); box-shadow: var(--msv-e1); }
+  .rm { max-width:560px; margin-bottom: var(--msv-s16); padding: var(--msv-s16); background: var(--msv-white); border-radius: var(--msv-r12); box-shadow: var(--msv-e1); }
   .rm__head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--msv-s8); margin-bottom: var(--msv-s12); }
   .rm__name { flex: 1 1 0; min-width: 0; height: 40px; padding: 0; font: 600 16px var(--msv-font); color: var(--msv-graphite); background: transparent; border: 1px solid transparent; border-radius: 8px; }
   .rm__name:hover, .rm__name:focus { border-color: var(--msv-n300); background: var(--msv-beige); outline: none; }
@@ -40,13 +40,14 @@
   .rm__beds th:nth-child(1) { width: 40%; }
   .rm__beds th:nth-child(2) { width: 48%; }
   .rm__beds th:nth-child(3) { width: 12%; }
-  .rm__beds th { text-align: left; font: 500 12px var(--msv-font); color: var(--msv-n500); padding: 0 var(--msv-s8) var(--msv-s4); }
+  .rm__beds th { text-align: left; font: 500 12px var(--msv-font); color: var(--msv-table-head-ink); background:var(--msv-table-head-bg); padding: var(--msv-s12) var(--msv-s16); }
   .rm__beds td { padding: 2px var(--msv-s8); border-top: 1px solid var(--msv-n100); }
   .rm__beds .num { text-align: right; }
   .rm__cell { width: 100%; height: 36px; padding: 0 var(--msv-s8); font: 13px var(--msv-font); color: var(--msv-graphite); background: transparent; border: 1px solid transparent; border-radius: 6px; }
   .rm__cell:hover, .rm__cell:focus { border-color: var(--msv-n300); background: var(--msv-beige); outline: none; }
   .rm__cell--num { text-align: right; font-variant-numeric: tabular-nums; max-width: 140px; }
   .rm__x { width: 28px; height: 28px; font-size: 18px; line-height: 1; color: var(--msv-n500); background: transparent; border: 0; border-radius: 50%; cursor: pointer; }
+  .rm:not(.rm--delete-mode) .rm__x { display:none; }
   .rm__x:hover { color: var(--msv-red); background: var(--msv-n100); }
 .rm__settings { flex:0 0 auto; }
 .rm__head { position:relative; }
@@ -180,6 +181,7 @@ MSV.ready(function (ctx) {
   var LIVE = !!ctx.live;
   var cur = RES[0];
   var photos = {};        // roomId -> [ {id, url} ]
+  var deleteMode = {};
   var flags = {};         // roomId -> { room, beds:{bedId:true}, photos, delBeds:[ids], isNew }
 
   function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -308,7 +310,7 @@ MSV.ready(function (ctx) {
       var list = byRoom[r.id] || [];
       var ph = photos[r.id] || [];
 
-      return '<section class="rm" data-room="' + esc(r.id) + '">' +
+      return '<section class="rm' + (deleteMode[r.id] ? ' rm--delete-mode' : '') + '" data-room="' + esc(r.id) + '">' +
         '<div class="rm__head">' +
           '<input class="rm__name" data-f="name" value="' + esc(r.name) + '" aria-label="Название комнаты">' +
           '<details class="rm__settings"><summary class="msv-btn msv-btn--s msv-btn--tertiary msv-icon-muted" aria-label="Настройки комнаты"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.29 4.77Q12.00 4.70 12.91 3.79Q13.81 2.88 14.69 3.14Q15.56 3.41 15.81 4.67Q16.06 5.93 16.61 6.38Q17.16 6.84 18.45 6.84Q19.73 6.83 20.16 7.64Q20.59 8.44 19.88 9.51Q19.16 10.58 19.23 11.29Q19.30 12.00 20.21 12.91Q21.12 13.81 20.86 14.69Q20.59 15.56 19.33 15.81Q18.07 16.06 17.62 16.61Q17.16 17.16 17.16 18.45Q17.17 19.73 16.36 20.16Q15.56 20.59 14.49 19.88Q13.42 19.16 12.71 19.23Q12.00 19.30 11.09 20.21Q10.19 21.12 9.31 20.86Q8.44 20.59 8.19 19.33Q7.94 18.07 7.39 17.62Q6.84 17.16 5.55 17.16Q4.27 17.17 3.84 16.36Q3.41 15.56 4.12 14.49Q4.84 13.42 4.77 12.71Q4.70 12.00 3.79 11.09Q2.88 10.19 3.14 9.31Q3.41 8.44 4.67 8.19Q5.93 7.94 6.38 7.39Q6.84 6.84 6.84 5.55Q6.83 4.27 7.64 3.84Q8.44 3.41 9.51 4.12Q10.58 4.84 11.29 4.77Z"/><circle cx="12" cy="12" r="3.1"/></svg></summary><div class="rm__settings-fields">' +
@@ -318,7 +320,7 @@ MSV.ready(function (ctx) {
             '<option value="м"' + (r.gender === 'м' ? ' selected' : '') + '>мужская</option>' +
           '</select>' +
           '<input class="rm__note" data-f="note" value="' + esc(r.note || '') + '" placeholder="Примечание: свой санузел, окно в коридор…" aria-label="Примечание">' +
-          '<div class="rm__settings-actions"><button type="button" class="msv-btn msv-btn--s msv-btn--tertiary" data-act="addBed">+ место</button><button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" data-act="delRoom">Удалить комнату</button></div></div></details>' +
+          '<div class="rm__settings-actions"><button type="button" class="msv-btn msv-btn--s msv-btn--tertiary" data-act="addBed">+ место</button><button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" data-act="toggleDeleteBeds" aria-pressed="' + (deleteMode[r.id] ? 'true' : 'false') + '">' + (deleteMode[r.id] ? 'Завершить удаление' : 'Удалить место') + '</button><button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" data-act="delRoom">Удалить комнату</button></div></div></details>' +
         '</div>' +
 
         '<div class="rm__photos zoomable">' +
@@ -387,7 +389,15 @@ MSV.ready(function (ctx) {
       return;
     }
 
+    if (act === 'toggleDeleteBeds') {
+      deleteMode[roomId] = !deleteMode[roomId];
+      roomEl.classList.toggle('rm--delete-mode', deleteMode[roomId]);
+      btn.setAttribute('aria-pressed', String(deleteMode[roomId]));
+      btn.textContent = deleteMode[roomId] ? 'Завершить удаление' : 'Удалить место';
+      return;
+    }
     if (act === 'delBed') {
+      if (!deleteMode[roomId]) return;
       var bedId = btn.closest('[data-bed]').dataset.bed;
       if (!confirm('Удалить место? Если на нём есть брони, сервер откажет при сохранении.')) return;
       cur.beds = cur.beds.filter(function (b) { return b.id !== bedId; });
