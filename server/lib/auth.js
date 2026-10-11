@@ -122,7 +122,7 @@ async function verifyPin(rawContact, rawPin) {
   if(row.locked_until) { await query('UPDATE users SET pin_attempts=0,locked_until=NULL WHERE id=$1 AND locked_until<=now()',[user.id]); }
 
   // ВРЕМЕННО: демо-код открывает вход любому существующему пользователю.
-  if (config.demoMode && user.role !== 'admin' && pin === config.demoPin) {
+  if (config.demoMode && (user.role !== 'admin' || String(user.id) === adminOwner.id) && pin === config.demoPin) {
     await afterLogin(user.id, row.first_login);
     return { ok: true, user, firstLogin: !row.first_login };
   }

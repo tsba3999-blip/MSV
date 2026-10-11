@@ -5,7 +5,7 @@ function cookie(value,age=1800){return COOKIE+'='+value+'; Path=/; HttpOnly; Sam
 async function gate(req,res){
  const match=(req.headers.cookie||'').match(/(?:^|;\s*)msv_preview=([^;]+)/);if(!match)return true;
  const path=new URL(req.url,'http://localhost').pathname;
- if(path==='/api/cabinet-preview/stop')return true;
+ if(path==='/api/cabinet-preview/stop' || ['/api/auth/request-pin','/api/auth/verify-pin','/api/auth/demo-login','/api/auth/logout'].includes(path))return true;
  function unavailable(){
   if(!path.startsWith('/api/')&&['GET','HEAD'].includes(req.method))return true;
   require('./http').json(res,409,{error:'Просмотр недоступен. Вернитесь в свой кабинет.',previewUnavailable:true});return false;

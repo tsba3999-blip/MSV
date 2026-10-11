@@ -48,7 +48,7 @@ module.exports = function register(route) {
     // firstLogin — сайт отправит на анкету, а не в кабинет
     await logLogin(req, r.user.id, true);
     json(res, 200, { role: r.user.role, name: r.user.name, firstLogin: !!r.firstLogin },
-         { 'Set-Cookie': auth.sessionCookie(r.user) });
+         { 'Set-Cookie': [auth.sessionCookie(r.user), require('../lib/cabinet-preview').cookie('',0)] });
   });
 
   /* ВРЕМЕННО: открытый вход по роли, только пока DEMO_MODE=1.
@@ -59,7 +59,7 @@ module.exports = function register(route) {
     if (!r.ok) return fail(res, 403, r.error);
     await logLogin(req, r.user.id, true);
     json(res, 200, { role: r.user.role, name: r.user.name, firstLogin: false },
-         { 'Set-Cookie': auth.sessionCookie(r.user) });
+         { 'Set-Cookie': [auth.sessionCookie(r.user), require('../lib/cabinet-preview').cookie('',0)] });
   });
 
   /* История входов: последние 50 записей вошедшего. */
@@ -94,7 +94,7 @@ module.exports = function register(route) {
   });
 
   route('POST', '/api/auth/logout', async (req, res) => {
-    json(res, 200, { ok: true }, { 'Set-Cookie': auth.clearCookie() });
+    json(res, 200, { ok: true }, { 'Set-Cookie': [auth.clearCookie(), require('../lib/cabinet-preview').cookie('',0)] });
   });
 
   route('GET', '/api/auth/me', async (req, res) => {
