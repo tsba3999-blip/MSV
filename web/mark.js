@@ -383,8 +383,10 @@
       var left = box.left + parseFloat(getComputedStyle(who).paddingLeft);
       var bottom = box.top + box.height / 2 + 19;
       if (face) { var photo = face.getBoundingClientRect(); left = photo.left; bottom = photo.bottom; }
+      var firstIcon = Array.from(side.querySelectorAll('.side__nav .side__link svg')).find(function (icon) { return icon.getBoundingClientRect().height > 0; });
+      var nextTop = firstIcon ? firstIcon.getBoundingClientRect().top : bottom + 44;
       btn.style.left = (left - base.left + 5) + 'px';
-      btn.style.top = (bottom - base.top + 8) + 'px';
+      btn.style.top = ((bottom + nextTop) / 2 - base.top - 14) + 'px';
     }
     function apply(folded) {
       shell.classList.remove('shell--folded');
@@ -400,6 +402,7 @@
     apply(saved);
     window.addEventListener('resize', function () { apply(shell.classList.contains('shell--folded')); });
     meReq.then(function () { apply(shell.classList.contains('shell--folded')); });
+    document.addEventListener('msv:menu-ready', place);
     btn.addEventListener('click', function () {
       var f = !shell.classList.contains('shell--folded'); apply(f);
       try { localStorage.setItem('msv.sideFolded', f ? '1' : '0'); } catch (e) {}

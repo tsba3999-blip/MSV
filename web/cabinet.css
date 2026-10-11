@@ -516,8 +516,11 @@ a.side__who:focus-visible { outline: 2px solid var(--msv-white); outline-offset:
 @media (min-width:861px) {
   .side__who { margin-bottom:48px; }
   .side, .shell--folded .side { padding:12px; }
-  .side__logo-link { display:none; }
-  .side .msv-mark-btn { position:relative; top:auto; right:auto; flex-shrink:0; margin:0 0 16px 2px; }
+  .side__logo-link { display:flex; align-items:center; height:44px; flex-shrink:0; margin:0 0 16px 2px; }
+  .side__logo { width:180px; height:auto; margin:0; }
+  .side .msv-mark-btn { display:none; position:relative; top:auto; right:auto; flex-shrink:0; margin:0 0 16px 2px; }
+  .shell--folded .side__logo-link { display:none; }
+  .shell--folded .side .msv-mark-btn { display:flex; }
   .side__who { grid-template-columns:38px minmax(0,1fr); padding:8px 5px; }
   .shell--folded .side__who { display:grid; width:var(--fold-who-width); flex-shrink:0; justify-content:normal; padding:8px 5px; margin:0 40px 48px 0; }
   .shell--folded .side__name, .shell--folded .side__role { display:block; visibility:hidden; }
