@@ -543,15 +543,18 @@
   var resize=new ResizeObserver(schedule);
   function align(){
     queued=false;var heading=document.querySelector('h1');if(!heading)return;
-    if(observed!==heading){resize.disconnect();resize.observe(heading);observed=heading;}
+    
     var mark=document.querySelector('.msv-mark-btn'),bar=document.querySelector('.edit-bar');
     var floating=mark&&getComputedStyle(mark).position==='fixed';
     var host=heading.closest('.work__top,.head,.top')||heading;
     host.classList.toggle('msv-heading-tools',!!floating);
-    var r=heading.getBoundingClientRect(),center=r.top+r.height/2;
-    if(floating)mark.style.setProperty('top',Math.max(8,center-22)+'px','important');
+    if(observed!==host){resize.disconnect();resize.observe(host);observed=host;}
+    var r=host.getBoundingClientRect(),style=getComputedStyle(host);
+    var borderTop=parseFloat(style.borderTopWidth)||0,borderBottom=parseFloat(style.borderBottomWidth)||0;
+    var center=r.top+borderTop+(r.height-borderTop-borderBottom)/2;
+    if(floating)mark.style.setProperty('top',Math.max(0,center-22)+'px','important');
     if(bar&&!document.body.classList.contains('editing')){
-      bar.style.setProperty('top',Math.max(8,center-22)+'px','important');
+      bar.style.setProperty('top',Math.max(0,center-22)+'px','important');
       bar.style.setProperty('right',floating?'70px':'14px','important');
       var rights=document.querySelector('.rights-scroll');
       if(rights&&!floating){
