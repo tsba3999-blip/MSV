@@ -575,3 +575,13 @@
 
 /* Access settings now live in each staff member’s expanded row. */
 (function(){document.querySelectorAll('.side__nav a[href="admin-rights.html"]').forEach(function(link){link.remove();});})();
+/* Keep the staff menu label consistent without replacing its SVG. */
+(function(){
+  function renameStaffMenu(){
+    document.querySelectorAll('.side__nav a[href="admin-staff.html"]').forEach(function(link){
+      var walker=document.createTreeWalker(link,NodeFilter.SHOW_TEXT),node;
+      while((node=walker.nextNode())){if(node.parentElement.closest('svg'))continue;if(node.textContent.trim()==='Сотрудники')node.textContent=node.textContent.replace('Сотрудники','Наши сотрудники');}
+    });
+  }
+  renameStaffMenu();document.addEventListener('msv:menu-ready',renameStaffMenu);
+})();
