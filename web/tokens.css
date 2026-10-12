@@ -526,3 +526,7 @@ table:not(.msv-sh__pay) thead tr:first-child > :last-child { border-top-right-ra
 button:disabled { background:var(--msv-n100)!important; color:var(--msv-n500)!important; border-color:var(--msv-n100)!important; opacity:1!important; box-shadow:none!important; cursor:default; }
 
 .set > .msv-btn, .set > .msv-form-actions { margin-top:var(--msv-form-gap)!important; }
+
+/* Three icon families share rounded outlines and semantic colors. */
+.tile__icon{color:var(--msv-graphite);}
+.tab:not([aria-current="page"]){color:var(--msv-white);}
