@@ -38,6 +38,11 @@ module.exports = function register(route) {
     const s = auth.readSession(req);
     if (!s) return fail(res, 401, 'Не выполнен вход');
     const b = await readJson(req);
+    if (b.residenceId === 'current') {
+      const current = await query(`SELECT r.residence_id FROM bookings b JOIN beds bd ON bd.id=b.bed_id JOIN rooms r ON r.id=bd.room_id WHERE b.user_id=$1 AND b.date_from<=CURRENT_DATE AND b.date_to>=CURRENT_DATE ORDER BY b.date_from DESC,b.id DESC LIMIT 1`, [s.uid]);
+      if (!current.rows[0]) return fail(res,400,'Не удалось определить текущую резиденцию. Выберите её по названию.');
+      b.residenceId = current.rows[0].residence_id;
+    }
     const size = b.roomSize ? Number(b.roomSize) : null;
     if (size !== null && !(Number.isInteger(size) && size >= 1 && size <= 12)) return fail(res, 400, 'Размер комнаты — от 1 до 12');
     const tier = b.tier === 'нижнее' || b.tier === 'верхнее' ? b.tier : null;

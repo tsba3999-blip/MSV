@@ -27,6 +27,7 @@
   .chips { display: flex; flex-wrap: wrap; gap: var(--msv-s8); }
   .other { margin-top: var(--msv-s12); }
   .ok { padding: var(--msv-s16); background: var(--msv-lime); border-radius: var(--msv-r12); }
+.residence-choices{display:grid;gap:var(--msv-s8)}.residence-choice{display:flex;align-items:center;gap:var(--msv-s12);padding:var(--msv-s16);border:1px solid var(--msv-n100);border-radius:var(--msv-r12);background:var(--msv-white);color:var(--msv-graphite);cursor:pointer}.residence-choice:has(input:checked){border-color:var(--msv-graphite);background:var(--msv-n100)}.residence-choice:has(input:focus-visible){outline:2px solid var(--msv-violet);outline-offset:2px}.residence-choice input{appearance:none;flex:none;width:20px;height:20px;margin:0;border:2px solid var(--msv-n300);border-radius:50%;background:var(--msv-white)}.residence-choice input:checked{border:6px solid var(--msv-graphite)}.residence-choice .msv-note{display:block;margin-top:var(--msv-s4)}
 </style>
 </head>
 <body>
@@ -48,12 +49,13 @@
   <div id="form">
     <div class="sect">
       <p class="msv-body q">В какую резиденцию хочешь переехать?</p>
-      <select class="msv-select" id="res" style="width:100%">
-        <option value="">Любая — где раньше освободится</option>
-        <option value="forma">Forma · м. Шаболовская</option>
-        <option value="uyut">Уют · м. Нагатинская</option>
-        <option value="molod">Молодежка · м. Молодежная</option>
-      </select>
+      <div class="residence-choices" role="radiogroup" aria-label="Резиденция для переселения">
+        <label class="residence-choice"><input type="radio" name="residence" value="current" checked><span>В своей резиденции<span class="msv-note">Другая комната или место</span></span></label>
+        <label class="residence-choice"><input type="radio" name="residence" value=""><span>Любая резиденция<span class="msv-note">Где раньше освободится</span></span></label>
+        <label class="residence-choice"><input type="radio" name="residence" value="forma"><span>Forma · м. Шаболовская</span></label>
+        <label class="residence-choice"><input type="radio" name="residence" value="uyut"><span>Уют · м. Нагатинская</span></label>
+        <label class="residence-choice"><input type="radio" name="residence" value="molod"><span>Молодежка · м. Молодежная</span></label>
+      </div>
     </div>
 
     <div class="sect">
@@ -162,7 +164,7 @@
       .filter(Boolean).join(' · ').slice(0, 300);
     var numeric = sz.filter(function (s) { return /^\d+$/.test(s); });
     var body = {
-      residenceId: document.getElementById('res').value || null,
+      residenceId: document.querySelector('input[name="residence"]:checked').value || null,
       roomSize: numeric.length === 1 ? Number(numeric[0]) : null,   // один точный размер — фильтр очереди; несколько — в примечании
       note: note
     };
