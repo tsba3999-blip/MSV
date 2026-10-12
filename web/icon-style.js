@@ -11,7 +11,7 @@
     var box=svg.getBBox();if(!box.height)return;
     if(eagle)box={x:0,y:0,width:24,height:23.5};
     var scale=(height-(eagle?0:weight))/box.height, viewport=size/scale;
-    var canvasWidth=bento?Math.max(size,box.width*scale+weight+12):size, viewportWidth=canvasWidth/scale;
+    var canvasWidth=size, viewportWidth=canvasWidth/scale;
     svg.setAttribute('viewBox',[(box.x+box.width/2-viewportWidth/2),(box.y+box.height/2-viewport/2),viewportWidth,viewport].join(' '));
     svg.style.width=canvasWidth+'px';svg.style.overflow='visible';svg.style.height=size+'px';svg.style.flexShrink='0';
     svg.setAttribute('stroke-linecap','round');svg.setAttribute('stroke-linejoin','round');
