@@ -1,7 +1,7 @@
 /* Shared optical sizes: measured artwork, rather than the SVG canvas. */
 (function(){
   'use strict';
-  var selector='svg.tile__icon,.row__icon>svg,.side__link>svg,.side__exit>svg,.tab>svg,.msv-icon-muted>svg,.face__delete>svg,.profile-settings>svg,.edit-bar__pen>svg';
+  var selector='svg.tile__icon,.row__icon>svg,.side__link>svg,.side__exit>svg,.msv-icon-muted>svg,.face__delete>svg,.profile-settings>svg,.edit-bar__pen>svg';
   var queued=false;
   function normalize(svg){
     if(svg.querySelector(':scope > g[data-msv-icon]')||!svg.getBoundingClientRect().width)return;
@@ -10,7 +10,8 @@
     var eagle=!!svg.querySelector('mask image');
     var box=svg.getBBox();if(!box.height)return;
     if(eagle)box={x:0,y:0,width:24,height:23.5};
-    var scale=(height-(eagle?0:weight))/box.height, viewport=size/scale;
+    var pin=svg.closest('a[href="pin.html"]');
+    var scale=pin?(height-weight)/16:(height-(eagle?0:weight))/box.height, viewport=size/scale;
     var canvasWidth=size, viewportWidth=canvasWidth/scale;
     svg.setAttribute('viewBox',[(box.x+box.width/2-viewportWidth/2),(box.y+box.height/2-viewport/2),viewportWidth,viewport].join(' '));
     svg.style.width=canvasWidth+'px';svg.style.overflow='visible';svg.style.height=size+'px';svg.style.flexShrink='0';

@@ -527,6 +527,6 @@ button:disabled { background:var(--msv-n100)!important; color:var(--msv-n500)!im
 
 .set > .msv-btn, .set > .msv-form-actions { margin-top:var(--msv-form-gap)!important; }
 
-/* Three icon families share rounded outlines and semantic colors. */
+/* Bento icons use graphite; quick-start icons retain resident.css sizing and colors. */
 .tile__icon{color:var(--msv-graphite);}
-.tab:not([aria-current="page"]){color:var(--msv-white);}
+
