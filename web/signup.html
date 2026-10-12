@@ -54,6 +54,9 @@
   /* Картинка фиксированной высоты — поэтому заголовок на всех трёх
      экранах стоит на одной высоте, сколько бы ни было текста ниже. */
   .onb__art {
+    /* Blend the white image paper against a stable background during transitions. */
+    isolation: isolate;
+    background: var(--msv-beige);
     display: flex;
     align-items: center;
     justify-content: center;

@@ -51,7 +51,7 @@
 .staff-table tr:not(.more)>td:last-child{padding-left:16px;padding-right:16px;text-align:center;}.staff-table tr:not(.more)>td:last-child .tri{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;padding:0;box-sizing:border-box;}
 .staff-more__menu{left:auto!important;right:0;max-width:calc(100vw - 32px);box-sizing:border-box;}.staff-more__menu .msv-btn{max-width:100%;white-space:normal;height:auto;min-height:36px;}
 .staff-table tr.more>td:first-child{padding:16px;}.staff-details{position:sticky;left:16px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;white-space:normal;}.staff-details dl{margin:0}.staff-details dt:not(:first-child){margin-top:8px}@media(max-width:760px){.staff-details{width:calc(100vw - 64px);grid-template-columns:1fr;}}
- .staff-table {min-width:660px;} .staff-table th:nth-child(-n+3){width:calc((100% - 64px)/3);padding-left:16px;} .staff-table th:nth-child(4){width:64px;} .staff-actions {display:flex;flex-direction:column;align-items:flex-start;gap:8px;} .staff-actions .msv-btn {flex:none;width:132px;max-width:100%;font-weight:600;} .staff-details {position:static;width:calc(100% - 32px);margin-left:-16px;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;} .staff-details dl{padding:0 16px;} @media(max-width:760px){.staff-details{width:calc(100% - 32px);grid-template-columns:repeat(3,minmax(0,1fr));}}
+ .staff-table {min-width:980px;} .staff-table th:nth-child(-n+3){width:calc((100% - 64px)/3);padding-left:16px;} .staff-table th:nth-child(4){width:64px;} .staff-actions {display:flex;flex-direction:row;align-items:center;gap:8px;} .staff-actions .msv-btn {flex:0 1 132px;width:132px;min-width:0;font-weight:600;} .staff-details__cabinet{grid-column:3;padding:12px 16px 0;} .staff-details__cabinet:empty{display:none;} .staff-details__cabinet .msv-btn{width:132px;font-weight:600;} .staff-details {position:static;width:calc(100% - 32px);margin-left:-16px;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;} .staff-details dl{padding:0 16px;} @media(max-width:760px){.staff-details{width:calc(100% - 32px);grid-template-columns:repeat(3,minmax(0,1fr));}}
 </style>
 <style>
   body { --role: var(--msv-graphite); --role-ink: var(--msv-graphite); }
@@ -196,14 +196,14 @@ MSV.ready(function (ctx) {
 
 
         '<td class="num">' + money(s.salary) + '</td>' +
-        '<td><div class="staff-actions"><button class="msv-btn msv-btn--s msv-btn--primary" type="button" data-pay>Начислить</button><button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-bonus>Премировать</button>' + (ctx.me&&ctx.me.canEditSite&&s.role!=='admin'?'<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-cabinet="'+esc(s.userId||s.id)+'">ЛК</button>':'') + '</div></td>' +
+        '<td><div class="staff-actions"><button class="msv-btn msv-btn--s msv-btn--primary" type="button" data-pay>Начислить</button><button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-bonus>Премировать</button></div></td>' +
         '<td class="num"><button class="tri" type="button" data-more aria-expanded="false" aria-label="Подробнее"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="msv-chevron"><path d="M6 9l6 6 6-6"/></svg></button></td>' +
       '</tr>' +
       '<tr class="more" data-more-of="'+esc(s.id)+'" hidden><td colspan="4"><div class="staff-details">'+
         '<dl><dt>Дата рождения</dt><dd>'+fdate(s.birthday)+'</dd></dl>'+
         '<dl><dt>Куда переводить</dt><dd>'+(s.payTo?esc(s.payTo):'<span class="miss">уточнить</span>')+'</dd><dt>Тип отношений</dt><dd>'+esc(s.relation||'—')+'</dd></dl>'+
         '<dl><dt>Работает с</dt><dd>'+fdate(s.started)+'</dd><dt>Стаж</dt><dd>'+esc(tenure(s.started))+'</dd></dl>'+
-        '</div></td></tr>';
+        '<div class="staff-details__cabinet">' + (ctx.me&&ctx.me.canEditSite&&s.role!=='admin'?'<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-cabinet="'+esc(s.userId||s.id)+'">ЛК</button>':'') + '</div></div></td></tr>';
     }).join('');
   }
 
