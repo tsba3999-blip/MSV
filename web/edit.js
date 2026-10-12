@@ -99,7 +99,7 @@
       '<button type="button" class="edit-bar__pen" data-edit="toggle" title="Править содержимое" aria-pressed="false">' +
         '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" ' +
         'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-        '<path d="m16 3 5 5-12 12-6 1 1-6Z"/><path d="m14 5 5 5M4 15l5 5"/></svg>' +
+        '<path d="m14.8 4.2 1-1a2 2 0 0 1 2.8 0l2.2 2.2a2 2 0 0 1 0 2.8L9.4 19.6a2 2 0 0 1-.9.5l-4.2 1a.8.8 0 0 1-1-1l1-4.2a2 2 0 0 1 .5-.9Z"/><path d="m14 5 5 5M5 15l4 4"/></svg>' +
       '</button>' +
       '<span class="edit-bar__meta" data-edit="meta" hidden></span>' +
       '<span class="edit-bar__tools" hidden>' +
