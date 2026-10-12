@@ -14,28 +14,29 @@
 <style>
   body { --role: var(--msv-graphite); --role-ink: var(--msv-graphite); }
   .who-link { color: inherit; text-decoration: none; } .who-link:hover .who-cell__name { text-decoration: underline; }
-  .role-pill--staff { background: var(--msv-ice); color: var(--msv-graphite); }
-.staff-marker{display:inline-flex;align-items:center;justify-content:center;flex:0 0 28px;height:28px;border-radius:50%;background:var(--msv-n100);color:var(--msv-graphite);font-size:13px;font-weight:500}
-.rights-scroll { max-width:100%; overflow:auto; touch-action:pan-x pan-y; -webkit-overflow-scrolling:touch; }
-.rights { display:table; min-width:850px; table-layout:fixed; overflow:visible; }
-.rights th:nth-child(1) { width:35%; }
-.rights th:nth-child(2) { width:15%; }
-.rights th:nth-child(3) { width:35%; }
-.rights th:nth-child(4) { width:15%; }
-.rights th,.rights td { padding:10px 12px; vertical-align:top; white-space:normal; }
-.rights .perm { display:flex; flex-wrap:wrap; gap:4px; }
-.rights .rights-note { margin:6px 0 0; line-height:1.2; }
-.rights .who-cell__name,.rights .msv-note { line-height:1.2; }
-@media(max-width:760px) { .rights { display:table; } .rights thead { display:table-header-group; } .rights tbody { display:table-row-group; } .rights tr { display:table-row; } .rights th,.rights td { display:table-cell; } }
-.rights .rights-act {display:flex;flex-direction:column;align-items:stretch;gap:8px;white-space:normal;}
-.rights .rights-act .msv-btn {width:100%;min-width:0;padding:0 10px;}
-.rights .role-pill {max-width:100%;white-space:normal;overflow-wrap:anywhere;box-sizing:border-box;}
-.rights .role-mobile {display:none;}
-.rights .who-cell>span:last-child {min-width:0;}
-.rights .who-cell__name {overflow-wrap:anywhere;}
-@media(max-width:760px){.rights {min-width:740px;} .rights th:nth-child(1){width:240px;} .rights th:nth-child(3){width:340px;} .rights th:nth-child(4){width:160px;} .rights th:nth-child(2),.rights td:nth-child(2){display:none;} .rights .role-mobile {display:inline-flex;margin:6px 0;} }
- .rights {min-width:0;width:100%;} .rights th:nth-child(n) {width:25%;} .rights .perm {width:100%;} .rights .perm__item--total {width:100%;box-sizing:border-box;text-align:center;} @media(max-width:760px){.rights th:nth-child(n){width:33.333%;}.rights .who-cell{flex-wrap:wrap;}.rights .who-cell>span:last-child{flex-basis:100%;}.rights .perm__item{white-space:normal;}.rights td,.rights th{padding:12px 8px;}.rights .msv-btn{max-width:100%;padding:0 6px;font-size:12px;}}
-@media(max-width:760px){.rights .perm__item {font-size:11px;padding:4px 6px;white-space:nowrap;}.rights .role-mobile{font-size:9px;letter-spacing:0;padding:4px 6px;white-space:nowrap;}.rights .msv-note{font-size:11px;overflow-wrap:normal;}}
+
+.staff-marker{display:inline-block;flex:0 0 12px;color:#000;background:none;font-size:13px;font-weight:400}
+.rights-scroll{width:100%;max-width:100%;overflow:auto}
+.rights{display:table;width:100%;min-width:0;table-layout:fixed}
+.rights th:nth-child(1),.rights th:nth-child(2){width:calc((100% - 130px)/2)}
+.rights th:nth-child(3){width:130px}
+.rights th,.rights td{padding:10px 12px;vertical-align:middle;white-space:normal}
+.rights .who-cell>span:last-child{min-width:0}
+.rights .who-cell__name,.rights .msv-note{overflow-wrap:anywhere;line-height:1.25}
+.rights .perm{display:flex;flex-wrap:wrap;gap:4px;width:100%}
+.rights .perm__item{white-space:nowrap}
+.rights .perm__item--total{width:100%;box-sizing:border-box;text-align:center}
+.rights .rights-act{display:flex;flex-direction:column;gap:8px}
+.rights td:last-child{text-align:right}
+.rights .msv-btn{max-width:100%;padding:0 12px}
+.rights tr{--person-role:var(--msv-ice)}
+.rights tr[data-role="admin"]{--person-role:#B8B8B8}
+.rights tr[data-role="moderator"]{--person-role:#CBB6FF}
+.rights .who-cell__face{background:var(--person-role);box-shadow:0 0 0 2px var(--person-role)}
+.rights-legend{display:flex;flex-wrap:wrap;gap:12px 24px;padding:12px 16px;margin:0 0 16px;background:var(--msv-n100);border-radius:12px}
+.rights-legend span{display:inline-flex;align-items:center;gap:8px}
+.rights-legend i{width:12px;height:12px;border-radius:3px;background:var(--legend-color);display:inline-block}
+@media(max-width:760px){.rights thead{display:table-header-group}.rights tbody{display:table-row-group}.rights tr{display:table-row}.rights th,.rights td{display:table-cell;padding:10px 6px}.rights th:nth-child(1),.rights th:nth-child(2){width:calc((100% - 84px)/2)}.rights th:nth-child(3){width:84px}.rights .who-cell{flex-wrap:wrap}.rights .who-cell>span:last-child{flex-basis:100%}.rights .msv-btn{font-size:10px;padding:0 5px;white-space:nowrap}.rights .perm__item{font-size:10px;padding:4px}.rights .msv-note{font-size:11px}}
 </style>
 </head>
 <body>
@@ -124,9 +125,10 @@
     <main class="work__body">
       <p class="msv-note notice">Нажмите «Изменить», включите или отключите отдельные разделы и сохраните. Роль сотрудника при этом не меняется.</p>
 
+      <div class="rights-legend msv-note" aria-label="Обозначения ролей"><span><i style="--legend-color:var(--msv-ice)" aria-hidden="true"></i>Сотрудник</span><span><i style="--legend-color:#B8B8B8" aria-hidden="true"></i>Администрация</span><span><i style="--legend-color:#CBB6FF" aria-hidden="true"></i>Модератор</span></div>
       <div class="rights-scroll" role="region" aria-label="Права доступа" tabindex="0"><table class="rights">
         <thead>
-          <tr><th>Человек</th><th>Роль</th><th>Доступ к разделам</th><th></th></tr>
+          <tr><th>Человек</th><th>Доступ к разделам</th><th></th></tr>
         </thead>
         <tbody id="people"></tbody>
       </table></div>
@@ -145,7 +147,7 @@
   .perm__item[data-p]:hover { box-shadow: inset 0 0 0 1.5px var(--msv-n300); }
   .perm__item[data-p][disabled] { cursor: not-allowed; opacity: .6; box-shadow: none; }
   .perm__chart{display:inline-flex;align-items:center;gap:5px;} .chart-mode__label,.chart-mode__toggle{border:0;padding:0;background:none;color:inherit;font:inherit;cursor:pointer;} .chart-mode__toggle,.chart-mode__symbol{display:inline-flex;align-items:center;justify-content:center;flex:none;} .chart-mode__toggle:focus-visible,.chart-mode__label:focus-visible{outline:2px solid var(--msv-graphite);outline-offset:2px;border-radius:3px;}
-  .rights tr:not(.is-edit) .perm{flex-wrap:nowrap;overflow-x:auto;align-items:center;} .rights tr:not(.is-edit) .perm__item{flex-shrink:0;white-space:nowrap;}
+  .rights tr:not(.is-edit) .perm{flex-wrap:wrap;overflow:visible;align-items:center;} .rights tr:not(.is-edit) .perm__item{flex-shrink:0;white-space:nowrap;}
   .rights-note { margin: var(--msv-s8) 0 0; color: var(--msv-n500); }
   .rights-act { display: flex; gap: var(--msv-s8); justify-content: flex-end; }
 </style>
@@ -237,11 +239,11 @@
       var what = edit ? diff(stateOf(p), st) : '';
       if(edit && stateOf(p).sections.chartEdit!==st.sections.chartEdit) what += (what?'; ':'')+'Шахматка: '+(st.sections.chartEdit?'редактирование':'только просмотр');
 
-      return '<tr' + (edit ? ' class="is-edit"' : '') + '><td>' +
+      var visualRole=/^Администратор/.test(roleLabel)?'admin':st.role;
+      return '<tr data-role="'+visualRole+'"' + (edit ? ' class="is-edit"' : '') + '><td>' +
           '<a class="who-link" href="admin-staff-view.html?id=' + esc(p.id) + '" title="Открыть карточку сотрудника"><span class="who-cell">' +
-          '<span class="staff-marker">'+marker+'</span><span class="who-cell__face presence-avatar" data-presence-user="' + esc(p.id) + '">' + (p.photo?'<img src="'+esc(p.photo)+'" alt="Фото сотрудника" style="width:48px;height:48px;object-fit:cover;border-radius:50%">':esc(ini(p.name))) + '</span><span><span class="who-cell__name">' + esc(p.name) + '</span><span class="role-mobile role-pill ' + roleStyle + '">' + esc(roleLabel) + '</span>' +
+          '<span class="staff-marker">'+marker+'</span><span title="'+esc(roleLabel)+'" class="who-cell__face presence-avatar" data-presence-user="' + esc(p.id) + '">' + (p.photo?'<img src="'+esc(p.photo)+'" alt="Фото сотрудника" style="width:48px;height:48px;object-fit:cover;border-radius:50%">':esc(ini(p.name))) + '</span><span><span class="who-cell__name">' + esc(p.name) + '</span>' +
           '<span class="msv-note">' + esc(p.position) + (p.contact ? ' · ' + esc(p.contact) : '') + '</span></span></span></a></td>' +
-        '<td><span class="role-pill ' + roleStyle + '">' + esc(roleLabel) + '</span></td>' +
         '<td><span class="perm">' + pills + '</span>' +
           (what ? '<p class="msv-note rights-note">' + esc(what) + '</p>' : '') + '</td>' +
         '<td>' + (edit
