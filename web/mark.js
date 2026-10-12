@@ -592,7 +592,7 @@
     document.querySelectorAll('a[href]').forEach(function(link){
       if(!/^(?:admin-|staff-)?reputation\.html(?:[?#]|$)/.test(link.getAttribute('href')))return;
       var svg=link.querySelector('svg');if(!svg||(svg.dataset.reputationGauge&&svg.querySelector('circle[cy="19"]')))return;
-      svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('fill','none');svg.setAttribute('stroke-linecap','round');svg.setAttribute('stroke-linejoin','round');svg.innerHTML=artwork;svg.dataset.reputationGauge='true';
+      svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('fill','none');svg.setAttribute('stroke-linecap','round');svg.setAttribute('stroke-linejoin','round');svg.innerHTML=artwork;svg.dataset.reputationGauge='true';if(link.classList.contains('tab')){svg.setAttribute('viewBox','3 4.75 18 18');svg.querySelectorAll('path,circle').forEach(function(shape){shape.setAttribute('vector-effect','non-scaling-stroke');shape.style.strokeWidth='2px';});}
     });
   }
   reputationIcons();document.addEventListener('msv:menu-ready',reputationIcons);
