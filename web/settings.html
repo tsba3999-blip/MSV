@@ -9,6 +9,7 @@
 <title>Настройки уведомлений — МСВ</title>
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="resident.css">
+<link rel="stylesheet" href="settings-save.css">
 </head>
 <body>
 
@@ -28,11 +29,13 @@
 
   <h2 class="msv-sub group__title">Каналы</h2>
   <div class="rows" style="padding:0 var(--msv-s16)">
-    <label class="tog" style="display:flex;align-items:center;gap:var(--msv-s12);min-height:56px;cursor:pointer;border-bottom:1px solid var(--msv-n100)"><input type="checkbox" checked style="width:20px;height:20px;accent-color:var(--msv-red)"> <span class="msv-body">Telegram</span></label>
-    <label class="tog" style="display:flex;align-items:center;gap:var(--msv-s12);min-height:56px;cursor:pointer;border-bottom:1px solid var(--msv-n100)"><input type="checkbox" style="width:20px;height:20px;accent-color:var(--msv-red)"> <span class="msv-body">Max</span></label>
-    <label class="tog" style="display:flex;align-items:center;gap:var(--msv-s12);min-height:56px;cursor:pointer"><input type="checkbox" checked style="width:20px;height:20px;accent-color:var(--msv-red)"> <span class="msv-body">Почта</span></label>
+    <label class="tog" style="display:flex;align-items:center;gap:var(--msv-s12);min-height:56px;cursor:pointer;border-bottom:1px solid var(--msv-n100)"><input data-pref="tg" type="checkbox" checked style="width:20px;height:20px;accent-color:var(--msv-red)"> <span class="msv-body">Telegram</span></label>
+    <label class="tog" style="display:flex;align-items:center;gap:var(--msv-s12);min-height:56px;cursor:pointer;border-bottom:1px solid var(--msv-n100)"><input data-pref="max" type="checkbox" style="width:20px;height:20px;accent-color:var(--msv-red)"> <span class="msv-body">Max</span></label>
+    <label class="tog" style="display:flex;align-items:center;gap:var(--msv-s12);min-height:56px;cursor:pointer"><input data-pref="email" type="checkbox" checked style="width:20px;height:20px;accent-color:var(--msv-red)"> <span class="msv-body">Почта</span></label>
   </div>
 
+  <div class="msv-form-actions"><button class="msv-btn msv-btn--primary" type="button" data-save-channels disabled>Сохранить</button></div>
+  <p class="msv-note" data-channels-message role="status" hidden style="margin-top:var(--msv-s8)"></p>
   <h2 class="msv-sub group__title">Что присылать</h2>
   <div class="rows" style="padding:var(--msv-s8) var(--msv-s16)">
     <label class="tog" style="display:flex;align-items:center;gap:var(--msv-s12);min-height:48px;cursor:pointer"><input type="radio" name="scope" value="all" checked style="width:20px;height:20px;accent-color:var(--msv-red)"> <span class="msv-body">Отправлять все уведомления</span></label>
@@ -42,8 +45,8 @@
   <p class="msv-note" id="noneWarn" hidden style="margin-top:var(--msv-s12);padding:var(--msv-s12) var(--msv-s16);background:var(--msv-n100);border:1px solid var(--msv-red);border-radius:var(--msv-r12)">Отказываясь от уведомлений, я полностью беру на себя ответственность за неинформированность: о сроках оплаты, изменениях в правилах и событиях мне не сообщат.</p>
 
   <div class="foot">
-    <button class="msv-btn msv-btn--block msv-btn--primary" type="button" id="save">Сохранить</button>
-    <p class="msv-note" id="msg" hidden style="margin-top:var(--msv-s8);text-align:center"></p>
+    <button class="msv-btn msv-btn--block msv-btn--primary" type="button" id="save" data-save-prefs disabled>Сохранить</button>
+    <p class="msv-note" id="msg" data-prefs-message role="status" hidden style="margin-top:var(--msv-s8);text-align:center"></p>
   </div>
 
 </div>
@@ -71,52 +74,7 @@
   </a>
 </nav>
 
-<script>
-(function () {
-  'use strict';
-  var warn = document.getElementById('noneWarn');
-  document.querySelectorAll('input[name="scope"]').forEach(function (r) {
-    r.addEventListener('change', function () { warn.hidden = r.value !== 'none'; });
-  });
-  var box = document.querySelectorAll('.rows')[0].querySelectorAll('input[type="checkbox"]');
-  var msg = document.getElementById('msg');
-  var live = location.protocol !== 'file:';
-
-  function scope() {
-    var r = document.querySelector('input[name="scope"]:checked');
-    return r ? r.value : 'all';
-  }
-  function say(text, bad) {
-    msg.textContent = text; msg.hidden = false;
-    msg.style.color = bad ? 'var(--msv-red)' : 'var(--msv-n500)';
-  }
-
-  /* Показываем то, что сохранено, а не то, что стоит в вёрстке */
-  if (live) {
-    fetch('/api/me/notify-prefs', { credentials: 'same-origin' })
-      .then(function (r) { return r.status === 200 ? r.json() : null; })
-      .then(function (p) {
-        if (!p) return;
-        box[0].checked = p.tg; box[1].checked = p.max; box[2].checked = p.email;
-        var r = document.querySelector('input[name="scope"][value="' + p.scope + '"]');
-        if (r) { r.checked = true; warn.hidden = p.scope !== 'none'; }
-      })
-      .catch(function () {});
-  }
-
-  document.getElementById('save').addEventListener('click', function () {
-    if (!live) { say('Сохранено'); return; }
-    say('Сохраняю…');
-    fetch('/api/me/notify-prefs', {
-      method: 'PUT', credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tg: box[0].checked, max: box[1].checked, email: box[2].checked, scope: scope() })
-    })
-      .then(function (r) { say(r.status === 200 ? 'Сохранено' : 'Не удалось сохранить', r.status !== 200); })
-      .catch(function () { say('Сеть не отвечает', true); });
-  });
-})();
-</script>
+<script src="settings-notify.js"></script>
 <script src="mark.js"></script>
 <script src="zoom.js"></script>
 <script src="edit.js"></script>
