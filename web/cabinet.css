@@ -527,7 +527,7 @@ html.msv-side-pending .side { visibility:hidden; }
   .side .msv-mark-btn .side__short-logo { display:block; height:31.35px; width:auto; max-width:none; }
   .shell--folded .side__logo-link { display:none; }
   .shell--folded .side .msv-mark-btn { display:flex; }
-  .side__who { grid-template-columns:38px minmax(0,1fr); grid-template-rows:36px 16px; padding:8px 5px; }
+  .side__who { grid-template-columns:38px minmax(0,1fr); grid-template-rows:auto auto; align-content:center; min-height:68px; box-sizing:border-box; padding:8px 5px; }
   .side__name { line-height:18px; max-height:36px; overflow:hidden; align-self:end; }
   .side__role { line-height:16px; margin-top:0; align-self:start; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .shell--folded .side__who { display:grid; width:var(--fold-who-width); flex-shrink:0; justify-content:normal; padding:8px 5px; margin:0 40px 48px 0; }
