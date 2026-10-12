@@ -530,3 +530,8 @@ button:disabled { background:var(--msv-n100)!important; color:var(--msv-n500)!im
 /* Bento icons use graphite; quick-start icons retain resident.css sizing and colors. */
 .tile__icon{color:var(--msv-graphite);}
 
+:root{--msv-table-copy-gap:16px;--msv-table-cell-y:12px;--msv-table-cell-x:16px;--msv-actions-gap:8px;--msv-actions-top:20px;--msv-button-padding-x:16px}
+.msv-table-section > .msv-note{margin:8px 0 0}
+.msv-table-section > .msv-note:empty{display:none}
+.msv-table-section > .msv-table-scroll{margin-top:var(--msv-table-copy-gap)}
+.msv-table-section table th,.msv-table-section table td{padding:var(--msv-table-cell-y) var(--msv-table-cell-x)}

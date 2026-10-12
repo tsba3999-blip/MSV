@@ -572,3 +572,6 @@
 
 /* Optical icon sizing is shared by bento and navigation. */
 (function(){if(!document.querySelector('script[src="icon-style.js"]')){var s=document.createElement("script");s.src="icon-style.js";document.head.appendChild(s);}})();
+
+/* Access settings now live in each staff member’s expanded row. */
+(function(){document.querySelectorAll('.side__nav a[href="admin-rights.html"]').forEach(function(link){link.remove();});})();
