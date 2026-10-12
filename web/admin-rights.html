@@ -145,6 +145,7 @@
   .perm__item[data-p]:hover { box-shadow: inset 0 0 0 1.5px var(--msv-n300); }
   .perm__item[data-p][disabled] { cursor: not-allowed; opacity: .6; box-shadow: none; }
   .perm__chart{display:inline-flex;align-items:center;gap:5px;} .chart-mode__label,.chart-mode__toggle{border:0;padding:0;background:none;color:inherit;font:inherit;cursor:pointer;} .chart-mode__toggle,.chart-mode__symbol{display:inline-flex;align-items:center;justify-content:center;flex:none;} .chart-mode__toggle:focus-visible,.chart-mode__label:focus-visible{outline:2px solid var(--msv-graphite);outline-offset:2px;border-radius:3px;}
+  .rights tr:not(.is-edit) .perm{flex-wrap:nowrap;overflow-x:auto;align-items:center;} .rights tr:not(.is-edit) .perm__item{flex-shrink:0;white-space:nowrap;}
   .rights-note { margin: var(--msv-s8) 0 0; color: var(--msv-n500); }
   .rights-act { display: flex; gap: var(--msv-s8); justify-content: flex-end; }
 </style>
@@ -216,6 +217,7 @@
       var on = lit(st);
 
       var pills = st.role === 'admin' ? '<span class="perm__item perm__item--on perm__item--total" title="Полный доступ ко всем разделам">Тотал</span>' : PERMS.map(function (x) {
+        if (!edit && !on[x]) return '';
         var cls = 'perm__item' + (on[x] ? ' perm__item--on' : '');
         if(x==='Шахматка') {
           var write=st.role==='moderator'&&!!st.sections.chartEdit;
