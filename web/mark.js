@@ -285,6 +285,8 @@
       });
     }
     var sectionIcons = {
+      'staff-repair.html':'<path d="M20.34 6.49A4.6 4.6 0 0 1 14.09 12.18L6.33 19.93A1.6 1.6 0 0 1 4.07 17.67L11.82 9.92A4.6 4.6 0 0 1 17.51 3.66L15.25 5.92 18.08 8.75Z"/>',
+      'staff-mailings.html':'<path d="M5 3H2v4c0 4 3 7 7 8l-1 6h8l-1-6c4-1 7-4 7-8V3h-3v4c0 3-2 5-7 5S5 10 5 7Z"/><path d="m5 4 7 4 7-4"/><rect x="10" y="6.5" width="4" height="3" rx="1"/>',
       'contracts-preview.html':'<path d="m3 8 3-3 4 1 3-1 3 1 5 5-3 6-4 3-3-1-5-5-3-1Z"/><path d="m10 6-3 4 2 2 4-3 5 5M6 14l2-2m1 5 2-2m1 4 2-2"/>',
       'admin-staff.html':'<path d="M8 7a4 4 0 0 0 8 0M7 6a5 5 0 0 1 10 0M6 6h12M4 21v-2a8 6 0 0 1 16 0v2M10 14l2 2 2-2m-2 2-2 4 2 2 2-2-2-4"/>',
       'admin-tickets.html':'<path d="m4 20 2-7L17 2l5 5-11 11-7 2Zm2-7 5 5M15 4l5 5M3 22h18"/>',
