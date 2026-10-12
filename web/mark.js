@@ -585,3 +585,16 @@
   }
   renameStaffMenu();document.addEventListener('msv:menu-ready',renameStaffMenu);
 })();
+/* Reputation: the same gauge artwork in each existing icon family. */
+(function(){
+  var artwork='<path d="M3 16a9 9 0 0 1 18 0M12.75 17.7 16.5 10"/><circle cx="12" cy="19" r="1.5"/>';
+  function reputationIcons(){
+    document.querySelectorAll('a[href]').forEach(function(link){
+      if(!/^(?:admin-|staff-)?reputation\.html(?:[?#]|$)/.test(link.getAttribute('href')))return;
+      var svg=link.querySelector('svg');if(!svg||(svg.dataset.reputationGauge&&svg.querySelector('circle[cy="19"]')))return;
+      svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('fill','none');svg.setAttribute('stroke-linecap','round');svg.setAttribute('stroke-linejoin','round');svg.innerHTML=artwork;svg.dataset.reputationGauge='true';
+    });
+  }
+  reputationIcons();document.addEventListener('msv:menu-ready',reputationIcons);
+  var pending=false;new MutationObserver(function(){if(!pending){pending=true;requestAnimationFrame(function(){pending=false;reputationIcons();});}}).observe(document.body,{childList:true,subtree:true});
+})();
