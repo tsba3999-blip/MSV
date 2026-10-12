@@ -18,6 +18,17 @@ const { query, tx } = require('../lib/db');
 function iso(d) { return d ? (typeof d === 'string' ? d.slice(0, 10) : d.toISOString().slice(0, 10)) : null; }
 
 module.exports = function register(route) {
+  route('GET','/api/me/notices',async(req,res)=>{
+    const s=auth.readSession(req);if(!s)return fail(res,401,'Не выполнен вход');
+    const r=await query('SELECT id,kind,text,is_read,created_at FROM notices WHERE user_id=$1 ORDER BY created_at DESC,id DESC',[s.uid]);
+    json(res,200,r.rows.map(n=>({id:String(n.id),kind:n.kind,text:n.text,read:n.is_read,at:n.created_at})));
+  });
+  route('PUT','/api/me/notices/:id/read',async(req,res)=>{
+    const s=auth.readSession(req);if(!s)return fail(res,401,'Не выполнен вход');
+    if(!/^[1-9][0-9]*$/.test(String(req.params.id)))return fail(res,400,'Неверное уведомление');
+    const r=await query('UPDATE notices SET is_read=true WHERE id=$1 AND user_id=$2 RETURNING id',[req.params.id,s.uid]);
+    if(!r.rows.length)return fail(res,404,'Уведомление не найдено');json(res,200,{ok:true});
+  });
 
   /* ---------- Главная резидента: бронь, баланс, заявки, уведомления ---------- */
 
