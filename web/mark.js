@@ -133,6 +133,13 @@
   "pin.html": "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"8\" cy=\"15\" r=\"4\"/><path d=\"M11 12l8-8\"/><path d=\"M17 6l2 2\"/></svg>"
 };
 
+    if(role==='staff' && page==='resident-card.html') {
+      document.body.style.setProperty('--role','var(--msv-sky)');
+      var staffTemplate=document.getElementById('staff-profile-nav'), profileNav=document.querySelector('.side__nav');
+      if(staffTemplate && profileNav) profileNav.replaceWith(staffTemplate.content.firstElementChild.cloneNode(true));
+      var staffIdentity=document.querySelector('.side__who');if(staffIdentity){staffIdentity.href='staff-profile.html';staffIdentity.title='Мои данные';}
+      document.querySelectorAll('.side__nav [aria-current]').forEach(function(link){link.removeAttribute('aria-current');});
+    }
     // One workspace for moderators without the separate payroll administrator role.
     if (role === 'moderator' && !me.canPayroll) {
       var aliases = {

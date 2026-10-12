@@ -1279,3 +1279,6 @@ body.msv-sh-dragging .msv-sh__bar { cursor: grabbing; }
 .msv-sh__accrued-label .short{display:none}
 @media(max-width:600px){.msv-sh__accrued-label .full{display:none}.msv-sh__accrued-label .short{display:inline;white-space:nowrap}}
 body:has(.msv-sh__panel--on) .msv-mark-btn,body:has(.msv-sh__panel--on) .edit-bar{display:none!important}
+
+/* Staff can inspect the chart without booking or relocation actions. */
+.msv-sh--readonly [data-act="hold"] { display:none; }

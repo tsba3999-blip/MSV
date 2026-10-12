@@ -665,11 +665,11 @@
         return;
       }
       if (btn.dataset.act === 'close') self.closePanel();
-      if (btn.dataset.act === 'unhold' && typeof self.opts.onUnhold === 'function') {
+      if (!self.opts.readOnly && btn.dataset.act === 'unhold' && typeof self.opts.onUnhold === 'function') {
         self.opts.onUnhold(self._bookingById(self.selectedId));
         return;
       }
-      if (btn.dataset.act === 'edit' && typeof self.opts.onEdit === 'function') {
+      if (!self.opts.readOnly && btn.dataset.act === 'edit' && typeof self.opts.onEdit === 'function') {
         self.opts.onEdit(self._bookingById(self.selectedId));
       }
       if (btn.dataset.act === 'profile' && typeof self.opts.onOpenProfile === 'function') {
@@ -1134,6 +1134,7 @@
      часами, именем и контактом. Esc отменяет. */
 
   Shahmatka.prototype.startHold = function () {
+    if (this.opts.readOnly) return;
     var self = this;
     if (this._holdPick) return this.cancelHold();
     this._holdPick = true;
@@ -2025,6 +2026,7 @@
       '</div>';
 
     this.panel.innerHTML = html;
+    if (this.opts.readOnly) this.panel.querySelectorAll('[data-act=edit], [data-act=unhold]').forEach(function (button) { button.remove(); });
     this.panel.classList.add('msv-sh__panel--on');
     this.panel.setAttribute('aria-hidden', 'false');
     this.scrim.classList.add('msv-sh__scrim--on');

@@ -137,7 +137,7 @@
     </header>
 
     <main class="work__body">
-      <p class="msv-note notice" id="note">Шахматка вашей резиденции. Просмотр: переселять и менять даты может администратор, модератор или сотрудник с правом «Редактировать шахматку».</p>
+      <p class="msv-note notice" id="note">Шахматка вашей резиденции. Только просмотр. Редактировать и переселять могут только модератор и администратор.</p>
       <div id="shahmatka" style="flex:1 1 auto;min-height:0"></div>
     </main>
   </div>
@@ -160,7 +160,7 @@ MSV.ready(function (ctx) {
      В демо: сотрудник без права редактирования. */
   var me = ctx.me || {};
   var allowed = me.residences || ['forma', 'uyut'];
-  var canEdit = !!me.canEditShahmatka;
+  var canEdit = (me.role === 'admin' || me.role === 'moderator') && !!me.canEditShahmatka;
 
   var params = new URLSearchParams(location.search);
   var wanted = params.get('res');
@@ -188,6 +188,7 @@ MSV.ready(function (ctx) {
     /* Бесплатная бронь: модератор придерживает место на 24 или 48 часов.
        Кнопку, выбор места и окно рисует сама шахматка — сюда приходит
        готовый набор полей (решение заказчика 24.09.2026). */
+    onOpenProfile: function (resident) { if (resident) location.href = 'resident-card.html?id=' + encodeURIComponent(resident.id); },
     onHold: function (payload, done) {
       if (!ctx.live) { done('Без сервера бронь не поставить.'); return; }
       ctx.api('POST', '/api/holds', payload)
@@ -216,7 +217,7 @@ MSV.ready(function (ctx) {
         .catch(function () { alert('Сервер не отвечает'); });
     }
   });
-  if (!canEdit) document.getElementById('note').textContent = 'Шахматка ' + res.title + ' — только просмотр. Право редактирования выдаёт администратор в разделе «Права доступа».';
+  if (!canEdit) document.getElementById('note').textContent = 'Шахматка ' + res.title + ' — только просмотр. Редактировать и переселять могут только модератор и администратор.';
 });
 </script>
 <script src="mark.js"></script>

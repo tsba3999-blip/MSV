@@ -208,7 +208,7 @@ MSV.ready(function (ctx) {
 
   var demo = ctx.bookings(res);
   var notice = document.querySelector('.notice');
-  if (notice && ctx.live) notice.textContent = 'Данные из базы. Переселение сохраняется на сервере.';
+  if (notice && ctx.live) notice.textContent = ctx.me.canEditShahmatka ? 'Данные из базы. Переселение сохраняется на сервере.' : 'Шахматка — только просмотр.';
 
   window.sh = MSVShahmatka.mount('#shahmatka', {
     buildings: [{ id: res.id, name: res.name }],
@@ -221,6 +221,7 @@ MSV.ready(function (ctx) {
     title: '',
     days: 35,
     months: 24,
+    readOnly: !ctx.me || !ctx.me.canEditShahmatka,
     onMove: function (b, was, now) {
       if (!ctx.live) return;   // без сервера — до обновления страницы
       var iso = function (ts) { return new Date(ts).toISOString().slice(0, 10); };

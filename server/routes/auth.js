@@ -116,7 +116,7 @@ module.exports = function register(route) {
          правку, которую сервер всё равно не давал: перенос брони там
          требует уровня модератора. */
       sectionAccess: {...require('../lib/section-access').defaults(u.role,u.can_payroll),...u.section_access},
-      canEditShahmatka: u.section_access.chart === false ? false : u.role === 'admin' || u.role === 'moderator',
+      canEditShahmatka: u.role === 'admin' || (u.role === 'moderator' && u.section_access.chart !== false && u.section_access.chartEdit !== false),
       canPayroll: u.role === 'admin' || (u.section_access.payroll ?? !!u.can_payroll),
       canEditSite: !!u.can_edit_site,
       photo: u.photo_url || '',
