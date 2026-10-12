@@ -33,3 +33,12 @@ h1{font-size:var(--msv-sub-size,28px)}.eyebrow{display:none}.scroll,.contract-gr
 .contracts #year::-webkit-calendar-picker-indicator { margin:0; padding:0; width:16px;height:16px;cursor:pointer; }
 .contracts #configure[aria-pressed=true] { background:var(--msv-n100);color:var(--msv-n500); }
 @media(max-width:600px){.contracts .views:not(#tableDesigns){grid-template-columns:1fr;} }
+
+.contracts .views button,.contracts #tableDesigns button { height:var(--msv-button-height); min-height:var(--msv-button-height); border-radius:var(--msv-button-radius); font:600 15px/1.2 var(--msv-font); padding:0 16px; }
+.contract-group .scroll { background:var(--msv-beige); border-radius:var(--msv-r12) var(--msv-r12) 0 0; }
+.contract-group table { background:var(--msv-beige); }
+.contract-group tbody td { background:var(--msv-white); }
+.contract-group table thead th:last-child { border-top-right-radius:var(--msv-r12); }
+
+.contract-group { background:var(--msv-beige); }
+.calendar.chess { width:max(100%,1325px); }

@@ -508,8 +508,21 @@ button:has(> .msv-chevron),summary:has(> .msv-chevron) { display:inline-flex; al
 
 /* One header palette for every data table, including sticky header cells. */
 :root { --msv-table-head-bg:var(--msv-graphite); --msv-table-head-ink:var(--msv-beige); }
-table thead th, table thead td { background:var(--msv-table-head-bg)!important; color:var(--msv-table-head-ink)!important; }
+table:not(.msv-sh__pay) thead th, table:not(.msv-sh__pay) thead td { background:var(--msv-table-head-bg)!important; color:var(--msv-table-head-ink)!important; }
 table thead :is(button,a) { color:inherit!important; }
 /* Standard full-size form and filter controls; table cell editors stay compact. */
 .msv-input,.msv-select,.msv-field>select,.filters input,.filters select,.bar__search { height:var(--msv-field)!important; box-sizing:border-box; }
 .msv-select,.msv-field>select,.filters select { appearance:none; -webkit-appearance:none; padding-right:44px!important; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2334495E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")!important; background-repeat:no-repeat!important; background-position:right 16px center!important; background-size:16px!important; }
+
+/* Shared controls and data tables; the booking chart keeps its own layout. */
+:root { --msv-button-height:44px; --msv-button-radius:22px; --msv-readonly-ink:#8B877F; }
+.msv-btn { height:var(--msv-button-height); min-height:var(--msv-button-height); border-radius:var(--msv-button-radius); font-size:15px; font-weight:600; }
+:is(input,textarea)[readonly], :is(input,select,textarea):disabled { color:var(--msv-readonly-ink)!important; -webkit-text-fill-color:var(--msv-readonly-ink); background-color:var(--msv-n100)!important; opacity:1; }
+table:not(.msv-sh__pay) { border-collapse:separate; border-spacing:0; }
+table:not(.msv-sh__pay) thead tr:first-child > :first-child { border-top-left-radius:var(--msv-r12); }
+table:not(.msv-sh__pay) thead tr:first-child > :last-child { border-top-right-radius:var(--msv-r12); }
+.msv-form-actions { display:flex; flex-wrap:wrap; gap:var(--msv-s8); margin-top:var(--msv-form-gap); }
+
+button:disabled { background:var(--msv-n100)!important; color:var(--msv-n500)!important; border-color:var(--msv-n100)!important; opacity:1!important; box-shadow:none!important; cursor:default; }
+
+.set > .msv-btn, .set > .msv-form-actions { margin-top:var(--msv-form-gap)!important; }

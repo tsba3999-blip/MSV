@@ -130,18 +130,18 @@
     <main class="work__body">
       <p class="msv-body" style="margin:0 0 var(--msv-s16);color:var(--msv-n500)">Сообщение резидентам: событие, отключение воды, напоминание. Уйдёт в те каналы, что резиденты указали в анкете — Telegram, Max, почта. Перед отправкой посмотрит модератор.</p>
 
-      <div class="set" style="max-width:680px">
+      <div class="set msv-form-card" style="max-width:680px">
         <div class="set__grid">
           <label class="msv-field"><span class="msv-field__label">Кому</span>
-            <select class="msv-select" id="to"><option value="all">Всем резидентам</option><option value="one">Одному резиденту…</option><option value="forma">FORMA</option><option value="uyut">Уют</option><option value="molod">Молодежка</option></select></label>
+            <select class="msv-input msv-select" id="to"><option value="all">Всем резидентам</option><option value="one">Одному резиденту…</option><option value="forma">FORMA</option><option value="uyut">Уют</option><option value="molod">Молодежка</option></select></label>
           <label class="msv-field"><span class="msv-field__label">Вид</span>
-            <select class="msv-select" id="kind"><option value="news">Новость или событие</option><option value="alarm">Предупреждение</option><option value="pay">Напоминание об оплате</option></select></label>
+            <select class="msv-input msv-select" id="kind"><option value="news">Новость или событие</option><option value="alarm">Предупреждение</option><option value="pay">Напоминание об оплате</option></select></label>
         </div>
         <label class="msv-field" id="oneField" hidden style="margin-top:var(--msv-s12)"><span class="msv-field__label">Кому именно</span><input class="msv-input" id="oneWho" list="oneList" placeholder="Начни вводить фамилию" autocomplete="off"><datalist id="oneList"></datalist></label>
         <input class="msv-input" id="title" placeholder="Заголовок: Вечер настолок в четверг" style="margin-top:var(--msv-s12)">
         <textarea class="msv-area" id="text" maxlength="1000" style="min-height:120px;margin-top:var(--msv-s12)" placeholder="Текст сообщения. Короткий, на «ты», без восклицательных знаков."></textarea>
         <span class="msv-note" style="display:block;margin-top:var(--msv-s4);text-align:right" id="count">0 из 1000</span>
-        <button class="msv-btn msv-btn--m msv-btn--primary" type="button" id="send" style="margin-top:var(--msv-s12)">Отправить на согласование</button>
+        <button class="msv-btn msv-btn--m msv-btn--primary" type="button" id="send" disabled style="margin-top:var(--msv-form-gap)">Отправить на согласование</button>
         <span class="msv-note" id="msg" hidden style="margin-left:var(--msv-s12)"></span>
       </div>
 
@@ -178,7 +178,12 @@
   })();
   var text = document.getElementById('text'), count = document.getElementById('count');
   text.addEventListener('input', function () { count.textContent = text.value.length + ' из 1000'; });
-  document.getElementById('send').addEventListener('click', function () {
+  var send=document.getElementById('send'),busy=false;
+  function refreshSend(){send.disabled=busy||!document.getElementById('title').value.trim()||!text.value.trim()||(document.getElementById('to').value==='one'&&!ONE[document.getElementById('oneWho').value.trim()]);}
+  ['title','text','to','kind','oneWho'].forEach(function(id){document.getElementById(id).addEventListener('input',refreshSend);document.getElementById(id).addEventListener('change',refreshSend);});
+  refreshSend();
+  send.addEventListener('click', function () {
+    if(send.disabled)return;
     var m = document.getElementById('msg');
     var toSel = document.getElementById('to').value, toVal = toSel;
     if (toSel === 'one') { var picked = ONE[document.getElementById('oneWho').value.trim()]; if (!picked) { alert('Выбери резидента из списка'); return; } toVal = 'user:' + picked; }
@@ -192,12 +197,13 @@
       var kindTag = { news: '<span class="tag tag--info">новость</span>', alarm: '<span class="tag tag--warn">предупреждение</span>', pay: '<span class="tag tag--bad">оплата</span>' }[body.kind];
       tb.insertAdjacentHTML('afterbegin', '<tr><td>' + body.title.replace(/</g,'&lt;') + '</td><td>' + toName + '</td><td>' + kindTag + '</td><td>' + d + '</td><td><span class="tag tag--mute">ждёт согласования</span></td></tr>');
       m.textContent = 'Отправлено модератору на согласование.'; m.hidden = false;
-      document.getElementById('title').value = ''; text.value = ''; count.textContent = '0 из 1000';
+      document.getElementById('title').value = ''; text.value = ''; count.textContent = '0 из 1000';refreshSend();
     }
     if (location.protocol === 'file:') { ok(); return; }
+    busy=true;refreshSend();
     fetch('/api/mailings', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
       .then(function (r) { if (r.status === 201) ok(); else { m.textContent = 'Не удалось'; m.hidden = false; } })
-      .catch(function () { m.textContent = 'Сервер не отвечает'; m.hidden = false; });
+      .catch(function () { m.textContent = 'Сервер не отвечает'; m.hidden = false; }).finally(function(){busy=false;refreshSend();});
   });
 })();
 </script>

@@ -23,6 +23,7 @@
 <style>
   body { --role: var(--msv-sky); --role-ink: var(--msv-graphite); }
 </style>
+<link rel="stylesheet" href="settings-save.css">
 </head>
 <body>
 
@@ -129,21 +130,23 @@
 
     <main class="work__body">
       <section class="set">
-        <h2 class="msv-sub set__title">Уведомления мне</h2>
+        <h2 class="msv-sub set__title">Уведомляйте меня</h2>
         <p class="msv-body set__text">Куда сообщать о новых заявках и просрочках.</p>
-        <label class="tog"><input type="checkbox" checked> <span>Telegram</span></label>
-        <label class="tog"><input type="checkbox"> <span>Почта</span></label>
-        <label class="tog"><input type="checkbox" checked> <span>Только заявки, назначенные на меня</span></label>
-        <label class="tog"><input type="checkbox" checked> <span>Напоминать о сроке экзаменов за месяц</span></label>
+        <label class="tog"><input data-pref="tg" type="checkbox" checked> <span>Telegram</span></label>
+        <label class="tog"><input data-pref="email" type="checkbox"> <span>Почта</span></label>
+        <label class="tog"><input data-pref="assignedOnly" type="checkbox" checked> <span>Только заявки, назначенные на меня</span></label>
+        <label class="tog"><input data-pref="examReminder" type="checkbox" checked> <span>Напоминать о сроке экзаменов за месяц</span></label>
         <p class="msv-note" style="margin:var(--msv-s16) 0 var(--msv-s4)">Что присылать</p>
         <label class="tog"><input type="radio" name="scope" value="all" checked> <span>Отправлять все уведомления</span></label>
         <label class="tog"><input type="radio" name="scope" value="mine"> <span>Только касающиеся меня</span></label>
         <p class="msv-note" id="noneWarn" hidden style="margin-top:var(--msv-s8);padding:var(--msv-s12) var(--msv-s16);background:var(--msv-n100);border:1px solid var(--msv-red);border-radius:var(--msv-r12)">Отказываясь от уведомлений, я полностью беру на себя ответственность за неинформированность: о сроках оплаты, изменениях в правилах и событиях мне не сообщат.</p>
+        <button class="msv-btn msv-btn--m msv-btn--primary" type="button" data-save-prefs disabled style="margin-top:var(--msv-form-gap)">Сохранить</button>
+        <span class="msv-note" data-prefs-message role="status" hidden style="margin-left:var(--msv-s12)"></span>
       </section>
       <section class="set">
-        <h2 class="msv-sub set__title">Вход</h2>
+        <h2 class="msv-sub set__title">Пин-код</h2>
         <p class="msv-body set__text">Код входа — четыре цифры. Смени, если кто-то мог его увидеть.</p>
-        <a class="msv-btn msv-btn--m msv-btn--secondary" href="pin.html">Сменить код входа</a>
+        <a class="msv-btn msv-btn--m msv-btn--secondary" href="pin.html">Обновить пин-код</a>
       </section>
       <section class="set">
         <h2 class="msv-sub set__title">Telegram-бот</h2>
@@ -156,15 +159,7 @@
 
 </div>
 
-<script>
-(function () {
-  'use strict';
-  var warn = document.getElementById('noneWarn');
-  document.querySelectorAll('input[name="scope"]').forEach(function (r) {
-    r.addEventListener('change', function () { warn.hidden = r.value !== 'none'; });
-  });
-})();
-</script>
+<script src="notify-prefs.js"></script>
 <script src="mark.js"></script>
 <script src="zoom.js"></script>
 <script src="edit.js"></script>

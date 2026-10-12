@@ -2,6 +2,7 @@
 <!-- © 2026 МСВ. Все права защищены. Подробнее: /legal.html -->
 <html lang="ru">
 <head>
+<script src="management-session.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="favicon.svg?v=red-2" type="image/svg+xml">
@@ -50,6 +51,7 @@
 .staff-table tr:not(.more)>td:last-child{padding-left:16px;padding-right:16px;text-align:center;}.staff-table tr:not(.more)>td:last-child .tri{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;padding:0;box-sizing:border-box;}
 .staff-more__menu{left:auto!important;right:0;max-width:calc(100vw - 32px);box-sizing:border-box;}.staff-more__menu .msv-btn{max-width:100%;white-space:normal;height:auto;min-height:36px;}
 .staff-table tr.more>td:first-child{padding:16px;}.staff-details{position:sticky;left:16px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;white-space:normal;}.staff-details dl{margin:0}.staff-details dt:not(:first-child){margin-top:8px}@media(max-width:760px){.staff-details{width:calc(100vw - 64px);grid-template-columns:1fr;}}
+ .staff-table {min-width:660px;} .staff-table th:nth-child(-n+3){width:calc((100% - 64px)/3);padding-left:16px;} .staff-table th:nth-child(4){width:64px;} .staff-actions {display:flex;flex-direction:column;align-items:flex-start;gap:8px;} .staff-actions .msv-btn {flex:none;width:132px;max-width:100%;font-weight:600;} .staff-details {position:static;width:calc(100% - 32px);margin-left:-16px;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;} .staff-details dl{padding:0 16px;} @media(max-width:760px){.staff-details{width:calc(100% - 32px);grid-template-columns:repeat(3,minmax(0,1fr));}}
 </style>
 <style>
   body { --role: var(--msv-graphite); --role-ink: var(--msv-graphite); }
@@ -146,7 +148,7 @@
         <button class="bar__chip" type="button" data-place="forma" aria-pressed="false">Шаб.</button>
         <button class="bar__chip" type="button" data-place="uyut" aria-pressed="false">Варш.</button>
         <button class="bar__chip" type="button" data-place="all" aria-pressed="false">Администрация</button><span class="msv-note bar__count" id="count"></span>
-        <details class="staff-more"><summary class="msv-btn msv-btn--s msv-btn--tertiary">Ещё <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="msv-chevron"><path d="M6 9l6 6 6-6"/></svg></summary><div class="staff-more__menu"><button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" id="addStaff">Добавить сотрудника</button></div></details>
+        <details class="staff-more"><summary class="msv-btn msv-btn--s msv-btn--tertiary" aria-label="Добавить сотрудника" style="width:44px;padding:0;font-size:24px">+</summary><div class="staff-more__menu"><button class="msv-btn msv-btn--s msv-btn--tertiary" type="button" id="addStaff">Добавить сотрудника</button></div></details>
       </div>
 
       <div class="staff-table-wrap"><table class="grid staff-table">
@@ -189,19 +191,19 @@ MSV.ready(function (ctx) {
     document.getElementById('count').textContent = list.length + ' из ' + STAFF.length;
     document.getElementById('rows').innerHTML = list.map(function (s) {
       return '<tr data-id="' + esc(s.id) + '">' +
-        '<td><a class="who-link" href="admin-staff-view.html?id=' + esc(s.id) + '" title="Открыть кабинет сотрудника"><span class="who-cell"><span class="staff-marker">' + ({uyut:'У',forma:'Ш',all:'А'}[s.place]||'—') + '</span><span class="who-cell__face presence-avatar" data-presence-user="' + esc(s.id) + '">' + (s.photo?'<img src="'+esc(s.photo)+'" alt="Фото сотрудника" data-zoom style="width:48px;height:48px;object-fit:cover;border-radius:50%">':esc(initials(s.name))) + '</span><span><span class="who-cell__name">' + esc(s.name) + '</span><span class="msv-note" style="display:block">'+esc(s.position)+'</span></span></span></a></td>' +
+        '<td><a class="who-link" href="admin-staff-view.html?id=' + esc(s.id) + '"' + (ctx.me&&ctx.me.canEditSite&&s.role!=='admin'?' data-cabinet="'+esc(s.userId||s.id)+'"':'') + ' title="Открыть кабинет сотрудника"><span class="who-cell"><span class="staff-marker">' + ({uyut:'У',forma:'Ш',all:'А'}[s.place]||'—') + '</span><span class="who-cell__face presence-avatar" data-presence-user="' + esc(s.id) + '">' + (s.photo?'<img src="'+esc(s.photo)+'" alt="Фото сотрудника" data-zoom style="width:48px;height:48px;object-fit:cover;border-radius:50%">':esc(initials(s.name))) + '</span><span><span class="who-cell__name">' + esc(s.name) + '</span><span class="msv-note" style="display:block">'+esc(s.position)+'</span></span></span></a></td>' +
 
 
 
         '<td class="num">' + money(s.salary) + '</td>' +
-        '<td><div class="staff-actions"><button class="msv-btn msv-btn--s msv-btn--primary" type="button" data-pay>Начислить</button><button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-bonus>Премировать</button></div></td>' +
+        '<td><div class="staff-actions"><button class="msv-btn msv-btn--s msv-btn--primary" type="button" data-pay>Начислить</button><button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-bonus>Премировать</button>' + (ctx.me&&ctx.me.canEditSite&&s.role!=='admin'?'<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-cabinet="'+esc(s.userId||s.id)+'">ЛК</button>':'') + '</div></td>' +
         '<td class="num"><button class="tri" type="button" data-more aria-expanded="false" aria-label="Подробнее"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="msv-chevron"><path d="M6 9l6 6 6-6"/></svg></button></td>' +
       '</tr>' +
       '<tr class="more" data-more-of="'+esc(s.id)+'" hidden><td colspan="4"><div class="staff-details">'+
         '<dl><dt>Дата рождения</dt><dd>'+fdate(s.birthday)+'</dd></dl>'+
         '<dl><dt>Куда переводить</dt><dd>'+(s.payTo?esc(s.payTo):'<span class="miss">уточнить</span>')+'</dd><dt>Тип отношений</dt><dd>'+esc(s.relation||'—')+'</dd></dl>'+
         '<dl><dt>Работает с</dt><dd>'+fdate(s.started)+'</dd><dt>Стаж</dt><dd>'+esc(tenure(s.started))+'</dd></dl>'+
-        (ctx.me&&ctx.me.canEditSite&&s.role!=='admin'?'<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-cabinet="'+esc(s.id)+'">ЛК</button>':'')+'</div></td></tr>';
+        '</div></td></tr>';
     }).join('');
   }
 
@@ -277,6 +279,7 @@ MSV.ready(function (ctx) {
   load();
 });
 </script>
+<script src="cabinet-preview.js"></script>
 <script src="mark.js"></script>
 <script src="zoom.js"></script>
 <script src="edit.js"></script>

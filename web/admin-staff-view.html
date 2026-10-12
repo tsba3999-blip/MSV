@@ -2,6 +2,7 @@
 <!-- © 2026 МСВ. Все права защищены. Подробнее: /legal.html -->
 <html lang="ru">
 <head>
+<script src="management-session.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="favicon.svg?v=red-2" type="image/svg+xml">
@@ -141,7 +142,7 @@ MSV.ready(function (ctx) {
   /* Карточку берём из того же списка, что и страница «Сотрудники», —
      из базы. Раньше список был записан в файле, и карточка показывала
      то, чего в базе уже не было (25.09.2026). */
-  window.MSV_STAFF_LOAD().then(function (list) { show(list.filter(function (x) { return x.id === id; })[0]); });
+  window.MSV_STAFF_LOAD().then(function (list) { show(list.filter(function (x) { return String(x.id) === String(id); })[0]); });
 
   function show(s) {
   if (!s) { box.innerHTML = '<p class="msv-body" style="color:var(--msv-n500)">Сотрудник не найден. <a class="msv-link" href="admin-staff.html">К списку</a></p>'; return; }

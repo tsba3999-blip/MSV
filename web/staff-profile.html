@@ -129,13 +129,11 @@
 
     <main class="work__body">
       <section class="set">
-        <h2 class="msv-sub set__title">Фотография</h2>
-        <p class="msv-body set__text">Ставится в кружок рядом с именем — в кабинете и в боковом меню. Видят её только сотрудники.</p>
         <div class="face">
           <span class="face__pic" id="myFace" aria-hidden="true"></span>
           <div class="face__act">
             <button class="msv-btn msv-btn--m msv-btn--secondary" type="button" id="facePick">Загрузить фото</button>
-            <button class="msv-btn msv-btn--m msv-btn--secondary" type="button" id="faceDrop" hidden>Убрать</button>
+            <button class="msv-btn msv-btn--m msv-btn--secondary" type="button" id="faceDrop" hidden aria-label="Удалить фото"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/></svg></button>
             <p class="msv-note" id="faceMsg">JPEG, PNG или WebP, до 8 МБ.</p>
           </div>
         </div>
@@ -144,7 +142,7 @@
       <section class="set">
         <h2 class="msv-sub set__title" id="cardName">&nbsp;</h2>
         <div class="set__grid">
-          <label class="msv-field"><span class="msv-field__label">Дата рождения</span><input class="msv-input" type="date" value="1994-06-21" readonly></label>
+          <label class="msv-field"><span class="msv-field__label">Дата рождения</span><input class="msv-input" type="date" id="pBirthday" readonly></label>
           <label class="msv-field"><span class="msv-field__label">Телефон</span><input class="msv-input" id="pPhone" type="tel" readonly></label>
           <label class="msv-field"><span class="msv-field__label">Рабочая почта</span><input class="msv-input" id="pEmail" type="email" readonly></label>
           <label class="msv-field"><span class="msv-field__label">Должность</span><input class="msv-input" id="pPosition" readonly></label>
@@ -190,7 +188,7 @@
           var set = function (id, v) { var e = document.getElementById(id); if (e) e.value = v || ''; };
           var h = document.getElementById('cardName');
           if (h) h.textContent = d.name || 'Анкета сотрудника';
-          set('pPhone', d.phone); set('pEmail', d.email);
+          set('pBirthday', String(d.birthday || '').slice(0,10)); set('pPhone', d.phone); set('pEmail', d.email);
           set('pPosition', d.position); set('pPlace', d.place); set('pRelation', d.relation);
           var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(d.started || ''));
           set('pStarted', m ? m[3] + '.' + m[2] + '.' + m[1] : '');

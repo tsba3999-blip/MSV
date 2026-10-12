@@ -1,6 +1,8 @@
 (function(){
  'use strict';
- document.addEventListener('click',async function(e){var b=e.target.closest('[data-cabinet]');if(!b)return;e.preventDefault();b.disabled=true;try{var r=await fetch('/api/cabinet-preview/start',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:b.dataset.cabinet})}),j=await r.json();if(!r.ok)throw Error(j.error);location.href=j.url;}catch(err){alert(err.message);b.disabled=false;}});
+ if(window.MSV_CABINET_PREVIEW_LOADED)return;window.MSV_CABINET_PREVIEW_LOADED=true;
+ window.addEventListener('pageshow',function(e){if(e.persisted && /admin-(staff|rights)/.test(location.pathname))location.reload();});
+ document.addEventListener('click',async function(e){var b=e.target.closest('[data-cabinet]');if(!b||b.dataset.previewBusy)return;e.preventDefault();b.dataset.previewBusy='1';b.disabled=true;try{var stop=await fetch('/api/cabinet-preview/stop',{method:'POST',credentials:'same-origin'});if(!stop.ok)throw Error('Не удалось завершить предыдущий просмотр');var r=await fetch('/api/cabinet-preview/start',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:b.dataset.cabinet})}),j=await r.json();if(!r.ok)throw Error(j.error);location.href=j.url+'?view='+encodeURIComponent(b.dataset.cabinet);}catch(err){alert(err.message);b.disabled=false;delete b.dataset.previewBusy;}});
  fetch('/api/auth/me',{credentials:'same-origin'}).then(r=>r.ok||r.status===409?r.json():null).then(function(me){if(me?.previewUnavailable)me={name:'Кабинет недоступен',preview:{returnTo:'admin-shahmatka.html'}};if(!me?.preview)return;
   var banner=document.createElement('div');banner.className='cabinet-preview';banner.setAttribute('role','status');
   var text=document.createElement('span');text.textContent='Просмотр ЛК: '+me.name+' · изменения отключены';

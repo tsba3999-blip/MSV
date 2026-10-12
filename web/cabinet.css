@@ -539,3 +539,11 @@ html.msv-side-pending .side { visibility:hidden; }
   .side__exit, .shell--folded .side__exit { padding:0 14px; justify-content:flex-start; }
   .side__exit svg { width:20px; height:20px; flex-shrink:0; }
 }
+
+/* Equal responsive data columns; detailed payroll and permissions refine this below. */
+.grid,.rights { width:100%; table-layout:fixed; border-collapse:separate; border-spacing:0; }
+.grid th,.grid td,.rights th,.rights td { overflow-wrap:anywhere; white-space:normal; }
+@media(max-width:760px) { .grid,.rights { display:table; } .grid thead,.rights thead { display:table-header-group; } .grid tbody,.rights tbody { display:table-row-group; } .grid tfoot {display:table-footer-group;} .grid tr,.rights tr { display:table-row; } .grid th,.grid td,.rights th,.rights td { display:table-cell; } }
+
+.grid thead th { white-space:normal; }
+.grid :is(td,th) .msv-btn { max-width:100%; padding-left:12px; padding-right:12px; }

@@ -196,7 +196,7 @@
       if (contractNav && !contractNav.querySelector('a[href="contracts-preview.html"]')) {
         var contractsLink = document.createElement('a');
         contractsLink.className = 'side__link'; contractsLink.href = 'contracts-preview.html';
-        contractsLink.textContent = 'Подряды';
+        contractsLink.textContent = 'Договора';
         var tasksLink = Array.from(contractNav.querySelectorAll('a')).find(function (link) { return /Задачи\s*M[²2]/.test(link.textContent); });
         if (tasksLink) tasksLink.after(contractsLink); else contractNav.appendChild(contractsLink);
       }
@@ -284,6 +284,18 @@
         if (link && !link.querySelector('svg')) link.insertAdjacentHTML('afterbegin','<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + item[1] + '</svg>');
       });
     }
+    var sectionIcons = {
+      'contracts-preview.html':'<path d="m3 8 3-3 4 1 3-1 3 1 5 5-3 6-4 3-3-1-5-5-3-1Z"/><path d="m10 6-3 4 2 2 4-3 5 5M6 14l2-2m1 5 2-2m1 4 2-2"/>',
+      'admin-staff.html':'<path d="M8 7a4 4 0 0 0 8 0M7 6a5 5 0 0 1 10 0M6 6h12M4 21v-2a8 6 0 0 1 16 0v2M10 14l2 2 2-2m-2 2-2 4 2 2 2-2-2-4"/>',
+      'admin-tickets.html':'<path d="m4 20 2-7L17 2l5 5-11 11-7 2Zm2-7 5 5M15 4l5 5M3 22h18"/>',
+      'staff-tickets.html':'<path d="m4 20 2-7L17 2l5 5-11 11-7 2Zm2-7 5 5M15 4l5 5M3 22h18"/>',
+      'admin-rights.html':'<rect x="3" y="3" width="18" height="18" rx="4"/><path d="m6 8 2 2 4-4m2 8 4 4m0-4-4 4"/>',
+      'admin-departures.html':'<path d="M12 21h9V3h-9v5m0 8v5l6-3V6l-6-3M3 12h11m-4-4 4 4-4 4"/>',
+      'staff-salary.html':'<path d="M3 8V6a2 2 0 0 1 1.6-2L17 2l1 2"/><rect x="3" y="7" width="18" height="14" rx="3"/><circle cx="16" cy="14" r="2"/>',
+      'staff-documents.html':'<path d="M10 8V4a2 2 0 0 1 4 0v4m0-3a2 2 0 0 1 4 0v3h3l-1-4c4 3 4 8 0 10l-5 1 2 7H7l2-7-5-1C0 12 0 7 4 4L3 8h3V5a2 2 0 0 1 4 0"/>',
+      'documents.html':'<path d="M10 8V4a2 2 0 0 1 4 0v4m0-3a2 2 0 0 1 4 0v3h3l-1-4c4 3 4 8 0 10l-5 1 2 7H7l2-7-5-1C0 12 0 7 4 4L3 8h3V5a2 2 0 0 1 4 0"/>'
+    };
+    document.querySelectorAll('a').forEach(function(link){var href=(link.getAttribute('href')||'').split('?')[0],path=sectionIcons[href];if(!path)return;var old=link.querySelector('svg');var cls=old&&old.getAttribute('class')||'';var size=old&&old.getAttribute('width')||'20';var svg='<svg class="'+cls+'" width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+path+'</svg>';if(old)old.outerHTML=svg;else link.insertAdjacentHTML('afterbegin',svg);});
     document.dispatchEvent(new Event('msv:menu-ready'));
     // «М» ведёт в свой кабинет
     a.href = ROLE_HOME[role] || 'menu.html';

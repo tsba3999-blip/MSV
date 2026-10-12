@@ -1272,8 +1272,7 @@ body.msv-sh-dragging .msv-sh__bar { cursor: grabbing; }
 .msv-sh__bar-name { z-index:2; }
 @media(max-width:760px){ .msv-sh__bar { height:28px; } }
 
-.msv-sh__head,.msv-sh__head-left { background:var(--msv-table-head-bg);color:var(--msv-table-head-ink); }
-.msv-sh__head :is(.msv-sh__month,.msv-sh__foldall,.msv-sh__day span) { color:var(--msv-table-head-ink); }
+
 .msv-sh__documents-line { grid-column:1/-1;display:block;margin-top:0;line-height:1.5; }
 .msv-sh__documents-line dt,.msv-sh__documents-line dd { display:inline;margin:0;text-align:left; }
 

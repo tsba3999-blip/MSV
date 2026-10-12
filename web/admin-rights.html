@@ -2,6 +2,7 @@
 <!-- © 2026 МСВ. Все права защищены. Сайт и его программное обеспечение охраняются ГК РФ (ст. 1259, 1261). Копирование без разрешения правообладателя запрещено. Подробнее: /legal.html -->
 <html lang="ru">
 <head>
+<script src="management-session.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="favicon.svg?v=red-2" type="image/svg+xml">
@@ -33,6 +34,8 @@
 .rights .who-cell>span:last-child {min-width:0;}
 .rights .who-cell__name {overflow-wrap:anywhere;}
 @media(max-width:760px){.rights {min-width:740px;} .rights th:nth-child(1){width:240px;} .rights th:nth-child(3){width:340px;} .rights th:nth-child(4){width:160px;} .rights th:nth-child(2),.rights td:nth-child(2){display:none;} .rights .role-mobile {display:inline-flex;margin:6px 0;} }
+ .rights {min-width:0;width:100%;} .rights th:nth-child(n) {width:25%;} .rights .perm {width:100%;} .rights .perm__item--total {width:100%;box-sizing:border-box;text-align:center;} @media(max-width:760px){.rights th:nth-child(n){width:33.333%;}.rights .who-cell{flex-wrap:wrap;}.rights .who-cell>span:last-child{flex-basis:100%;}.rights .perm__item{white-space:normal;}.rights td,.rights th{padding:12px 8px;}.rights .msv-btn{max-width:100%;padding:0 6px;font-size:12px;}}
+@media(max-width:760px){.rights .perm__item {font-size:11px;padding:4px 6px;white-space:nowrap;}.rights .role-mobile{font-size:9px;letter-spacing:0;padding:4px 6px;white-space:nowrap;}.rights .msv-note{font-size:11px;overflow-wrap:normal;}}
 </style>
 </head>
 <body>
@@ -211,7 +214,7 @@
       var marker={forma:'Ф',uyut:'У',all:'А'}[p.place]||'—';
       var on = lit(st);
 
-      var pills = st.role === 'admin' ? '<span class="perm__item perm__item--on" title="Полный доступ ко всем разделам">Тотал</span>' : PERMS.map(function (x) {
+      var pills = st.role === 'admin' ? '<span class="perm__item perm__item--on perm__item--total" title="Полный доступ ко всем разделам">Тотал</span>' : PERMS.map(function (x) {
         var cls = 'perm__item' + (on[x] ? ' perm__item--on' : '');
         if (!edit) return '<span class="' + cls + '">' + x + '</span>';
         var why = locked(st, x, self);
