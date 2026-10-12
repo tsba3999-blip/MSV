@@ -137,7 +137,7 @@
       document.body.style.setProperty('--role','var(--msv-sky)');
       var staffTemplate=document.getElementById('staff-profile-nav'), profileNav=document.querySelector('.side__nav');
       if(staffTemplate && profileNav) profileNav.replaceWith(staffTemplate.content.firstElementChild.cloneNode(true));
-      var staffIdentity=document.querySelector('.side__who');if(staffIdentity){staffIdentity.href='staff-profile.html';staffIdentity.title='Мои данные';}
+      var staffIdentity=document.querySelector('.side__who');if(staffIdentity){staffIdentity.href='staff-profile.html';staffIdentity.title='Это Я';}
       document.querySelectorAll('.side__nav [aria-current]').forEach(function(link){link.removeAttribute('aria-current');});
     }
     // One workspace for moderators without the separate payroll administrator role.
@@ -166,7 +166,7 @@
           ['staff-mailings.html', 'Рассылки'],
           ['staff-salary.html', 'Моя зарплата'],
           ['staff-documents.html', 'Мои документы'],
-          ['staff-profile.html', 'Мои данные'],
+          ['staff-profile.html', 'Это Я'],
           ['staff-exams.html', 'Экзамены'],
           ['staff-say.html', 'Хочу сказать'],
           ['staff-repair.html', 'Заявка технику'],
@@ -194,7 +194,7 @@
           nav.appendChild(link);
         });
         var identity = document.querySelector('.side__who');
-        if (identity) { identity.href = 'staff-profile.html'; identity.title = 'Мои данные'; }
+        if (identity) { identity.href = 'staff-profile.html'; identity.title = 'Это Я'; }
       }
     }
 
@@ -242,7 +242,7 @@
         var profile = personalNav.querySelector('a[href="staff-profile.html"]');
         if (!profile) {
           profile = document.createElement('a'); profile.className = 'side__link'; profile.href = 'staff-profile.html';
-          profile.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>Мои данные';
+          profile.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>Это Я';
           personalNav.appendChild(profile);
         }
         var group = document.createElement('div'); group.className = 'side__personal';
