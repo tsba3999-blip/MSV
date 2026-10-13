@@ -9,6 +9,7 @@
 <title>Анкета, шаг 2 — МСВ</title>
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="form.css">
+<style>#referralForm>p{margin:0 0 8px}#referralForm [data-sources]{margin-top:16px}#referralForm [hidden]{display:none}#referralForm .chip{height:auto;min-height:44px;white-space:normal;text-align:left}#referralForm [data-detail]{margin-top:16px}#referralForm [data-detail-label]{display:block;margin-bottom:8px}</style>
 </head>
 <body>
 
@@ -129,6 +130,17 @@
     </div>
   </section>
 
+  <section class="sect" id="referralForm" aria-labelledby="referralTitle">
+    <h2 class="msv-sub sect__title" id="referralTitle">Откуда вы о нас узнали?</h2>
+    <p class="msv-note">Помогите нам понять, как вы нас нашли, и поблагодарить тех, кто нас рекомендует.</p>
+    <p class="msv-note">Можно пропустить. Повторное нажатие снимает выбор.</p>
+    <div class="chips" data-sources role="group" aria-labelledby="referralTitle"></div>
+    <div data-detail hidden>
+      <label class="msv-note" data-detail-label id="referralDetailLabel" for="referralDetail"></label>
+      <input class="msv-input" id="referralDetail" type="text" maxlength="300">
+      <div class="chips" data-choices role="group" aria-labelledby="referralDetailLabel" hidden></div>
+    </div>
+  </section>
   <div class="form__foot">
     <button class="msv-btn msv-btn--block msv-btn--primary" id="next" type="button">Выбрать место для проживания</button>
     <p class="msv-note" id="nextMsg" hidden style="margin-top:var(--msv-s8);text-align:center"></p>
@@ -136,6 +148,7 @@
 
 </div>
 
+<script src="referral-form.js"></script>
 <script>
 /* Куда вернуться после анкеты: адрес передаёт тот, кто её вызвал —
    обычно «Проверка данных». Пускаем только свои страницы, иначе ссылку
@@ -253,9 +266,10 @@ var MSV_NEXT = (function () {
     var hobbies = Array.prototype.map.call(document.querySelectorAll('.petal[aria-pressed="true"]'), function (b) { return b.textContent.trim(); });
     var rate = document.querySelector('.rate__btn[aria-pressed="true"]');
     return { about: document.getElementById('about').value, hobbies: hobbies, own: document.getElementById('ownHobby').value,
-             rate: rate ? rate.dataset.rate : '', why: document.getElementById('why').value };
+             referral: MSVReferralForm.get(), rate: rate ? rate.dataset.rate : '', why: document.getElementById('why').value };
   }
   function fill2(v) {
+    MSVReferralForm.set(v.referral);
     document.getElementById('about').value = v.about || '';
     document.getElementById('about').dispatchEvent(new Event('input'));
     document.querySelectorAll('.petal').forEach(function (b) { if ((v.hobbies || []).indexOf(b.textContent.trim()) >= 0) b.setAttribute('aria-pressed', 'true'); });
@@ -284,12 +298,14 @@ var MSV_NEXT = (function () {
   try { saved2 = JSON.parse(sessionStorage.getItem('msv.profile2') || 'null'); } catch (e) {}
   if (saved2) {
     fill2(saved2);
+    if(saved2.referral===undefined && location.protocol!=='file:') fetch('/api/me/profile',{credentials:'same-origin'}).then(r=>r.ok?r.json():null).then(d=>{if(d)MSVReferralForm.set(d.referral);}).catch(function(){});
   } else if (location.protocol !== 'file:') {
     fetch('/api/me/profile', { credentials: 'same-origin' })
       .then(function (r) { return r.status === 200 ? r.json() : null; })
       .then(function (d) {
         if (!d) return;
         var a = fromAbout(d.about);
+        a.referral = d.referral;
         a.rate = d.healthScore ? String(d.healthScore) : '';
         a.why = d.healthNote || '';
         fill2(a);
@@ -312,7 +328,8 @@ var MSV_NEXT = (function () {
     var profile = Object.assign({}, step1, {
       about: [document.getElementById('about').value.trim(), hobbies.length ? 'Увлечения: ' + hobbies.join(', ') : ''].filter(Boolean).join('\n'),
       healthScore: rate ? Number(rate.dataset.rate) : null,
-      healthNote: document.getElementById('why').value.trim()
+      healthNote: document.getElementById('why').value.trim(),
+      referral: MSVReferralForm.get()
     });
 
     var btn = this, msg = document.getElementById('nextMsg');

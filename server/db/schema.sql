@@ -899,3 +899,6 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS last_active_at timestamptz;
 
 -- Approved residence display name.
 UPDATE residences SET title='Молодежка' WHERE id='molod' AND title='Квартира Молодежка';
+
+-- Optional registration source, independent of the resident biography.
+ALTER TABLE resident_profiles ADD COLUMN IF NOT EXISTS referral jsonb;

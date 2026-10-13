@@ -386,6 +386,7 @@ MSV.ready(function (ctx) {
         '<div><dt>ВУЗ</dt><dd>' + esc(p.university || '—') + '</dd></div>' +
         '<div><dt>Курс</dt><dd>' + esc(p.course || '—') + '</dd></div>' +
         '<div><dt>Факультет</dt><dd>' + esc(p.faculty || '—') + '</dd></div>' +
+        '<div><dt>Откуда о нас узнали</dt><dd>' + esc(p.referral ? (({university:'В вузе',recommendation:'Посоветовали',search:'В поисковике',maps:'На картах',social:'В соцсетях или Telegram',other:'Другое'})[p.referral.source] || '—') + (p.referral.detail ? ' · ' + p.referral.detail : '') : '—') + '</dd></div>' +
         '<div><dt>Мессенджеры</dt><dd>' + esc((p.messengers || []).map(function (m) { return m === 'tg' ? 'Telegram' : 'Макс'; }).join(', ') || '—') + '</dd></div>' +
         '<div><dt>Контактное лицо</dt><dd>' + esc(p.contactPerson || '—') + '</dd></div>' +
         '<div><dt>Профиль VK</dt><dd>' + (p.vk ? '<a class="msv-link" href="' + esc(p.vk) + '" target="_blank" rel="noopener">' + esc(p.vk) + '</a>' : '—') + '</dd></div>' +

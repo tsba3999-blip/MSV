@@ -203,7 +203,7 @@ module.exports = function register(route) {
       university: p.university, course: p.course, faculty: p.faculty, about: p.about,
       messengers: p.messengers || [], tgNick: p.tg_nick,
       healthScore: p.health_score, healthNote: p.health_note,
-      contactPerson: p.contact_person, vk: p.vk
+      contactPerson: p.contact_person, vk: p.vk, referral: p.referral || null
     });
   });
 
@@ -211,6 +211,12 @@ module.exports = function register(route) {
     const s = auth.readSession(req);
     if (!s) return fail(res, 401, 'Не выполнен вход');
     const b = await readJson(req);
+    let referral;
+    if(b.referral!==undefined){
+      try{referral=require('../lib/referral').normalize(b.referral);}
+      catch(e){return fail(res,400,e.message);}
+    }
+
     if (!require('../lib/names')(b)) return fail(res,400,'Необходимо вводить данные по-русски');
 
     const str = (v, n) => v === undefined || v === null ? null : String(v).slice(0, n);
@@ -259,6 +265,8 @@ module.exports = function register(route) {
          str(b.university, 200), str(b.course, 20), str(b.faculty, 200), str(b.about, 600), health,
          str(b.contactPerson, 200), str(b.vk, 200), mess, gender,
          str(b.tgNick, 100), str(b.healthNote, 300)]);
+
+      if(referral!==undefined)await q('UPDATE resident_profiles SET referral=$2::jsonb WHERE user_id=$1',[s.uid,referral===null?null:JSON.stringify(referral)]);
 
       // Имя в учётной записи — из анкеты
       const full = [b.lastName, b.firstName, b.middleName].filter(Boolean).join(' ').trim();

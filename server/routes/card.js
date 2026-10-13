@@ -56,7 +56,7 @@ module.exports = function register(route) {
     const u = await query(`
       SELECT u.id, u.name, u.role, u.phone, u.email, u.is_active, u.created_at, u.first_login, u.invited_at,
              p.last_name, p.first_name, p.middle_name, p.birthday, p.city, p.citizenship, p.university, p.course,
-             p.faculty, p.about, p.health_score, p.contact_person, p.vk, p.messengers,
+             p.faculty, p.about, p.referral, p.health_score, p.contact_person, p.vk, p.messengers,
              COALESCE(u.photo_url, p.photo_url, (SELECT f.url FROM resident_files f WHERE f.user_id=u.id AND f.kind='photo' ORDER BY f.uploaded_at DESC LIMIT 1)) AS photo_url,
              p.gender, p.docs_signed_at, p.updated_at
       FROM users u LEFT JOIN resident_profiles p ON p.user_id = u.id
@@ -116,7 +116,7 @@ module.exports = function register(route) {
       profile: {
         lastName: row.last_name || '', firstName: row.first_name || '', middleName: row.middle_name || '',
         birthday: iso(row.birthday), city: row.city || '', citizenship: row.citizenship || '', university: row.university || '',
-        course: row.course || '', faculty: row.faculty || '', about: row.about || '',
+        course: row.course || '', faculty: row.faculty || '', about: row.about || '', referral: row.referral || null,
         healthScore: row.health_score, contactPerson: row.contact_person || '', vk: row.vk || '',
         photo: row.photo_url || '', messengers: row.messengers || [], gender: row.gender || '',
         docsSignedAt: iso(row.docs_signed_at), updatedAt: row.updated_at
