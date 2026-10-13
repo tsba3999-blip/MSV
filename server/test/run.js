@@ -17,6 +17,7 @@ function t(name, fn) {
 }
 
 const auth = require('../lib/auth');
+const owner = require('../lib/admin-owner');
 const httpLib = require('../lib/http');
 
 (async () => {
@@ -38,9 +39,9 @@ const httpLib = require('../lib/http');
   // ---------- сессии ----------
   const { sign, verify, newPin } = auth._internal;
   await t('подпись сессии проверяется', () => {
-    const tok = sign({ uid: 7, role: 'admin', exp: Date.now() + 10000 });
+    const tok = sign({ uid: owner.id, role: 'admin', adminVersion: owner.sessionVersion, exp: Date.now() + 10000 });
     const p = verify(tok);
-    assert.strictEqual(p.uid, 7); assert.strictEqual(p.role, 'admin');
+    assert.strictEqual(p.uid, owner.id); assert.strictEqual(p.role, 'admin');
   });
   await t('подделка роли не проходит', () => {
     const tok = sign({ uid: 7, role: 'resident', exp: Date.now() + 10000 });
@@ -58,7 +59,7 @@ const httpLib = require('../lib/http');
     for (let i = 0; i < 200; i++) assert.match(newPin(), /^\d{4}$/);
   });
   await t('cookie HttpOnly и SameSite', () => {
-    const c = auth.sessionCookie({ id: 1, role: 'admin' });
+    const c = auth.sessionCookie({ id: owner.id, role: 'admin' });
     assert.ok(c.includes('HttpOnly') && c.includes('SameSite=Lax'));
   });
   await t('роли ранжируются', () => {
@@ -107,7 +108,7 @@ const httpLib = require('../lib/http');
   }
   await t('index.html отдаётся по /', () => {
     const res = fakeRes();
-    const ok = httpLib.serveStatic(web, { path: '/' }, res);
+    const ok = httpLib.serveStatic(web, { path: '/', headers: {} }, res);
     assert.ok(ok); assert.strictEqual(res.status, 200);
     assert.ok(res.headers['Content-Type'].startsWith('text/html'));
   });
@@ -121,7 +122,7 @@ const httpLib = require('../lib/http');
   });
   await t('css с нужным типом', () => {
     const res = fakeRes();
-    httpLib.serveStatic(web, { path: '/tokens.css' }, res);
+    httpLib.serveStatic(web, { path: '/tokens.css', headers: {} }, res);
     assert.ok(res.headers['Content-Type'].startsWith('text/css'));
   });
 

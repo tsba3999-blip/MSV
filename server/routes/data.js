@@ -29,6 +29,7 @@ function isoDate(d) {
 }
 
 module.exports = function register(route) {
+  require('./chart-history')(route);
 
   /* ---------- Резиденции: тот же вид, что residences.js ---------- */
 

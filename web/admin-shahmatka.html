@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="cabinet.css">
 <link rel="stylesheet" href="shahmatka.css">
 <style>
+  #chartHistory[hidden]{display:none}
   body { --role: var(--msv-graphite); --role-ink: var(--msv-graphite); }
 
   /* Шахматке нужна вся высота рабочей области, иначе прокрутка
@@ -158,6 +159,7 @@
   <div class="work">
     <header class="work__top">
       <h1 class="msv-sub work__title" id="title"></h1>
+      <a class="msv-btn msv-btn--primary" href="admin-chart-history.html" id="chartHistory" hidden>Архив изменений</a>
       <nav class="res-switch" id="resSwitch" aria-label="Резиденция"></nav>
     </header>
 
@@ -181,6 +183,7 @@ MSV.ready(function (ctx) {
   'use strict';
 
   var RES = ctx.residences;
+  document.getElementById('chartHistory').hidden = !(ctx.live && ctx.me && ['admin','moderator'].includes(ctx.me.role));
 
   var params = new URLSearchParams(location.search);
   var id = params.get('res');

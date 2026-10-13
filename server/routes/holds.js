@@ -25,7 +25,7 @@
 const auth = require('../lib/auth');
 const notify = require('../lib/notify');
 const { json, fail, readJson } = require('../lib/http');
-const { query } = require('../lib/db');
+const { query, tx } = require('../lib/db');
 
 const MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
                 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
@@ -60,7 +60,8 @@ module.exports = function register(route) {
        время удержания, берём диапазон от сегодня до дня, следующего
        за днём сгорания. */
     try {
-      const r = await query(`
+      const row = await tx(async q => {
+      const r = await q(`
         INSERT INTO bookings (user_id, bed_id, date_from, date_to, source, tariff, note,
                               hold_until, hold_name, hold_contact)
         VALUES (NULL, $1, CURRENT_DATE,
@@ -71,8 +72,11 @@ module.exports = function register(route) {
         [String(b.bedId), String(hours), 'Поставил ' + (s.name || 'модератор'), name, contact]);
 
       const row = r.rows[0];
-      await query(`INSERT INTO audit_log (actor_id, action, target, payload) VALUES ($1, 'hold.create', $2, $3)`,
-        [s.uid, 'booking:' + row.id, JSON.stringify({ bedId: b.bedId, hours, name, contact })]);
+      await q(`INSERT INTO audit_log (actor_id, action, target, payload) VALUES ($1, 'hold.create', $2, $3)`,
+        [s.uid, 'booking:' + row.id, JSON.stringify({ bedId: b.bedId, hours, name, contact, actorName: s.name })]);
+
+        return row;
+      });
 
       json(res, 201, { id: String(row.id), holdUntil: row.hold_until, until: whenText(row.hold_until) });
     } catch (err) {
@@ -89,11 +93,13 @@ module.exports = function register(route) {
     const id = Number(req.params.id);
     if (!Number.isInteger(id)) return fail(res, 400, 'Неверный номер брони');
 
-    const r = await query(`DELETE FROM bookings WHERE id = $1 AND hold_until IS NOT NULL RETURNING id`, [id]);
-    if (!r.rows[0]) return fail(res, 404, 'Такой брони нет — возможно, она уже сгорела');
-
-    await query(`INSERT INTO audit_log (actor_id, action, target, payload) VALUES ($1, 'hold.cancel', $2, '{}')`,
-      [s.uid, 'booking:' + id]);
+    const removed = await tx(async q => {
+      const r = await q('DELETE FROM bookings WHERE id=$1 AND hold_until IS NOT NULL RETURNING id,bed_id,hold_name,hold_until,date_from,date_to',[id]);
+      if(!r.rows[0])return false;
+      await q("INSERT INTO audit_log(actor_id,action,target,payload) VALUES($1,'hold.cancel',$2,$3)",[s.uid,'booking:'+id,JSON.stringify({before:r.rows[0],actorName:s.name})]);
+      return true;
+    });
+    if(!removed)return fail(res,404,'Такой брони нет — возможно, она уже сгорела');
     json(res, 200, { ok: true });
   });
 };
@@ -134,7 +140,11 @@ async function sweepHolds() {
     }
   }
 
-  const gone = await query(`DELETE FROM bookings WHERE hold_until IS NOT NULL AND hold_until <= now() RETURNING id`);
+  const gone = await tx(async q => {
+    const r=await q('DELETE FROM bookings WHERE hold_until IS NOT NULL AND hold_until <= now() RETURNING id,bed_id,hold_name,hold_until,date_from,date_to');
+    for(const row of r.rows)await q("INSERT INTO audit_log(actor_id,action,target,payload) VALUES(NULL,'hold.expire',$1,$2)",['booking:'+row.id,JSON.stringify({before:row})]);
+    return r;
+  });
   if (gone.rows.length) {
     console.log('[holds] сгорело броней:', gone.rows.length);
     try {
