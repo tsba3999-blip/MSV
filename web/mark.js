@@ -587,7 +587,7 @@
 })();
 /* Reputation: the same gauge artwork in each existing icon family. */
 (function(){
-  var artwork='<path d="M3 16a9 9 0 0 1 18 0M12.75 17.7 16.5 10"/><circle cx="12" cy="19" r="1.5"/>';
+  var artwork='<path d="M3 16a9 9 0 0 1 18 0M12.75 17.7 15.55 11.95"/><circle cx="12" cy="19" r="1.5"/>';
   function reputationIcons(){
     document.querySelectorAll('a[href]').forEach(function(link){
       if(!/^(?:admin-|staff-)?reputation\.html(?:[?#]|$)/.test(link.getAttribute('href')))return;
