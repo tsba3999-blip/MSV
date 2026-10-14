@@ -82,7 +82,7 @@
       var parts = String(name || '').split(/\s+/).filter(Boolean);
       pic.textContent = (parts.length >= 2 ? parts[0][0] + parts[1][0] : String(name || '').slice(0, 2)).toUpperCase();
       /* Пустой кружок красим в цвет роли — тот же, что у кнопки «М» */
-      pic.style.background = ({ admin: '#34495E', moderator: '#7EB2DD', staff: '#B8B1A5', resident: '#FB344A' })[role] || 'var(--msv-n300)';
+      pic.style.backgroundColor = ({ admin: '#34495E', moderator: '#7EB2DD', staff: '#B8B1A5', resident: '#FB344A' })[role] || 'var(--msv-n300)';
     }
     if (drop) drop.hidden = !url;
   }
@@ -100,7 +100,7 @@
 
   var picker = document.createElement('input');
   picker.type = 'file';
-  picker.accept = 'image/jpeg,image/png,image/webp,image/gif';
+  picker.accept = 'image/*';
   picker.style.display = 'none';
   document.body.appendChild(picker);
 

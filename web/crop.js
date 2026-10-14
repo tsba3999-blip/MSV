@@ -40,8 +40,8 @@
           '<input type="range" min="50" max="400" value="100" aria-label="Приблизить">' +
         '<span>+</span></div>' +
         '<div class="crop__act">' +
-          '<button type="button" class="msv-btn msv-btn--m msv-btn--secondary" data-act="cancel">Отмена</button>' +
-          '<button type="button" class="msv-btn msv-btn--m msv-btn--primary" data-act="ok">Поставить фото</button>' +
+          '<button type="button" class="msv-btn msv-btn--m msv-btn--secondary" data-act="cancel">Выберу другое</button>' +
+          '<button type="button" class="msv-btn msv-btn--m msv-btn--primary" data-act="ok">Вот так мне нравится!</button>' +
         '</div>' +
       '</div>';
     document.body.appendChild(wrap);
