@@ -497,6 +497,21 @@ a.side__who:focus-visible { outline: 2px solid var(--msv-white); outline-offset:
 .side__personal-toggle[aria-expanded="true"] .side__personal-arrow { transform: rotate(180deg); }
 .side__personal-menu { margin-left: 16px; padding-left: 8px; border-left: 1px solid rgba(255,255,255,.3); }
 .side__personal-menu[hidden] { display: none; }
+.side__personal-mobile,.personal-sections { display:none; }
+@media(max-width:860px){
+ .side__personal .side__personal-toggle,.side__personal .side__personal-menu{display:none!important}
+ .side__personal-mobile{display:flex;white-space:nowrap}
+ .personal-sections{display:flex;flex-wrap:wrap;gap:var(--msv-s8);margin-bottom:var(--msv-s20)}
+ .personal-sections .side__link{color:var(--msv-graphite);background:var(--msv-white);border-radius:var(--msv-r12);padding:12px;gap:8px;display:flex;align-items:center}
+ .staff-task-grid thead{display:none}
+ .staff-task-grid,.staff-task-grid tbody{display:block;width:100%;min-width:0}
+ .staff-task-grid tr{display:block;border-bottom:1px solid var(--msv-n100);padding:16px}
+ .staff-task-grid td{display:block;border:0;padding:8px 0;white-space:normal;overflow-wrap:break-word}
+ .staff-task-grid td:not([colspan]):nth-child(2)::before{content:'Кто и где: ';font-weight:600}
+ .staff-task-grid td:not([colspan]):nth-child(3)::before{content:'Срочность: ';font-weight:600}
+ .staff-task-grid td:not([colspan]):nth-child(4)::before{content:'Исполнитель: ';font-weight:600}
+ .staff-task-grid td:not([colspan]):nth-child(5)::before{content:'Статус: ';font-weight:600}
+}
 .shell--folded .side__personal-menu { display: none; }
 .side__link[hidden]{display:none!important}
 

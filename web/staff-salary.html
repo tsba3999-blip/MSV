@@ -22,6 +22,7 @@
 <style>
   body { --role: var(--msv-sky); --role-ink: var(--msv-graphite); }
 </style>
+<link rel="stylesheet" href="payroll-grid.css">
 </head>
 <body>
 
@@ -153,6 +154,7 @@
   </div>
 
 </div>
+<script src="payroll-grid.js"></script>
 <script>
 (function () {
   'use strict';
@@ -171,6 +173,7 @@
         return '<tr><td>' + x.period.replace(/</g,'&lt;') + '</td><td class="num">—</td><td class="num">' + money(x.amount) + '</td><td class="num">' + (x.bonus ? money(x.bonus) : '0') + '</td><td class="num"><b>' + money(x.total) + '</b></td>' +
           '<td><span class="tag tag--ok">' + f(x.paidAt) + '</span></td><td>' + (x.receivedAt ? '<span class="tag tag--ok">' + f(x.receivedAt) + '</span>' : '<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-got="' + x.id + '">Получил</button>') + '</td></tr>';
       }).join('') : '<tr><td colspan="7" class="grid__empty">Начислений пока нет.</td></tr>';
+      window.MSV_PAY_ROWS = rows; MSVPayrollGrid.update('staff',rows);
       var total = rows.reduce(function (a, x) { return a + x.total; }, 0);
       var stat = document.getElementById('paidTotal');
       if (stat) stat.textContent = rows.length ? money(total) + ' руб.' : 'нет выплат';
@@ -228,7 +231,7 @@
     var b = e.target.closest('[data-got]'); if (!b || b.disabled) return;
     var d = String(now.getDate()).padStart(2,'0') + '.' + String(now.getMonth()+1).padStart(2,'0') + '.' + String(now.getFullYear()).slice(2);
     var id = b.dataset.got;
-    function ok() { b.outerHTML = '<span class="tag tag--ok">' + d + '</span>'; }
+    function ok() { var row=(window.MSV_PAY_ROWS||[]).find(function(x){return String(x.id)===id;});if(row){row.receivedAt=new Date().toISOString();MSVPayrollGrid.update('staff',window.MSV_PAY_ROWS);} b.outerHTML = '<span class="tag tag--ok">' + d + '</span>'; }
     if (location.protocol === 'file:' || !id) { ok(); return; }
     fetch('/api/payroll/' + id + '/received', { method: 'POST', credentials: 'same-origin' }).then(function (r) { if (r.status === 200) ok(); else alert('Не удалось'); }).catch(function () { alert('Сервер не отвечает'); });
   });

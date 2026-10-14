@@ -350,13 +350,6 @@ a.tab[href="notifications.html"] { position:relative; }
     .then(function (d) {
       if (!d) return;
       var stub = document.querySelector('.stub'); if (stub) stub.remove();
-      var profileTile = document.querySelector('.tile[href="mydata.html"]');
-      if (profileTile && d.me.photo) {
-        var photo = document.createElement('img');
-        photo.alt = ''; photo.decoding = 'async';
-        photo.onload = function () { profileTile.prepend(photo); profileTile.classList.add('tile--photo'); };
-        photo.src = d.me.photo;
-      }
       var first = (d.me.name || '').split(' ')[1] || d.me.name;
       var nm = document.querySelector('.top__name'); if (nm) nm.textContent = 'Привет, ' + first;
       var pl = document.querySelector('.top__place');
@@ -403,7 +396,7 @@ a.tab[href="notifications.html"] { position:relative; }
   </a>
 </nav>
 
-<script src="mark.js"></script>
+<script src="account-tile-photo.js"></script><script src="mark.js"></script>
 <script src="zoom.js"></script>
 <script src="edit.js"></script>
 <script src="protect.js"></script>

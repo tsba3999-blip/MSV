@@ -1,0 +1,4 @@
+(function(){'use strict';var tile=document.querySelector('.tile[href="mydata.html"]');if(!tile)return;var revision=0;
+async function refresh(){var turn=++revision;try{var r=await fetch('/api/auth/me',{credentials:'same-origin',cache:'no-store'});if(!r.ok)return;var me=await r.json();if(turn!==revision)return;if(!me.photo){tile.querySelectorAll('img[data-account-photo]').forEach(function(i){i.remove();});tile.classList.remove('tile--photo');return;}var img=new Image();img.alt='';img.dataset.accountPhoto='';img.onload=function(){if(turn!==revision)return;tile.querySelectorAll('img[data-account-photo]').forEach(function(i){i.remove();});tile.prepend(img);tile.classList.add('tile--photo');};img.src=me.photo;}catch(e){}}
+refresh();window.addEventListener('pageshow',function(e){if(e.persisted)refresh();});document.addEventListener('visibilitychange',function(){if(!document.hidden)refresh();});
+})();

@@ -246,11 +246,12 @@
           personalNav.appendChild(profile);
         }
         var group = document.createElement('div'); group.className = 'side__personal';
+        var mobileProfile=profile.cloneNode(true);mobileProfile.className='side__link side__personal-mobile';
         var toggle = document.createElement('button'); toggle.type = 'button'; toggle.className = 'side__link side__personal-toggle';
         toggle.innerHTML = profile.innerHTML + '<svg class="side__personal-arrow msv-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
         toggle.setAttribute('aria-controls', 'staffPersonalMenu');
         var submenu = document.createElement('div'); submenu.id = 'staffPersonalMenu'; submenu.className = 'side__personal-menu';
-        profile.before(group); group.appendChild(toggle); group.appendChild(submenu);
+        profile.before(group); group.appendChild(mobileProfile); group.appendChild(toggle); group.appendChild(submenu);
         // Keep the profile page accessible when its former link becomes a disclosure.
         profile.childNodes.forEach(function (node) { if (node.nodeType === 3 && node.textContent.trim()) node.textContent = 'Личные данные'; });
         submenu.appendChild(profile);
@@ -264,6 +265,12 @@
           if (link) submenu.appendChild(link);
         });
         function expand(open) { submenu.hidden = !open; toggle.setAttribute('aria-expanded', String(open)); }
+        if(page==='staff-profile.html'){
+          var sections=document.createElement('nav');sections.className='personal-sections';sections.setAttribute('aria-label','Разделы Это Я');
+          Array.from(submenu.children).forEach(function(link){sections.appendChild(link.cloneNode(true));});
+          var salary=personalNav.querySelector('a[href="staff-salary.html"]');if(salary)sections.appendChild(salary.cloneNode(true));
+          var body=document.querySelector('.work__body');if(body)body.prepend(sections);
+        }
         expand(!!submenu.querySelector('[aria-current="page"]'));
         toggle.addEventListener('click', function () {
           var folded = document.querySelector('.shell--folded .side__fold');
