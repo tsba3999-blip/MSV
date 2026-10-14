@@ -230,7 +230,7 @@
       }
       var oldIcon = link.querySelector('svg');
       var path = handshake
-        ? '<path d="m2 12 4-7 4 2 3-2 5 2 4 6-3 3-4 4-3-1-3-2-3-3z"/><path d="m10 7-3 4 2 2 4-3 6 6M6 14l3-3M9 17l2-3M12 19l2-3"/>'
+        ? '<path d="m2 7 3-2 4 2m6 0 4-2 3 2-3 8-3 4a2 2 0 0 1-3 0l-6-5-2 1-3-8Z"/><path d="m19 15-6-6-3 2a2 2 0 0 1-3-2l3-3h4l3 1M8 15l4 4m-1-6 4 4"/>'
         : '<path d="M4 21v-3M9 21v-6M14 21v-4M19 21v-9M3 12l6-6 5 4 7-8M16 2h5v5"/>';
       var svg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + path + '</svg>';
       if (oldIcon) oldIcon.outerHTML = svg; else link.insertAdjacentHTML('afterbegin', svg);
@@ -292,14 +292,16 @@
       });
     }
     var sectionIcons = {
+      'staff-residents.html':'<circle cx="12" cy="8" r="3"/><path d="M6 21v-1a6 6 0 0 1 12 0v1M5 5a3 3 0 0 0 0 6m14-6a3 3 0 0 1 0 6M2 19v-1a5 5 0 0 1 3-4.6M22 19v-1a5 5 0 0 0-3-4.6"/>',
+      'admin-residents.html':'<circle cx="12" cy="8" r="3"/><path d="M6 21v-1a6 6 0 0 1 12 0v1M5 5a3 3 0 0 0 0 6m14-6a3 3 0 0 1 0 6M2 19v-1a5 5 0 0 1 3-4.6M22 19v-1a5 5 0 0 0-3-4.6"/>',
       'staff-repair.html':'<path d="M20.34 6.49A4.6 4.6 0 0 1 14.09 12.18L6.33 19.93A1.6 1.6 0 0 1 4.07 17.67L11.82 9.92A4.6 4.6 0 0 1 17.51 3.66L15.25 5.92 18.08 8.75Z"/>',
       'staff-mailings.html':'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
-      'contracts-preview.html':'<path d="m3 8 3-3 4 1 3-1 3 1 5 5-3 6-4 3-3-1-5-5-3-1Z"/><path d="m10 6-3 4 2 2 4-3 5 5M6 14l2-2m1 5 2-2m1 4 2-2"/>',
+      'contracts-preview.html':'<path d="m2 7 3-2 4 2m6 0 4-2 3 2-3 8-3 4a2 2 0 0 1-3 0l-6-5-2 1-3-8Z"/><path d="m19 15-6-6-3 2a2 2 0 0 1-3-2l3-3h4l3 1M8 15l4 4m-1-6 4 4"/>',
       'admin-staff.html':'<path d="M8 7a4 4 0 0 0 8 0M7 6a5 5 0 0 1 10 0M6 6h12M4 21v-2a8 6 0 0 1 16 0v2M10 14l2 2 2-2m-2 2-2 4 2 2 2-2-2-4"/>',
       'admin-tickets.html':'<path d="m14.8 4.2 1-1a2 2 0 0 1 2.8 0l2.2 2.2a2 2 0 0 1 0 2.8L9.4 19.6a2 2 0 0 1-.9.5l-4.2 1a.8.8 0 0 1-1-1l1-4.2a2 2 0 0 1 .5-.9Z"/><path d="m14 5 5 5M5 15l4 4"/><path d="M3 22h18"/>',
       'staff-tickets.html':'<path d="m14.8 4.2 1-1a2 2 0 0 1 2.8 0l2.2 2.2a2 2 0 0 1 0 2.8L9.4 19.6a2 2 0 0 1-.9.5l-4.2 1a.8.8 0 0 1-1-1l1-4.2a2 2 0 0 1 .5-.9Z"/><path d="m14 5 5 5M5 15l4 4"/><path d="M3 22h18"/>',
       'admin-rights.html':'<rect x="3" y="3" width="18" height="18" rx="4"/><path d="m6 8 2 2 4-4m2 8 4 4m0-4-4 4"/>',
-      'admin-departures.html':'<path d="M12 21h9V3h-9v5m0 8v5l6-3V6l-6-3M3 12h11m-4-4 4 4-4 4"/>',
+      'admin-departures.html':'<rect x="3" y="7" width="12" height="14" rx="2"/><path d="M6 7V4h6v3M7 11v6m4-6v6M17 12h5m-2-2 2 2-2 2"/>',
       'staff-salary.html':'<path d="M3 8V6a2 2 0 0 1 1.6-2L17 2l1 2"/><rect x="3" y="7" width="18" height="14" rx="3"/><circle cx="16" cy="14" r="2"/>',
       'staff-documents.html':'<g transform="scale(.32)"><circle cx="36.5" cy="11.5" r="2.2"/><path d="M26 17c5-1 7 2 7 7v8c-9 0-7-8-14-10l-7-4c-3 14 1 23 18 24-6 0-7 7-14 7m-3-4 6 11M30 42c4 5 2 9-7 16 8 6 20 7 28 0-9-7-12-11-7-16 15-1 21-10 18-24l-7 4c-7 2-5 10-14 10v-8c0-5 2-8 7-7M44 42c5 6 9 8 15 8l1 3-5-1"/></g>',
       'documents.html':'<g transform="scale(.32)"><circle cx="36.5" cy="11.5" r="2.2"/><path d="M26 17c5-1 7 2 7 7v8c-9 0-7-8-14-10l-7-4c-3 14 1 23 18 24-6 0-7 7-14 7m-3-4 6 11M30 42c4 5 2 9-7 16 8 6 20 7 28 0-9-7-12-11-7-16 15-1 21-10 18-24l-7 4c-7 2-5 10-14 10v-8c0-5 2-8 7-7M44 42c5 6 9 8 15 8l1 3-5-1"/></g>'

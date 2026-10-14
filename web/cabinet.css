@@ -493,7 +493,7 @@ a.side__who:focus-visible { outline: 2px solid var(--msv-white); outline-offset:
 .tag-btn:hover { filter: brightness(.95); }
 /* Personal sections are disclosed together in staff/moderator navigation. */
 .side__personal-toggle { width: 100%; border: 0; background: transparent; font: inherit; text-align: left; cursor: pointer; }
-.side__personal-arrow { margin-left: auto; transition: transform .15s; }
+.side__link .side__personal-arrow { width:16px; height:16px; flex:0 0 16px; margin-left:auto; stroke-width:2; transition:transform .15s; }
 .side__personal-toggle[aria-expanded="true"] .side__personal-arrow { transform: rotate(180deg); }
 .side__personal-menu { margin-left: 16px; padding-left: 8px; border-left: 1px solid rgba(255,255,255,.3); }
 .side__personal-menu[hidden] { display: none; }

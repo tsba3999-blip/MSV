@@ -15,6 +15,7 @@
   .set { margin-bottom: var(--msv-s24); padding: var(--msv-s20); background: var(--msv-white); border-radius: var(--msv-r20); box-shadow: var(--msv-e1); }
   .set__title { margin: 0 0 var(--msv-s8); }
   .set__text { margin: 0 0 var(--msv-s16); color: var(--msv-n500); }
+  .set__text:has(+ .msv-btn) { margin-bottom: 0; }
   .set__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--msv-s12); }
   .set .msv-field { margin-bottom: 0; }
   .tog { display: flex; align-items: center; gap: var(--msv-s12); min-height: 44px; cursor: pointer; }
@@ -134,10 +135,11 @@
         <p class="msv-body set__text">Куда сообщать о новых заявках и просрочках.</p>
         <label class="tog"><input data-pref="tg" type="checkbox" checked> <span>Telegram</span></label>
         <label class="tog"><input data-pref="email" type="checkbox"> <span>Почта</span></label>
-        <label class="tog"><input data-pref="assignedOnly" type="checkbox" checked> <span>Только заявки, назначенные на меня</span></label>
-        <label class="tog"><input data-pref="examReminder" type="checkbox" checked> <span>Напоминать о сроке экзаменов за месяц</span></label>
+        <hr style="border:0;border-top:1px solid var(--msv-n100);margin:var(--msv-s16) 0">
+        <label class="tog"><input data-pref="assignedOnly" type="checkbox" checked> <span>Только касающиеся меня</span></label>
+        <label class="tog"><input data-pref="examReminder" type="checkbox" checked> <span>Напомнить об экзамене</span></label>
         <p class="msv-note" style="margin:var(--msv-s16) 0 var(--msv-s4)">Что присылать</p>
-        <label class="tog"><input type="radio" name="scope" value="all" checked> <span>Отправлять все уведомления</span></label>
+        <label class="tog"><input type="radio" name="scope" value="all" checked> <span>Все уведомления</span></label>
         <label class="tog"><input type="radio" name="scope" value="mine"> <span>Только касающиеся меня</span></label>
         <p class="msv-note" id="noneWarn" hidden style="margin-top:var(--msv-s8);padding:var(--msv-s12) var(--msv-s16);background:var(--msv-n100);border:1px solid var(--msv-red);border-radius:var(--msv-r12)">Отказываясь от уведомлений, я полностью беру на себя ответственность за неинформированность: о сроках оплаты, изменениях в правилах и событиях мне не сообщат.</p>
         <button class="msv-btn msv-btn--m msv-btn--primary" type="button" data-save-prefs disabled style="margin-top:var(--msv-form-gap)">Сохранить</button>
