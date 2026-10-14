@@ -41,9 +41,12 @@
         panel.querySelector('[data-session-note]').textContent = me.role === 'admin' ? 'Полный доступ. Передайте устройство только после выхода.' : 'Перед передачей устройства другому человеку выйдите из аккаунта.';
         panel.hidden = false;
         panel.querySelector('button').textContent=me.preview?'Вернуться в мой кабинет':'Выйти из аккаунта';
-        // Keep the link through login.html so every entry revalidates the session.
-        entry.textContent = 'Мой кабинет';
-        if (logo) logo.setAttribute('aria-label', 'В кабинет');
+        // Preview navigation keeps the selected account; only the return button ends it.
+        var destination = me.preview ? homes[me.role] : 'login.html';
+        entry.href = destination;
+        entry.textContent = me.preview ? 'В кабинет сотрудника' : 'Мой кабинет';
+        if (me.preview && me.role === 'resident') entry.textContent = 'В кабинет резидента';
+        if (logo) { logo.href = destination; logo.setAttribute('aria-label', 'В кабинет'); }
       }).catch(function () { if(current!==version)return;showLogin();account=null;unknown=true;announce(null);if(panel){panel.hidden=false;panel.querySelector('[data-session-role]').textContent='Не удалось проверить вход';panel.querySelector('[data-session-name]').textContent='';panel.querySelector('[data-session-note]').textContent='Проверьте соединение и повторите проверку.';panel.querySelector('button').textContent='Проверить снова';} });
   }
   if (panel) panel.querySelector('button').addEventListener('click', function () {
