@@ -65,6 +65,7 @@
 
     box = document.createElement('div');
     box.className = 'msv-zoom';
+    if (items.every(function (item) { return /photos\/(forma|uyut|molod)\//.test(item.src); })) box.classList.add('msv-zoom--residence');
     box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true');
     box.innerHTML =
       '<button type="button" class="msv-zoom__close" aria-label="Закрыть">&times;</button>' +
@@ -180,6 +181,13 @@
     '.msv-zoom__nav:active{transform:translateY(-50%) scale(.96)}' +
     '.msv-zoom__nav:focus-visible{outline:2px solid #fff;outline-offset:3px}' +
     '@media (max-width:640px){.msv-zoom__nav{width:48px;height:48px}.msv-zoom__nav svg{width:24px;height:24px}' +
-      '.msv-zoom__nav--prev{left:8px}.msv-zoom__nav--next{right:8px}}';
+      '.msv-zoom__nav--prev{left:8px}.msv-zoom__nav--next{right:8px}' +
+      '.msv-zoom--residence{display:grid;grid-template-columns:1fr 1fr;align-content:center;justify-items:center;gap:12px;padding:64px 16px 24px;overflow:auto}' +
+      '.msv-zoom--residence img{grid-column:1/-1;grid-row:1;max-width:100%;max-height:calc(100svh - 220px)}' +
+      '.msv-zoom--residence .msv-zoom__cap{grid-column:1/-1;grid-row:2}' +
+      '.msv-zoom--residence .msv-zoom__nav{position:static;grid-row:3;transform:none}' +
+      '.msv-zoom--residence .msv-zoom__nav--prev{grid-column:1;justify-self:end}' +
+      '.msv-zoom--residence .msv-zoom__nav--next{grid-column:2;justify-self:start}' +
+      '.msv-zoom--residence .msv-zoom__nav[hidden]{display:none}}';
   document.head.appendChild(css);
 })();

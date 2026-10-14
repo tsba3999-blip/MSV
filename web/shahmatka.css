@@ -1282,3 +1282,11 @@ body:has(.msv-sh__panel--on) .msv-mark-btn,body:has(.msv-sh__panel--on) .edit-ba
 
 /* Staff can inspect the chart without booking or relocation actions. */
 .msv-sh--readonly [data-act="hold"] { display:none; }
+
+/* On phones, actions follow the resident details with the standard 24px gap. */
+@media (max-width:860px) {
+  .msv-sh__panel { bottom:auto; max-height:100%; overflow:auto; }
+  .msv-sh__panel-body { flex:0 0 auto; overflow:visible; padding-bottom:0; }
+  .msv-sh__panel-body > .msv-sh__sect:last-child { padding-bottom:0; }
+  .msv-sh__panel-foot { flex-shrink:0; border-top:0; padding-top:var(--msv-s24,24px); }
+}

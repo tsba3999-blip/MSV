@@ -40,7 +40,7 @@
       <div class="chips" role="group" aria-label="Наличие мест">
         <button class="chip" type="button" data-free="1" aria-pressed="true">Только свободные места</button>
         <button class="chip" type="button" data-free="" aria-pressed="false">Показать все места</button>
-        <button class="chip chip--soon" type="button" data-free="soon" aria-pressed="false">Освободятся скоро</button>
+        <button class="chip" type="button" data-free="soon" aria-pressed="false">Освободятся скоро</button>
       </div>
     </div>
 
@@ -294,7 +294,7 @@ MSV.ready(function (ctx) {
         (r.text && !/капсул/i.test(r.text) ? '<p class="msv-body room__text">' + esc(r.text) + '</p>' : '') +
         '<div class="room__shots" data-gallery="' + esc(r.resId) + '">' + shots(r, ri) + '</div>' +
         '<div class="room__prices">' + prices + '</div>' +
-        '<p class="msv-note room__terms">Цены указаны минимальные при условии оплаты по СБП и заключении «годового контракта» уже со скидкой 30% от розничной цены (проживание и оплаты без перерыва минимум до конца августа).</p>' +
+        '<p class="msv-note room__terms">Цены указаны минимальные при условии оплаты по СБП и заключении «годового контракта» <strong>уже со скидкой 30%</strong> от розничной цены (проживание и оплаты без перерыва минимум до конца августа).</p>' +
       '</article>';
     }).join('');
   }

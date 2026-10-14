@@ -452,6 +452,9 @@ a.side__who:focus-visible { outline: 2px solid var(--msv-white); outline-offset:
   color: rgba(255,255,255,.7); background: transparent; border: 0; border-radius: 8px; cursor: pointer;
 }
 .side__fold:hover { color: #fff; background: rgba(255,255,255,.14); }
+@media (max-width:860px) {
+  .side .side__fold { display:none; }
+}
 .side { position: relative; }
 .shell--folded { grid-template-columns: 72px 1fr; }
 .shell--folded .side { width: 72px; padding-left: var(--msv-s12); padding-right: var(--msv-s12); }
