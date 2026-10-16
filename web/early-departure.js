@@ -8,7 +8,7 @@ window.MSVEarlyDeparture=function(box,booking){
  var note=document.createElement('p');note.textContent='Досрочный выезд до окончания годового контракта. Предлагаем выставить место на продажу с даты ниже. Учтите время на подготовку. Это подтверждение не расторгает договор и не пересчитывает скидку.';
  var label=document.createElement('label');label.style.cssText='display:flex;gap:var(--msv-s8);align-items:center';var check=document.createElement('input');check.type='checkbox';check.id='bkConfirmSale';label.append(check,document.createTextNode('Подтверждаю выставление места на продажу'));panel.append(note,label);release.closest('label').after(panel);
  var active=false,saved=release.value;
- function refresh(){check.checked=false;var next=isEarly(booking,to.value,bed.value);if(next){if(!active)saved=release.value;var d=new Date(to.value+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+1);release.value=date(d);}else if(active)release.value=saved;active=next;panel.hidden=!active;}
+ function refresh(){check.checked=false;var next=isEarly(booking,to.value,bed.value);if(next){if(!active)saved=release.value;release.value=to.value;}else if(active)release.value=saved;active=next;panel.hidden=!active;}
  to.addEventListener('change',refresh);bed.addEventListener('change',refresh);release.addEventListener('input',function(){check.checked=false;});
  return function(){if(!active)return false;if(!check.checked)throw Error('Подтвердите выставление места на продажу.');if(!release.value||release.value<to.value)throw Error('Дата доступности места не может быть раньше выезда.');return true;};
 };
