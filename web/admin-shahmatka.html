@@ -177,6 +177,7 @@
 <script src="residents-uyut.js"></script>
 <script src="residents-forma.js"></script>
 <script src="shahmatka.js"></script>
+<script src="early-departure.js"></script>
 <script src="relocation-ui.js"></script>
 <script>
 MSV.ready(function (ctx) {
@@ -296,6 +297,7 @@ MSV.ready(function (ctx) {
       box.querySelector('#bkFrom').value = iso(b.from);
       box.querySelector('#bkTo').value = iso(b.to);
       box.querySelector('#bkRel').value = b.releaseFrom || '';
+      var confirmEarlySale = window.MSVEarlyDeparture(box,b);
       function close() { box.remove(); }
       box.querySelector('#bkCancel').addEventListener('click', close);
       box.addEventListener('click', function (e) { if (e.target === box) close(); });
@@ -304,7 +306,8 @@ MSV.ready(function (ctx) {
         var rel = box.querySelector('#bkRel').value;
         var err = box.querySelector('#bkErr');
         if (!from || !to || to <= from) { err.textContent = 'Выезд должен быть позже заезда.'; err.hidden = false; return; }
-        ctx.api('PATCH', '/api/bookings/' + encodeURIComponent(b.id), { bedId: bedId, from: from, to: to, releaseFrom: rel || null })
+        var confirmed=false;try{confirmed=confirmEarlySale();}catch(e){err.textContent=e.message;err.hidden=false;return;}
+        ctx.api('PATCH', '/api/bookings/' + encodeURIComponent(b.id), { bedId: bedId, from: from, to: to, releaseFrom: rel || null, confirmEarlySale: confirmed })
           .then(function (r) {
             if (r.status !== 200) { err.textContent = (r.body && r.body.error) || 'Не удалось сохранить.'; err.hidden = false; return; }
             b.bedId = bedId; b.from = new Date(from + 'T00:00:00').getTime(); b.to = new Date(to + 'T00:00:00').getTime();

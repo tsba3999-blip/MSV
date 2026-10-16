@@ -136,7 +136,7 @@ module.exports = function register(route) {
         WHERE u.id = ANY($1)`, [userIds]),
       query(`SELECT user_id, number, issued_at, valid_until, address FROM registrations
              WHERE user_id = ANY($1) ORDER BY issued_at DESC`, [userIds]),
-      query(`SELECT p.id, p.booking_id, b.user_id, p.amount, p.paid_at, p.period
+      query(`SELECT p.id, p.booking_id, b.user_id, p.amount, p.paid_at, p.period, p.note
              FROM payments p JOIN bookings b ON b.id = p.booking_id
              WHERE b.user_id = ANY($1) ORDER BY p.paid_at DESC`, [userIds])
     ]);
@@ -198,7 +198,7 @@ module.exports = function register(route) {
       })),
       payments: pays.rows.map((p) => ({
         id: String(p.id), residentId: String(p.user_id), bookingId: String(p.booking_id),
-        amount: p.amount, date: isoDate(p.paid_at),
+        amount: p.amount, date: isoDate(p.paid_at), kind: p.note === 'Депозит' ? 'deposit' : '',
         period: p.period ? isoDate(p.period) : ''
       }))
     });
@@ -297,9 +297,13 @@ module.exports = function register(route) {
 
     try {
       const out = await tx(async (q) => {
-        const before = await q(`SELECT bed_id, date_from, date_to, release_from, moved_to FROM bookings WHERE id = $1 FOR UPDATE`, [id]);
+        const before = await q(`SELECT bed_id, date_from, date_to, release_from, moved_to, contract_id FROM bookings WHERE id = $1 FOR UPDATE`, [id]);
         if (!before.rows[0]) return null;
         if (before.rows[0].moved_to) throw Object.assign(new Error('Бронь уже переселена. Обновите шахматку'), {status:409});
+        if (body.confirmEarlySale === true) {
+          const contract = await q('SELECT annual,date_to FROM contracts WHERE id=$1 FOR UPDATE',[before.rows[0].contract_id]);
+          require('../lib/early-departure')(before.rows[0],contract.rows[0],body);
+        }
 
         const upd = await q(
           `UPDATE bookings SET ${sets.join(', ')} WHERE id = $${vals.length}
@@ -309,18 +313,21 @@ module.exports = function register(route) {
            Контракт на этом и кончается: место с этой даты уходит в продажу, а
            система перестаёт напоминать про следующие месяцы. Снял дату —
            контракт снова действует (решение заказчика 24.09.2026). */
-        if (body.releaseFrom === null) {
+        if (body.confirmEarlySale === true) {
+          // Confirmation publishes availability only; financial/contract decisions are separate.
+          await q(`UPDATE bookings SET release_auto = false WHERE id = $1`, [id]);
+        } else if (body.releaseFrom === null && before.rows[0].release_from) {
           await q(`UPDATE contracts c SET ended_at = NULL
                      FROM bookings b WHERE b.contract_id = c.id AND b.id = $1`, [id]);
           await q(`UPDATE bookings SET release_auto = false, sale_period = NULL WHERE id = $1`, [id]);
-        } else if (body.releaseFrom) {
+        } else if (body.releaseFrom && String(body.releaseFrom) !== isoDate(before.rows[0].release_from)) {
           await q(`UPDATE contracts c SET ended_at = $2::date
                      FROM bookings b WHERE b.contract_id = c.id AND b.id = $1`, [id, String(body.releaseFrom).slice(0, 10)]);
           await q(`UPDATE bookings SET release_auto = false WHERE id = $1`, [id]);
         }
 
         await q(`INSERT INTO audit_log (actor_id, action, target, payload) VALUES ($1, 'booking.move', $2, $3)`,
-          [s.uid, 'booking:' + id, JSON.stringify({ before: before.rows[0], after: upd.rows[0] })]);
+          [s.uid, 'booking:' + id, JSON.stringify({ before: before.rows[0], after: upd.rows[0], earlySaleConfirmed: body.confirmEarlySale === true })]);
 
         return upd.rows[0];
       });
