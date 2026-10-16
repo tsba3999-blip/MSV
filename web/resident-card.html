@@ -179,6 +179,7 @@
     <header class="work__top">
       <a class="msv-btn msv-btn--s msv-btn--tertiary" href="admin-shahmatka.html" style="margin-right:var(--msv-s12)">← К шахматке</a>
       <h1 class="msv-sub work__title" id="title">Карточка резидента</h1>
+      <button class="msv-btn msv-btn--s msv-btn--secondary" type="button" id="residentCabinet" hidden>ЛК</button>
     </header>
 
     <main class="work__body" id="body">
@@ -337,6 +338,9 @@ MSV.ready(function (ctx) {
 
   function draw(d) {
     document.title = (d.me.name || 'Карточка резидента') + ' — МСВ';
+    var cabinet=document.getElementById('residentCabinet');
+    cabinet.hidden=!(ctx.me&&!ctx.me.preview&&(ctx.me.canEditSite||ctx.me.role==='moderator')&&d.me.role==='resident'&&d.me.isActive);
+    if(!cabinet.hidden)cabinet.dataset.cabinet=String(d.me.id);
 
     var live = d.bookings.filter(function (b) {
       var t = new Date().toISOString().slice(0, 10);

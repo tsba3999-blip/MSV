@@ -1290,3 +1290,5 @@ body:has(.msv-sh__panel--on) .msv-mark-btn,body:has(.msv-sh__panel--on) .edit-ba
   .msv-sh__panel-body > .msv-sh__sect:last-child { padding-bottom:0; }
   .msv-sh__panel-foot { flex-shrink:0; border-top:0; padding-top:var(--msv-s24,24px); }
 }
+
+.msv-sh__pay .msv-sh__pay-deposit td{background:color-mix(in srgb,var(--msv-ice) 12%,var(--msv-white));color:var(--msv-graphite)}

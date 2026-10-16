@@ -230,7 +230,7 @@
       }
       var oldIcon = link.querySelector('svg');
       var path = handshake
-        ? '<path d="m2 7 3-2 4 2m6 0 4-2 3 2-3 8-3 4a2 2 0 0 1-3 0l-6-5-2 1-3-8Z"/><path d="m19 15-6-6-3 2a2 2 0 0 1-3-2l3-3h4l3 1M8 15l4 4m-1-6 4 4"/>'
+        ? '<path d="m2 7 3-3 5 2m4 0 5-2 3 3-4 8-3 4a2 2 0 0 1-3 0l-6-5-2-1Z"/><path d="m18 15-5-5-2 2a2 2 0 0 1-3-3l3-3h3l4 2M8 15l4 4m-1-7 5 5"/>'
         : '<path d="M4 21v-3M9 21v-6M14 21v-4M19 21v-9M3 12l6-6 5 4 7-8M16 2h5v5"/>';
       var svg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + path + '</svg>';
       if (oldIcon) oldIcon.outerHTML = svg; else link.insertAdjacentHTML('afterbegin', svg);
@@ -288,7 +288,7 @@
     }
     if(staffNav && role!=='resident' && !staffNav.querySelector('a[href="support.html"]')){var support=document.createElement('a');support.className='side__link';support.href='support.html';support.textContent='Поддержка';staffNav.append(support);}
     if(staffNav && me.sectionAccess && role!=='admin')staffNav.querySelectorAll('a').forEach(function(link){var href=link.getAttribute('href')||'',key=link.dataset.section||(/shahmatka/.test(href)?'chart':/residents/.test(href)?'residents':/charges/.test(href)?'charges':/tickets|repair/.test(href)?'tickets':/admin-staff.html/.test(href)?'payroll':null);if(key && me.sectionAccess[key]===false)link.hidden=true;});
-    if(staffNav && ['admin','moderator'].includes(role) && (!me.sectionAccess||me.sectionAccess.residents)){var departures=document.createElement('a');departures.className='side__link';departures.href='admin-departures.html';departures.textContent='Заявки на выезд';staffNav.append(departures);}
+    if(staffNav && ['admin','moderator'].includes(role) && (!me.sectionAccess||me.sectionAccess.residents)){var departures=document.createElement('a');departures.className='side__link';departures.href='admin-departures.html';departures.textContent='Заявки на выезд';var residentsLink=staffNav.querySelector('a[href="staff-residents.html"],a[href="admin-residents.html"]');if(role==='moderator'&&residentsLink)residentsLink.after(departures);else staffNav.append(departures);}
     if (staffNav) {
       [['support.html','<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/><path d="M5.6 5.6l3.9 3.9"/><path d="M14.5 14.5l3.9 3.9"/><path d="M18.4 5.6l-3.9 3.9"/><path d="M9.5 14.5l-3.9 3.9"/>'],
        ['admin-departures.html','<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 12h8M8 16h8M8 19h4"/>'],
@@ -303,7 +303,7 @@
       'admin-residents.html':'<circle cx="12" cy="8" r="3"/><path d="M6 21v-1a6 6 0 0 1 12 0v1M5 5a3 3 0 0 0 0 6m14-6a3 3 0 0 1 0 6M2 19v-1a5 5 0 0 1 3-4.6M22 19v-1a5 5 0 0 0-3-4.6"/>',
       'staff-repair.html':'<path d="M20.34 6.49A4.6 4.6 0 0 1 14.09 12.18L6.33 19.93A1.6 1.6 0 0 1 4.07 17.67L11.82 9.92A4.6 4.6 0 0 1 17.51 3.66L15.25 5.92 18.08 8.75Z"/>',
       'staff-mailings.html':'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
-      'contracts-preview.html':'<path d="m2 7 3-2 4 2m6 0 4-2 3 2-3 8-3 4a2 2 0 0 1-3 0l-6-5-2 1-3-8Z"/><path d="m19 15-6-6-3 2a2 2 0 0 1-3-2l3-3h4l3 1M8 15l4 4m-1-6 4 4"/>',
+      'contracts-preview.html':'<path d="m2 7 3-3 5 2m4 0 5-2 3 3-4 8-3 4a2 2 0 0 1-3 0l-6-5-2-1Z"/><path d="m18 15-5-5-2 2a2 2 0 0 1-3-3l3-3h3l4 2M8 15l4 4m-1-7 5 5"/>',
       'admin-staff.html':'<path d="M8 7a4 4 0 0 0 8 0M7 6a5 5 0 0 1 10 0M6 6h12M4 21v-2a8 6 0 0 1 16 0v2M10 14l2 2 2-2m-2 2-2 4 2 2 2-2-2-4"/>',
       'admin-tickets.html':'<path d="m14.8 4.2 1-1a2 2 0 0 1 2.8 0l2.2 2.2a2 2 0 0 1 0 2.8L9.4 19.6a2 2 0 0 1-.9.5l-4.2 1a.8.8 0 0 1-1-1l1-4.2a2 2 0 0 1 .5-.9Z"/><path d="m14 5 5 5M5 15l4 4"/><path d="M3 22h18"/>',
       'staff-tickets.html':'<path d="m14.8 4.2 1-1a2 2 0 0 1 2.8 0l2.2 2.2a2 2 0 0 1 0 2.8L9.4 19.6a2 2 0 0 1-.9.5l-4.2 1a.8.8 0 0 1-1-1l1-4.2a2 2 0 0 1 .5-.9Z"/><path d="m14 5 5 5M5 15l4 4"/><path d="M3 22h18"/>',

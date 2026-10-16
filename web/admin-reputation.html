@@ -117,12 +117,18 @@
         <div class="set__grid">
           <label class="msv-field"><span class="msv-field__label">Резидент</span>
             <input class="msv-input" id="who" list="people" placeholder="Начни вводить фамилию"><datalist id="people"></datalist></label>
-          <label class="msv-field"><span class="msv-field__label">Событие</span>
+          <label class="msv-field"><span class="msv-field__label">Позитивные токены</span>
             <select class="msv-select msv-input" id="kind">
+              <option value="">Выберите событие</option>
               <option value="+1.0">Организация события · +1,0</option>
               <option value="+0.5">Помощь соседям, волонтёрство · +0,5</option>
               <option value="+0.4">Все платежи вовремя полгода · +0,4</option>
               <option value="+0.3">Благодарность от сотрудника · +0,3</option>
+              <option value="custom">Другое — своя сумма</option>
+            </select></label>
+          <label class="msv-field"><span class="msv-field__label">Негативные токены</span>
+            <select class="msv-select msv-input" id="kindNegative">
+              <option value="">Выберите событие</option>
               <option value="-0.5">Шум, беспорядок, замечание · −0,5</option>
               <option value="-1.0">Просрочка оплаты · −1,0</option>
               <option value="-2.0">Грубое нарушение правил · −2,0</option>
@@ -164,13 +170,20 @@ MSV.ready(function (ctx) {
   ctx.residences.forEach(function (res) { ctx.bookings(res).residents.forEach(function (r) { names[r.name] = r.id; }); });
   document.getElementById('people').innerHTML = Object.keys(names).sort().map(function (n) { return '<option value="' + n.replace(/"/g,'&quot;') + '">'; }).join('');
 
-  var kind = document.getElementById('kind'), wrap = document.getElementById('customWrap');
-  kind.addEventListener('change', function () { wrap.hidden = kind.value !== 'custom'; });
+  var positive=document.getElementById('kind'), negative=document.getElementById('kindNegative');
+  var kind = positive, wrap = document.getElementById('customWrap');
+  [positive,negative].forEach(function(select){select.addEventListener('change',function(){
+    kind=select;(select===positive?negative:positive).value='';
+    wrap.hidden=select.value!=='custom';document.getElementById('custom').value='';
+    wrap.querySelector('.msv-field__label').textContent=select===positive?'Позитивные токены (от 0 до +5)':'Негативные токены (от −5 до 0)';
+    document.getElementById('custom').placeholder=select===positive?'+0,7':'−1,5';
+  });});
 
   document.getElementById('add').addEventListener('click', function () {
     var who = document.getElementById('who').value.trim(), m = document.getElementById('msg');
     var delta = kind.value === 'custom' ? parseFloat(document.getElementById('custom').value.replace(',', '.').replace('−', '-')) : parseFloat(kind.value);
     var details = document.getElementById('details').value.trim();
+    if((kind===positive&&delta<=0)||(kind===negative&&delta>=0)){m.textContent='Знак суммы должен соответствовать выбранной группе токенов.';m.hidden=false;return;}
     if (!who || isNaN(delta) || Math.abs(delta) > 5 || !details) { m.textContent = 'Нужны резидент, токены от −5 до +5 и описание'; m.hidden = false; return; }
     var title = kind.value === 'custom' ? details : kind.options[kind.selectedIndex].text.split(' · ')[0];
     function ok() {

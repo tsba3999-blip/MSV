@@ -1756,7 +1756,6 @@
         : 'Баланс: <b>' + esc(money(Math.abs(balance))) + (balance < -0.5 ? ' переплата' : '') + '</b>'
     ];
 
-    if (b.source) rows.splice(3, 0, 'Источник: ' + esc(b.source));
 
     return '<ul><li>' + rows.join('</li><li>') + '</li></ul>';
   };
@@ -1977,7 +1976,6 @@
             '<dt>Ночей</dt><dd>' + nights + '</dd>' +
             (b.bookedAt !== null ? '<dt>Дата бронирования</dt><dd>' + esc(fmtDate(b.bookedAt)) + '</dd>' : '') +
             (b.tariff ? '<dt>Контракт</dt><dd>' + (/^годовой(?: контракт)?$/i.test(b.tariff.trim()) ? 'Годовой' : 'НЕ годовой') + '</dd>' : '') +
-            (b.source ? '<dt>Источник</dt><dd>' + esc(b.source) + '</dd>' : '') +
           '</dl>' +
         '</div>' +
 
@@ -2008,7 +2006,8 @@
           (pays.length
             ? '<table class="msv-sh__pay"><thead><tr><th>Период</th><th>Сумма</th><th>Дата платежа</th></tr></thead><tbody>' +
               pays.map(function (p) {
-                return '<tr><td>' + esc(p.period || p.kind || '—') + '</td>' +
+                var deposit=p.kind==='deposit'||p.kind==='Депозит';
+                return '<tr'+(deposit?' class="msv-sh__pay-deposit"':'')+'><td>' + esc(deposit?'Депозит':p.period || p.kind || '—') + '</td>' +
                   '<td>' + esc(money(p.amount)) + '</td>' +
                   '<td>' + esc(p.date !== null ? fmtDateFull(p.date) : '—') + '</td></tr>';
               }).join('') + '</tbody></table>'

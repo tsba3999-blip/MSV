@@ -80,7 +80,7 @@ MSV.ready(function (ctx) {
       var until = lastReg ? day(lastReg.until) : null;
 
       ALL.push({
-        res: res, userId: person.id, bookingId: b.id,
+        res: res, userId: person.id, bookingId: b.id, source: b.source || '',
         name: person.name, photo: person.photo || '',
         university: person.university || '',
         contactPerson:person.contactPerson||'', depositAmount:Number(b.depositAmount)||0,depositPaid:Number(b.depositPaid)||0, phone: person.phone || '', messengers: person.messengers || [],
@@ -282,7 +282,7 @@ MSV.ready(function (ctx) {
         '<td>' + pay + '</td><td>' + payBtn + '</td><td>' + depBtn + '</td>' +
         '<td>' + reg + '</td>' +
         '<td class="num"><button class="tri" type="button" data-resident-more aria-expanded="false" aria-label="Подробнее"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="msv-chevron"><path d="M6 9l6 6 6-6"/></svg></button></td></tr>'+
-      '<tr class="resident-more" hidden data-name="'+esc(x.name)+'" data-user="'+esc(x.userId)+'"><td colspan="8"><div class="resident-details"><span>Контакт родителя: '+esc(x.contactPerson||'не указан')+'</span><span class="resident-details__actions">'+(ctx.me&&ctx.me.canEditSite?'<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-cabinet="'+esc(x.userId)+'">ЛК</button>':'')+'<button class="msv-btn msv-btn--s msv-btn--tertiary del" type="button" data-del title="Удалить резидента из базы">Удалить</button></span></div></td></tr>';
+      '<tr class="resident-more" hidden data-name="'+esc(x.name)+'" data-user="'+esc(x.userId)+'"><td colspan="8"><div class="resident-details"><span>Источник бронирования: '+esc(x.source||'не указан')+'</span><span>Контакт родителя: '+esc(x.contactPerson||'не указан')+'</span><span class="resident-details__actions">'+(ctx.me&&(ctx.me.canEditSite||ctx.me.role==='moderator')?'<button class="msv-btn msv-btn--s msv-btn--secondary" type="button" data-cabinet="'+esc(x.userId)+'">ЛК</button>':'')+'<button class="msv-btn msv-btn--s msv-btn--tertiary del" type="button" data-del title="Удалить резидента из базы">Удалить</button></span></div></td></tr>';
     }).join('');
   }
 
