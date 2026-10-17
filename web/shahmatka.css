@@ -1292,3 +1292,7 @@ body:has(.msv-sh__panel--on) .msv-mark-btn,body:has(.msv-sh__panel--on) .edit-ba
 }
 
 .msv-sh__pay .msv-sh__pay-deposit td{background:color-mix(in srgb,var(--msv-ice) 12%,var(--msv-white));color:var(--msv-graphite)}
+
+/* Разделитель номеров мест и календаря: 1px → 1.5px. */
+.msv-sh__head-left,.msv-sh__cell{border-right:0;box-shadow:inset -1.5px 0 0 var(--sh-line)}
+.msv-sh__group::after{content:"";position:absolute;left:calc(var(--sh-left-w) - 1.5px);top:-3px;bottom:-1px;width:1.5px;background:var(--sh-line);pointer-events:none}

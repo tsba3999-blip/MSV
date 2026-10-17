@@ -203,7 +203,7 @@
       if (contractNav && !contractNav.querySelector('a[href="contracts-preview.html"]')) {
         var contractsLink = document.createElement('a');
         contractsLink.className = 'side__link'; contractsLink.href = 'contracts-preview.html';
-        contractsLink.textContent = 'Договора';
+        contractsLink.textContent = 'Дог и Док';
         var tasksLink = Array.from(contractNav.querySelectorAll('a')).find(function (link) { return /Задачи\s*M[²2]/.test(link.textContent); });
         if (tasksLink) tasksLink.after(contractsLink); else contractNav.appendChild(contractsLink);
       }
