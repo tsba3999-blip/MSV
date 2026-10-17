@@ -6,6 +6,19 @@
 MSV.ready(function (ctx) {
   'use strict';
 
+  if (ctx.me && ctx.me.role === 'moderator' && !document.getElementById('pinInstructions')) {
+    var inviteForm = document.getElementById('invite');
+    if (inviteForm) {
+      var pinInstructions = document.createElement('section');
+      pinInstructions.id = 'pinInstructions';
+      pinInstructions.className = 'invite';
+      pinInstructions.setAttribute('aria-labelledby', 'pinInstructionsTitle');
+      pinInstructions.innerHTML = '<h2 id="pinInstructionsTitle" class="msv-sub" style="margin:0 0 var(--msv-s12)">Инструкция по выдаче пин-кода</h2>' +
+        '<p style="margin:0">Модератор задаёт код через рубрику <strong>«Резиденты» → «Пригласить резидента»</strong>: вводит имя, телефон или почту и четырёхзначный пин-код, сохраняет и сообщает его новичку лично. Уже зарегистрированному человеку эта форма код не меняет.</p>';
+      inviteForm.before(pinInstructions);
+    }
+  }
+
   /* Страница общая для двух кабинетов — ссылку на шахматку берём по своей
      же странице, чтобы модератор не уходил в кабинет администратора. */
   var SHAHMATKA = /^staff-/.test(location.pathname.split('/').pop() || '')
