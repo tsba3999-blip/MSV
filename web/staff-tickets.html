@@ -39,6 +39,7 @@
 
   body { --role: var(--msv-sky); --role-ink: var(--msv-graphite); }
 </style>
+<link rel="stylesheet" href="staff-task-mobile.css">
 </head>
 <body>
 
@@ -155,7 +156,7 @@
         <span class="msv-note bar__count" id="count"></span>
       </div>
 
-      <table class="grid">
+      <table class="grid staff-task-grid">
         <thead><tr><th>Заявка</th><th>Кто и где</th><th>Срочность</th><th>Исполнитель</th><th>Статус</th><th></th></tr></thead>
         <tbody id="rows"></tbody>
       </table>
@@ -261,7 +262,7 @@ MSV.ready(function (ctx) {
     document.getElementById('count').textContent = list.length + ' из ' + ALL.length;
     var box = document.getElementById('rows');
     box.innerHTML = list.length ? list.map(row).join('')
-      : '<tr><td colspan="5" class="grid__empty">Ничего не нашлось.</td></tr>';
+      : '<tr><td colspan="6" class="grid__empty">Ничего не нашлось.</td></tr>';
   }
 
   document.getElementById('rows').addEventListener('click', function (e) {

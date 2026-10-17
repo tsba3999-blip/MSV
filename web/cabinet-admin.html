@@ -15,6 +15,16 @@
   #stats .stat { display:flex;flex-direction:column;gap:var(--msv-s8);padding:var(--msv-s16); }
   #stats .stat__value,#stats .stat__note { margin:0; }
   #stats .stat__label { line-height:20px; }
+  @media(max-width:600px){
+    #byRes .grid,#byRes tbody{display:block;width:100%;min-width:0}
+    #byRes thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+    #byRes tbody tr{display:block;padding:var(--msv-s16);border-bottom:1px solid var(--msv-n100)}
+    #byRes tbody tr:last-child{border-bottom:0}
+    #byRes tbody td{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--msv-s16);width:auto;padding:8px 0;border:0;white-space:normal;overflow-wrap:normal}
+    #byRes tbody td:first-child{display:block;padding:0 0 var(--msv-s12);font-weight:600}
+    #byRes tbody td[data-label]::before{content:attr(data-label);font-size:12px;color:var(--msv-n500)}
+    #byRes .res-value{white-space:nowrap}
+  }
 </style>
 </head>
 <body>
@@ -50,7 +60,7 @@
       <a class="side__link" href="admin-residences.html">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V8l7-4 7 4v13"/><path d="M9 21v-6h6v6"/><path d="M9 11h.01"/><path d="M15 11h.01"/></svg>
-        Резиденции
+        Адреса
       </a>
       <a class="side__link" href="admin-shahmatka.html">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -202,7 +212,7 @@ MSV.ready(function (ctx) {
 
   document.getElementById('byRes').innerHTML = '<table class="grid"><thead><tr><th>Резиденция</th><th>Загрузка в чел.</th><th>Загрузка в %</th><th>Пол</th></tr></thead><tbody>'+rows.map(function (x) {
     var pct = x.beds ? Math.round(100 * x.busy / x.beds) : 0;
-    return '<tr><td><a href="admin-shahmatka.html?res='+encodeURIComponent(x.res.id)+'">'+esc(({forma:'Форма',uyut:'Уют'})[x.res.id] || x.res.title)+'</a></td><td>'+x.busy+' из '+x.beds+'</td><td>'+pct+'%</td><td>М — '+x.men+'<br>Ж — '+x.women+(x.busy>x.men+x.women?'<br><span class="msv-note">Не указан — '+(x.busy-x.men-x.women)+'</span>':'')+'</td></tr>';
+    return '<tr><td><a href="admin-shahmatka.html?res='+encodeURIComponent(x.res.id)+'">'+esc(({forma:'Форма',uyut:'Уют'})[x.res.id] || x.res.title)+'</a></td><td data-label="Загрузка в чел."><span class="res-value">'+x.busy+' из '+x.beds+'</span></td><td data-label="Загрузка в %"><span class="res-value">'+pct+'%</span></td><td data-label="Пол"><span class="res-value">М — '+x.men+'<br>Ж — '+x.women+(x.busy>x.men+x.women?'<br><span class="msv-note">Не указан — '+(x.busy-x.men-x.women)+'</span>':'')+'</span></td></tr>';
   }).join('')+'</tbody></table>';
 });
 </script>

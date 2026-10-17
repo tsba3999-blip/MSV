@@ -104,7 +104,7 @@
 
     <p class="msv-note" id="err" hidden style="color:var(--msv-red);margin:0 0 var(--msv-s12)"></p>
     <div class="foot">
-      <button class="msv-btn msv-btn--block msv-btn--primary" type="button" id="send">Подать заявление на переселение</button>
+      <button class="msv-btn msv-btn--block msv-btn--primary" type="button" id="send" disabled>Подать заявление на переселение</button>
     </div>
   </div>
 
@@ -123,6 +123,14 @@
 <script>
 (function () {
   'use strict';
+  var busy = false, readOnly = location.protocol !== 'file:';
+  if (location.protocol !== 'file:') fetch('/api/auth/me', {credentials:'same-origin'}).then(function(r){return r.ok?r.json():null;}).then(function(me){readOnly=!me||!!me.preview;syncSend();}).catch(syncSend);
+  function syncSend() {
+    document.getElementById('send').disabled = readOnly || busy || !document.querySelector('#reasons input:checked') ||
+      (document.getElementById('otherCb').checked && !document.getElementById('otherText').value.trim());
+  }
+  document.getElementById('form').addEventListener('input', syncSend);
+  document.getElementById('form').addEventListener('change', syncSend);
   // Размеры комнат: можно отметить несколько; «Все варианты» снимает остальные
   function sizes() { return Array.prototype.map.call(document.querySelectorAll('#sizes .chip[aria-pressed="true"]'), function (c) { return c.dataset.size; }); }
   document.getElementById('sizes').addEventListener('click', function (e) {
@@ -149,6 +157,7 @@
   });
 
   document.getElementById('send').addEventListener('click', function () {
+    if (busy || this.disabled) return;
     var btn = this, err = document.getElementById('err');
     var reasons = Array.prototype.map.call(document.querySelectorAll('#reasons input:checked'), function (i) { return i.value; });
     var other = document.getElementById('otherText').value.trim();
@@ -169,15 +178,15 @@
       note: note
     };
     if (location.protocol === 'file:') { show(); return; }
-    btn.disabled = true;
+    busy = true; syncSend();
     fetch('/api/waitlist', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
       .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j || {} }; }, function () { return { s: r.status, j: {} }; }); })
       .then(function (r) {
         if (r.s === 200 || r.s === 201) { show(); return; }
-        btn.disabled = false;
+        busy = false; syncSend();
         err.textContent = r.s === 401 ? 'Сессия истекла — войди ещё раз.' : (r.j.error || 'Не удалось отправить.'); err.hidden = false;
       })
-      .catch(function () { btn.disabled = false; err.textContent = 'Сервер не отвечает. Попробуй ещё раз.'; err.hidden = false; });
+      .catch(function () { busy = false; syncSend(); err.textContent = 'Сервер не отвечает. Попробуй ещё раз.'; err.hidden = false; });
   });
   function show() { document.getElementById('form').hidden = true; document.getElementById('done').hidden = false; window.scrollTo(0, 0); }
 })();

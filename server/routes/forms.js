@@ -82,7 +82,7 @@ module.exports = function register(route) {
       if(s.role!=='resident')return fail(res,403,'Заявку подаёт резидент');
       const date=String(b.date||''),stamp=new Date(date+'T00:00:00Z');
       if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Number.isFinite(stamp.getTime())||stamp.toISOString().slice(0,10)!==date)return fail(res,400,'Укажите дату выезда');
-      if(!String(b.reason||'').trim()||![b.residenceRating,b.staffRating].every(n=>Number.isInteger(n)&&n>=1&&n<=5))return fail(res,400,'Укажите причину и обе оценки от 1 до 5');
+      if(!String(b.reason||'').trim()||![b.residenceRating,b.staffRating].every(n=>n==='5+'||(Number.isInteger(n)&&n>=1&&n<=5)))return fail(res,400,'Укажите причину и обе оценки от 1 до 5+');
       b.note='Дата выезда: '+date+'\nПричина: '+String(b.reason).slice(0,1000)+'\nРезиденция: '+b.residenceRating+' / 5\nСотрудники: '+b.staffRating+' / 5\nПояснение: '+String(b.comments||'').slice(0,1000);
     }
     const r = await query(`INSERT INTO doc_requests (user_id, kind, note) VALUES ($1, $2, $3) RETURNING id`,

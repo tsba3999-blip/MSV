@@ -10,6 +10,11 @@
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="resident.css">
 <link rel="stylesheet" href="form.css">
+<style>
+body:has(#kinds) .page{padding-bottom:calc(var(--msv-tabbar) + var(--msv-s32))}
+body:has(#kinds) #note{line-height:1.5;scroll-margin-bottom:120px}
+body:has(#kinds):has(#note:focus) .tabbar{display:none}
+</style>
 </head>
 <body>
 
@@ -38,9 +43,9 @@
 
   <div id="form" hidden style="padding:var(--msv-s16);background:var(--msv-white);border-radius:var(--msv-r12);box-shadow:var(--msv-e1);margin-top:var(--msv-s12)">
     <h2 class="msv-sub group__title" id="formTitle"></h2>
-    <textarea class="msv-area" id="note" maxlength="500" style="min-height:96px;width:100%;box-sizing:border-box" placeholder="Уточнение, если нужно: для какого вуза, что исправить, куда переселить"></textarea>
-    <div style="display:flex;gap:var(--msv-s8);margin-top:var(--msv-s12)">
-      <button class="msv-btn msv-btn--m msv-btn--primary" type="button" id="send">Отправить запрос</button>
+    <textarea class="msv-area" id="note" maxlength="500" rows="5" style="min-height:160px;width:100%;box-sizing:border-box;overflow:auto" placeholder="Уточнение, если нужно: для какого вуза, что исправить, куда переселить"></textarea>
+    <div style="display:flex;gap:var(--msv-s8);margin-top:var(--msv-s24)">
+      <button class="msv-btn msv-btn--m msv-btn--primary" type="button" id="send" disabled>Отправить запрос</button>
     </div>
   </div>
 
@@ -81,6 +86,11 @@
     { kind: 'registration', status: 'В работе', at: '28.08.2026', note: '' }
   ];
   var kind = null;
+  var busy = false, readOnly = location.protocol !== 'file:';
+  var note = document.getElementById('note'), send = document.getElementById('send');
+  function syncSend() { send.disabled = readOnly || busy || !kind || !note.value.trim(); }
+  note.addEventListener('input', syncSend);
+  if (location.protocol !== 'file:') fetch('/api/auth/me', {credentials:'same-origin'}).then(function(r){return r.ok?r.json():null;}).then(function(me){readOnly=!me||!!me.preview;syncSend();}).catch(syncSend);
   var form = document.getElementById('form'), list = document.getElementById('list');
 
   function render(items) {
@@ -101,20 +111,21 @@
   document.getElementById('kinds').addEventListener('click', function (e) {
     var b = e.target.closest('[data-kind]'); if (!b) return;
     kind = b.dataset.kind;
+    syncSend();
     document.getElementById('formTitle').textContent = NAMES[kind];
     form.hidden = false; document.getElementById('note').focus();
     form.scrollIntoView({ block: 'nearest' });
   });
-  document.getElementById('cancel').addEventListener('click', function () { form.hidden = true; kind = null; });
 
   document.getElementById('send').addEventListener('click', function () {
-    if (!kind) return;
+    if (readOnly || busy || !kind || !note.value.trim()) return;
+    busy = true; syncSend();
     var body = { kind: kind, note: document.getElementById('note').value.trim() };
     var now = new Date(), at = String(now.getDate()).padStart(2, '0') + '.' + String(now.getMonth() + 1).padStart(2, '0') + '.' + now.getFullYear();
-    function ok() { demo.unshift({ kind: kind, status: 'Принят', at: at, note: body.note }); form.hidden = true; document.getElementById('note').value = ''; kind = null; load(); }
+    function ok() { demo.unshift({ kind: kind, status: 'Принят', at: at, note: body.note }); form.hidden = true; note.value = ''; kind = null; busy = false; syncSend(); load(); }
     if (location.protocol === 'file:') { ok(); return; }
     fetch('/api/requests', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
-      .then(function (r) { if (r.status === 201) ok(); else alert('Не удалось отправить'); }).catch(function () { alert('Сервер не отвечает'); });
+      .then(function (r) { if (r.status === 201) ok(); else alert('Не удалось отправить'); }).catch(function () { alert('Сервер не отвечает'); }).finally(function () { busy = false; syncSend(); });
   });
 
   // ?type=fix — сразу нужный запрос: список остальных сворачиваем, форма наверху.

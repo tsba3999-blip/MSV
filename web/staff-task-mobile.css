@@ -1,0 +1,15 @@
+  @media(max-width:760px){
+    table.grid.staff-task-grid,table.grid.staff-task-grid tbody{display:block;width:100%;min-width:0}
+    table.grid.staff-task-grid thead{display:none}
+    table.grid.staff-task-grid tbody tr{display:block;padding:var(--msv-s16);border-bottom:1px solid var(--msv-n100)}
+    table.grid.staff-task-grid tbody tr:last-child{border-bottom:0}
+    table.grid.staff-task-grid tbody td{display:block;width:auto;padding:8px 0;border:0;text-align:left;white-space:normal;overflow-wrap:break-word}
+    table.grid.staff-task-grid tr[data-id] td:nth-child(2)::before{content:'Кто и где'}
+    table.grid.staff-task-grid tr[data-id] td:nth-child(3)::before{content:'Срочность'}
+    table.grid.staff-task-grid tr[data-id] td:nth-child(4)::before{content:'Исполнитель'}
+    table.grid.staff-task-grid tr[data-id] td:nth-child(5)::before{content:'Статус'}
+    table.grid.staff-task-grid tr[data-id] td::before{display:block;margin-bottom:4px;font-size:12px;color:var(--msv-n500)}
+    table.grid.staff-task-grid tbody td.num{padding-top:var(--msv-s24)}
+    table.grid.staff-task-grid tbody td.num:empty{display:none}
+    table.grid.staff-task-grid tbody td.grid__empty{padding:0}
+  }
