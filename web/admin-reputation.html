@@ -25,7 +25,7 @@
 <style>
   body { --role: var(--msv-graphite); --role-ink: var(--msv-graphite); }
 </style>
-</head>
+<style>.token-caption{display:flex;align-items:center;gap:8px}.token-sign{display:inline-flex;align-items:center;justify-content:center;flex:0 0 24px;width:24px;height:24px;border-radius:50%;font-size:18px;line-height:1;font-weight:700}.token-sign--positive{color:#248048;background:#e5f0e9}.token-sign--negative{color:#c32d46;background:#f8e6e9}</style></head>
 <body>
 
 <div class="shell">
@@ -117,7 +117,7 @@
         <div class="set__grid">
           <label class="msv-field"><span class="msv-field__label">Резидент</span>
             <input class="msv-input" id="who" list="people" placeholder="Начни вводить фамилию"><datalist id="people"></datalist></label>
-          <label class="msv-field"><span class="msv-field__label">Позитивные токены</span>
+          <label class="msv-field"><span class="msv-field__label token-caption"><span class="token-sign token-sign--positive" aria-hidden="true">+</span>Позитивные токены</span>
             <select class="msv-select msv-input" id="kind">
               <option value="">Выберите событие</option>
               <option value="+1.0">Организация события · +1,0</option>
@@ -126,7 +126,7 @@
               <option value="+0.3">Благодарность от сотрудника · +0,3</option>
               <option value="custom">Другое — своя сумма</option>
             </select></label>
-          <label class="msv-field"><span class="msv-field__label">Негативные токены</span>
+          <label class="msv-field"><span class="msv-field__label token-caption"><span class="token-sign token-sign--negative" aria-hidden="true">−</span>Негативные токены</span>
             <select class="msv-select msv-input" id="kindNegative">
               <option value="">Выберите событие</option>
               <option value="-0.5">Шум, беспорядок, замечание · −0,5</option>
