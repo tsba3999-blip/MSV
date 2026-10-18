@@ -14,7 +14,7 @@
 <style>
   .set { margin-bottom: var(--msv-s24); padding: var(--msv-s20); background: var(--msv-white); border-radius: var(--msv-r20); box-shadow: var(--msv-e1); }
   .set__title { margin: 0 0 var(--msv-s12); }
-  .set__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--msv-s12); }
+  .msv-form-card .set__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--msv-s12); }
   .set__grid > .msv-field { min-width:0; }
   .set__grid > .msv-field:first-child,.set__grid > #customWrap { grid-column:1/-1; }
   .set__grid > .msv-field:has(.token-caption) { display:flex;flex-direction:column; }
@@ -143,7 +143,7 @@
             <input class="msv-input" id="custom" inputmode="decimal" placeholder="+0,7 или −1,5"></label>
         </div>
         <input class="msv-input" id="details" placeholder="Что именно произошло — резидент увидит этот текст" style="margin-top:var(--msv-form-gap)">
-        <button class="msv-btn msv-btn--m msv-btn--primary" type="button" id="add" style="margin-top:var(--msv-form-gap)">Начислить</button>
+        <button class="msv-btn msv-btn--m msv-btn--primary" type="button" id="add" disabled style="margin-top:var(--msv-form-gap)">Начислить</button>
         <span class="msv-note" id="msg" hidden style="margin-left:var(--msv-s12)"></span>
       </div>
 
@@ -177,14 +177,19 @@ MSV.ready(function (ctx) {
 
   var positive=document.getElementById('kind'), negative=document.getElementById('kindNegative');
   var kind = positive, wrap = document.getElementById('customWrap');
+  var add=document.getElementById('add'),busy=false;
+  function syncAdd(){var value=kind.value==='custom'?Number(document.getElementById('custom').value.replace(',','.').replace('−','-')):Number(kind.value);add.disabled=busy||!ctx.me||!!ctx.me.preview||!names[document.getElementById('who').value.trim()]||!document.getElementById('details').value.trim()||!Number.isFinite(value)||Math.abs(value)>5||(kind===positive?value<=0:value>=0);}
+  ['who','details','custom'].forEach(function(id){document.getElementById(id).addEventListener('input',syncAdd);});
+  syncAdd();
   [positive,negative].forEach(function(select){select.addEventListener('change',function(){
     kind=select;(select===positive?negative:positive).value='';
     wrap.hidden=select.value!=='custom';document.getElementById('custom').value='';
     wrap.querySelector('.msv-field__label').textContent=select===positive?'Позитивные токены (от 0 до +5)':'Негативные токены (от −5 до 0)';
-    document.getElementById('custom').placeholder=select===positive?'+0,7':'−1,5';
+    document.getElementById('custom').placeholder=select===positive?'+0,7':'−1,5';syncAdd();
   });});
 
   document.getElementById('add').addEventListener('click', function () {
+    syncAdd();if(add.disabled)return;
     var who = document.getElementById('who').value.trim(), m = document.getElementById('msg');
     var delta = kind.value === 'custom' ? parseFloat(document.getElementById('custom').value.replace(',', '.').replace('−', '-')) : parseFloat(kind.value);
     var details = document.getElementById('details').value.trim();
@@ -195,12 +200,13 @@ MSV.ready(function (ctx) {
       var now = new Date(), d = String(now.getDate()).padStart(2,'0') + '.' + String(now.getMonth()+1).padStart(2,'0') + '.' + String(now.getFullYear()).slice(2);
       document.querySelector('#log tbody').insertAdjacentHTML('afterbegin', '<tr><td>' + d + '</td><td>' + who.replace(/</g,'&lt;') + '</td><td>' + title.replace(/</g,'&lt;') + '</td><td class="num" style="color:' + (delta < 0 ? 'var(--msv-red)' : '#4A6B12') + ';font-weight:700">' + (delta > 0 ? '+' : '−') + Math.abs(delta).toFixed(1).replace('.', ',') + '</td><td>' + (ctx.me ? ctx.me.name : 'вы') + '</td></tr>');
       m.textContent = 'Начислено. Резидент увидит запись в своей репутации.'; m.hidden = false;
-      document.getElementById('details').value = '';
+      document.getElementById('details').value = '';syncAdd();
     }
     if (!ctx.live) { ok(); return; }
+    busy=true;syncAdd();
     ctx.api('POST', '/api/reputation', { userId: names[who], delta: delta, title: title, details: details })
       .then(function (r) { if (r.status === 201) ok(); else { m.textContent = r.body && r.body.error || 'Не удалось'; m.hidden = false; } })
-      .catch(function () { m.textContent = 'Сервер не отвечает'; m.hidden = false; });
+      .catch(function () { m.textContent = 'Сервер не отвечает'; m.hidden = false; }).finally(function(){busy=false;syncAdd();});
   });
 });
 </script>

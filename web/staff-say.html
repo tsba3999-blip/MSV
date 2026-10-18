@@ -133,14 +133,13 @@
         <p class="msv-note" style="margin-bottom:var(--msv-s4)">Тема</p>
         <div class="chips" role="group" style="margin-bottom:var(--msv-s16)">
           <button class="chip" type="button" aria-pressed="true">Идея</button>
-          <button class="chip" type="button" aria-pressed="false">Зарплата</button>
           <button class="chip" type="button" aria-pressed="false">Инструмент и материалы</button>
           <button class="chip" type="button" aria-pressed="false">Жалоба</button>
           <button class="chip" type="button" aria-pressed="false">Другое</button>
         </div>
         <textarea class="msv-area" id="text" maxlength="1500" style="min-height:140px" placeholder="Например: не хватает второго набора ключей для FORMA"></textarea>
         <label class="tog" style="margin-top:var(--msv-s12)"><input type="checkbox" id="anon"> <span>Отправить анонимно</span></label><p class="msv-body" style="margin:var(--msv-s8) 0 var(--msv-form-gap);color:var(--msv-n500)">Анонимно — управляющий не увидит, от кого. Но и ответить не сможет. Поясните — почему анонимно.</p>
-        <button class="msv-btn msv-btn--m msv-btn--primary" type="button" id="send" style="margin-top:var(--msv-s12)">Отправить</button>
+        <button class="msv-btn msv-btn--m msv-btn--primary" type="button" id="send" disabled style="margin-top:var(--msv-s12)">Отправить</button>
         <span class="msv-note" id="msg" hidden style="margin-left:var(--msv-s12)"></span>
       </div>
     </main>
@@ -150,20 +149,30 @@
 <script>
 (function () {
   'use strict';
+  var send = document.getElementById('send'), text = document.getElementById('text');
+  var readOnly = true, busy = false;
+  function sync() { send.disabled = readOnly || busy || !text.value.trim(); }
+  text.addEventListener('input', sync);
+  fetch('/api/auth/me', { credentials: 'same-origin' })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (me) { readOnly = !me || !!me.preview; sync(); })
+    .catch(function () { readOnly = true; sync(); });
   document.querySelector('.chips').addEventListener('click', function (e) {
     var c = e.target.closest('.chip'); if (!c) return;
     document.querySelectorAll('.chip').forEach(function (x) { x.setAttribute('aria-pressed', 'false'); });
     c.setAttribute('aria-pressed', 'true');
   });
   document.getElementById('send').addEventListener('click', function () {
+    sync(); if (send.disabled) return;
     var t = document.getElementById('text').value.trim(), m = document.getElementById('msg');
     if (!t) { m.textContent = 'Напиши хоть пару слов'; m.hidden = false; return; }
     var body = { topic: document.querySelector('.chip[aria-pressed="true"]').textContent.trim(), text: t, anonymous: document.getElementById('anon').checked };
     function ok() { m.textContent = 'Отправлено. Ответ придёт в уведомлениях.'; m.hidden = false; document.getElementById('text').value = ''; }
-    if (location.protocol === 'file:') { ok(); return; }
+    busy = true; sync();
     fetch('/api/feedback', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
       .then(function (r) { if (r.status === 201) ok(); else { m.textContent = 'Не удалось'; m.hidden = false; } })
-      .catch(function () { m.textContent = 'Сервер не отвечает'; m.hidden = false; });
+      .catch(function () { m.textContent = 'Сервер не отвечает'; m.hidden = false; })
+      .finally(function () { busy = false; sync(); });
   });
 })();
 </script>

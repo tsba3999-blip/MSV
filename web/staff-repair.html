@@ -202,7 +202,6 @@
     <span class="msv-note" style="display:block;margin-top:var(--msv-s4);text-align:right" id="fileCount">0 из 5</span>
   </section>
 
-  <label class="tog" style="display:flex;align-items:center;gap:var(--msv-s12);margin:0 0 var(--msv-s4)"><input type="checkbox" id="mine" checked> <span class="msv-body">Сразу взять в работу себе</span></label>
   <div class="foot">
     <button class="msv-btn msv-btn--block msv-btn--primary" id="send" type="button" disabled>Отправить заявку</button>
     <p class="msv-note" style="margin-top:var(--msv-s8);text-align:center" id="why">Опиши, что случилось — тогда кнопка станет активной</p>
@@ -324,8 +323,6 @@
       .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j || {} }; }, function () { return { s: r.status, j: {} }; }); })
       .then(function (r) {
         if (r.s === 201 || r.s === 200) {
-        var mine = document.getElementById('mine');
-        if (mine && mine.checked && r.j.id) { return fetch('/api/tickets/' + r.j.id, { method: 'PATCH', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ take: true, status: 'В работе' }) }).then(function () { location.href = 'staff-tickets.html'; }); }
         location.href = 'staff-tickets.html'; return; }
         send.disabled = false;
         alert(r.s === 401 ? 'Сессия истекла — войди ещё раз.' : (r.j.error || 'Не удалось отправить заявку.'));

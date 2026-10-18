@@ -12,4 +12,5 @@
     table.grid.staff-task-grid tbody td.num{padding-top:var(--msv-s24)}
     table.grid.staff-task-grid tbody td.num:empty{display:none}
     table.grid.staff-task-grid tbody td.grid__empty{padding:0}
+    table.grid.staff-task-grid tbody td[data-label]::before{content:attr(data-label);display:block;margin-bottom:4px;font-size:12px;color:var(--msv-n500)}
   }

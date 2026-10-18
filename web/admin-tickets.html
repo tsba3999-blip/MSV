@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="tokens.css">
 <script>document.documentElement.classList.add("msv-side-pending");try{if(localStorage.getItem("msv.sideFolded")==="1")document.documentElement.classList.add("msv-side-start-folded");}catch(e){}</script>
 <link rel="stylesheet" href="cabinet.css">
+<link rel="stylesheet" href="staff-task-mobile.css">
 <style>
   body { --role: var(--msv-graphite); --role-ink: var(--msv-graphite); }
 </style>
@@ -110,7 +111,7 @@
         <span class="msv-note bar__count" id="count"></span>
       </div>
 
-      <table class="grid">
+      <table class="grid staff-task-grid">
         <thead>
           <tr>
             <th>Заявка</th><th>Кто и где</th><th>Срочность</th>
@@ -211,12 +212,12 @@ MSV.ready(function (ctx) {
       return '<tr>' +
         '<td><span class="who-cell__name">' + esc(t.category) + ' ' + late + '</span>' +
           '<span class="msv-note sub">' + esc(t.text) + '</span></td>' +
-        '<td>' + esc(t.resident) +
+        '<td data-label="Кто и где">' + esc(t.resident) +
           '<span class="msv-note sub">' + esc(t.bed) + ' · ' + esc(t.room) + ' · ' + esc(t.residence) + '</span></td>' +
-        '<td><span class="tag ' + PRIO_TAG[t.priority] + '">' + esc(t.priorityName) + '</span>' +
+        '<td data-label="Срочность"><span class="tag ' + PRIO_TAG[t.priority] + '">' + esc(t.priorityName) + '</span>' +
           '<span class="msv-note sub">срок ' + t.deadlineHours + ' ч · ' + esc(ago(t.ageHours)) + '</span></td>' +
-        '<td>' + (t.master ? esc(t.master) : '<span class="msv-note">не назначен</span>') + '</td>' +
-        '<td><span class="tag ' + STATUS_TAG[t.status] + '">' + esc(t.status) + '</span></td>' +
+        '<td data-label="Мастер">' + (t.master ? esc(t.master) : '<span class="msv-note">не назначен</span>') + '</td>' +
+        '<td data-label="Статус"><span class="tag ' + STATUS_TAG[t.status] + '">' + esc(t.status) + '</span></td>' +
       '</tr>';
     }).join('');
   }

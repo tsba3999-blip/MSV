@@ -23,7 +23,20 @@
 <style>
   body { --role: var(--msv-sky); --role-ink: var(--msv-graphite); }
 </style>
-</head>
+<style>
+@media(max-width:760px){
+table.grid.mailing-grid,table.grid.mailing-grid tbody{display:block;width:100%;min-width:0}
+table.grid.mailing-grid thead{display:none}
+table.grid.mailing-grid tbody tr{display:block;padding:16px;border-bottom:1px solid var(--msv-n100)}
+table.grid.mailing-grid tbody td{display:block;width:auto;padding:8px 0;border:0;white-space:normal;overflow-wrap:break-word}
+table.grid.mailing-grid tbody td::before{display:block;font-size:12px;color:var(--msv-n500);margin-bottom:4px}
+table.grid.mailing-grid tbody td:nth-child(2)::before{content:'Кому'}
+table.grid.mailing-grid tbody td:nth-child(3)::before{content:'Вид'}
+table.grid.mailing-grid tbody td:nth-child(4)::before{content:'Дата'}
+table.grid.mailing-grid tbody td:nth-child(5)::before{content:'Состояние'}
+table.grid.mailing-grid .tag{white-space:normal}
+}
+</style></head>
 <body>
 
 <div class="shell">
@@ -146,7 +159,7 @@
       </div>
 
       <h2 class="msv-sub" style="margin:var(--msv-s32) 0 var(--msv-s12)">Мои рассылки</h2>
-      <table class="grid" id="list">
+      <table class="grid mailing-grid" id="list">
         <thead><tr><th>Заголовок</th><th>Кому</th><th>Вид</th><th>Дата</th><th>Состояние</th></tr></thead>
         <tbody>
           <tr><td>Отключение горячей воды 14 сентября</td><td>Уют</td><td><span class="tag tag--warn">предупреждение</span></td><td>10.09.26</td><td><span class="tag tag--ok">отправлено · 35 чел.</span></td></tr>
