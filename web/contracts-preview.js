@@ -85,6 +85,10 @@
     groups.forEach(function(g){$('group').add(new Option(g,g));$('contractForm').elements.group.add(new Option(g,g));});
     $('year').value=today.slice(0,7);$('add').hidden=true;
     $('configure').onclick=function(){configuring=!configuring;this.setAttribute('aria-pressed',String(configuring));$('add').hidden=!configuring;render();};
+    document.addEventListener('click',function(e){
+      if(!configuring||$('detail').open||e.target.closest('#configure,.contract-actions,#board'))return;
+      configuring=false;$('configure').setAttribute('aria-pressed','false');$('add').hidden=true;render();
+    });
     $('add').onclick=function(){open(null);};$('close').onclick=function(){$('detail').close();};
 
     ['group','search','year'].forEach(function(id){$(id).addEventListener('input',render);});
