@@ -9,7 +9,7 @@
   var shortMonths=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
   function calendarHead(months){
     var years=[];months.forEach(function(m){var year=m.slice(0,4),last=years[years.length-1];if(last&&last.year===year)last.count++;else years.push({year:year,count:1});});
-    return '<thead><tr class="calendar-years"><th rowspan="2" scope="col">Договор / объект</th>'+years.map(function(y){return '<th scope="colgroup" colspan="'+y.count+'">'+y.year+'</th>';}).join('')+'</tr><tr class="calendar-months">'+months.map(function(m){return '<th scope="col" title="'+m+'">'+shortMonths[Number(m.slice(5))-1]+'</th>';}).join('')+'</tr></thead>';
+    return '<thead><tr class="calendar-years"><th rowspan="2" scope="col">Договор / объект</th>'+years.map(function(y,i){return '<th class="'+(i?'calendar-year-start':'')+'" scope="colgroup" colspan="'+y.count+'">'+y.year+'</th>';}).join('')+'</tr><tr class="calendar-months">'+months.map(function(m){return '<th class="'+(m.slice(5)==='01'?'calendar-year-start':'')+'" scope="col" title="'+m+'">'+shortMonths[Number(m.slice(5))-1]+'</th>';}).join('')+'</tr></thead>';
   }
   var today = new Date().toLocaleDateString('en-CA',{timeZone:'Europe/Moscow'});
   async function api(path,body,method){var r=await fetch(path,{method:method||(body?'POST':'GET'),credentials:'same-origin',cache:'no-store',headers:body?{'Content-Type':'application/json'}:{},body:body?JSON.stringify(body):undefined});var result=await r.json();if(!r.ok)throw Error(result.error||'Не удалось сохранить');return result;}
@@ -60,7 +60,7 @@
     function label(c){return '<td>'+controls(c)+name(c)+'</td>';}
     function plan(c){return months.filter(function(m){return dueIn(c,m);}).reduce(function(n,m){return n+c.amount;},0);}
     function actual(c){return months.reduce(function(n,m){return n+sum(c,m);},0);}
-    function cell(c,m){var paid=sum(c,m),planned=dueIn(c,m),state=paid>0?'paid':planned?'planned':'blank';return '<td><button class="period '+state+'" data-open="'+esc(c.id)+'" title="'+esc(c.name+' · '+m)+'">'+(paid>0?money(paid):planned?money(c.amount):'—')+'<small>'+(state==='paid'?'Оплачено':state==='partial'?'Частично':state==='planned'?'План':'')+'</small></button></td>';}
+    function cell(c,m){var paid=sum(c,m),planned=dueIn(c,m),state=paid>0?'paid':planned?'planned':'blank';return '<td class="'+(m.slice(5)==='01'?'calendar-year-start':'')+'"><button class="period '+state+'" data-open="'+esc(c.id)+'" title="'+esc(c.name+' · '+m)+'">'+(paid>0?money(paid):planned?money(c.amount):'—')+'<small>'+(state==='paid'?'Оплачено':state==='partial'?'Частично':state==='planned'?'План':'')+'</small></button></td>';}
     function grid(rows){return '<div class="scroll"><table class="calendar chess"><colgroup><col class="calendar-name-col">'+months.map(function(){return '<col class="calendar-month-col">';}).join('')+'</colgroup>'+calendarHead(months)+'<tbody>'+rows.map(function(c){return '<tr data-row="'+esc(c.id)+'">'+label(c)+months.map(function(m){return cell(c,m);}).join('')+'</tr>';}).join('')+'</tbody></table></div>';}
     if(design==='chess'){$('board').innerHTML=grid(list);return;}
     if(design==='groups'){$('board').innerHTML=groups.map(function(g){var rows=list.filter(function(c){return c.group===g;});return rows.length?'<details class="contract-group" open><summary>'+esc(g)+' <span>'+rows.length+' '+contractWord(rows.length)+'</span>'+arrow+'</summary>'+grid(rows)+'</details>':'';}).join('');return;}
