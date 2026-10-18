@@ -64,7 +64,7 @@ html{scrollbar-gutter:stable}
 #documentForm input:not([type=file]),#documentForm select{height:46px;padding:10px 12px;line-height:22px}
 .document-dates{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;min-width:0}
 .document-dates label{display:grid;grid-template-rows:minmax(32px,auto) 46px;align-items:end}
-#documentForm input[type=file],#contractFile{width:100%;min-width:0;padding:8px;font-size:12px}
+#documentForm input[type=file],#contractFile{width:100%;min-width:0;padding:0;font-size:12px;background:transparent;border:0;border-radius:0}
 #documentForm input[type=file]::file-selector-button,#contractFile::file-selector-button{font:600 13px var(--msv-font);color:var(--msv-graphite);background:var(--msv-n100);border:0;border-radius:var(--msv-button-radius);padding:10px 14px;margin-right:8px;cursor:pointer}
 #documentForm input[type=file]::file-selector-button:hover,#contractFile::file-selector-button:hover{background:var(--msv-lavender)}
 .document-card{margin-top:var(--msv-s24);overflow-wrap:anywhere}
