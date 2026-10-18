@@ -909,6 +909,7 @@ CREATE TABLE IF NOT EXISTS vendor_documents (
  legal_entity text NOT NULL DEFAULT '',
  residence text NOT NULL DEFAULT '',
  valid_until date,
+ signed_on date,
  filename text NOT NULL,
  mime text NOT NULL,
  content bytea NOT NULL CHECK (octet_length(content) BETWEEN 1 AND 10485760),
