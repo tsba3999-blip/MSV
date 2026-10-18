@@ -51,6 +51,11 @@ h1{font-size:var(--msv-sub-size,28px)}.eyebrow{display:none}.scroll,.contract-gr
 .document-tabs button{flex:1;min-width:0}
 .document-tabs button[aria-selected=false]{background:transparent;color:var(--msv-graphite);box-shadow:inset 0 0 0 1.5px var(--msv-n300)}
 #documentForm .fields{margin-bottom:0}
+#documentsPanel,#documentForm{min-width:0;max-width:100%}
+#documentForm .fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--msv-s24)}
+#documentForm label{min-width:0;gap:4px}
+#documentForm input,#documentForm select{width:100%;min-width:0;max-width:100%;box-sizing:border-box}
+@media(max-width:750px){#documentForm .fields{grid-template-columns:minmax(0,1fr)}}
 #documentForm > button{margin-top:var(--msv-s24)}
 .document-card{margin-top:var(--msv-s24);overflow-wrap:anywhere}
 .document-card h2{font-size:20px;margin:0 0 16px}
