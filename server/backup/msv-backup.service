@@ -1,7 +1,0 @@
-[Unit]
-Description=MSV — резервная копия базы
-After=postgresql.service
-
-[Service]
-Type=oneshot
-ExecStart=/opt/msv/server/backup/backup.sh
