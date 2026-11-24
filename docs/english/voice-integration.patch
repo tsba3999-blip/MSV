@@ -1,0 +1,37 @@
+--- a/server/lib/http.js
++++ b/server/lib/http.js
+@@ -118,7 +118,8 @@
+   if (!stat.isFile()) return false;
+ 
+   const ext = path.extname(file).toLowerCase();
+-  const type = MIME[ext] || 'application/octet-stream';
++  const englishAudio = ext === '.mp3' && rel.startsWith('/english/assets/audio/');
++  const type = englishAudio ? 'audio/mpeg' : MIME[ext] || 'application/octet-stream';
+   // HTML, стили и скрипты — «переспрашивай каждый раз» (no-cache): после
+   // выкладки посетитель не получит новую страницу со старыми стилями.
+   // Переспрос дешёвый: по Last-Modified отвечаем 304 без тела.
+@@ -126,6 +127,24 @@
+   const fresh = ext === '.html' || ext === '.css' || ext === '.js';
+   const cache = req.privatePage ? 'private, no-store' : fresh ? 'no-cache' : 'public, max-age=86400';
+   const modified = stat.mtime.toUTCString();
++
++  // Mobile audio players may request a byte range before starting playback.
++  if (englishAudio) {
++    res.setHeader('Accept-Ranges', 'bytes');
++    const range = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range || '');
++    if (req.method === 'GET' && range && (range[1] || range[2]) &&
++        (!req.headers['if-range'] || req.headers['if-range'] === modified)) {
++      const start = range[1] ? Number(range[1]) : Math.max(0, stat.size - Number(range[2]));
++      const end = range[1] && range[2] ? Math.min(Number(range[2]), stat.size - 1) : stat.size - 1;
++      if (!Number.isSafeInteger(start) || !Number.isSafeInteger(end) || start > end || start >= stat.size) {
++        res.writeHead(416, { 'Content-Range': 'bytes */' + stat.size, 'Content-Length': 0 });
++        res.end();return true;
++      }
++      res.writeHead(206, { 'Content-Type': type, 'Content-Length': end - start + 1,
++        'Content-Range': `bytes ${start}-${end}/${stat.size}`, 'Cache-Control': cache, 'Last-Modified': modified });
++      fs.createReadStream(file, { start, end }).pipe(res);return true;
++    }
++  }
+ 
+   const since = req.headers['if-modified-since'];
+   if (!req.privatePage && since && new Date(since).getTime() >= Math.floor(stat.mtimeMs / 1000) * 1000) {

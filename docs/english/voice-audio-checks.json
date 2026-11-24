@@ -1,0 +1,278 @@
+{
+  "voice_selected": 1,
+  "voice": "am_michael",
+  "files": [
+    {
+      "text": "Hello! What is your name?",
+      "file": "michael-5a72e30357f8393d.mp3",
+      "seconds": 1.825,
+      "bytes": 15024,
+      "sha256": "5a72e30357f8393da5911751e83d1c4221c4c15ca22ebd79a3e97455aaf11240",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "Would you like to check in?",
+      "file": "michael-da39c3e6a4a28940.mp3",
+      "seconds": 1.7,
+      "bytes": 14376,
+      "sha256": "da39c3e6a4a28940c91d1b48c8c86a54fb2a757e9b92ab2d01ef9d1375f5ae31",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "Do you have a reservation?",
+      "file": "michael-29d43fc921595d48.mp3",
+      "seconds": 1.875,
+      "bytes": 15504,
+      "sha256": "29d43fc921595d48763b9492604b1284e515d30b912b591e81e72836492f2b67",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "How many nights will you stay?",
+      "file": "michael-25a3751acb7fa373.mp3",
+      "seconds": 2.0,
+      "bytes": 16536,
+      "sha256": "25a3751acb7fa37384773f12d9dde12710cb6c96a420f494b586be1b7d743a87",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "Would you like breakfast?",
+      "file": "michael-1878e9880abbdde9.mp3",
+      "seconds": 1.65,
+      "bytes": 14640,
+      "sha256": "1878e9880abbdde9b32400ac2a1745c79dfb9a6af89e2bb16bfdad1320b1c760",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "Do you need help with your bags?",
+      "file": "michael-526c1287a1254913.mp3",
+      "seconds": 2.025,
+      "bytes": 18024,
+      "sha256": "526c1287a12549133fd04c2232a911efc9153af3f587c7d90e1b79f2a2f65e89",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "Would you like to pay by card?",
+      "file": "michael-3eda265e9f3cbf66.mp3",
+      "seconds": 2.1,
+      "bytes": 18648,
+      "sha256": "3eda265e9f3cbf666907de5150231ef22ca70fcbbc314177e998d749e31d2ec9",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "Do you need a receipt?",
+      "file": "michael-bda9271904943c69.mp3",
+      "seconds": 1.575,
+      "bytes": 13320,
+      "sha256": "bda9271904943c69b9b72e8298e14072348884a659309739b6f1b2ceeca8e387",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "Where do you want to go?",
+      "file": "michael-f5e0af5150b1ff95.mp3",
+      "seconds": 1.55,
+      "bytes": 12288,
+      "sha256": "f5e0af5150b1ff951aea750f4bab3ed83bd44e72649275697a635776823367ef",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "Who do you travel with?",
+      "file": "michael-7f7c800551ea3dd2.mp3",
+      "seconds": 1.575,
+      "bytes": 13560,
+      "sha256": "7f7c800551ea3dd259515d28ddca7dd8a43e3e3d265f253c9feb10584a94eec7",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "What would you like to drink?",
+      "file": "michael-4e8f7e35ea3806ab.mp3",
+      "seconds": 1.65,
+      "bytes": 14352,
+      "sha256": "4e8f7e35ea3806ab6e2347407bb3deae71128f93146796da5e1eaf12b4c3aef6",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "Do you use AI at work?",
+      "file": "michael-d5c89203b2507597.mp3",
+      "seconds": 2.075,
+      "bytes": 17232,
+      "sha256": "d5c89203b25075971ef7aa47b1cf3c31a07973801b61989aec2056ad86646abd",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "Do you understand this word?",
+      "file": "michael-606b4105dabcc29c.mp3",
+      "seconds": 2.0,
+      "bytes": 18336,
+      "sha256": "606b4105dabcc29ce04ed8d1b950c6e9410472e29d892d3f6a96eb776a158bba",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "What do you want to learn?",
+      "file": "michael-3fc265fb661f40c2.mp3",
+      "seconds": 1.575,
+      "bytes": 12768,
+      "sha256": "3fc265fb661f40c2fd53d1d3d0c7c4d7ebfcb46e42303a5fc4c8eaec429a9698",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "Are you a student?",
+      "file": "michael-4d7c1cf2cd93b241.mp3",
+      "seconds": 1.5,
+      "bytes": 11952,
+      "sha256": "4d7c1cf2cd93b2419bd80efa45538a8205336c027c25a777fde0ddf9b0c2e1a3",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "What do you study?",
+      "file": "michael-4b5a6a2fa38613b1.mp3",
+      "seconds": 1.375,
+      "bytes": 11712,
+      "sha256": "4b5a6a2fa38613b1c0b15cb609f97b08e87e142c6c07c662341afb02b4e1774a",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "Do you have a class today?",
+      "file": "michael-0b7c4f0d2855951d.mp3",
+      "seconds": 1.875,
+      "bytes": 15744,
+      "sha256": "0b7c4f0d2855951d64f96b2e912a035198b536e1f1433063c509f5f434316496",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "Where do you work?",
+      "file": "michael-496cd9af1a08fd64.mp3",
+      "seconds": 1.25,
+      "bytes": 9888,
+      "sha256": "496cd9af1a08fd64d85fbc96fc718420bb50766398fd6c6210cac00efb25c81a",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "Do you enjoy your work?",
+      "file": "michael-00b73f35059c5dc4.mp3",
+      "seconds": 1.775,
+      "bytes": 14040,
+      "sha256": "00b73f35059c5dc462e0a5e014b7d0d421d6384c8783df99f5141040044cfd0c",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "What time do you start work?",
+      "file": "michael-2ff8f5d7ff2c6d8d.mp3",
+      "seconds": 2.0,
+      "bytes": 16704,
+      "sha256": "2ff8f5d7ff2c6d8d2df301c1b5e0e5c79e093793ad45c6ee01ffcca9685e494a",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "reservation",
+      "file": "michael-4695c1dab0efb469.mp3",
+      "seconds": 1.1,
+      "bytes": 9720,
+      "sha256": "4695c1dab0efb469b73b6f5679defd20a40dabf2c6bd84c3715251d44297c41a",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "check in",
+      "file": "michael-7cd5c1ceb6afaf15.mp3",
+      "seconds": 0.7,
+      "bytes": 6168,
+      "sha256": "7cd5c1ceb6afaf15a4a4476cde8da1003eebf16ce5799e295d1282cab18491a7",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "breakfast",
+      "file": "michael-db451fcc53cbe8be.mp3",
+      "seconds": 0.725,
+      "bytes": 7152,
+      "sha256": "db451fcc53cbe8be685acff5fa594d6f2cb44ea08ef8d07e503aaffa651688e0",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "pay by card",
+      "file": "michael-d017833eed38cb5f.mp3",
+      "seconds": 1.125,
+      "bytes": 10080,
+      "sha256": "d017833eed38cb5f7a898c82d5ec0899062223d70fe7e2c443cff7edc57aaed2",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "receipt",
+      "file": "michael-0e23fe4f4e2b060b.mp3",
+      "seconds": 0.7,
+      "bytes": 6432,
+      "sha256": "0e23fe4f4e2b060bc741591f2509a02a82961b876dbb8279368ac504689bb1e7",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "What would you like to order?",
+      "file": "michael-1390aaa38c435ed3.mp3",
+      "seconds": 1.775,
+      "bytes": 15312,
+      "sha256": "1390aaa38c435ed3a233463b97d400b21cc001696b0cd7330699b5ffe108ae72",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "I’m learning English.",
+      "file": "michael-d17cc7ca294b45bf.mp3",
+      "seconds": 1.55,
+      "bytes": 12936,
+      "sha256": "d17cc7ca294b45bf7f87d9501d39acc6c6da6f9f489ac80c96e37657695318bb",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "I have a reservation.",
+      "file": "michael-ee023f0f8a723f8d.mp3",
+      "seconds": 1.7,
+      "bytes": 13584,
+      "sha256": "ee023f0f8a723f8da3dd5eeb9faca5648cb6040b0001b3b5d36c5d652ee785e3",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "You did it!",
+      "file": "michael-971bba57c7eda707.mp3",
+      "seconds": 1.075,
+      "bytes": 9048,
+      "sha256": "971bba57c7eda7075d29633755b581c47f39a8ae1e81880824bd00b592ef035b",
+      "decoded": true,
+      "clipping": false
+    },
+    {
+      "text": "Where would you like to go?",
+      "file": "michael-33e147101dbbcff7.mp3",
+      "seconds": 1.75,
+      "bytes": 14736,
+      "sha256": "33e147101dbbcff77d0b9fa5423f98cd4463da85da750b8008874db526fc586e",
+      "decoded": true,
+      "clipping": false
+    }
+  ],
+  "count": 30,
+  "total_bytes": 399816
+}

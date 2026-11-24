@@ -1,5 +1,12 @@
 THIRD-PARTY COMPONENTS
 
+GOша prerecorded audio: synthesized locally with Kokoro-82M v1.0,
+voice am_michael (American English), selected by the site owner on 2026-11-25.
+Model: https://huggingface.co/hexgrad/Kokoro-82M (Apache-2.0).
+Generator: https://github.com/thewh1teagle/kokoro-onnx (MIT), version0.6.1.
+The model and generator dependencies are not distributed or run by the website.
+Only the generated MP3 recordings are served. See AUDIO.txt for reproduction.
+
 Golos Text: font files for weights 400/500, subset used by the approved
 prototype. SIL Open Font License 1.1; full notice in licenses/golos-text-OFL.txt
 and the stylesheet. Source project: https://github.com/googlefonts/golos-text

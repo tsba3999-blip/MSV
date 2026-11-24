@@ -1,0 +1,13 @@
+{
+  "success": true,
+  "checks": [
+    "30 MP3 hashes/MIME, full/partial/suffix/invalid/HEAD audio responses; other static files and guest guard unchanged",
+    "Stalled audio times out with retry; no stale playback after cancellation",
+    "390px: lazy audio, capabilities, dictionary, lessons, one player, rapid repeat, pause/navigation/end/hidden/pagehide, 503/404 recovery; no system voice",
+    "All 30 files decoded by real Chromium audio engine",
+    "1366px: lazy audio, capabilities, dictionary, lessons, one player, rapid repeat, pause/navigation/end/hidden/pagehide, 503/404 recovery; no system voice",
+    "Old HTML/new script during rollout refreshes safely"
+  ],
+  "errors": [],
+  "scope": "Real Chrome desktop and mobile emulation; not a physical phone"
+}

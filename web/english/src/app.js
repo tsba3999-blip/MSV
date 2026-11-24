@@ -18,6 +18,11 @@
   const cabinet={admin:'/cabinet-admin.html',moderator:'/staff-shahmatka.html',staff:'/cabinet-staff.html'};
   root.querySelector('#goe-cabinet').href=cabinet[me.role]||'/menu.html';
   const lessonData=JSON.parse(document.getElementById('goe-lesson-data').textContent);
+  const audioData=document.getElementById('goe-audio-data');
+  if(!audioData){location.reload();return;}
+  const audioFiles=JSON.parse(audioData.textContent).files;
+  const audio=new Audio();
+  audio.preload='none';
   const topics={
     travel:{label:'Travel',title:'В путь с английским',short:'В путешествии',ru:'Путешествия',desc:'Поездки, кафе и новые знакомства',color:'var(--goe-peach)',icon:'plane'},
     hotel:{label:'Hotel',title:'Заселяемся<br>в отель',short:'В отеле',ru:'Гостиница и гости',desc:'Бронирование, заселение и сервис',color:'var(--goe-mint)',icon:'key-round'},
@@ -40,7 +45,7 @@
     {question:'Что означает receipt?',options:['Бронирование','Чек','Завтрак'],answer:1,note:'Receipt — чек. Фраза Do you need a receipt? означает «Вам нужен чек?».'}
   ];
   const state={screen:'welcome',name:String(me.name||'Участник').trim().split(/\s+/).slice(0,2).pop(),level:'A1',topic:'hotel',period:'week',goal:3,animations:true,modal:null,lessonIndex:0,translation:false,hint:false,answerOpen:false,feedback:null,paused:false,compact:false,speaking:false,completed:false,sessionCount:2,xpValue:120,missionAwarded:false,lastMissionBonus:0,lessonFinished:false,history:[],quizIndex:0,quizChoice:null,quizFeedback:false,quizScore:0,quizDone:false};
-  let speechToken=0,toastTimer,modalFocusTimer;
+  let speechToken=0,speechTimer,toastTimer,modalFocusTimer;
   let motionContext=null,renderSnapshot=null,modalOrigin=null;
   const reducedMotion=typeof window.matchMedia==='function'?window.matchMedia('(prefers-reduced-motion: reduce)'):{matches:false};
   const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -285,19 +290,31 @@
   }
   function announce(message){root.querySelector('#goe-announcement').textContent=message;}
   function toast(message){clearTimeout(toastTimer);root.querySelector('.goe-toast')?.remove();const n=document.createElement('div');n.className='goe-toast';n.setAttribute('role','status');n.textContent=message;shell.appendChild(n);toastTimer=setTimeout(()=>n.remove(),3300);}
-  function cancelSpeech(){speechToken++;state.speaking=false;if('speechSynthesis' in window)window.speechSynthesis.cancel();}
+  function cancelSpeech(){
+    speechToken++;state.speaking=false;clearTimeout(speechTimer);
+    audio.onplaying=audio.onended=audio.onerror=audio.onwaiting=null;
+    audio.pause();audio.removeAttribute('src');audio.load();
+  }
   function navigate(screen){cancelSpeech();state.screen=screen;state.modal=null;modalOrigin=null;if(screen!=='lesson')state.paused=false;render();}
   function startLesson(restart=false){cancelSpeech();state.modal=null;modalOrigin=null;state.screen='lesson';if(restart||state.lessonIndex>=lessonData[state.topic].length||state.lessonFinished)state.lessonIndex=0;state.lessonFinished=false;state.answerOpen=false;state.feedback=null;state.translation=false;state.hint=false;state.paused=false;render();}
   function openModal(value,trigger){cancelSpeech();modalOrigin=trigger?{...trigger.dataset}:null;state.modal=value;render();}
   function closeModal(){cancelSpeech();const origin=modalOrigin;modalOrigin=null;state.modal=null;render({focusDataset:origin});}
   function speak(text,showState=false){
-    if(!('speechSynthesis' in window)||typeof SpeechSynthesisUtterance==='undefined'){toast('Озвучка недоступна в этом просмотре. Фраза остаётся на экране.');return;}
-    cancelSpeech();const token=speechToken;const u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=.78;
-    const voice=window.speechSynthesis.getVoices().find(v=>v.lang==='en-US')||window.speechSynthesis.getVoices().find(v=>v.lang.startsWith('en'));if(voice)u.voice=voice;
-    u.onstart=()=>{if(token!==speechToken)return;if(showState){state.speaking=true;render();}};
-    u.onend=()=>{if(token!==speechToken)return;if(showState){state.speaking=false;render();}};
-    u.onerror=()=>{if(token!==speechToken)return;state.speaking=false;if(showState)render();toast('Озвучка недоступна в этом просмотре. Можно прочитать фразу.');};
-    window.speechSynthesis.speak(u);
+    cancelSpeech();const token=speechToken;
+    function finish(failed=false){
+      if(token!==speechToken)return;
+      cancelSpeech();if(showState)render();
+      if(failed)toast('Не удалось воспроизвести запись. Попробуй ещё раз. Фраза остаётся на экране.');
+    }
+    const file=audioFiles[text];
+    if(!file){finish(true);return;}
+    audio.onplaying=()=>{if(token!==speechToken)return;clearTimeout(speechTimer);if(showState){state.speaking=true;render();}};
+    audio.onended=()=>finish();
+    audio.onerror=()=>finish(true);
+    audio.onwaiting=()=>{clearTimeout(speechTimer);speechTimer=setTimeout(()=>finish(true),15000);};
+    audio.src=new URL('assets/audio/'+file,document.baseURI).href;
+    audio.onwaiting();
+    audio.play().catch(()=>finish(true));
   }
   root.addEventListener('click',event=>{
     if(event.target.dataset.backdrop){closeModal();return;}
@@ -365,7 +382,7 @@
   });
   addEventListener('pageshow',event=>{if(event.persisted)location.reload();});
   document.addEventListener('visibilitychange',async()=>{
-    if(document.hidden){root.hidden=true;cancelSpeech();return;}
+    if(document.hidden){const wasSpeaking=state.speaking;cancelSpeech();if(wasSpeaking)render({skipMotion:true});root.hidden=true;return;}
     try{const current=await session();if(!current)return;if(current.id!==me.id||current.role!==me.role){location.reload();return;}root.hidden=false;}
     catch{root.hidden=false;unavailable();}
   });
