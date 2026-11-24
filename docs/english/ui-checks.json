@@ -1,0 +1,11 @@
+{
+  "checks": [
+    "resident: English last; other menu markup/SVG unchanged",
+    "admin: English last; other menu markup/SVG unchanged",
+    "moderator: English last; other menu markup/SVG unchanged",
+    "staff: English last; other menu markup/SVG unchanged",
+    "390px: GOша tile fits; T24 third, exact caption, favorite and full photo; old cards unchanged",
+    "1366px: GOша tile fits; T24 third, exact caption, favorite and full photo; old cards unchanged"
+  ],
+  "errors": []
+}

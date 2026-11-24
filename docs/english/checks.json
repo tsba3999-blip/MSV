@@ -1,0 +1,15 @@
+{
+  "scope": "Local production entry point with synthetic sessions/database, real Chromium",
+  "checks": [
+    "Original fonts, atlas, vendors, licenses and design CSS unchanged; GOша spelling",
+    "Server blocks guests/invalid/disabled/revoked sessions and encoded paths; GET/HEAD all four roles",
+    "390px: six capability demos, modal Escape, mascot labels",
+    "390px: hint, translation, pause, compact, correction/retry, completion and one-time mission",
+    "390px: quiz, escaped name, animations off, no storage/mutations, reset and logout",
+    "1366px: six capability demos, modal Escape, mascot labels",
+    "1366px: hint, translation, pause, compact, correction/retry, completion and one-time mission",
+    "1366px: quiz, escaped name, animations off, no storage/mutations, reset and logout",
+    "Return link uses the corresponding account role"
+  ],
+  "errors": []
+}

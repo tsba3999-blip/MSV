@@ -1,0 +1,22 @@
+{
+  "server/lib/private-pages.js": {
+    "before": "c2942c18f42844841a20d7d6f9392faaad260f2c3c27430cf8ab06ff226ee5c8",
+    "after": "6a5ee1fe0d38cf1e514ef477657642c2f27c5dae20b6ef94ca952e22b155545c"
+  },
+  "server/index.js": {
+    "before": "02b7a994f744531547c438786ad189aedecbee1aa397d1d04fa8801fb9b01c06",
+    "after": "7c7f566428e291f072b4d4fb37d669eff585f650da4aeb41879d47a07d35b9bf"
+  },
+  "web/mark.js": {
+    "before": "63248a7d4834d83a34892c64f27c8deb796ce7da3c8ce079bb93eb0b6624d5b9",
+    "after": "d902b87314b251a4fec46f0a08077c3f3b12a896fb1da8855de66da347dc93c0"
+  },
+  "web/cabinet-resident.html": {
+    "before": "3451f261ddf50373c222dc704d4ea289675ff3bd21e5e050760845391841a9a3",
+    "after": "b91848bbe987c7a2a92b7209caacd97a900ba42e0aecdddca608176cfc87992e"
+  },
+  "web/residences-selection.js": {
+    "before": "18b09863a6a015fd4562deb39f63c54b5cbb96f41e98d31a9370f75dfc73ef13",
+    "after": "e3da6b9e3e893ab112c7f2bbf78cf23fa4b00806de26a9bd448cbf4644227d6e"
+  }
+}

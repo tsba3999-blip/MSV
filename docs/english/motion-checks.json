@@ -1,0 +1,11 @@
+{
+  "checks": [
+    "Real GSAP welcome completes visibly",
+    "Browser speech control stops on pause; no microphone request",
+    "Live reduced-motion change disables motion",
+    "Approved welcome size, font, colors, radius and atlas match reference",
+    "History restore reloads session; hidden old page cannot expose profile",
+    "Session failure shows retry without demo/profile"
+  ],
+  "errors": []
+}

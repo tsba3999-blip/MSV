@@ -1,0 +1,17 @@
+THIRD-PARTY COMPONENTS
+
+Golos Text: font files for weights 400/500, subset used by the approved
+prototype. SIL Open Font License 1.1; full notice in licenses/golos-text-OFL.txt
+and the stylesheet. Source project: https://github.com/googlefonts/golos-text
+
+GSAP 3.15.1: preserved unmodified distribution, including its copyright
+and license header. Source: https://cdn.jsdelivr.net/npm/gsap@3.15.1/dist/gsap.min.js
+License terms referenced by the distributor: https://gsap.com/standard-license/
+
+Lucide 0.468.0: preserved distribution, ISC license.
+Source: https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js
+License copy: licenses/lucide-LICENSE.txt
+Project: https://github.com/lucide-icons/lucide
+
+Goша atlas: the same approved generated illustration used by this chat's
+prototype; exported without redrawing or changing its six poses.

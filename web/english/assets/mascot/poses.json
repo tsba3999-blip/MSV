@@ -1,0 +1,34 @@
+{
+  "atlas": "gosha-atlas.webp",
+  "width": 1536,
+  "height": 1024,
+  "columns": 3,
+  "rows": 2,
+  "cell": 512,
+  "positions": {
+    "hello": [
+      0,
+      0
+    ],
+    "listen": [
+      1,
+      0
+    ],
+    "explain": [
+      2,
+      0
+    ],
+    "success": [
+      0,
+      1
+    ],
+    "curious": [
+      1,
+      1
+    ],
+    "rest": [
+      2,
+      1
+    ]
+  }
+}

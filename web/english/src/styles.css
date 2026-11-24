@@ -1,0 +1,385 @@
+
+/*
+Golos Text — SIL Open Font License
+Copyright 2019 The Golos Text Project Authors (https://github.com/googlefonts/golos-text)
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+This license is copied below, and is also available with a FAQ at:
+https://scripts.sil.org/OFL
+
+
+-----------------------------------------------------------
+SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+-----------------------------------------------------------
+
+PREAMBLE
+The goals of the Open Font License (OFL) are to stimulate worldwide
+development of collaborative font projects, to support the font creation
+efforts of academic and linguistic communities, and to provide a free and
+open framework in which fonts may be shared and improved in partnership
+with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and
+redistributed freely as long as they are not sold by themselves. The
+fonts, including any derivative works, can be bundled, embedded, 
+redistributed and/or sold with any software provided that any reserved
+names are not used by derivative works. The fonts and derivatives,
+however, cannot be released under any other type of license. The
+requirement for fonts to remain under this license does not apply
+to any document created using the fonts or their derivatives.
+
+DEFINITIONS
+"Font Software" refers to the set of files released by the Copyright
+Holder(s) under this license and clearly marked as such. This may
+include source files, build scripts and documentation.
+
+"Reserved Font Name" refers to any names specified as such after the
+copyright statement(s).
+
+"Original Version" refers to the collection of Font Software components as
+distributed by the Copyright Holder(s).
+
+"Modified Version" refers to any derivative made by adding to, deleting,
+or substituting -- in part or in whole -- any of the components of the
+Original Version, by changing formats or by porting the Font Software to a
+new environment.
+
+"Author" refers to any designer, engineer, programmer, technical
+writer or other person who contributed to the Font Software.
+
+PERMISSION & CONDITIONS
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of the Font Software, to use, study, copy, merge, embed, modify,
+redistribute, and sell modified and unmodified copies of the Font
+Software, subject to the following conditions:
+
+1) Neither the Font Software nor any of its individual components,
+in Original or Modified Versions, may be sold by itself.
+
+2) Original or Modified Versions of the Font Software may be bundled,
+redistributed and/or sold with any software, provided that each copy
+contains the above copyright notice and this license. These can be
+included either as stand-alone text files, human-readable headers or
+in the appropriate machine-readable metadata fields within text or
+binary files as long as those fields can be easily viewed by the user.
+
+3) No Modified Version of the Font Software may use the Reserved Font
+Name(s) unless explicit written permission is granted by the corresponding
+Copyright Holder. This restriction only applies to the primary font name as
+presented to the users.
+
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font
+Software shall not be used to promote, endorse or advertise any
+Modified Version, except to acknowledge the contribution(s) of the
+Copyright Holder(s) and the Author(s) or with their explicit written
+permission.
+
+5) The Font Software, modified or unmodified, in part or in whole,
+must be distributed entirely under this license, and must not be
+distributed under any other license. The requirement for fonts to
+remain under this license does not apply to any document created
+using the Font Software.
+
+TERMINATION
+This license becomes null and void if any of the above conditions are
+not met.
+
+DISCLAIMER
+THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
+OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE
+COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
+DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
+OTHER DEALINGS IN THE FONT SOFTWARE.
+
+*/
+@font-face{font-family:'Goe Golos Text';font-style:normal;font-weight:400;font-display:block;src:url(../assets/fonts/golos-text-400.woff2) format('woff2');}
+@font-face{font-family:'Goe Golos Text';font-style:normal;font-weight:500;font-display:block;src:url(../assets/fonts/golos-text-500.woff2) format('woff2');}
+#goe-prototype-states{--goe-ink:#34313f;--goe-sub:#686575;--goe-violet:#7851d1;--goe-violet-deep:#6541ba;--goe-line:#e8e4ee;--goe-mint:#e4f5ec;--goe-teal:#168b7c;--goe-blue:#e5f2fc;--goe-peach:#fce9e2;--goe-rose:#f8e8f1;--goe-lilac:#f0eafb;--goe-cream:#fff6e6;--goe-atlas:url('../assets/mascot/gosha-atlas.webp');font-family:'Goe Golos Text','Segoe UI',system-ui,sans-serif;font-synthesis:none;color:var(--goe-ink);font-size:15px;font-weight:400;line-height:1.5;background:transparent;width:100%;padding:4px 0 12px;color-scheme:light}
+#goe-prototype-states *{box-sizing:border-box}
+#goe-prototype-states button,#goe-prototype-states input,#goe-prototype-states select{font:inherit;color:inherit}
+#goe-prototype-states button{border:0;background:none;touch-action:manipulation}
+#goe-prototype-states button:disabled{opacity:.46}
+#goe-prototype-states button:focus-visible,#goe-prototype-states input:focus-visible,#goe-prototype-states select:focus-visible{outline:3px solid #9981d8;outline-offset:3px}
+#goe-prototype-states button svg{pointer-events:none}
+#goe-prototype-states .goe-shell{width:min(100%,420px);margin:0 auto;background:#fffefd;border:1px solid #e1daee;border-radius:30px;position:relative;overflow:hidden}
+#goe-prototype-states .goe-status{display:flex;align-items:center;justify-content:space-between;padding:18px 24px 5px;font-size:13px;font-weight:500;letter-spacing:.01em}
+#goe-prototype-states .goe-status-icons{display:flex;align-items:center;gap:5px}
+#goe-prototype-states .goe-status-icons svg{width:15px;height:15px;stroke-width:1.8}
+#goe-prototype-states .goe-header{display:flex;justify-content:space-between;align-items:center;min-height:64px;padding:8px 22px 14px;gap:10px}
+#goe-prototype-states .goe-brand{font-size:24px;font-weight:500;letter-spacing:-1px;white-space:nowrap}
+#goe-prototype-states .goe-avatar{height:42px;min-width:42px;border-radius:50%;background:#eae2fc;font-size:14px;font-weight:500}
+#goe-prototype-states .goe-quiet-tag{font-size:11px;color:var(--goe-sub);letter-spacing:.03em;padding:5px 10px;background:#f5f2f8;border-radius:20px}
+#goe-prototype-states .goe-content{padding:0 20px 20px;min-height:608px}
+#goe-prototype-states h1,#goe-prototype-states h2,#goe-prototype-states h3,#goe-prototype-states p{margin:0}
+#goe-prototype-states h1{font-size:30px;font-weight:400;line-height:1.2;letter-spacing:-1.05px;margin:10px 0 17px}
+#goe-prototype-states h2{font-size:21px;font-weight:400;line-height:1.3;letter-spacing:-.55px}
+#goe-prototype-states h3{font-size:16px;font-weight:500;line-height:1.4;letter-spacing:-.2px}
+#goe-prototype-states .goe-muted{color:var(--goe-sub);font-size:13px}
+#goe-prototype-states .goe-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+#goe-prototype-states .goe-icon{width:21px;height:21px;stroke-width:1.65;flex-shrink:0;display:inline-block;vertical-align:middle}
+#goe-prototype-states .goe-icon-button{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;border-radius:14px}
+#goe-prototype-states .goe-primary{width:100%;min-height:48px;padding:11px 16px;border-radius:15px;background:linear-gradient(110deg,#8b63d7,#7046c9);color:#fff;font-weight:500;display:flex;align-items:center;justify-content:center;gap:10px;transition:filter .15s,transform .15s}
+#goe-prototype-states .goe-primary:hover{filter:brightness(1.045)}
+#goe-prototype-states .goe-primary:active{transform:translateY(1px)}
+#goe-prototype-states .goe-primary .goe-icon{width:21px;height:21px}
+#goe-prototype-states .goe-secondary{min-height:44px;border:1px solid var(--goe-line);border-radius:14px;padding:9px 13px;display:inline-flex;justify-content:center;align-items:center;gap:8px;background:#fff}
+#goe-prototype-states .goe-link{font-size:13px;color:var(--goe-violet-deep);padding:8px 0;display:inline-flex;align-items:center;gap:4px;min-height:40px}
+#goe-prototype-states .goe-link .goe-icon{width:15px;height:15px}
+#goe-prototype-states .goe-level{padding:7px 12px;min-height:40px;border-radius:23px;background:#f6f4fb;border:1px solid #ded7ed;display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:500}
+#goe-prototype-states .goe-level .goe-icon{width:16px;height:16px}
+#goe-prototype-states .goe-topics{display:flex;justify-content:space-between;gap:5px;margin:14px 0 17px}
+#goe-prototype-states .goe-topic{border-radius:23px;padding:9px 10px;font-size:12px;min-height:40px;white-space:nowrap;border:1.5px solid transparent;display:inline-flex;align-items:center;gap:4px}
+#goe-prototype-states .goe-topic .goe-icon{width:13px;height:13px}
+#goe-prototype-states .goe-topic[data-topic=travel]{background:var(--goe-peach)}
+#goe-prototype-states .goe-topic[data-topic=hotel]{background:var(--goe-mint)}
+#goe-prototype-states .goe-topic[data-topic=ai]{background:var(--goe-blue)}
+#goe-prototype-states .goe-topic[data-topic=university]{background:var(--goe-lilac)}
+#goe-prototype-states .goe-topic[data-topic=work]{background:var(--goe-rose)}
+#goe-prototype-states .goe-topic[aria-pressed=true]{border-color:var(--goe-teal);color:#126d63;font-weight:500}
+#goe-prototype-states .goe-hero{border-radius:19px;position:relative;padding:20px 17px 16px;min-height:226px;background:radial-gradient(ellipse at 90% 0,#fff6da 0,transparent 56%),linear-gradient(140deg,#e5f8ee,#d9f2f7 62%,#d8edff);overflow:hidden}
+#goe-prototype-states .goe-hero-copy{position:relative;z-index:1;max-width:65%;min-height:143px}
+#goe-prototype-states .goe-eyebrow{font-size:13px;font-weight:500;margin-bottom:12px}
+#goe-prototype-states .goe-hero h2{font-size:26px;line-height:1.15;letter-spacing:-.8px;margin-bottom:9px}
+#goe-prototype-states .goe-hero .goe-meta{font-size:11px;line-height:1.5;max-width:190px}
+#goe-prototype-states .goe-hero .goe-mascot{width:172px;position:absolute;right:-15px;top:-2px}
+#goe-prototype-states .goe-hero .goe-primary{position:relative;z-index:2;justify-content:space-between}
+#goe-prototype-states .goe-hero .goe-primary span{flex:1;text-align:center}
+#goe-prototype-states .goe-mascot{aspect-ratio:1;width:180px;background-image:var(--goe-atlas);background-size:300% 200%;background-repeat:no-repeat;flex-shrink:0;transform-origin:50% 72%;position:relative}
+#goe-prototype-states .goe-pose-hello{background-position:0 0}
+#goe-prototype-states .goe-pose-listen{background-position:50% 0}
+#goe-prototype-states .goe-pose-explain{background-position:100% 0}
+#goe-prototype-states .goe-pose-success{background-position:0 100%}
+#goe-prototype-states .goe-pose-curious{background-position:50% 100%}
+#goe-prototype-states .goe-pose-rest{background-position:100% 100%}
+#goe-prototype-states .goe-motion .goe-float{animation:goe-breathe 5s ease-in-out infinite}
+#goe-prototype-states .goe-motion .goe-wave{animation:goe-wave 1.35s ease-in-out 2}
+#goe-prototype-states .goe-motion .goe-nod{animation:goe-nod 2.8s ease-in-out infinite}
+#goe-prototype-states .goe-motion .goe-cheer{animation:goe-cheer .8s ease-in-out 2}
+@keyframes goe-breathe{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-5px) rotate(1deg)}}
+@keyframes goe-wave{0%,100%{transform:rotate(0)}30%{transform:rotate(-5deg)}65%{transform:rotate(4deg)}}
+@keyframes goe-nod{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(2deg) translateY(3px)}}
+@keyframes goe-cheer{0%,100%{transform:translateY(0) scale(1)}45%{transform:translateY(-13px) scale(1.035)}}
+#goe-prototype-states .goe-week{background:var(--goe-cream);border-radius:17px;padding:15px 16px;margin-top:12px}
+#goe-prototype-states .goe-week h2{font-size:21px}
+#goe-prototype-states .goe-week .goe-row{flex-wrap:wrap}
+#goe-prototype-states .goe-session-marks{display:flex;align-items:center;gap:4px}
+#goe-prototype-states .goe-session-mark{width:27px;height:27px;border:1.5px solid #9cbcb8;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff}
+#goe-prototype-states .goe-session-mark.goe-done{background:var(--goe-teal);border-color:transparent}
+#goe-prototype-states .goe-session-mark svg{width:17px;height:17px}
+#goe-prototype-states .goe-session-connector{width:10px;height:2px;background:#8abbb2}
+#goe-prototype-states .goe-week-footer{border-top:1px solid #eee6d7;margin-top:11px;padding-top:9px;font-size:12px;color:var(--goe-sub);display:flex;align-items:center;justify-content:space-between;gap:5px}
+#goe-prototype-states .goe-week-footer button{min-height:30px;color:#476b65;padding:3px 0}
+#goe-prototype-states .goe-shortcuts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:13px}
+#goe-prototype-states .goe-shortcut{padding:12px 4px 10px;border-radius:17px;display:flex;flex-direction:column;align-items:center;gap:6px;min-height:78px;font-size:12px}
+#goe-prototype-states .goe-shortcut:nth-child(1){background:var(--goe-mint)}
+#goe-prototype-states .goe-shortcut:nth-child(2){background:var(--goe-blue)}
+#goe-prototype-states .goe-shortcut:nth-child(3){background:var(--goe-peach)}
+#goe-prototype-states .goe-shortcut svg{width:26px;height:26px}
+#goe-prototype-states .goe-nav{display:grid;grid-template-columns:repeat(5,1fr);align-items:end;padding:7px 9px 13px;border-top:1px solid var(--goe-line);background:#fffefd}
+#goe-prototype-states .goe-nav button{padding:6px 0 0;min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;font-size:10px;line-height:1.3}
+#goe-prototype-states .goe-nav button[aria-current=page]{color:var(--goe-violet-deep);font-weight:500}
+#goe-prototype-states .goe-nav svg{width:22px;height:22px}
+#goe-prototype-states .goe-nav-mascot{height:48px;width:48px;border-radius:50%;background:#ebe2fb;margin-top:-22px;position:relative}
+#goe-prototype-states .goe-nav-mascot .goe-mascot{position:absolute;width:51px;left:-1px;top:-2px}
+#goe-prototype-states .goe-welcome{padding:0 25px 26px;text-align:center;min-height:650px;display:flex;flex-direction:column;align-items:stretch}
+#goe-prototype-states .goe-welcome-art{height:252px;display:grid;place-items:center;position:relative;margin:0 -25px 13px;background:radial-gradient(ellipse at 24% 33%,#e0f5eb 0,transparent 57%),radial-gradient(ellipse at 85% 55%,#fae8f0 0,transparent 57%),radial-gradient(ellipse at 50% 80%,#e9e8fd 0,transparent 60%)}
+#goe-prototype-states .goe-welcome-art .goe-mascot{width:238px}
+#goe-prototype-states .goe-welcome h1{font-size:31px;font-weight:400;margin:6px 0 5px;letter-spacing:-.65px;overflow-wrap:anywhere}
+#goe-prototype-states .goe-welcome .goe-intro-name{font-size:26px;font-weight:400;letter-spacing:-.4px;margin-bottom:16px}
+#goe-prototype-states .goe-welcome .goe-intro-copy{font-size:15px;color:#666171;line-height:1.65;max-width:295px;margin:0 auto 25px}
+#goe-prototype-states .goe-welcome .goe-primary{margin-top:9px}
+#goe-prototype-states .goe-welcome .goe-secondary{margin-top:10px;background:var(--goe-cream);border-color:transparent}
+#goe-prototype-states .goe-intro-foot{margin-top:auto;padding-top:23px;font-size:12px;color:var(--goe-sub)}
+#goe-prototype-states .goe-backbar{display:flex;align-items:center;gap:8px;padding:1px 16px 6px;color:var(--goe-sub);font-size:13px}
+#goe-prototype-states .goe-about-title{display:flex;align-items:center;gap:6px;margin-bottom:14px}
+#goe-prototype-states .goe-about-title .goe-mascot{width:110px;margin:-12px -7px -9px auto}
+#goe-prototype-states .goe-about-title h1{margin:6px 0 8px}
+#goe-prototype-states .goe-capabilities{display:grid;gap:10px;margin:10px 0 21px}
+#goe-prototype-states .goe-capability{display:flex;gap:12px;align-items:center;padding:8px 0;width:100%;text-align:left;background:transparent;border:0;color:var(--goe-ink);font:inherit}
+#goe-prototype-states .goe-capability-copy{flex:1;min-width:0}
+#goe-prototype-states .goe-capability-title{display:block;font-size:15px;font-weight:500;line-height:1.35}
+#goe-prototype-states .goe-capability-detail{display:block;font-size:12px;color:var(--goe-sub);margin-top:3px;line-height:1.5}
+#goe-prototype-states .goe-capability-chevron{color:var(--goe-sub);flex-shrink:0;width:16px}
+#goe-prototype-states .goe-capability-icon{height:46px;width:46px;border-radius:14px;display:grid;place-items:center;flex-shrink:0;background:var(--goe-mint)}
+#goe-prototype-states .goe-capability:nth-child(2) .goe-capability-icon{background:var(--goe-peach)}
+#goe-prototype-states .goe-capability:nth-child(3) .goe-capability-icon{background:var(--goe-blue)}
+#goe-prototype-states .goe-capability:nth-child(4) .goe-capability-icon{background:var(--goe-rose)}
+#goe-prototype-states .goe-capability:nth-child(5) .goe-capability-icon{background:var(--goe-cream)}
+#goe-prototype-states .goe-capability:nth-child(6) .goe-capability-icon{background:var(--goe-lilac)}
+#goe-prototype-states .goe-capability p{font-size:12px;color:var(--goe-sub);margin-top:3px}
+#goe-prototype-states .goe-goals{display:grid;gap:9px;margin:22px 0}
+#goe-prototype-states .goe-goal{width:100%;display:flex;align-items:center;text-align:left;padding:12px 14px;gap:12px;border:1.5px solid transparent;border-radius:16px;background:var(--goe-mint);min-height:68px}
+#goe-prototype-states .goe-goal[aria-pressed=true]{border-color:var(--goe-teal)}
+#goe-prototype-states .goe-goal-copy{flex:1}
+#goe-prototype-states .goe-goal p{font-size:12px;color:var(--goe-sub)}
+#goe-prototype-states .goe-goal .goe-selected{color:var(--goe-teal)}
+#goe-prototype-states .goe-periods{display:flex;gap:6px;margin-bottom:17px}
+#goe-prototype-states .goe-period{flex:1;min-height:38px;padding:6px 5px;border:1px solid var(--goe-line);border-radius:24px;font-size:13px}
+#goe-prototype-states .goe-period[aria-pressed=true]{background:linear-gradient(110deg,#9865df,#773edd);border-color:transparent;color:#fff}
+#goe-prototype-states .goe-summary{border-radius:17px;background:radial-gradient(ellipse at 90% 12%,#d9faeb,transparent 65%),linear-gradient(135deg,#e2f3fb,#eee5fc);position:relative;padding:17px 18px;min-height:147px;overflow:hidden}
+#goe-prototype-states .goe-summary .goe-mascot{position:absolute;width:172px;right:-6px;bottom:-5px}
+#goe-prototype-states .goe-summary-copy{position:relative;z-index:1;max-width:62%}
+#goe-prototype-states .goe-summary-value{font-size:31px;letter-spacing:-.7px;line-height:1.3;margin:5px 0}
+#goe-prototype-states .goe-xp{display:inline-flex;padding:3px 12px;border-radius:23px;background:#e6d6fa;font-size:13px;font-weight:500;color:#7331b6;margin-top:10px}
+#goe-prototype-states .goe-section-title{margin:20px 0 12px}
+#goe-prototype-states .goe-skills{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#goe-prototype-states .goe-skill{padding:14px 12px 13px;border-radius:16px;background:var(--goe-blue);text-align:left;min-width:0}
+#goe-prototype-states .goe-skill-header{display:flex;gap:9px;align-items:center}
+#goe-prototype-states .goe-skill-header svg{width:25px;height:25px}
+#goe-prototype-states .goe-skill h3{font-size:13px}
+#goe-prototype-states .goe-skill p{font-size:11px;line-height:1.5;margin-top:2px;color:#575365}
+#goe-prototype-states .goe-segments{display:flex;gap:2px;margin-top:13px}
+#goe-prototype-states .goe-segments span{flex:1;height:6px;border-radius:6px;background:var(--skill-color);opacity:.22}
+#goe-prototype-states .goe-segments span.goe-filled{opacity:1}
+#goe-prototype-states .goe-repeat-row{width:100%;text-align:left;display:flex;gap:12px;align-items:center;background:var(--goe-cream);border-radius:16px;padding:13px 15px;margin:13px 0}
+#goe-prototype-states .goe-repeat-row .goe-grow{flex:1}
+#goe-prototype-states .goe-repeat-row p{font-size:12px;color:var(--goe-sub)}
+#goe-prototype-states .goe-celebration{margin-top:17px;background:radial-gradient(ellipse at 60% 0,#fff4dc,transparent 65%),linear-gradient(120deg,#fce3f4,#ffe8dc 54%,#e3d7fa)}
+#goe-prototype-states .goe-celebration .goe-mascot{width:160px;right:0;bottom:-4px}
+#goe-prototype-states .goe-place{display:inline-flex;padding:3px 12px;background:#fbd6cb;border-radius:20px;font-size:13px;font-weight:500;margin-top:8px}
+#goe-prototype-states .goe-ranking{border:1px solid var(--goe-line);border-radius:17px;margin:13px 0;overflow:hidden}
+#goe-prototype-states .goe-rank-row{display:grid;grid-template-columns:24px 30px 1fr auto;gap:10px;align-items:center;padding:10px 13px;border-bottom:1px solid #f0edf4;font-size:13px}
+#goe-prototype-states .goe-rank-row:last-child{border-bottom:0}
+#goe-prototype-states .goe-rank-row.goe-self{background:#e0f5ed;font-weight:500}
+#goe-prototype-states .goe-rank-row.goe-self .goe-rank-number{color:var(--goe-teal)}
+#goe-prototype-states .goe-initial{display:grid;place-items:center;width:29px;height:29px;border-radius:50%;background:var(--goe-lilac)}
+#goe-prototype-states .goe-rank-score{font-variant-numeric:tabular-nums;font-size:12px;white-space:nowrap}
+#goe-prototype-states .goe-mission{padding:15px;background:var(--goe-cream);border-radius:17px}
+#goe-prototype-states .goe-mission h2{font-size:21px;margin:5px 0}
+#goe-prototype-states .goe-reward{font-size:11px;padding:4px 8px;background:#fcdfce;border-radius:20px;white-space:nowrap}
+#goe-prototype-states .goe-track{height:7px;background:#cce7df;border-radius:8px;overflow:hidden;margin-top:10px}
+#goe-prototype-states .goe-track span{height:100%;background:var(--goe-teal);display:block;border-radius:inherit;transition:width .3s}
+#goe-prototype-states .goe-league-bottom{display:flex;flex-direction:column;align-items:stretch;margin-top:8px}
+#goe-prototype-states .goe-league-bottom .goe-link{justify-content:space-between;border-bottom:1px solid var(--goe-line);padding:10px 1px}
+#goe-prototype-states .goe-voluntary{color:var(--goe-sub);font-size:11px;text-align:center;padding:10px 0 0}
+#goe-prototype-states .goe-lesson-header{display:flex;align-items:center;justify-content:space-between;padding:2px 15px 9px;gap:10px}
+#goe-prototype-states .goe-lesson-header h2{font-size:20px}
+#goe-prototype-states .goe-lesson-count{font-size:13px;min-width:44px;text-align:center}
+#goe-prototype-states .goe-lesson-track{height:5px;border-radius:5px;background:#e5dbf7;margin:0 20px;overflow:hidden}
+#goe-prototype-states .goe-lesson-track span{display:block;height:100%;border-radius:5px;background:#a35bf4;transition:width .35s}
+#goe-prototype-states.goe-gsap .goe-lesson-track span{transition:none}
+#goe-prototype-states .goe-lesson-art{height:246px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at 35% 17%,#dcf6ea,transparent 65%),radial-gradient(ellipse at 82% 35%,#e1f0fc,transparent 70%),radial-gradient(ellipse at 85% 0,#fff5dc,transparent 48%);margin:10px 0 0;position:relative}
+#goe-prototype-states .goe-lesson-art .goe-mascot{width:208px}
+#goe-prototype-states .goe-character-frame{position:relative;display:grid;place-items:center;width:208px;height:208px;flex-shrink:0}
+#goe-prototype-states .goe-character-frame .goe-mascot{width:100%;height:100%}
+#goe-prototype-states .goe-character-frame .goe-pose-ghost{position:absolute;inset:0;pointer-events:none}
+#goe-prototype-states .goe-voice-bars{display:inline-flex;align-items:center;justify-content:center;gap:2px;width:22px;height:16px;flex-shrink:0}
+#goe-prototype-states .goe-voice-bars span{width:3px;height:10px;display:block;border-radius:3px;background:currentColor;transform:scaleY(.4)}
+#goe-prototype-states .goe-voice-bars span:nth-child(2){height:16px}
+#goe-prototype-states .goe-voice-bars span:nth-child(3){height:13px}
+#goe-prototype-states .goe-motion .goe-voice-bars.is-active span{animation:goe-voice-pulse .85s ease-in-out infinite alternate}
+#goe-prototype-states .goe-motion .goe-voice-bars.is-active span:nth-child(2){animation-delay:-.25s}
+#goe-prototype-states .goe-motion .goe-voice-bars.is-active span:nth-child(3){animation-delay:-.45s}
+#goe-prototype-states .goe-motion .goe-voice-bars.is-active span:nth-child(4){animation-delay:-.65s}
+#goe-prototype-states .goe-state-label.goe-thinking{background:var(--goe-cream);color:#7b622d}
+#goe-prototype-states .goe-state-label.goe-resting{background:var(--goe-blue);color:#466a88}
+#goe-prototype-states .goe-retry-actions{display:grid;gap:9px}
+#goe-prototype-states .goe-retry-actions .goe-secondary{margin-top:0}
+@keyframes goe-voice-pulse{from{transform:scaleY(.35)}to{transform:scaleY(1)}}
+#goe-prototype-states .goe-state-label{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:4px 15px;border-radius:20px;background:#daf5ec;color:#157b6d;font-size:13px;font-weight:500;min-height:28px;margin-top:-9px}
+#goe-prototype-states .goe-state-label.goe-warm{background:var(--goe-cream);color:#8e6948}
+#goe-prototype-states .goe-lesson-body{padding:13px 20px 23px;text-align:center}
+#goe-prototype-states .goe-question-label{font-size:13px;color:#625d6c;margin-bottom:9px}
+#goe-prototype-states .goe-question{font-size:31px;line-height:1.19;letter-spacing:-.8px;font-weight:400;margin:0 auto 5px;max-width:350px;min-height:74px;display:flex;align-items:center;justify-content:center}
+#goe-prototype-states .goe-translation{font-size:14px;color:#5e586a;padding:8px 8px 0}
+#goe-prototype-states .goe-hint{font-size:13px;background:var(--goe-cream);text-align:left;padding:12px 14px;border-radius:13px;margin:6px 0 13px;line-height:1.6}
+#goe-prototype-states .goe-lesson-tools{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:11px 0 18px}
+#goe-prototype-states .goe-lesson-tools button:first-child{background:var(--goe-blue);border-color:transparent}
+#goe-prototype-states .goe-lesson-tools button:last-child{background:var(--goe-cream);border-color:transparent}
+#goe-prototype-states .goe-lesson-footer{display:flex;gap:15px;justify-content:center;margin-top:13px}
+#goe-prototype-states .goe-lesson-footer button{font-size:12px;min-width:110px}
+#goe-prototype-states .goe-demo-note{font-size:11px;color:var(--goe-sub);padding-top:15px;text-align:center}
+#goe-prototype-states .goe-response-panel{background:#f7f4fb;border-radius:16px;padding:14px;text-align:left;margin:10px 0 14px}
+#goe-prototype-states .goe-response-panel h3{font-size:14px;margin-bottom:9px}
+#goe-prototype-states .goe-choice{display:block;width:100%;background:#fff;text-align:left;border:1px solid #e6e0ed;border-radius:12px;padding:12px;margin-top:8px;font-size:14px;line-height:1.5}
+#goe-prototype-states .goe-choice:hover{border-color:#ae98db;background:#fcfaff}
+#goe-prototype-states .goe-feedback{background:var(--goe-mint);border-radius:16px;padding:15px;text-align:left;margin:13px 0}
+#goe-prototype-states .goe-feedback.goe-correction{background:var(--goe-cream)}
+#goe-prototype-states .goe-feedback p{font-size:13px;line-height:1.65;margin-top:7px}
+#goe-prototype-states .goe-feedback .goe-correct-phrase{font-size:16px;line-height:1.5;color:#51426e;margin-top:10px}
+#goe-prototype-states .goe-paused{padding:18px;background:var(--goe-cream);border-radius:17px;margin:12px 0 0;text-align:center}
+#goe-prototype-states .goe-paused p{font-size:13px;color:var(--goe-sub);margin:6px 0 15px}
+#goe-prototype-states .goe-compact .goe-lesson-art{height:160px}
+#goe-prototype-states .goe-compact .goe-lesson-art .goe-mascot{width:138px}
+#goe-prototype-states .goe-compact .goe-character-frame{width:138px;height:138px}
+#goe-prototype-states .goe-compact .goe-question{font-size:34px;min-height:115px}
+#goe-prototype-states .goe-compact .goe-primary{min-height:62px;font-size:17px}
+#goe-prototype-states .goe-profile-card{padding:16px;background:#f8f6fb;border-radius:16px;margin:14px 0}
+#goe-prototype-states .goe-field{display:flex;flex-direction:column;gap:7px;margin-bottom:15px;font-size:13px}
+#goe-prototype-states .goe-field:last-child{margin-bottom:0}
+#goe-prototype-states .goe-input{width:100%;min-height:44px;background:#fff;border:1px solid #d9d3e3;border-radius:12px;padding:9px 12px;font-size:16px}
+#goe-prototype-states .goe-toggle{display:flex;align-items:center;gap:11px;font-size:14px;min-height:44px}
+#goe-prototype-states .goe-toggle input{accent-color:#7851d1;width:19px;height:19px;flex-shrink:0}
+#goe-prototype-states .goe-profile-links{display:flex;flex-direction:column;gap:11px;margin-top:20px}
+#goe-prototype-states .goe-scrim{position:absolute;inset:0;background:#2e214526;z-index:5;display:flex;align-items:flex-end;border-radius:inherit}
+#goe-prototype-states .goe-sheet{width:100%;background:#fffefd;border-radius:24px 24px 0 0;padding:19px 22px 27px;box-shadow:0 -10px 40px #30234712}
+#goe-prototype-states .goe-sheet-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}
+#goe-prototype-states .goe-sheet h2{font-size:22px}
+#goe-prototype-states .goe-sheet p{font-size:14px;line-height:1.6;color:#625c6d}
+#goe-prototype-states .goe-sheet .goe-primary{margin-top:20px}
+#goe-prototype-states .goe-capability-stage{display:flex;flex-direction:column;align-items:center;background:radial-gradient(ellipse at 28% 30%,var(--goe-mint),transparent 65%),radial-gradient(ellipse at 85% 45%,var(--goe-lilac),transparent 65%);margin:0 -8px 15px;padding-bottom:10px}
+#goe-prototype-states .goe-capability-stage .goe-character-frame{width:180px;height:180px}
+#goe-prototype-states .goe-capability-stage .goe-state-label{font-size:12px;margin-top:-7px}
+#goe-prototype-states .goe-sheet .goe-capability-quote{font-size:19px;line-height:1.35;font-weight:400;text-align:center;color:var(--goe-ink);margin:0 0 15px}
+#goe-prototype-states .goe-capability-example{padding:14px 16px;border-radius:16px;background:var(--goe-blue)}
+#goe-prototype-states .goe-capability-example p{margin:0}
+#goe-prototype-states .goe-capability-example .goe-example-english{font-size:18px;color:var(--goe-ink);line-height:1.4}
+#goe-prototype-states .goe-capability-example .goe-example-translation{font-size:12px;margin-top:5px;color:var(--goe-sub)}
+#goe-prototype-states .goe-capability-example.goe-example-correction{background:var(--goe-cream)}
+#goe-prototype-states .goe-example-correction s{text-decoration-color:#a89079;color:#796a5a;font-size:14px}
+#goe-prototype-states .goe-example-correction .goe-example-english{display:flex;gap:8px;align-items:center;margin-top:5px}
+#goe-prototype-states .goe-example-correction .goe-example-english .goe-icon{color:var(--goe-teal)}
+#goe-prototype-states .goe-example-audio{margin-top:10px;width:100%}
+#goe-prototype-states .goe-sheet .goe-demo-note{font-size:11px;text-align:center;margin-top:12px;color:var(--goe-sub)}
+#goe-prototype-states .goe-dict-row{display:flex;gap:10px;align-items:center;justify-content:space-between;border-bottom:1px solid #eeeaf3;padding:8px 0}
+#goe-prototype-states .goe-dict-row strong{font-weight:500;font-size:14px}
+#goe-prototype-states .goe-dict-row p{font-size:12px}
+#goe-prototype-states .goe-history-item{background:var(--goe-blue);border-radius:14px;padding:13px;margin-top:10px}
+#goe-prototype-states .goe-history-item:nth-child(2){background:var(--goe-peach)}
+#goe-prototype-states .goe-history-item p{font-size:12px;margin-top:3px}
+#goe-prototype-states .goe-level-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:15px 0}
+#goe-prototype-states .goe-level-option{border:1.5px solid var(--goe-line);border-radius:13px;padding:12px;text-align:left;background:#fff;font-size:16px}
+#goe-prototype-states .goe-level-option[aria-pressed=true]{border-color:#9e82d7;background:var(--goe-lilac)}
+#goe-prototype-states .goe-level-option span{display:block;font-size:11px;color:var(--goe-sub);margin-top:2px}
+#goe-prototype-states .goe-success-art{display:grid;place-items:center;background:radial-gradient(ellipse at center,#fbe6ef,transparent 68%);height:250px}
+#goe-prototype-states .goe-success-art .goe-mascot{width:240px}
+#goe-prototype-states .goe-success-art{position:relative;isolation:isolate}
+#goe-prototype-states .goe-success-art .goe-mascot{z-index:1}
+#goe-prototype-states .goe-celebration-bits{position:absolute;width:250px;height:210px;max-width:100%;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none}
+#goe-prototype-states .goe-celebration-bits span{position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:3px;opacity:0;background:#ba9be9}
+#goe-prototype-states .goe-celebration-bits span:nth-child(2n){background:#95d3bc}
+#goe-prototype-states .goe-celebration-bits span:nth-child(3n){background:#efb6c9;border-radius:50%}
+#goe-prototype-states .goe-success{text-align:center;padding:0 23px 30px;min-height:620px}
+#goe-prototype-states .goe-success h1{font-size:30px;margin:0 0 14px;overflow-wrap:anywhere}
+#goe-prototype-states .goe-success p{color:var(--goe-sub);font-size:14px;line-height:1.7}
+#goe-prototype-states .goe-success-rewards{display:flex;gap:9px;justify-content:center;margin:22px 0}
+#goe-prototype-states .goe-reward-box{background:var(--goe-mint);padding:12px 15px;border-radius:15px;font-size:14px}
+#goe-prototype-states .goe-reward-box:nth-child(2){background:var(--goe-peach)}
+#goe-prototype-states .goe-success .goe-secondary{width:100%;margin-top:10px}
+#goe-prototype-states .goe-quiz-choices{display:flex;flex-direction:column;gap:9px;margin:20px 0}
+#goe-prototype-states .goe-quiz-choices button{border:1px solid var(--goe-line);border-radius:14px;min-height:50px;text-align:left;padding:12px 15px;background:#fff}
+#goe-prototype-states .goe-quiz-choices button[aria-pressed=true]{border-color:#9e82d7;background:var(--goe-lilac)}
+#goe-prototype-states .goe-toast{position:absolute;left:18px;right:18px;bottom:87px;padding:12px 15px;border-radius:13px;color:#fff;background:#46404ef0;font-size:12px;z-index:8;text-align:center;box-shadow:0 4px 20px #0001}
+#goe-prototype-states .goe-visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+#goe-prototype-states .goe-preview-note{font-size:11px;color:#77717e;text-align:center;padding:0 0 9px;letter-spacing:.015em}
+#goe-prototype-states .goe-mini-demo{font-size:10px;background:#ffffff26;padding:2px 6px;border-radius:8px;font-weight:400}
+@media(max-width:370px){#goe-prototype-states .goe-shell{border-radius:23px}#goe-prototype-states .goe-header{padding-left:17px;padding-right:17px}#goe-prototype-states .goe-content{padding:0 15px 17px}#goe-prototype-states h1{font-size:27px}#goe-prototype-states .goe-topic{font-size:11px;padding:8px}#goe-prototype-states .goe-topics{gap:4px}#goe-prototype-states .goe-hero .goe-mascot{width:150px;right:-13px;top:5px}#goe-prototype-states .goe-hero h2{font-size:23px}#goe-prototype-states .goe-hero-copy{max-width:68%}#goe-prototype-states .goe-hero .goe-meta{max-width:165px;font-size:11px}#goe-prototype-states .goe-skill{padding:12px 9px}#goe-prototype-states .goe-skill-header{gap:6px}#goe-prototype-states .goe-skill-header svg{width:19px;height:19px}#goe-prototype-states .goe-skill h3{font-size:12px}#goe-prototype-states .goe-summary .goe-mascot{width:144px;right:-4px}#goe-prototype-states .goe-summary-value{font-size:29px}#goe-prototype-states .goe-lesson-body{padding-left:17px;padding-right:17px}#goe-prototype-states .goe-lesson-footer{gap:9px}#goe-prototype-states .goe-lesson-tools{gap:8px}#goe-prototype-states .goe-lesson-tools button{font-size:13px;padding:9px}#goe-prototype-states .goe-question{font-size:28px}#goe-prototype-states .goe-reward{font-size:11px;padding:4px 7px}#goe-prototype-states .goe-mission h2{font-size:20px}#goe-prototype-states .goe-welcome h1{font-size:31px}#goe-prototype-states .goe-welcome .goe-intro-name{font-size:26px}#goe-prototype-states .goe-link{font-size:12px}#goe-prototype-states .goe-level{font-size:12px;padding:7px 10px}}
+@media(prefers-reduced-motion:reduce){#goe-prototype-states *,#goe-prototype-states *:before,#goe-prototype-states *:after{animation:none!important;transition:none!important}}
+
+
+#goe-prototype-states .goe-welcome-art{isolation:isolate}
+#goe-prototype-states .goe-mascot-trigger{width:238px;height:238px;padding:0;display:grid;place-items:center;position:relative;z-index:2;border-radius:24px;flex-shrink:0}
+#goe-prototype-states .goe-welcome-halo{position:absolute;width:224px;height:210px;border-radius:50%;background:radial-gradient(ellipse,#e5d7fa 0,#e8e2fd99 40%,#dcf6ee00 72%);pointer-events:none;z-index:0}
+#goe-prototype-states .goe-welcome-spark{position:absolute;pointer-events:none;z-index:1;color:#ad83d7}
+#goe-prototype-states .goe-welcome-spark:first-of-type{left:16%;top:24%;color:#60a99e}
+#goe-prototype-states .goe-welcome-spark:nth-of-type(2){right:14%;bottom:23%;color:#c798c7}
+#goe-prototype-states .goe-welcome-spark svg{width:24px;height:24px;stroke-width:1.45}
+#goe-prototype-states.goe-gsap .goe-welcome .goe-mascot{animation:none}
+#goe-prototype-states.goe-gsap .goe-primary{transition:filter .15s}
+#goe-prototype-states.goe-gsap .goe-primary:active{transform:none}
+#goe-prototype-states .goe-mascot-trigger:active{background:transparent}
+#goe-prototype-states .goe-intro-action{display:flex;flex-direction:column}
