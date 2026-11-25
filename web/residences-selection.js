@@ -6,6 +6,15 @@ var wishlist=[];try{wishlist=JSON.parse(localStorage.getItem('msv.residence-wish
 var preview=document.getElementById('preview');
 function update(){preview.querySelectorAll('[data-wish]').forEach(function(b){var on=wishlist.includes(b.dataset.wish);b.setAttribute('aria-pressed',String(on));b.setAttribute('aria-label',(on?'Убрать из вишлиста: ':'Добавить в вишлист: ')+residences.find(r=>r.id===b.dataset.wish).name);});}
 preview.className='v2';preview.innerHTML='<header class="screen-head"><p class="step">МСВ · Регистрация</p><h1>Выбери свою резиденцию</h1><p>Три места для студенческой жизни в Москве. Посмотри фотографии и сохрани понравившееся.</p></header><div class="cards">'+residences.map(function(r){return '<article class="card" data-residence="'+r.id+'"><div class="photo-wrap" data-gallery="'+r.id+'"><button class="photo-open" data-more="'+Math.max(0,MSV_PHOTOS.all(r.id).findIndex(p=>p.src===r.photo))+'" aria-label="Открыть галерею '+r.name+'"><img class="photo" src="'+r.photo+'" alt="'+r.name+' — фотография резиденции"><span class="photo-loupe" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></span></button><button class="wish" data-wish="'+r.id+'" aria-pressed="false"><svg width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg></button></div><div class="content"><div class="identity"><img class="logo" src="'+r.logo+'" alt="Знак '+r.name+'"><div><h2>'+r.name+'</h2><p class="kind">'+r.kind+'</p></div></div><p class="metro">м. '+r.metro+'</p><p class="address"><a class="msv-link" target="_blank" rel="noopener" href="'+maps[r.id]+'">'+r.address+'</a></p><p class="note">'+r.note+'</p><div class="card-bottom"><p class="availability-note" data-availability="'+r.id+'" title="Свободные места на сегодня" aria-live="polite">Уточняем наличие</p><p class="price" data-price="'+r.id+'"></p><div class="actions"><a class="msv-btn learn" href="residence.html?id='+r.id+'">Подробнее</a><a class="msv-btn msv-btn--primary" href="rooms.html?res='+r.id+'">Выбрать</a></div></div></div></article>';}).join('')+'</div>';
+residences.push({id:'t24',name:'Т24'});
+preview.querySelector('.screen-head > p:last-child').textContent='Резиденции для студенческой жизни в Москве. Посмотри фотографии и сохрани понравившееся.';
+preview.querySelector('[data-residence="molod"]').insertAdjacentHTML('beforebegin',
+ '<article class="card card--pending" data-residence="t24"><div class="photo-wrap" data-gallery="t24">' +
+ '<button class="photo-open" data-more="0" aria-label="Открыть фото Т24"><img class="photo" src="photos/t24/cover.png" alt="Т24 — здание" loading="lazy" decoding="async"><span class="photo-loupe" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></span></button>' +
+ '<button class="wish" data-wish="t24" aria-pressed="false"><svg width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg></button>' +
+ '</div><div class="content"><div class="identity"><img class="logo" src="t24-logo-selection.png" alt="Знак Т24"><div><h2>Т24</h2><p class="kind">Премиальная резиденция для студентов в центре Москвы</p></div></div>' +
+ '<p class="note">Комнаты, места и цены пока не добавлены.</p>' +
+ '<div class="actions"><a class="msv-btn learn" href="residence.html?id=t24">Подробнее</a></div></div></article>');
 preview.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;if(b.dataset.wish){wishlist=wishlist.includes(b.dataset.wish)?wishlist.filter(x=>x!==b.dataset.wish):wishlist.concat(b.dataset.wish);try{localStorage.setItem('msv.residence-wishlist',JSON.stringify(wishlist));}catch(e){}update();}});update();
 
 function updatePrices(list){
@@ -26,6 +35,7 @@ async function refreshAvailability(){
   updatePrices(list);
   await Promise.all(residences.map(async function(r){
    var label=preview.querySelector('[data-availability="'+r.id+'"]');
+   if(!label)return;
    try{
     var residence=list.find(function(x){return x.id===r.id;});
     if(!residence||!Array.isArray(residence.beds))throw new Error('Missing beds');
