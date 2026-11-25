@@ -9,19 +9,23 @@ preview.className='v2';preview.innerHTML='<header class="screen-head"><p class="
 residences.push({id:'t24',name:'Т24'});
 preview.querySelector('.screen-head > p:last-child').textContent='Резиденции для студенческой жизни в Москве. Посмотри фотографии и сохрани понравившееся.';
 preview.querySelector('[data-residence="molod"]').insertAdjacentHTML('beforebegin',
- '<article class="card card--pending" data-residence="t24"><div class="photo-wrap" data-gallery="t24">' +
+ '<article class="card" data-residence="t24"><div class="photo-wrap" data-gallery="t24">' +
  '<button class="photo-open" data-more="0" aria-label="Открыть фото Т24"><img class="photo" src="photos/t24/cover.png" alt="Т24 — здание" loading="lazy" decoding="async"><span class="photo-loupe" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></span></button>' +
  '<button class="wish" data-wish="t24" aria-pressed="false"><svg width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg></button>' +
- '</div><div class="content"><div class="identity"><span class="logo t24-logo-frame"><img src="t24-logo-selection.png" alt="Знак Т24"></span><div><h2>Т24</h2><p class="kind">Премиальная резиденция для студентов в центре Москвы</p></div></div>' +
- '<p class="note">Комнаты, места и цены пока не добавлены.</p>' +
- '<div class="actions"><a class="msv-btn learn" href="residence.html?id=t24">Подробнее</a></div></div></article>');
+ '</div><div class="content"><div class="identity"><span class="logo t24-logo-frame"><img src="t24-logo-selection.png" alt="Знак Т24"></span><div><h2>Т24</h2><p class="kind">Премиум-резиденция в центре Москвы (отель 3*)</p></div></div>' +
+ '<p class="metro">м. Маяковская / Чеховская / Пушкинская / Тверская</p>' +
+ '<p class="address"><a class="msv-link" target="_blank" rel="noopener" href="https://yandex.ru/maps/-/CXcxEZLi">Тверская, 24</a></p>' +
+ '<p class="note">1- и 2-местные номера</p>' +
+ '<div class="card-bottom"><p class="availability-note">Свободно 100 мест</p><p class="price">от 90 000 руб. / месяц</p>' +
+ '<div class="actions"><a class="msv-btn learn" href="residence.html?id=t24">Подробнее</a><a class="msv-btn msv-btn--primary" href="residence.html?id=t24">Выбрать</a></div></div></div></article>');
 preview.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;if(b.dataset.wish){wishlist=wishlist.includes(b.dataset.wish)?wishlist.filter(x=>x!==b.dataset.wish):wishlist.concat(b.dataset.wish);try{localStorage.setItem('msv.residence-wishlist',JSON.stringify(wishlist));}catch(e){}update();}});update();
 
 function updatePrices(list){
  residences.forEach(function(r){
  var item=list.find(function(x){return x.id===r.id;});
  var prices=(item&&item.beds||[]).map(function(b){return Number(b.price);}).filter(function(n){return Number.isFinite(n)&&n>0;});
- if(prices.length)preview.querySelector('[data-price="'+r.id+'"]').textContent='от '+Math.round(Math.min.apply(null,prices)).toLocaleString('ru-RU')+' руб. / месяц';
+ var label=preview.querySelector('[data-price="'+r.id+'"]');
+ if(prices.length&&label)label.textContent='от '+Math.round(Math.min.apply(null,prices)).toLocaleString('ru-RU')+' руб. / месяц';
  });
 }
 updatePrices(window.MSV_RESIDENCES||[]);

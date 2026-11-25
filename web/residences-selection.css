@@ -12,9 +12,6 @@ button{cursor:pointer}button:focus-visible,a:focus-visible{outline:2px solid var
 .card-bottom{display:flex;flex-direction:column;margin-top:auto;padding-top:22px}
 .price{margin:12px 0 0;font-size:14px;font-weight:600;min-height:20px}
 @media(max-width:760px){.cards{grid-template-columns:1fr}.selection-page{padding:16px}.screen-head h1{font-size:26px}}
-.v2 .card--pending .content{gap:var(--msv-s24)}
-.v2 .card--pending .identity{margin-bottom:0}
+.v2 .cards{grid-auto-rows:1fr}
 .v2 .t24-logo-frame{display:block;overflow:hidden;background:#000}
 .v2 .t24-logo-frame img{display:block;width:100%;height:100%;object-fit:contain;transform:translate(-7%,-.7%)}
-.v2 .card--pending .logo{object-fit:contain}
-.card--pending .actions{margin-top:0;padding-top:0}
