@@ -1,0 +1,27 @@
+[Unit]
+Description=GO English local speech recognition
+After=network.target
+
+[Service]
+Type=simple
+DynamicUser=yes
+WorkingDirectory=/opt/msv-english-speech
+ExecStart=/opt/msv-english-speech/venv/bin/python /opt/msv-english-speech/transcribe.py
+Environment=PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 HF_HUB_OFFLINE=1 TOKENIZERS_PARALLELISM=false
+Restart=on-failure
+RestartSec=5
+MemoryMax=768M
+CPUQuota=70%
+Nice=10
+TasksMax=32
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+RestrictAddressFamilies=AF_UNIX AF_INET
+IPAddressDeny=any
+IPAddressAllow=localhost
+LimitCORE=0
+
+[Install]
+WantedBy=multi-user.target

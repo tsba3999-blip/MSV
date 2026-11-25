@@ -1,0 +1,11 @@
+{
+  "success": true,
+  "checks": [
+    "API: authentication, same-origin, size/base64 validation, no-store, busy/error recovery and rate limit; microphone allowed only in protected English HTML",
+    "390px: real MediaRecorder, mouse/keyboard/touch, one submit per release, track cleanup, consent delay/denied, blur cancellation, silence/error retry, transcript escaping, example route preserved, no storage/overflow",
+    "20-second automatic stop sends once and releases microphone",
+    "1366px: real MediaRecorder, mouse/keyboard, one submit per release, track cleanup, consent delay/denied, blur cancellation, silence/error retry, transcript escaping, example route preserved, no storage/overflow"
+  ],
+  "errors": [],
+  "scope": "Real Chrome with synthetic microphone and recognition worker; mobile emulation"
+}

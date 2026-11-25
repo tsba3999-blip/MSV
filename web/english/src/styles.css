@@ -126,6 +126,10 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 #goe-prototype-states .goe-primary:hover{filter:brightness(1.045)}
 #goe-prototype-states .goe-primary:active{transform:translateY(1px)}
 #goe-prototype-states .goe-primary .goe-icon{width:21px;height:21px}
+#goe-prototype-states .goe-record{min-height:112px;font-size:46px;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+#goe-prototype-states .goe-record .goe-icon{width:32px;height:32px}
+#goe-prototype-states .goe-recording{background:var(--goe-ink);box-shadow:0 0 0 4px var(--goe-lilac)}
+#goe-prototype-states .goe-record-status{text-align:center;font-size:14px;line-height:1.5;margin:12px 0 24px;min-height:42px}
 #goe-prototype-states .goe-secondary{min-height:44px;border:1px solid var(--goe-line);border-radius:14px;padding:9px 13px;display:inline-flex;justify-content:center;align-items:center;gap:8px;background:#fff}
 #goe-prototype-states .goe-link{font-size:13px;color:var(--goe-violet-deep);padding:8px 0;display:inline-flex;align-items:center;gap:4px;min-height:40px}
 #goe-prototype-states .goe-link .goe-icon{width:15px;height:15px}

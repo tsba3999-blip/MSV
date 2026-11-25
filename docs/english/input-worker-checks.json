@@ -1,0 +1,65 @@
+{
+  "success": true,
+  "checks": [
+    {
+      "case": "actual Chrome WebM, short phrase",
+      "status": 200,
+      "text": "Hello, let's practice.",
+      "errorReturned": false
+    },
+    {
+      "case": "synthetic full WAV",
+      "status": 200,
+      "text": "Hello, let's practice English together. Do you have a reservation? How many nights will you stay? Would you like breakfast? I'll pay by card please. Do you need a receipt? Take your time, you did it.",
+      "errorReturned": false
+    },
+    {
+      "case": "webm libopus",
+      "status": 200,
+      "text": "Hello, let's practice English together. Do you have a reservation? How many nights will you stay? Would you like breakfast? I'll pay by card please. Do you need a receipt? Take your time, you did it.",
+      "errorReturned": false
+    },
+    {
+      "case": "ogg libopus",
+      "status": 200,
+      "text": "Hello, let's practice English together. Do you have a reservation? How many nights will you stay? Would you like breakfast? I'll pay by card please. Do you need a receipt? Take your time, you did it.",
+      "errorReturned": false
+    },
+    {
+      "case": "mp4 aac",
+      "status": 200,
+      "text": "Hello, let's practice English together. Do you have a reservation? How many nights will you stay? Would you like breakfast? I'll pay by card, please. Do you need a receipt? Take your time, you did it.",
+      "errorReturned": false
+    },
+    {
+      "case": "silence",
+      "status": 422,
+      "text": null,
+      "errorReturned": true
+    },
+    {
+      "case": "short",
+      "status": 422,
+      "text": null,
+      "errorReturned": true
+    },
+    {
+      "case": "overlong",
+      "status": 422,
+      "text": null,
+      "errorReturned": true
+    },
+    {
+      "case": "malformed",
+      "status": 422,
+      "text": null,
+      "errorReturned": true
+    },
+    {
+      "case": "unknown format",
+      "status": 422,
+      "text": null,
+      "errorReturned": true
+    }
+  ]
+}

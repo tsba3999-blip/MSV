@@ -20,6 +20,7 @@
   const lessonData=JSON.parse(document.getElementById('goe-lesson-data').textContent);
   const audioData=document.getElementById('goe-audio-data');
   if(!audioData){location.reload();return;}
+  if(!window.GOEVoice){location.reload();return;}
   const audioFiles=JSON.parse(audioData.textContent).files;
   const audio=new Audio();
   audio.preload='none';
@@ -45,6 +46,24 @@
     {question:'Что означает receipt?',options:['Бронирование','Чек','Завтрак'],answer:1,note:'Receipt — чек. Фраза Do you need a receipt? означает «Вам нужен чек?».'}
   ];
   const state={screen:'welcome',name:String(me.name||'Участник').trim().split(/\s+/).slice(0,2).pop(),level:'A1',topic:'hotel',period:'week',goal:3,animations:true,modal:null,lessonIndex:0,translation:false,hint:false,answerOpen:false,feedback:null,paused:false,compact:false,speaking:false,completed:false,sessionCount:2,xpValue:120,missionAwarded:false,lastMissionBonus:0,lessonFinished:false,history:[],quizIndex:0,quizChoice:null,quizFeedback:false,quizScore:0,quizDone:false};
+  Object.assign(state,{voicePhase:'idle',voiceMessage:'',transcript:''});
+  let voicePointer=null,voiceKey=null;
+  const voice=GOEVoice.create({change(phase,message){state.voicePhase=phase;state.voiceMessage=message;syncVoice();},result(text){
+    if(state.screen!=='lesson'||state.paused)return;
+    const step=lessonData[state.topic][state.lessonIndex];
+    const normalized=value=>value.toLowerCase().replace(/[’‘]/g,"'").replace(/[^a-z0-9' ]/g,'').replace(/\s+/g,' ').trim();
+    state.transcript=text;state.answerOpen=false;
+    state.feedback=normalized(text)===normalized(step.good)?'good':normalized(text)===normalized(step.retry)?'retry':'example';
+    render({focusAction:'voice-retry'});announce('Ответ распознан: '+text);
+  }});
+  function syncVoice(){
+    const button=root.querySelector('[data-action="voice-record"]'),status=root.querySelector('#goe-record-status');
+    if(!button||!status)return;
+    button.disabled=state.voicePhase==='processing';
+    button.classList.toggle('goe-recording',state.voicePhase==='recording');
+    button.setAttribute('aria-pressed',String(state.voicePhase==='recording'));
+    status.textContent=state.voiceMessage||({permission:'Разрешите микрофон. Затем удерживайте GO и говорите.',recording:'Слушаю… Отпустите GO, когда закончите.',processing:'Обрабатываю ответ…',idle:'Удерживайте GO и говорите. Отпустите, чтобы отправить.'})[state.voicePhase]||'';
+  }
   let speechToken=0,speechTimer,toastTimer,modalFocusTimer;
   let motionContext=null,renderSnapshot=null,modalOrigin=null;
   const reducedMotion=typeof window.matchMedia==='function'?window.matchMedia('(prefers-reduced-motion: reduce)'):{matches:false};
@@ -64,6 +83,7 @@
   function lessonMood(){
     if(state.paused)return {pose:'rest',mode:'rest',label:'Небольшая пауза',tone:'goe-resting'};
     if(state.feedback==='good')return {pose:'success',mode:'success',label:'Получилось!',tone:''};
+    if(state.feedback==='example')return {pose:'explain',mode:'explain',label:'Разберём ответ',tone:'goe-warm'};
     if(state.feedback==='retry')return {pose:'explain',mode:'explain',label:'Давай разберём',tone:'goe-warm'};
     if(state.speaking)return {pose:'explain',mode:'speaking',label:'GOша говорит',tone:''};
     if(state.answerOpen)return {pose:'listen',mode:'listening',label:'GOша слушает · демо',tone:''};
@@ -115,10 +135,11 @@
     const voiceActive=!state.paused&&!state.feedback&&(state.answerOpen||state.speaking);
     let response='';
     if(state.paused){response=`<div class="goe-paused"><h3>Продолжим, когда будешь готов</h3><p>Мы остановились на этом вопросе.</p>${button(`Продолжить ${icon('play')}`,'pause')}</div>`;}
+    else if(state.feedback&&state.transcript){response=`<div class="goe-feedback" role="status"><h3>Я услышал:</h3><p class="goe-correct-phrase" lang="en">${esc(state.transcript)}</p>${state.feedback==='retry'?`<p>${esc(step.explanation)}</p>`:state.feedback==='good'?'<p>Такая фраза подходит в этом диалоге.</p>':'<p>Сравни свой ответ с примером. Другие формулировки тоже возможны.</p>'}<p>Пример ответа:</p><p class="goe-correct-phrase" lang="en">${esc(step.good)}</p></div><div class="goe-retry-actions">${button(`Ответить ещё раз ${icon('mic')}`,'voice-retry')}${button(`${state.lessonIndex===steps.length-1?'Завершить урок':'Дальше'} ${icon('arrow-right')}`,'next','goe-secondary')}</div>`;}
     else if(state.feedback){response=`<div class="goe-feedback ${state.feedback==='retry'?'goe-correction':''}" role="status"><h3>${state.feedback==='good'?'Отлично, тебя легко понять!':'Смысл понятен. Давай чуть точнее.'}</h3><p>${state.feedback==='good'?'Такая фраза подходит в этом диалоге. Продолжим?':esc(step.explanation)}</p><p class="goe-correct-phrase">${esc(step.good)}</p></div>${state.feedback==='retry'?`<div class="goe-retry-actions">${button(`Попробую ещё раз ${icon('rotate-ccw')}`,'retry-answer')}${button(`${state.lessonIndex===steps.length-1?'Завершить урок':'Продолжить урок'} ${icon('arrow-right')}`,'next','goe-secondary')}</div>`:button(`${state.lessonIndex===steps.length-1?'Завершить урок':'Дальше'} ${icon('arrow-right')}`,'next')}`;}
     else if(state.answerOpen){response=`<div class="goe-response-panel"><h3>Пример твоего ответа</h3><p class="goe-muted">Выбери фразу и посмотри реакцию GOши.</p>${button(esc(step.good),'answer-good','goe-choice')}${button(esc(step.retry),'answer-retry','goe-choice')}</div>${button('Вернуться к вопросу','cancel-answer','goe-link')}`;}
-    else{response=button(`${icon('mic')} Ответить голосом <span class="goe-mini-demo">Демо</span>`,'answer');}
-    return `<div class="${state.compact?'goe-compact':''}"><header class="goe-lesson-header">${button(icon('x'),'home','goe-icon-button','aria-label="Закрыть урок"')}<h2>${topics[state.topic].short}</h2><span class="goe-lesson-count">${state.lessonIndex+1} / ${steps.length}</span></header><div class="goe-lesson-track" role="progressbar" aria-label="Ход урока" aria-valuenow="${state.lessonIndex+1}" aria-valuemin="0" aria-valuemax="${steps.length}"><span style="width:${(state.lessonIndex+1)/steps.length*100}%"></span></div><div class="goe-lesson-art">${characterFrame(mood.pose,mood.mode)}<span class="goe-state-label ${mood.tone}">${voiceActive?voiceBars(true):''}${mood.label}</span></div><main class="goe-lesson-body"><p class="goe-question-label">Ответь на вопрос</p><div class="goe-question" lang="en">${esc(step.prompt)}</div>${state.translation?`<p class="goe-translation">${esc(step.translation)}</p>`:''}${button(`${state.translation?'Скрыть перевод':'Показать перевод'} ${icon('chevron-right')}`,'translate','goe-link')}${state.hint?`<div class="goe-hint">${esc(step.hint)}</div>`:''}<div class="goe-lesson-tools">${button(`${icon('volume-2')} ${state.speaking?'Слушаем…':'Повторить'}`,'speak','goe-secondary',state.paused?'disabled':'')}${button(`${icon('lightbulb')} Подсказка`,'hint','goe-secondary',`aria-pressed="${state.hint}"`)}</div>${response}<div class="goe-lesson-footer">${button(`${icon(state.paused?'play':'pause')} ${state.paused?'Продолжить':'Пауза'}`,'pause','goe-secondary')}${button(`${icon('headphones')} ${state.compact?'Обычный вид':'Крупнее'}`,'compact','goe-secondary',`aria-pressed="${state.compact}"`)}</div><p class="goe-demo-note">Демо диалога · микрофон не включается</p></main></div>`;
+    else{response=button(`${icon('mic')}<span>GO</span>`,'voice-record','goe-primary goe-record','aria-label="Удерживайте GO и говорите. Отпустите, чтобы отправить." aria-describedby="goe-record-status" aria-pressed="false"')+'<p id="goe-record-status" class="goe-record-status" role="status">Удерживайте GO и говорите. Отпустите, чтобы отправить.</p>'+button('Посмотреть пример без микрофона','answer','goe-link');}
+    return `<div class="${state.compact?'goe-compact':''}"><header class="goe-lesson-header">${button(icon('x'),'home','goe-icon-button','aria-label="Закрыть урок"')}<h2>${topics[state.topic].short}</h2><span class="goe-lesson-count">${state.lessonIndex+1} / ${steps.length}</span></header><div class="goe-lesson-track" role="progressbar" aria-label="Ход урока" aria-valuenow="${state.lessonIndex+1}" aria-valuemin="0" aria-valuemax="${steps.length}"><span style="width:${(state.lessonIndex+1)/steps.length*100}%"></span></div><div class="goe-lesson-art">${characterFrame(mood.pose,mood.mode)}<span class="goe-state-label ${mood.tone}">${voiceActive?voiceBars(true):''}${mood.label}</span></div><main class="goe-lesson-body"><p class="goe-question-label">Ответь на вопрос</p><div class="goe-question" lang="en">${esc(step.prompt)}</div>${state.translation?`<p class="goe-translation">${esc(step.translation)}</p>`:''}${button(`${state.translation?'Скрыть перевод':'Показать перевод'} ${icon('chevron-right')}`,'translate','goe-link')}${state.hint?`<div class="goe-hint">${esc(step.hint)}</div>`:''}<div class="goe-lesson-tools">${button(`${icon('volume-2')} ${state.speaking?'Слушаем…':'Повторить'}`,'speak','goe-secondary',state.paused?'disabled':'')}${button(`${icon('lightbulb')} Подсказка`,'hint','goe-secondary',`aria-pressed="${state.hint}"`)}</div>${response}<div class="goe-lesson-footer">${button(`${icon(state.paused?'play':'pause')} ${state.paused?'Продолжить':'Пауза'}`,'pause','goe-secondary')}${button(`${icon('headphones')} ${state.compact?'Обычный вид':'Крупнее'}`,'compact','goe-secondary',`aria-pressed="${state.compact}"`)}</div><p class="goe-demo-note">Запись до 20 секунд. Голос обрабатывается на сервере МСВ и не сохраняется. Распознавание не оценивает произношение.</p></main></div>`;
   }
   function success(){return `${header()}<main class="goe-success"><div class="goe-success-art">${mascot('success','none')}<div class="goe-celebration-bits" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div></div><h1>Здорово, ${esc(state.name)}!</h1><p>Ещё один разговор на английском.<br>Ты потренировал знакомые фразы.</p><div class="goe-success-rewards"><div class="goe-reward-box">+60 XP за урок</div>${state.lastMissionBonus?'<div class="goe-reward-box">+40 XP за миссию</div>':''}</div>${button(`Мой прогресс ${icon('arrow-right')}`,'progress')}${button('Вернуться к урокам','home','goe-secondary')}<p class="goe-demo-note">Результаты этого примера сохраняются только в макете.</p></main>`;}
   function profile(){return `${header()}<main class="goe-content"><h1>Мой профиль</h1><div class="goe-profile-card"><label class="goe-field">Как тебя называть?<input class="goe-input" id="goe-name" name="name" autocomplete="given-name" maxlength="24" value="${esc(state.name)}"></label><label class="goe-field">Занятий в неделю<select class="goe-input" id="goe-goal">${[3,4,5].map(n=>`<option value="${n}" ${state.goal===n?'selected':''}>${n} ${lessonWord(n)} в неделю</option>`).join('')}</select></label><label class="goe-toggle"><input type="checkbox" id="goe-animation" ${state.animations?'checked':''}><span>Лёгкая анимация GOши</span></label></div>${button('Сохранить настройки','save-profile')}<div class="goe-profile-links">${button(`${icon('sparkles')} Ещё раз познакомиться с GOшей`,'welcome','goe-secondary')}${button(`Мой уровень: ${state.level} ${icon('chevron-right')}`,'level','goe-secondary')}</div></main>${navigation()}`;}
@@ -295,8 +316,8 @@
     audio.onplaying=audio.onended=audio.onerror=audio.onwaiting=null;
     audio.pause();audio.removeAttribute('src');audio.load();
   }
-  function navigate(screen){cancelSpeech();state.screen=screen;state.modal=null;modalOrigin=null;if(screen!=='lesson')state.paused=false;render();}
-  function startLesson(restart=false){cancelSpeech();state.modal=null;modalOrigin=null;state.screen='lesson';if(restart||state.lessonIndex>=lessonData[state.topic].length||state.lessonFinished)state.lessonIndex=0;state.lessonFinished=false;state.answerOpen=false;state.feedback=null;state.translation=false;state.hint=false;state.paused=false;render();}
+  function navigate(screen){voice.cancel();cancelSpeech();state.screen=screen;state.modal=null;modalOrigin=null;if(screen!=='lesson')state.paused=false;render();}
+  function startLesson(restart=false){voice.cancel();state.transcript='';cancelSpeech();state.modal=null;modalOrigin=null;state.screen='lesson';if(restart||state.lessonIndex>=lessonData[state.topic].length||state.lessonFinished)state.lessonIndex=0;state.lessonFinished=false;state.answerOpen=false;state.feedback=null;state.translation=false;state.hint=false;state.paused=false;render();}
   function openModal(value,trigger){cancelSpeech();modalOrigin=trigger?{...trigger.dataset}:null;state.modal=value;render();}
   function closeModal(){cancelSpeech();const origin=modalOrigin;modalOrigin=null;state.modal=null;render({focusDataset:origin});}
   function speak(text,showState=false){
@@ -320,6 +341,9 @@
     if(event.target.dataset.backdrop){closeModal();return;}
     const b=event.target.closest('button[data-action]');if(!b||!root.contains(b)||b.disabled||b.closest('[inert]'))return;
     const a=b.dataset.action;
+    if(a==='voice-record')return;
+    voicePointer=voiceKey=null;voice.cancel();
+    if(a==='voice-retry'){cancelSpeech();state.transcript='';state.feedback=null;state.answerOpen=false;render({focusAction:'voice-record'});return;}
     if(a==='replay-welcome'){render({replayWelcome:true});announce('Привет, '+state.name+'! Меня зовут GOша.');return;}
     if(['welcome','about','goals','home','progress','league','profile'].includes(a)){navigate(a);return;}
     if(a==='lesson'){startLesson();return;}
@@ -338,17 +362,32 @@
     if(a==='translate'){state.translation=!state.translation;render();return;}
     if(a==='hint'){state.hint=!state.hint;render();return;}
     if(a==='speak'){speak(lessonData[state.topic][state.lessonIndex].prompt,true);return;}
-    if(a==='answer'||a==='retry-answer'){cancelSpeech();state.answerOpen=true;state.feedback=null;render({focusAction:'answer-good'});announce(a==='retry-answer'?'Попробуй ещё раз. Выбери фразу.':'Выбери пример ответа');return;}
+    if(a==='answer'||a==='retry-answer'){state.transcript='';cancelSpeech();state.answerOpen=true;state.feedback=null;render({focusAction:'answer-good'});announce(a==='retry-answer'?'Попробуй ещё раз. Выбери фразу.':'Выбери пример ответа');return;}
     if(a==='cancel-answer'){state.answerOpen=false;render({focusAction:'answer'});return;}
     if(a==='answer-good'||a==='answer-retry'){cancelSpeech();state.answerOpen=false;state.feedback=a==='answer-good'?'good':'retry';render({focusAction:state.feedback==='good'?'next':'retry-answer'});announce(state.feedback==='good'?'Получилось!':'GOша объясняет фразу');return;}
     if(a==='pause'){cancelSpeech();state.paused=!state.paused;render();return;}
     if(a==='compact'){state.compact=!state.compact;render();return;}
-    if(a==='next'){if(state.screen!=='lesson'||state.lessonFinished||!state.feedback)return;cancelSpeech();if(state.lessonIndex>=lessonData[state.topic].length-1){state.lessonFinished=true;state.completed=true;state.sessionCount++;state.lastMissionBonus=state.missionAwarded?0:40;state.missionAwarded=true;state.xpValue+=60+state.lastMissionBonus;state.history.unshift({topic:state.topic,reward:60+state.lastMissionBonus});state.screen='success';}else{state.lessonIndex++;}state.answerOpen=false;state.feedback=null;state.translation=false;state.hint=false;render({focusAction:state.screen==='lesson'?'answer':'progress'});return;}
+    if(a==='next'){if(state.screen!=='lesson'||state.lessonFinished||!state.feedback)return;state.transcript='';cancelSpeech();if(state.lessonIndex>=lessonData[state.topic].length-1){state.lessonFinished=true;state.completed=true;state.sessionCount++;state.lastMissionBonus=state.missionAwarded?0:40;state.missionAwarded=true;state.xpValue+=60+state.lastMissionBonus;state.history.unshift({topic:state.topic,reward:60+state.lastMissionBonus});state.screen='success';}else{state.lessonIndex++;}state.answerOpen=false;state.feedback=null;state.translation=false;state.hint=false;render({focusAction:state.screen==='lesson'?'answer':'progress'});return;}
     if(a==='quiz-start'){state.quizIndex=0;state.quizChoice=null;state.quizFeedback=false;state.quizScore=0;state.quizDone=false;navigate('quiz');return;}
     if(a==='quiz-choice'){state.quizChoice=Number(b.dataset.choice);render();return;}
     if(a==='quiz-check'){if(state.quizChoice===null)return;state.quizFeedback=true;if(state.quizChoice===quizzes[state.quizIndex].answer)state.quizScore++;render();return;}
     if(a==='quiz-next'){if(state.quizIndex===quizzes.length-1)state.quizDone=true;else state.quizIndex++;state.quizChoice=null;state.quizFeedback=false;render();return;}
   });
+  root.addEventListener('pointerdown',event=>{
+    const b=event.target.closest('[data-action="voice-record"]');
+    if(!b||b.disabled||event.button!==0||voicePointer!==null||voiceKey!==null)return;
+    event.preventDefault();voicePointer=event.pointerId;b.focus();cancelSpeech();voice.begin();
+  });
+  document.addEventListener('pointerup',event=>{if(event.pointerId===voicePointer){voicePointer=null;voice.finish();}});
+  document.addEventListener('pointercancel',event=>{if(event.pointerId===voicePointer){voicePointer=null;voice.cancel('Запись отменена. Удерживайте GO, чтобы повторить.');}});
+  root.addEventListener('contextmenu',event=>{if(event.target.closest('[data-action="voice-record"]'))event.preventDefault();});
+  root.addEventListener('keydown',event=>{
+    if(![' ','Enter'].includes(event.key)||!event.target.closest('[data-action="voice-record"]'))return;
+    event.preventDefault();if(event.repeat||voiceKey!==null||voicePointer!==null)return;
+    voiceKey=event.key;cancelSpeech();voice.begin();
+  });
+  document.addEventListener('keyup',event=>{if(event.key===voiceKey){event.preventDefault();voiceKey=null;voice.finish();}});
+  addEventListener('blur',()=>{if(voice.phase==='recording'||voice.phase==='permission'){voicePointer=voiceKey=null;voice.cancel();}});
   function buttonMotion(event,mode){
     if(!canAnimate()||!motionContext)return;
     const b=event.target.closest('.goe-primary,.goe-secondary');
@@ -377,12 +416,12 @@
     if(event.key==='Tab'&&state.modal){const dialog=root.querySelector('[role="dialog"]');const items=Array.from(dialog.querySelectorAll('button:not([disabled]),input,select'));const first=items[0],last=items[items.length-1];if(event.shiftKey&&document.activeElement===first){last.focus();event.preventDefault();}else if(!event.shiftKey&&document.activeElement===last){first.focus();event.preventDefault();}}
   });
   addEventListener('pagehide',()=>{
-    root.hidden=true; cancelSpeech(); clearTimeout(toastTimer); clearTimeout(modalFocusTimer);
+    root.hidden=true;voicePointer=voiceKey=null;voice.cancel(); cancelSpeech(); clearTimeout(toastTimer); clearTimeout(modalFocusTimer);
     if(motionContext)motionContext.revert();
   });
   addEventListener('pageshow',event=>{if(event.persisted)location.reload();});
   document.addEventListener('visibilitychange',async()=>{
-    if(document.hidden){const wasSpeaking=state.speaking;cancelSpeech();if(wasSpeaking)render({skipMotion:true});root.hidden=true;return;}
+    if(document.hidden){voicePointer=voiceKey=null;voice.cancel();const wasSpeaking=state.speaking;cancelSpeech();if(wasSpeaking)render({skipMotion:true});root.hidden=true;return;}
     try{const current=await session();if(!current)return;if(current.id!==me.id||current.role!==me.role){location.reload();return;}root.hidden=false;}
     catch{root.hidden=false;unavailable();}
   });

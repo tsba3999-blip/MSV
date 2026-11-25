@@ -22,3 +22,12 @@ Project: https://github.com/lucide-icons/lucide
 
 Goша atlas: the same approved generated illustration used by this chat's
 prototype; exported without redrawing or changing its six poses.
+
+English speech input: faster-whisper1.2.1 (MIT), running locally on the MSV VPS.
+https://github.com/SYSTRAN/faster-whisper
+Model: Systran/faster-whisper-base.en, MIT, fixed revision and checksums
+in server/speech/model-manifest.json. https://huggingface.co/Systran/faster-whisper-base.en
+CTranslate2 provides CPU int8 inference; PyAV decodes browser audio.
+These dependencies and the model stay on the server and are not browser assets.
+No learner recording is sent to a model provider. Installed package licenses
+remain in the isolated server environment; see server/speech/README.txt.

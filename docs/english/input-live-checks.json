@@ -1,0 +1,106 @@
+{
+  "checks": [
+    {
+      "role": "admin",
+      "path": "/english",
+      "status": 200
+    },
+    {
+      "role": "admin",
+      "path": "/english/",
+      "status": 200
+    },
+    {
+      "role": "admin",
+      "path": "/english/index.html",
+      "status": 200
+    },
+    {
+      "role": "admin",
+      "path": "/api/english/transcribe",
+      "status": 200,
+      "recognized": true
+    },
+    {
+      "role": "admin",
+      "path": "/api/english/transcribe/",
+      "status": 200,
+      "recognized": true
+    },
+    {
+      "role": "moderator",
+      "path": "/english",
+      "status": 200
+    },
+    {
+      "role": "moderator",
+      "path": "/english/",
+      "status": 200
+    },
+    {
+      "role": "moderator",
+      "path": "/english/index.html",
+      "status": 200
+    },
+    {
+      "role": "moderator",
+      "path": "/api/english/transcribe",
+      "status": 200,
+      "recognized": true
+    },
+    {
+      "role": "staff",
+      "path": "/english",
+      "status": 200
+    },
+    {
+      "role": "staff",
+      "path": "/english/",
+      "status": 200
+    },
+    {
+      "role": "staff",
+      "path": "/english/index.html",
+      "status": 200
+    },
+    {
+      "role": "staff",
+      "path": "/api/english/transcribe",
+      "status": 200,
+      "recognized": true
+    },
+    {
+      "role": "resident",
+      "path": "/english",
+      "status": 200
+    },
+    {
+      "role": "resident",
+      "path": "/english/",
+      "status": 200
+    },
+    {
+      "role": "resident",
+      "path": "/english/index.html",
+      "status": 200
+    },
+    {
+      "role": "resident",
+      "path": "/api/english/transcribe",
+      "status": 200,
+      "recognized": true
+    }
+  ],
+  "matching_resources": [
+    "web/english/src/capture.js",
+    "web/english/src/styles.css",
+    "web/english/src/app.js",
+    "web/english/build.py",
+    "web/english/EDITING.txt",
+    "web/english/THIRD-PARTY-NOTICES.txt"
+  ],
+  "success": true,
+  "guestRedirects": 3,
+  "guestAudioDenied": true,
+  "otherPageMicrophoneDenied": true
+}
